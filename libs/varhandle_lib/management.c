@@ -10,6 +10,22 @@ void initVariable(struct variables *anker)
     anker = malloc(sizeof(struct variables));
 }
 
+struct variables *searchVar(struct variables *anker, char *name)
+{
+    struct variables *hptr;
+
+    hptr = anker;
+    while(hptr != NULL)
+    {
+        if(strcmp(hptr->name, name))
+            break;
+        hptr = hptr->next;
+    }
+
+    return(hptr);
+
+}
+
 int getArrayLength(struct variables *anker, char *name, int *x, int *y)
 {
     struct variables *ptr;

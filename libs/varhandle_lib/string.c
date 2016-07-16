@@ -4,25 +4,20 @@
 
 #include "standard.h"
 #include "varhandle.h"
+#include "management.h"
 
 char* getStringValue(struct variables *anker, char *name)
 {
     struct variables *ptr;
     char *hptr;
 
-    ptr = anker;
-    while(ptr != NULL)
+    if((ptr = searchVar(anker, name)) == NULL)
     {
-        if(cmp(ptr->name, name))
-        {
-            return((char*)ptr->data);
-        }
-        ptr = ptr->next;
+        hptr = malloc(sizeof(""));
+        strcpy(hptr, "");
+        return(hptr);
     }
-
-    hptr = malloc(sizeof(""));
-    strcpy(hptr, "");
-    return(hptr);
+    return((char*)ptr->data);
 }
 
 void newStringVar(struct variables *anker, char *name, char *value)
@@ -103,15 +98,7 @@ void appendStringArray(struct variables *anker, char *name, char *value)
     struct variables *ptr;
     int length;
 
-    ptr = anker;
-    while(ptr != NULL)
-    {
-        if(cmp(ptr->name, name))
-            break;
-        ptr = ptr->next;
-    }
-
-    if(ptr == NULL)
+    if((ptr = searchVar(anker, name)) == NULL)
     {
         return;
     }
@@ -131,19 +118,10 @@ char *getStringValuefromArray(struct variables *anker, char *name, int index)
     char *bla = malloc(sizeof(""));
     strcpy(bla, "");
 
-    ptr = anker;
-
-    while(ptr != NULL)
-    {
-        if(cmp(ptr->name, name))
-            break;
-        ptr = ptr->next;
-    }
-
-    if(ptr == NULL)
+    if((ptr = searchVar(anker, name)) == NULL)
     {
         return(bla);
-    } 
+    }
 
     if(index >= ptr->length)
     {
@@ -160,19 +138,10 @@ char *getStringValuefrom2DArray(struct variables *anker, char *name, int x,
     char *bla = malloc(sizeof(""));
     strcpy(bla, "");
 
-    ptr = anker;
-
-    while(ptr != NULL)
-    {
-        if(cmp(ptr->name, name))
-            break;
-        ptr = ptr->next;
-    }
-
-    if(ptr == NULL)
+    if((ptr = searchVar(anker, name)) == NULL)
     {
         return(bla);
-    }
+    } 
 
     if(x >= ptr->x_length || y >= ptr->y_length)
         return(bla);
@@ -183,16 +152,8 @@ char *getStringValuefrom2DArray(struct variables *anker, char *name, int x,
 int editStringVarArray(struct variables *anker, char *name, char *value, int x)
 {
     struct variables *ptr;
-    ptr = anker;
 
-    while(ptr != NULL)
-    {
-        if(cmp(ptr->name, name))
-            break;
-        ptr = ptr->next;
-    }
-
-    if(ptr == NULL)
+    if((ptr = searchVar(anker, name)) == NULL)
     {
         return(-1);
     }
@@ -211,16 +172,8 @@ int editStringVar2DArray(struct variables *anker, char *name, char *value,
                          int x, int y)
 {
     struct variables *ptr;
-    ptr = anker;
 
-    while(ptr != NULL)
-    {
-        if(cmp(ptr->name, name))
-            break;
-        ptr = ptr->next;
-    }
-
-    if(ptr == NULL)
+    if((ptr = searchVar(anker, name)) == NULL)
     {
         return(-1);
     }
@@ -236,16 +189,10 @@ int editStringVar(struct variables *anker, char *name, char *value)
 {
     struct variables *ptr;
 
-    ptr = anker;
-    while(ptr != NULL)
+    if((ptr = searchVar(anker, name)) == NULL)
     {
-        if(cmp(ptr->name, name))
-            break;
-        ptr = ptr->next;
-    }
-
-    if(ptr == NULL)
         return(-1);
+    }
 
    if(ptr->type != STRING)
        //Wrong Var Type

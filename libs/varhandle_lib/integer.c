@@ -4,42 +4,29 @@
 
 #include "standard.h"
 #include "varhandle.h"
+#include "management.h"
 
 int getIntValue(struct variables *anker, char *name)
 {
     struct variables *ptr;
 
-    ptr = anker;
-    while(ptr != NULL)
-    {
-        if(cmp(ptr->name, name))
-        {
-            return(*(int*)ptr->data);
-        }
-        ptr = ptr->next;
+    if((ptr = searchVar(anker, name)) == NULL)
+    { 
+        return(-1);
     }
-    return(NULL);
+
+    return(*(int*)ptr->data);
 }
 
 int getIntValuefromArray(struct variables *anker, char *name, int index)
 {
     struct variables *ptr;
-    char *bla = malloc(sizeof(""));
-    strcpy(bla, "");
-
     ptr = anker;
 
-    while(ptr != NULL)
-    {
-        if(cmp(ptr->name, name))
-            break;
-        ptr = ptr->next;
-    }
-
-    if(ptr == NULL)
+    if((ptr = searchVar(anker, name)) == NULL)
     {
         return(-1);
-    } 
+    }
 
     if(index >= ptr->length)
     {
@@ -54,16 +41,7 @@ int getIntValuefrom2DArray(struct variables *anker, char *name, int x,
 {
     struct variables *ptr;
 
-    ptr = anker;
-
-    while(ptr != NULL)
-    {
-        if(cmp(ptr->name, name))
-            break;
-        ptr = ptr->next;
-    }
-
-    if(ptr == NULL)
+    if((ptr = searchVar(anker, name)) == NULL)
     {
         return(-1);
     }
@@ -152,20 +130,11 @@ void appendIntArray(struct variables *anker, char *name, int value)
     struct variables *ptr;
     int length;
 
-    ptr = anker;
-    while(ptr != NULL)
-    {
-        if(cmp(ptr->name, name))
-        {
-            break;
-        }
-        ptr = ptr->next;
-    }
-
-    if(ptr == NULL)
+    if((ptr = searchVar(anker, name)) == NULL)
     {
         return;
     }
+
     ptr->length++;
     length = ptr->length;
 
@@ -179,16 +148,10 @@ int editIntVar(struct variables *anker, char *name, int value)
 {
     struct variables *ptr;
 
-    ptr = anker;
-    while(ptr != NULL)
+    if((ptr = searchVar(anker, name)) == NULL)
     {
-        if(cmp(ptr->name, name))
-            break;
-        ptr = ptr->next;
-    }
-
-    if(ptr == NULL)
         return(-1);
+    }
 
    if(ptr->type != INT)
        //Wrong Var Type
@@ -204,16 +167,10 @@ int editIntVarArray(struct variables *anker, char *name, int value, int x)
 {
     struct variables *ptr;
 
-    ptr = anker;
-    while(ptr != NULL)
+    if((ptr = searchVar(anker, name)) == NULL)
     {
-        if(cmp(ptr->name, name))
-            break;
-        ptr = ptr->next;
-    }
-
-    if(ptr == NULL)
         return(-1);
+    }
 
     if(x >= ptr->length)
     {
@@ -230,16 +187,10 @@ int editIntVar2DArray(struct variables *anker, char *name, int value, int x,
 {
     struct variables *ptr;
 
-    ptr = anker;
-    while(ptr != NULL)
+    if((ptr = searchVar(anker, name)) == NULL)
     {
-        if(cmp(ptr->name, name))
-            break;
-        ptr = ptr->next;
-    }
-
-    if(ptr == NULL)
         return(-1);
+    }
 
     if(ptr->type != TWO_DINTARRAY)
         return(-1);
