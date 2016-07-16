@@ -1,0 +1,5 @@
+#define UNAUTHORIZED "401"
+#define FORBIDDEN "403"
+#define NOT_FOUND "404"
+#define NOT_ALLOWED "405"
+#define SERVER_ERROR "500"

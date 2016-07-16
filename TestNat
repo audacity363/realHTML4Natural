@@ -1,0 +1,8 @@
+##[gap50@vrs1]/develop_global/sys_6.1/64/cnatural/general_v2.0.7>echo $NATUSER
+##/VAW/natural/sharedlibs/v63110/general_v2.0.7.so:/VAW/natural/sharedlibs/v63110/waage_v2.0.1.so
+##[gap50@vrs1]/develop_global/sys_6.1/64/cnatural/general_v2.0.7>
+
+export NATUSER=./general_v2.0.8.so:/VAW/natural/sharedlibs/v63110/waage_v2.0.1.so
+echo $NATUSER
+sleep 1
+nat
