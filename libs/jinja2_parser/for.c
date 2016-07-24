@@ -3,7 +3,7 @@
 #include <string.h>
 
 #include "include/standard.h"
-#include "parser.h"
+#include "jinja2_parser.h"
 #include "utils.h"
 
 struct for_infos {

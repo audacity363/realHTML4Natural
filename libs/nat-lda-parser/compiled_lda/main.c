@@ -3,8 +3,8 @@
 #include <string.h>
 #include <errno.h>
 
-#include "../include/standard.h"
-#include "parser.h"
+#include "standard.h"
+#include "lda_parser.h"
 
 #define SAG_NATONE "/*"
 #define SAG_UNIX   "**"
@@ -170,7 +170,7 @@ int initAnker(struct varnames **anker)
     return(0);
 }
 
-struct varnames* getVarNames(char *ldaname)
+struct varnames* getVarNames(char *ldaname, char *error_str)
 {
     char linebuf[1024];
     FILE *ldafile;
@@ -196,13 +196,12 @@ struct varnames* getVarNames(char *ldaname)
 
     if((ldafile = fopen(ldaname, "r")) == NULL)
     {
-        fprintf(stderr, "%s\n", strerror(errno));
+        sprintf(error_str, "Error reading LDA [%s]: [%s]\n", ldaname,
+            strerror(errno));
         return(NULL);
     }
 
     fgets(linebuf, sizeof(linebuf), ldafile);
-
-    printf("[%2s]\n", linebuf+4);
 
     if(strncmp(linebuf+4, SAG_NATONE, 2) == 0)
     {
@@ -214,9 +213,9 @@ struct varnames* getVarNames(char *ldaname)
     }
     else
     {
-        printf("Unkown LDA Type\n");
+        sprintf(error_str, "Error parsing LDA [%s]: Unkown LDA Type", ldaname);
         fclose(ldafile);
-        exit(1);
+        return(NULL);
     }
 
     rewind(ldafile);

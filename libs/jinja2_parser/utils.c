@@ -2,10 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "include/standard.h"
-#include "parser.h"
-#include "utils.h"
+#include "standard.h"
 #include "varhandle.h"
+#include "jinja2_parser.h"
+#include "jinja_utils.h"
 
 int hasFunction(char *word)
 {

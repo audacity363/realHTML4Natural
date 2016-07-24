@@ -3,8 +3,8 @@
 #include <string.h>
 #include <errno.h>
 
-#include "../include/standard.h"
-#include "parser.h"
+#include "standard.h"
+#include "lda_parser.h"
 
 #define SAG_COMMENT_STR          "**C  "
 #define SAG_DEFINE_STR           "**DF "

@@ -1,4 +1,5 @@
-HOMEDIR = /u/it/a140734/C/sharedlib_jinja2
+#HOMEDIR = /u/it/a140734/C/sharedlib_jinja2
+HOMEDIR = /home/tom/Documents/realHtml4Natural
 
 STANDARD_PATH    	=   $(HOMEDIR)/include
 
@@ -23,6 +24,9 @@ INCDIR   =  -I$(STANDARD_PATH)  \
             -I$(NATVAR_PATH)    \
             -I$(UTILS_PATH)
 
+LIBS     =  -L$(VAR_PATH) -lvarhandle \
+			-L$(UTILS_PATH) -lutils
+
 CC = gcc
 
 all:
@@ -34,8 +38,8 @@ all:
 	ar -vcru libjinjaparser.a ./bin/*.o
 
 testprog:
-	xlc  -o ./test/main ./test/main.c $(INCLUDES) $(LIBS) -I./ -L./ -ljinjaparser
+	gcc  -o ./test/main ./test/main.c $(INCDIR) -I./ -L./ -ljinjaparser $(LIBS)
 
 clean:
-	-rm ./bin/*.o
-	-rm ./*.a
+	-rm -f ./bin/*.o
+	-rm -f ./*.a

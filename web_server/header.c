@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "standard.h"
 #include "header.h"
 #include "utils.h"
-#include "include/standard.h"
 
 void printheader(char **parsedheader, int size)
 {

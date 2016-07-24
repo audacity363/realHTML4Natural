@@ -1,0 +1,61 @@
+<html>
+    <head>
+        <title>Hello World</title>
+    </head>
+    <body>
+        <h1>DEBUG</h1>
+        <h1>HELLO2:</h1>
+        <p>{{HELLO2}}</p>
+        <hr>
+        <p>{{FILENAME}}</p>
+        <h1>Strings</h1>
+        <h3>Einfacher</h2>
+        {{HELLO1}}
+        <hr>
+        <h3>1D Array</h3>
+        {{TESTARRAY}}
+        <ul>
+        {%for entry in TESTARRAY%}
+            <li>{{ entry }}</li>
+        {%end-for%}
+        <br>
+        </ul>
+        <hr>
+        <h3>2D Array</h3>
+        {{TWODARRAY}}
+        <hr>
+        <h1>Ints</h1>
+        <h4>I1</h4>
+        {{ITEST1}}
+        <h4>I2</h4>
+        {{ITEST2}}
+        <h4>I4</h4>
+        {{ITEST4}}
+        <hr>
+        <h3>1D Arrays</h3>
+        <h4>I1 (1:5)</h4>
+        {{ITEST1ARRAY}}
+        <p>Is 5 in ITEST1ARRAY</p>
+        {%if 5 in ITEST1ARRAY%}
+            <p>Jop</p>
+        {%end-if%}
+        <h4>I2 (1:5)</h4>
+        {{ITEST2ARRAY}}
+        <h4>I4 (1:5)</h4>
+        {{ITEST4ARRAY}}
+        <hr>
+        <h3>2D Arrays</h3>
+        <h4>I1 (1:5,1:5)</h4>
+        {{ITEST12DARRAY}}
+        <ul>
+        </ul>
+        <h4>I2 (1:5,1:5)</h4>
+        {{ITEST22DARRAY}}
+        <h4>I4 (1:5,1:5)</h4>
+        {{ITEST42DARRAY}}
+    </body>
+    <script>
+        var test = {{TESTARRAY}}
+        console.log(test);
+    </script>
+</html>

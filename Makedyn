@@ -92,8 +92,8 @@ LINTFLAGS	=	-x -a -wD -wd -c -n -qsrcmsg
 #-------------------------------------------------------------------------
 
 
-#CC	= cc_r
-CC	= gcc
+CC	= cc_r
+
 CFLAGS  = -qmaxmem=-1 -qcpluscmt -qsource -qlist
 LD	= ld
 LFLAGS1 = -G -bsymbolic -bexpall -bnoentry

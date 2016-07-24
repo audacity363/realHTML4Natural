@@ -5,6 +5,8 @@
 #include "standard.h"
 #include "varhandle.h"
 
+char varhandle_error_str[2048];
+
 void printArrayfromPtr(struct variables *ptr)
 {
     int x;
@@ -119,10 +121,8 @@ char *generateStringValuefromArray(struct variables *anker, char *name)
 
     if(hptr == NULL)
     {
-        printf("Var [%s] not found\n", name);
-        returnstr = malloc(1);
-        returnstr[0] = ' ';
-        return(returnstr);
+        sprintf(varhandle_error_str, "Unkown Variable [%s]", name);
+        return(NULL);
     }
    
     if(hptr->type == STRINGARRAY)
@@ -163,7 +163,7 @@ struct variables* getVarPointer(struct variables *anker, char* name)
     return(NULL);
 }
 
-void print2DArray(struct variables *anker, char *name, bool rt,
+int print2DArray(struct variables *anker, char *name, bool rt,
                     char *returnstring)
 {
     int x, y;
@@ -173,7 +173,8 @@ void print2DArray(struct variables *anker, char *name, bool rt,
     if((ptr = getVarPointer(anker, name)) == NULL)
     {
         fprintf(stderr, "Var not found\n");
-        return;
+        sprintf(varhandle_error_str, "Unkown variable [%s]", name);
+        return(-1);
     }
 
     if(rt == true)
@@ -246,7 +247,7 @@ int getVarType(struct variables *anker, char *name)
         }
         ptr = ptr->next;
     }
-    fprintf(stderr, "Unknown Variable: [%s]\n", name);
+    sprintf(varhandle_error_str, "Unknown Variable: [%s]", name);
     return(-1);
 }
 

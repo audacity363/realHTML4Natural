@@ -3,17 +3,18 @@
 #include <string.h>
 
 #include "standard.h"
-#include "parser.h"
 #include "varhandle.h"
 #include "var2name.h"
+#include "lda_parser.h"
 
 void handleRedefine(struct variables *var_anker, int valueoffset, struct varnames *redefanker)
 {
     void *tmpbuffer;
     struct variables *hptr = var_anker->next; 
-    struct varnames *ptr = redefanker->nextlevel;
+    struct varnames *ptr;
     int i,
         dataoffset = 0;
+    ptr = redefanker->nextlevel;
     
 
     for(i=0; i != valueoffset; i++)
@@ -34,7 +35,7 @@ void handleRedefine(struct variables *var_anker, int valueoffset, struct varname
     }
 }
 
-void var2name(struct variables *var_anker, char *ldaname)
+int var2name(struct variables *var_anker, char *ldaname, char *error_str)
 {
         
     struct variables *var_hptr = var_anker->next;
@@ -42,11 +43,13 @@ void var2name(struct variables *var_anker, char *ldaname)
     int varoffset = 0,
         i = 0;
     bool ingrp = false;
+    char l_error_str[2048];
 
-    names_hptr = getVarNames(ldaname);
-
-    printfork(names_hptr);
-    printVars(var_anker);
+    if((names_hptr = getVarNames(ldaname, l_error_str)) == NULL)
+    {
+        strcpy(error_str, l_error_str);
+        return(-1);
+    }
 
     names_ptr = names_hptr = names_hptr->next->nextlevel;
 
@@ -59,8 +62,8 @@ void var2name(struct variables *var_anker, char *ldaname)
         }
         if(var_hptr == NULL)
         {
-            printf("offset to high\n");
-            return;
+            strcpy(error_str, "Offset to high");
+            return(-1);
         }
 
         if(names_ptr->type == GROUP_LEADER)
@@ -74,11 +77,7 @@ void var2name(struct variables *var_anker, char *ldaname)
             names_ptr = names_ptr->next;
         }
 
-        /*printVar(var_anker, var_hptr->name);*/
-        /*printSingleVar(names_ptr);*/
         strcpy(var_hptr->name, names_ptr->name);
-
-        printf("\n\n");
 
         if(names_ptr->next == NULL && ingrp == true)
         {
@@ -89,7 +88,8 @@ void var2name(struct variables *var_anker, char *ldaname)
 
         names_ptr = names_ptr->next;
         if(names_ptr == NULL)
-            return;
+            return(0);
         varoffset++;
     }
+    return(0);
 }

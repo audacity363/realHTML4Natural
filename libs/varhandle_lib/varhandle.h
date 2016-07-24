@@ -27,6 +27,8 @@ struct args {
         int type;
 };
 
+extern char varhandle_error_str[2048];
+
 
 int getVarType(struct variables *anker, char *name);
 int getArrayLength(struct variables *anker, char *name, int *x, int *y);

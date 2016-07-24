@@ -18,6 +18,7 @@
 #define UNIT_SEPERATOR 0x1F
 
 void signalHandler(int signal);
+extern char *StripTrailingSpaces(char *str);
 int exec_stat = 0;
 
 struct variables *gotoendofAnker(struct variables *anker)
@@ -98,11 +99,12 @@ int getVar(void *parmhandle, int index, struct variables *nat_vars, int *complet
 	dynamic_flag = var_info.flags & IF4_FLG_DYNVAR;
 	protected_flag = var_info.flags & IF4_FLG_PROTECTED;
     x_array_flag = var_info.flags & IF4_FLG_XARRAY;
-
+#ifdef DEBUG
     printf("Format:     [%c]\n", var_info.format);
     printf("Length:     [%d]\n", var_info.length);
     printf("Length All: [%d]\n", var_info.length_all);
     printf("Dimensions: [%d]\n", var_info.dimensions);
+#endif
 
     data = malloc(var_info.length_all);
 
@@ -116,7 +118,7 @@ int getVar(void *parmhandle, int index, struct variables *nat_vars, int *complet
     {
         exec_stat = 450;
         sprintf(namebuff, "var%d", index);
-        data = StripTrailingSpaces(data);
+        //data = StripTrailingSpaces(data);
         newStringVar(nat_vars, namebuff, data);
     }
     else if((var_info.format == 'A' || var_info.format == 'N') && var_info.dimensions == 1)
@@ -125,7 +127,7 @@ int getVar(void *parmhandle, int index, struct variables *nat_vars, int *complet
         tmpdata = malloc(var_info.length);
 
         memcpy(tmpdata, data, var_info.length);
-        tmpdata = StripTrailingSpaces(tmpdata);
+        //tmpdata = StripTrailingSpaces(tmpdata);
 
         sprintf(namebuff, "var%d", index);
 
@@ -133,7 +135,7 @@ int getVar(void *parmhandle, int index, struct variables *nat_vars, int *complet
         for(i=1; i < var_info.occurrences[0]; i++)
         {
             memcpy(tmpdata, data+(i*var_info.length), var_info.length);
-            tmpdata = StripTrailingSpaces(tmpdata);
+            //tmpdata = StripTrailingSpaces(tmpdata);
             appendStringArray(nat_vars, namebuff, tmpdata);
         }
     }
@@ -146,7 +148,7 @@ int getVar(void *parmhandle, int index, struct variables *nat_vars, int *complet
         sprintf(namebuff, "var%d", index);
 
         memcpy(tmpdata, data, var_info.length);
-        tmpdata = StripTrailingSpaces(tmpdata);
+        //tmpdata = StripTrailingSpaces(tmpdata);
 
         new2DStringArray(nat_vars, namebuff, var_info.occurrences[0], var_info.occurrences[1]);
         for(i=0; i < var_info.occurrences[0]; i++)
@@ -156,7 +158,7 @@ int getVar(void *parmhandle, int index, struct variables *nat_vars, int *complet
                 offset = ((var_info.occurrences[1]*var_info.length)*i)+(var_info.length*x);
                 printf("Offset [%d]Bytes\n", offset);
                 memcpy(tmpdata, data+offset, var_info.length);
-                tmpdata = StripTrailingSpaces(tmpdata);
+                //tmpdata = StripTrailingSpaces(tmpdata);
                 editStringVar2DArray(nat_vars, namebuff, tmpdata, i, x);
             }
         }
@@ -216,11 +218,13 @@ long print_all_vars(WORD nparm, void *parmhandle, void *traditional)
     FILE *logfile;
     int old_stdout;
 
-    char ldaname[20];
-    char templatename[20];
+    char ldaname[22];
+    char templatename[22];
+    char deliver_filename[100];
+    char *settingsstr;
 
     int complete_size = 0;
-    struct parameter_description lda, template;
+    struct parameter_description lda, template, settings, deliver_file;
 
     logfile = fopen("/tmp/gen_page.log", "w");
 
@@ -300,10 +304,65 @@ long print_all_vars(WORD nparm, void *parmhandle, void *traditional)
             return((long)13);
     }
 
-    printf("LDA: [%s]\n", ldaname);
-    printf("Template: [%s]\n", templatename);
+    /*Read deliver File name*/
+    switch(ncxr_get_parm_info(2, parmhandle, &deliver_file))
+    {
+        case -1:
+            return((long)14);
+        case -2:
+            return((long)15);
+        case -7:
+            return((long)16);
+    }
 
-    for(i=2; i < nparm; i++)
+    if(deliver_file.format != 'A' || deliver_file.length_all != 100 || deliver_file.dimensions != 0)
+    {
+        return((long)17);
+    }
+
+    switch(ncxr_get_parm(2, parmhandle, 100, deliver_filename))
+    {
+        case -1:
+            return((long)18);
+        case -2:
+            return((long)19);
+        case -3:
+            return((long)20);
+    }
+    /*Read settings str*/
+    switch(ncxr_get_parm_info(3, parmhandle, &settings))
+    {
+        case -1:
+            return((long)14);
+        case -2:
+            return((long)15);
+        case -7:
+            return((long)16);
+    }
+
+    if(settings.format != 'A' || settings.dimensions != 0)
+    {
+        return((long)17);
+    }
+
+    settingsstr = malloc(settings.length_all);
+
+    switch(ncxr_get_parm(3, parmhandle, settings.length_all, settingsstr))
+    {
+        case -1:
+            return((long)18);
+        case -2:
+            return((long)19);
+        case -3:
+            return((long)20);
+    }
+
+    printf("LDA: [%s]\n", ldaname);
+    printf("Template: [%s]\n", StripTrailingSpaces(templatename));
+    printf("DeliverFile: [%s]\n", deliver_filename);
+    printf("Settingstr: [%s]\n", settingsstr);
+
+    for(i=4; i < nparm; i++)
     {
         printf("I: [%d]\n", i);
         exec_stat = 4 + i;
@@ -322,7 +381,7 @@ long print_all_vars(WORD nparm, void *parmhandle, void *traditional)
 
     //SendVarsToSocket(fp, nat_vars, complete_size);
     printf("Call generate_page\n");
-    generate_page(nat_vars, "", "");
+    generate_page(nat_vars, ldaname, templatename, deliver_filename);
     printf("generate_page finished\n");
 
     dup2(old_stdout, 1);

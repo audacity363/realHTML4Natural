@@ -50,6 +50,6 @@ struct status_p {
 void natone_parser(struct varnames *anker, struct status_p *status, char *line);
 void unix_parser(struct varnames *anker, struct status_p *status, char *line);
 
-struct varnames* getVarNames(char *ldaname);
+struct varnames* getVarNames(char *ldaname, char *error_str);
 void printfork(struct varnames *ptr);
 void printSingleVar(struct varnames *ptr);

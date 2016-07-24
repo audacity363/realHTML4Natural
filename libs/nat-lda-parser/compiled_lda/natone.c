@@ -4,7 +4,7 @@
 #include <errno.h>
 
 #include "standard.h"
-#include "parser.h"
+#include "lda_parser.h"
 
 #define SAG_COMMENT_STR            "/*C  "
 #define SAG_DEFINE_STR             "/*DF "

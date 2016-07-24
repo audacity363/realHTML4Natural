@@ -2,12 +2,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "include/standard.h"
-#include "parser.h"
-#include "utils.h"
+#include "standard.h"
+#include "varhandle.h"
+#include "jinja2_parser.h"
+#include "jinja_utils.h"
 #include "if.h"
 //#include "for.h"
-#include "varhandle.h"
+//
 
 int getIndex(char *word)
 {
@@ -27,7 +28,7 @@ int getIndex(char *word)
         }
         if(found_open == false && word[i] == ']')
         {
-            fprintf(stderr, "Syntax Error\n");
+            strcpy(error_str, "Syntax Error");
             return(-1);
         }
         if(found_open == true && word[i] == ']')
@@ -45,7 +46,10 @@ int getIndex(char *word)
 
     index[x] = '\0';
     if(glob_found == false)
+    {
+        strcpy(error_str, "Syntax Error");
         return(-1);
+    }
     return(atoi(index));
 }
 
@@ -72,7 +76,7 @@ int getIndex2D(char *word, int *x, int *y)
         }
         if(found_open == false && word[i] == ']')
         {
-            fprintf(stderr, "Syntax Error\n");
+            strcpy(error_str, "Syntax Error");
             return(-1);
         }
         if(found_open == true && word[i] == ']')
@@ -90,7 +94,10 @@ int getIndex2D(char *word, int *x, int *y)
     }
 
     if(glob_found == false || strlen(x_str) == 0)
+    {
+        strcpy(error_str, "Syntax Error");
         return(-2);
+    }
 
     x_str[index] = '\0';
     *x = atoi(x_str);
@@ -122,14 +129,18 @@ int getIndex2D(char *word, int *x, int *y)
     return(0);
 }
 
-void handleArray(struct variables *anker, parser_info *status,
+int handleArray(struct variables *anker, parser_info *status,
                     bool function, char *functionname)
 {
     struct args arguments;
     int x_length, y_length;
     int type;
 
-    type = getVarType(anker, status->statement);
+    if((type = getVarType(anker, status->statement)) < 0)
+    {
+        strcpy(error_str, varhandle_error_str);
+        return(-1);
+    }
     switch(type)
     {
         case TWO_DSTRINGARRAY:
@@ -140,6 +151,9 @@ void handleArray(struct variables *anker, parser_info *status,
                                     status->statement, &x_length, &y_length))
             {
                 fprintf(stderr, "Out of range\n");
+                sprintf(error_str, "[%s] [%d] Out of Range", status->statement,
+                        status->index);
+                return(-1);
             }
 
             arguments.type = STRING;
@@ -157,6 +171,7 @@ void handleArray(struct variables *anker, parser_info *status,
     }
 
     status->index = -1;
+    return(0);
 }
 
 void getAttributes(char *word, char *attr)
@@ -215,6 +230,9 @@ int local_jinja_parser(parser_info *status, struct variables *anker, char *line,
 
             switch((type = getVarType(anker, status->statement)))
             {
+                case -1:
+                    strcpy(error_str, varhandle_error_str);
+                    return(-1);
                 case STRING:
                     arguments.cargs = malloc(strlen(status->statement));
                     strcpy(arguments.cargs, status->statement);
@@ -246,7 +264,8 @@ int local_jinja_parser(parser_info *status, struct variables *anker, char *line,
                     }
                     else if(status->index > -1)
                     {
-                        handleArray(anker, status, function, functionname);
+                        if(handleArray(anker, status, function, functionname) < 0)
+                            return(-1);
                         break;
                     }
                     else
@@ -276,11 +295,12 @@ int local_jinja_parser(parser_info *status, struct variables *anker, char *line,
                     }
                     else
                     {
-                        fprintf(stderr, "Syntax Error\n");
+                        return(-1);
                     }
                     if(status->index > -1)
                     {
-                        handleArray(anker, status, function, functionname);
+                        if(handleArray(anker, status, function, functionname) < 0)
+                            return(-1);
                     }
                     print2DArray(anker, status->statement, false, NULL);
                     break;
@@ -292,7 +312,8 @@ int local_jinja_parser(parser_info *status, struct variables *anker, char *line,
                             if(getIntValuefrom2DArray(anker, status->statement,
                                         x_index, y_index, &intvalue) < 0)
                             {
-                                fprintf(stderr, "Error getting Int Value\n");
+                                sprintf(error_str, "Unkown Variable %s",
+                                    status->statement);
                                 break;
                             }
                             printf("%d", intvalue);
@@ -304,10 +325,14 @@ int local_jinja_parser(parser_info *status, struct variables *anker, char *line,
 //                        free(tmparray);
                         break;
                     }
+                    else
+                    {
+                        return(-1);
+                    }
                     print2DArray(anker, status->statement, false, NULL);
                     break;
                 deafult:
-                    fprintf(stderr, "Type Error: Kenn ich nicht\n");
+                    strcpy(error_str, "TypeError: Unkown Variable type");
                     return(-1);
             }
             status->found_var_open = false;
@@ -371,7 +396,7 @@ int local_jinja_parser(parser_info *status, struct variables *anker, char *line,
             }
             else
             {
-                fprintf(stderr, "Unkown Command\n!!EXIT!!\n");
+                sprintf(error_str, "Unknown Command [%s]", status->statement);
                 return(-1);
             }
         }
@@ -398,4 +423,5 @@ int local_jinja_parser(parser_info *status, struct variables *anker, char *line,
         strcat(status->forbuffer, line);
     }
     bzero(status->statement, sizeof(status->statement));
+    return(0);
 }

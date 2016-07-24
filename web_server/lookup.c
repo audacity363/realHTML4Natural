@@ -19,43 +19,43 @@ path_struct getConfig(char *requestpath, char *filepath, char **error_str)
 
     settings.found = 1;
 
-    if(GetCfgToken(PROGRAMM, error_str, '') == NULL)
+    if(GetCfgToken(PROGRAMM, error_str, 0) == NULL)
     {
         settings.found_programm = 0;
     }
     else
     {
-        strcpy(settings.programm, GetCfgToken(PROGRAMM, error_str, ''));
+        strcpy(settings.programm, GetCfgToken(PROGRAMM, error_str, 0));
         settings.found_programm = 1;
     }
 
-    if(GetCfgToken(ALIAS, error_str, '') == NULL)
+    if(GetCfgToken(ALIAS, error_str, 0) == NULL)
     {
         settings.found_alias = 0;
     }
     else
     {
-        strcpy(settings.alias, GetCfgToken(ALIAS, error_str, ''));
+        strcpy(settings.alias, GetCfgToken(ALIAS, error_str, 0));
         settings.found_alias = 1;
     }
 
-    if(GetCfgToken(RETURN, error_str, '') == NULL)
+    if(GetCfgToken(RETURN, error_str, 0) == NULL)
     {
         settings.found_returncode = 0;
     }
     else
     {
-        strcpy(settings.returncode, GetCfgToken(RETURN, error_str, ''));
+        strcpy(settings.returncode, GetCfgToken(RETURN, error_str, 0));
         settings.found_returncode = 1;
     }
-    if(GetCfgToken(DEBUG, error_str, '') == NULL)
+    if(GetCfgToken(DEBUG, error_str, 0) == NULL)
     {
         settings.debug = 0;
         settings.found_debug = 0;
     }
     else
     {
-        strcpy(debug_buff, GetCfgToken(DEBUG, error_str, ''));
+        strcpy(debug_buff, GetCfgToken(DEBUG, error_str, 0));
         if(strcmp("yes", debug_buff) == 0)
         {
             settings.debug = 1;

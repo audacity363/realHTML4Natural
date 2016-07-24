@@ -23,7 +23,7 @@ INCDIR   =  -I$(STANDARD_PATH)  \
             -I$(NATVAR_PATH)    \
             -I$(UTILS_PATH)
 
-CC = gcc
+CC = xlc
 
 all:
 	$(CC) -c -o ./bin/lookup.o lookup.c $(INCDIR)

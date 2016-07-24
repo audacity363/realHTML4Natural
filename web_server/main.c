@@ -5,7 +5,7 @@
 
 #include "sockets.h"
 #include "hexdump.h"
-#include "include/standard.h"
+#include "standard.h"
 #include "header.h"
 #include "lookup.h"
 #include "httpcodes.h"
@@ -19,7 +19,7 @@
 
 int serverhandle;
 void signalhandler(int);
-extern void call_nat_handler(char *programm);
+extern void call_nat_handler(char *programm, char* deliver_file);
 
 FILE *logfile;
 
@@ -38,9 +38,10 @@ bool checkforFile(char *requestpath)
 }
 
 
-void handleclient(int client, char *ip, int (*nat_handler)(char*))
+void handleclient(int client, char *ip, int (*nat_handler)(char*, char*))
 {
     char *headerbuffer = malloc(BUFFERSIZE);
+    char *deliver_file = malloc(100);
     int bytes_read;
     httpheader header;
     path_struct settings;
@@ -106,10 +107,14 @@ void handleclient(int client, char *ip, int (*nat_handler)(char*))
         //Programm ausfueren und auf return warten
         //sendSuccessHeader(client, "text/html", 7);
         printf("Start Subprog\n");
-        natrc = nat_handler(settings.programm);
+        natrc = nat_handler(settings.programm, deliver_file);
         printf("Nat Returncode: [%d]\n", natrc);
 
-        deliverFile("/tmp/t_output.log", client, 0);
+        deliverFile(deliver_file, client, 0);
+        if(remove(deliver_file) != 0)
+        {
+            printf("Error while deleting [%s]\n", deliver_file);
+        }
 
         //write_socket(client, "OK Habs", 7);
         return;
@@ -118,7 +123,7 @@ void handleclient(int client, char *ip, int (*nat_handler)(char*))
     printf("IP: [%s] ERROR: 404 (%s)\n", ip, header.page);
 }
 
-int start_web_server_from_nat(int (*nat_handler)(char*))
+int start_web_server_from_nat(int (*nat_handler)(char*, char*))
 {
     int socket, client, bytes_read;
     char ip[15], buff[BUFFERSIZE];
@@ -132,6 +137,10 @@ int start_web_server_from_nat(int (*nat_handler)(char*))
 
     dup2(fileno(logfile), 1);
     close(fileno(logfile));
+
+    strcpy(webserver_settings.templatepath, "/u/it/a140734/C/sharedlib_jinja2/web_server/templates");
+    strcpy(webserver_settings.natlibrary, "TGAP0734");
+    strcpy(webserver_settings.nat_sourcepath, "/VAW/natural/logi/fuser63/");
 
     printf("Create Signal listner\n");
     fflush(logfile);

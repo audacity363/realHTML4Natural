@@ -53,6 +53,9 @@ struct functions {
     void (*fncPnt)(struct args*, struct variables*);
 };
 
+//extern int error_line = 0;
+extern char error_str[2048];
+
 
 int local_jinja_parser(parser_info *status, struct variables *anker, char *line,
            int length);

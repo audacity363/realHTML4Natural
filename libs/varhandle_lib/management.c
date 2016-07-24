@@ -17,7 +17,7 @@ struct variables *searchVar(struct variables *anker, char *name)
     hptr = anker;
     while(hptr != NULL)
     {
-        if(strcmp(hptr->name, name))
+        if(strcmp(hptr->name, name) == 0)
             break;
         hptr = hptr->next;
     }

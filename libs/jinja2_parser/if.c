@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "include/standard.h"
-#include "parser.h"
-#include "utils.h"
-#include "if.h"
+#include "standard.h"
 #include "varhandle.h"
+#include "jinja2_parser.h"
+#include "jinja_utils.h"
+#include "if.h"
 
 bool ifhandler(struct variables *anker, char *cmd)
 {
@@ -43,9 +43,9 @@ bool ifhandler(struct variables *anker, char *cmd)
 //            printf("Functionname: [%s]\n", functionname);
         }
 
-        if((firstarg.type = getVarType(anker, first)) == -1)
+        if((firstarg.type = getVarType(anker, first)) < 0)
         {
-            fprintf(stderr, "Variable not on Stack\n");
+            strcpy(error_str, varhandle_error_str);
             return(-1);
         }
         switch(firstarg.type)
@@ -57,10 +57,8 @@ bool ifhandler(struct variables *anker, char *cmd)
                 firstarg.iargs = getIntValue(anker, first);
                 break;
             case STRINGARRAY:
-                fprintf(stderr, "Type Error\n");
-                return(-1);
             default:
-                fprintf(stderr, "Not Supported (first arg)\n"); 
+                sprintf(error_str, "Not Supported (%s)\n", first); 
                 return(-1);
         }
 
@@ -93,10 +91,8 @@ bool ifhandler(struct variables *anker, char *cmd)
                 secondarg.iargs = getIntValue(anker, second);
                 break;
             case STRINGARRAY:
-                fprintf(stderr, "Type Error\n");
-                return(-1);
             default:
-                fprintf(stderr, "Not Supported (second arg)\n"); 
+                sprintf(error_str, "Not Supported (%s)\n", second); 
                 return(-1);
         }
     }
@@ -104,7 +100,7 @@ bool ifhandler(struct variables *anker, char *cmd)
     if((firstarg.type == STRING && secondarg.type == INT) ||
        (firstarg.type == INT && secondarg.type == STRING))
     {
-        fprintf(stderr, "Type Error\n");
+        sprintf(error_str, "Type Error");
         return(-1);
     }
 
@@ -137,7 +133,7 @@ bool ifhandler(struct variables *anker, char *cmd)
     {
         if(firstarg.type == STRING)
         {
-            fprintf(stderr, "ERRROR: Unsupported\n");
+            strcpy(error_str, "Syntax Error");
             return(-1);
         }
 
@@ -155,7 +151,7 @@ bool ifhandler(struct variables *anker, char *cmd)
     {
         if(firstarg.type == STRING)
         {
-            fprintf(stderr, "ERRROR: Unsupported\n");
+            strcpy(error_str, "Syntax Error");
             return(-1);
         }
 
@@ -172,7 +168,7 @@ bool ifhandler(struct variables *anker, char *cmd)
     {
         if(firstarg.type == STRING)
         {
-            fprintf(stderr, "ERRROR: Unsupported\n");
+            strcpy(error_str, "Syntax Error");
             return(-1);
         }
 
@@ -189,7 +185,7 @@ bool ifhandler(struct variables *anker, char *cmd)
     {
         if(firstarg.type == STRING)
         {
-            fprintf(stderr, "ERRROR: Unsupported\n");
+            strcpy(error_str, "Syntax Error");
             return(-1);
         }
 
@@ -214,7 +210,7 @@ bool ifhandler(struct variables *anker, char *cmd)
         }
         if(ptr == NULL)
         {
-            fprintf(stderr, "Var nicht gefunden\n");
+            sprintf(error_str, "Unkown Variable [%s]\n", second);
             return(-1);
         }
 
@@ -227,7 +223,7 @@ bool ifhandler(struct variables *anker, char *cmd)
     }
     else
     {
-        fprintf(stderr, "Kenn ich nicht\n!!EXIT!!");
-        return(false);
+        strcpy(error_str, "Syntax Error");
+        return(-1);
     }
 }

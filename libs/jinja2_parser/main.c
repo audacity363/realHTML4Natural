@@ -2,12 +2,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <errno.h>
 
-#include "include/standard.h"
-#include "parser.h"
-#include "utils.h"
-#include "if.h"
+#include "standard.h"
 #include "varhandle.h"
+#include "jinja2_parser.h"
+#include "jinja_utils.h"
+#include "if.h"
+
+char error_str[2048];
 
 void callFunction(struct args *word, struct variables *anker, char *functionname, int vartype)
 {
@@ -142,15 +145,17 @@ void fillTestValues(struct variables *anker)
 
 
 
-int parser_start(char *templatefile, struct variables *anker, char *deliverfile)
+int parser_start(char *templatefile, struct variables *anker, char *deliverfile,
+                char *l_error_str, int *error_zeile)
 {
     FILE *p_template, *p_outputfile;
     char linebuf[1024];
     bool function = false;
-    int i, length;
+    int i, length, line = 0;
     parser_info status = {false, false, false, false, false, -1, "", 0, 0, malloc(sizeof(char))};
     char *forbuffer = malloc(1);
     int old_stdout;
+    bool error = false;
 
     printf("---Starting Parser---\n");
     printf("Working with Vars:\n");
@@ -158,35 +163,50 @@ int parser_start(char *templatefile, struct variables *anker, char *deliverfile)
 
     if((p_template = fopen(templatefile, "r")) == NULL)
     {
-        fprintf(stderr, "Can not open [%s]", templatefile);
+        sprintf(error_str, "Can not open templatefile: [%s] [%s]", templatefile,
+                strerror(errno));
+        strcpy(l_error_str, error_str);
         return(-1);
     }
 
     if((p_outputfile = fopen(deliverfile, "w")) == NULL)
     {
         fclose(p_template);
+        sprintf(error_str, "Can not open Outputfile [%s] [%s]", deliverfile,
+                strerror(errno));
+        strcpy(l_error_str, error_str);
         return(-2);
     }
 
     old_stdout = dup(1);
     dup2(fileno(p_outputfile), 1);
     close(fileno(p_outputfile));
-    /*printf("<h1>DEBUG</h1>\n");
-    printf("<pre>\n");
-    printVars(anker);
-    printf("</pre>\n");*/
 
     do
     {
+        line++;
         fgets(linebuf, sizeof(linebuf), p_template);  
         length = strlen(linebuf);
-        local_jinja_parser(&status, anker, linebuf, length);
+        if(local_jinja_parser(&status, anker, linebuf, length) != 0)
+        {
+            error = true;
+            break;
+        }
         bzero(linebuf, sizeof(linebuf));
     } while(!feof(p_template));
     fclose(p_template);
 
+    fflush(stdout);
+
     dup2(old_stdout, 1);
     close(old_stdout);
+
+    if(error == true)
+    {
+        *error_zeile = line;
+        strcpy(l_error_str, error_str);
+        return(-3);
+    }
 
     return(0);
 }

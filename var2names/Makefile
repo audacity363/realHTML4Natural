@@ -1,5 +1,5 @@
-#HOMEDIR = /u/it/a140734/C/sharedlib_jinja2
-HOMEDIR = /home/tom/Documents/sharedlib_jinja2
+#HOMEDIR = /home/tom/Documents/sharedlib_jinja2
+HOMEDIR = /u/it/a140734/C/sharedlib_jinja2
 
 STANDARD_PATH    	=   $(HOMEDIR)/include
 
@@ -25,7 +25,7 @@ INCDIR   =  -I$(STANDARD_PATH)  \
             -I$(NATVAR_PATH)    \
             -I$(UTILS_PATH)
 
-CC = gcc
+CC = xlc
 
 all:
 	$(CC) -c var2name.c -o ./bin/var2name.o $(INCDIR)
