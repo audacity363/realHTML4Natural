@@ -15,7 +15,6 @@ int generate_500errPage_parser(char *output, struct variables *anker,
     char *c_line;
     char *parser_template = malloc(strlen(webserver_settings.templatepath)+19);
 
-    //"/home/tom/Documents/realHtml4Natural/web_server/templates/error/500_parser.html";
     sprintf(parser_template, "%s/error/500_parser.html",
         webserver_settings.templatepath);
     newStringVar(anker, "error_str", error_str);
@@ -35,8 +34,13 @@ int generate_500errPage_lda(char *output, char *error_str, char *ldaname)
     char *lda_template = malloc(strlen(webserver_settings.templatepath)+19);
     int error_line;
 
+    anker->next = NULL;
+    strcpy(anker->name, "anker");
+
     sprintf(lda_template, "%s/error/500_lda.html",
         webserver_settings.templatepath);
+
+    printf("working with template: [%s]\n", lda_template);
 
     newStringVar(anker, "error_str", error_str);
     newStringVar(anker, "lda_name", ldaname);
@@ -53,13 +57,12 @@ int generate_page(struct variables *anker, char *ldaname, char *templatename,
     char *lda = malloc(strlen(webserver_settings.nat_sourcepath)
                             +strlen(webserver_settings.natlibrary)
                                     +strlen(ldaname)+10);
-    char error_str[2048];
+    char *error_str = malloc(2048);
     int error_zeile;
 
     sprintf(template, "%s/%s", webserver_settings.templatepath, templatename);
     sprintf(lda, "%s/%s/SRC/%s.NSL", webserver_settings.nat_sourcepath,
                             webserver_settings.natlibrary, StripTrailingSpaces(ldaname));
-    strcpy(lda, ldaname);
 
 #ifdef DEBUG
     printf("Working with Template: [%s]\n", template);
@@ -70,11 +73,14 @@ int generate_page(struct variables *anker, char *ldaname, char *templatename,
      * TODO: Get ReturnValues from these functions ans redner custom 
      * HTTP 500 Error pages
      */
+    printf("Start var2name\n");
     if(var2name(anker, lda, error_str) < 0)
     {
         printf("%s\n", error_str);
+        generate_500errPage_lda(output_file, error_str, lda);
         return(-1);
     }
+    printf("Start jinja Parser\n");
     if(parser_start(template, anker, output_file, error_str, &error_zeile) < 0)
     {
         printf("Error in zeile %d [%s]\n", error_zeile, error_str);
@@ -83,6 +89,5 @@ int generate_page(struct variables *anker, char *ldaname, char *templatename,
         return(-1);
     }
     free(template);
-
 }
 

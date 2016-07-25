@@ -5,6 +5,7 @@
 #include "standard.h"
 #include "header.h"
 #include "utils.h"
+#include "hexdump.h"
 
 void printheader(char **parsedheader, int size)
 {
@@ -17,6 +18,66 @@ void printheader(char **parsedheader, int size)
     }
 }
 
+int parseGETRequest(httpheader *header)
+{
+    char *fragezeichen;
+    char *get_buff, *pair, *key, *value, *tmp;
+    int anzahl = 0;
+    
+    fragezeichen = strchr(header->page, '?');
+    if(fragezeichen == NULL)
+    {
+        header->request_arguments = 0;
+        return(0);
+    }
+
+    get_buff = malloc(strlen(fragezeichen));
+    strcpy(get_buff, fragezeichen);
+    fragezeichen[0] = '\0';
+    memmove(get_buff, get_buff+1, strlen(get_buff));
+
+    header->request_keys = malloc(sizeof(char*));
+    header->request_values = malloc(sizeof(char*));
+
+    pair = strtok(get_buff, "&");
+    while(pair != NULL)
+    {
+        anzahl++;
+        tmp = strchr(pair, '='); 
+        if(tmp == NULL)
+        {
+            //Key hat kein Value
+            value = malloc(2);
+            strcpy(value, " ");
+        }
+        else
+        {
+            tmp[0] = '\0';
+            value = malloc(strlen(tmp+1));
+            strcpy(value, tmp+1);
+        }
+
+        key = malloc(strlen(pair));
+        strcpy(key, pair);
+
+        header->request_values = realloc(header->request_values, sizeof(char*)*anzahl);
+        ((char**)header->request_values)[anzahl-1] = malloc(strlen(value));
+        strcpy(((char**)header->request_values)[anzahl-1], value);
+
+        header->request_keys = realloc(header->request_keys, sizeof(char*)*anzahl);
+        ((char**)header->request_keys)[anzahl-1] = malloc(strlen(value));
+        strcpy(((char**)header->request_keys)[anzahl-1], key);
+
+        free(key);
+        free(value);
+
+        pair = strtok(NULL, "&");
+    }
+
+    header->request_arguments = anzahl;
+    return(0);
+}
+
 httpheader parseheader(char *header, int headerlength)
 {
     int i;
@@ -27,6 +88,9 @@ httpheader parseheader(char *header, int headerlength)
     char *fields[100];
     char *key, *value;
     char *buffer;
+
+    //logHexDump(header, headerlength, stdout);
+    printf("%s", header);
 
     httpheader header_struct;
 
@@ -100,6 +164,10 @@ httpheader parseheader(char *header, int headerlength)
             header_struct.connection = malloc(strlen(value));
             strcpy(header_struct.connection, value);
         }
+    }
+    if(strcmp(header_struct.request_type, GET) == 0)
+    {
+        parseGETRequest(&header_struct);
     }
 
     return(header_struct);

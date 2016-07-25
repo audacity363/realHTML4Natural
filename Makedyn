@@ -22,7 +22,7 @@ VERSION			=   2.0.9
 INFO_STRING     =   "$(MODUL_NAME) Version $VERSION Copyright (C) \
 Hydro Aluminium GmbH Grevenbroich $(DATUM)"
 
-HOMEDIR = /u/it/a140734/C/sharedlib_jinja2
+HOMEDIR = /u/it/a140734/C/realHtml4Natural
 
 STANDARD_PATH    	=   $(HOMEDIR)/include
 

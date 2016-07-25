@@ -12,6 +12,9 @@ typedef struct {
     char *user_agent;
     char *page;
     char *connection;
+    int request_arguments;
+    char *request_keys;
+    char *request_values;
 } httpheader;
 
 

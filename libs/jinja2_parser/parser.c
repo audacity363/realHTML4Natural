@@ -48,7 +48,7 @@ int getIndex(char *word)
     if(glob_found == false)
     {
         strcpy(error_str, "Syntax Error");
-        return(-1);
+        return(-2);
     }
     return(atoi(index));
 }
@@ -79,6 +79,7 @@ int getIndex2D(char *word, int *x, int *y)
             strcpy(error_str, "Syntax Error");
             return(-1);
         }
+
         if(found_open == true && word[i] == ']')
         {
 //            word[i-(index+1)] = '\0';
@@ -95,8 +96,7 @@ int getIndex2D(char *word, int *x, int *y)
 
     if(glob_found == false || strlen(x_str) == 0)
     {
-        strcpy(error_str, "Syntax Error");
-        return(-2);
+        return(-100);
     }
 
     x_str[index] = '\0';
@@ -203,6 +203,7 @@ int local_jinja_parser(parser_info *status, struct variables *anker, char *line,
     int i, type, cmdindex = 0;
     int anzahl_for = 0;
     int x_index, y_index, intvalue;
+    int rv;
     bool function;
     char functionname[100];
     struct args arguments;
@@ -276,7 +277,7 @@ int local_jinja_parser(parser_info *status, struct variables *anker, char *line,
                     printArray(anker, status->statement, false, NULL);
                     break;
                 case TWO_DSTRINGARRAY:
-                    if(getIndex2D(status->attrbuf, &x_index, &y_index) == 0)
+                    if((rv = getIndex2D(status->attrbuf, &x_index, &y_index)) == 0)
                     {
                         if(y_index > -1)
                         {
@@ -293,19 +294,19 @@ int local_jinja_parser(parser_info *status, struct variables *anker, char *line,
 //                        free(tmparray);
                         break;
                     }
-                    else
-                    {
-                        return(-1);
-                    }
                     if(status->index > -1)
                     {
                         if(handleArray(anker, status, function, functionname) < 0)
                             return(-1);
                     }
+                    if(rv < 0 && rv != -100)
+                    {
+                        return(-1);
+                    }
                     print2DArray(anker, status->statement, false, NULL);
                     break;
                 case TWO_DINTARRAY:
-                    if(getIndex2D(status->attrbuf, &x_index, &y_index) == 0)
+                    if((rv = getIndex2D(status->attrbuf, &x_index, &y_index)) == 0)
                     {
                         if(y_index > -1)
                         {
@@ -325,7 +326,7 @@ int local_jinja_parser(parser_info *status, struct variables *anker, char *line,
 //                        free(tmparray);
                         break;
                     }
-                    else
+                    else if(rv < 0 && rv != -100)
                     {
                         return(-1);
                     }

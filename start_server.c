@@ -12,6 +12,7 @@
 #include "natuser.h"
 #include "standard.h"
 #include "varhandle.h"
+#include "header.h"
 #include "utils.h"
 
 #define VARLENGTH 20 
@@ -20,7 +21,7 @@
 #define NATTIMEOUT 5
 #define FILELENGTH 100
 
-int call_subprog(char*, char*);
+int call_subprog(char*, char*, httpheader);
 
 /*
  * This function just starts the webserver with the context of natural.
@@ -34,7 +35,9 @@ long start_web_server( WORD nparm, void *parmhandle, void *traditional )
 
 void nat_signalHandler(int signal)
 {
-    fprintf(stderr, "Recv Signal: [%d]\n", signal);
+    FILE *errfile = fopen("/tmp/nat_call_error", "w");
+    fprintf(errfile, "Recv Signal: [%d]\n", signal);
+    fclose(errfile);
 }
 
 /*
@@ -81,7 +84,7 @@ int handle_timeout(char *deliver_file, char *program)
  * This function will call the given Natural Subprog with the parameters:
  *    Request Values (Length: 20; Type Alpha; Array with index of 20)
  *    Request Keys   (Length: 30; Type Alpha; Array with index of 20)
- *    Request Type   (Length:  4; Type Alpha)
+ *    Request Type   (Length:  5; Type Alpha)
  *    Request File   (!!!Only for internal use!!! 
  *                    This is the file where the rendered template will writen to)
  *                   (Length: 100; Type Alpha)
@@ -90,7 +93,7 @@ int handle_timeout(char *deliver_file, char *program)
  *                      in the format: "key1=value1;key2=value2"
  *                      (Length: Dynamic; Type Alpha)
  */      
-int call_subprog(char *programm, char *server_deliver_filename)
+int call_subprog(char *programm, char *server_deliver_filename, httpheader request_header)
 {
     int i,
         arraylength = ARRAYLENGTH;
@@ -99,7 +102,7 @@ int call_subprog(char *programm, char *server_deliver_filename)
     sigset_t orig_mask;
     int timeout_bool = 0;
 
-    char req_type[] = "POST";
+    char req_type[] = "POST"; 
     char req_settings[] = "debug=1";
     char req_file[] = " ";
     char keys[VARLENGTH];
@@ -117,7 +120,7 @@ int call_subprog(char *programm, char *server_deliver_filename)
         return(-1);
     }
     fclose(f_deliver_file);
-    
+
 
     printf("generated Deliver File: [%s]\n", deliver_file);
 
@@ -152,7 +155,7 @@ int call_subprog(char *programm, char *server_deliver_filename)
         ncxr_create_parm(5, &myparmhandle);
         ncxr_init_parm_sa(0, myparmhandle, 'A', VARLENGTH, 0, 1, &arraylength, 0);
         ncxr_init_parm_sa(1, myparmhandle, 'A', VARLENGTH, 0, 1, &arraylength, 0);
-        ncxr_init_parm_s (2, myparmhandle, 'A', 4,         0, 0);
+        ncxr_init_parm_s (2, myparmhandle, 'A', 5,         0, 0);
         ncxr_init_parm_s (3, myparmhandle, 'A', FILELENGTH,0, 0);
         ncxr_init_parm_d (4, myparmhandle, 'A', 0);
 
@@ -161,13 +164,21 @@ int call_subprog(char *programm, char *server_deliver_filename)
         {
             memset(keys, 0x20, VARLENGTH);
             memset(values, 0x20, VARLENGTH);
-            sprintf(keys, "key %d", i);
-            sprintf(values, "value %d", i);
+            if(i < request_header.request_arguments)
+            {
+                strcpy(keys, ((char**)request_header.request_keys)[i]);
+                strcpy(values, ((char**)request_header.request_values)[i]);
+            }
+            else
+            {
+                strcpy(keys, " ");
+                strcpy(values, " ");
+            }
             ncxr_put_parm_array(0, myparmhandle, VARLENGTH, values, &i);
             ncxr_put_parm_array(1, myparmhandle, VARLENGTH, keys, &i);
         }
 
-        if(ncxr_put_parm(2, myparmhandle, 4, req_type) < 0)
+        if(ncxr_put_parm(2, myparmhandle, 5, request_header.request_type) < 0)
         {
             exit(7);
         }
@@ -188,6 +199,7 @@ int call_subprog(char *programm, char *server_deliver_filename)
         fprintf(stderr, "Calling ncxr_if4_callnat\n"); 
 
         nat_rc = ncxr_if4_callnat(programm, 5, pass);
+
         exit(0);
     }
     //Parent

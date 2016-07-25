@@ -1,6 +1,6 @@
 .PHONY: var2names web_server
-#HOMEDIR = /u/it/a140734/C/sharedlib_jinja2
-HOMEDIR = /home/tom//Documents/realHtml4Natural/
+HOMEDIR = /u/it/a140734/C/realHtml4Natural/
+#HOMEDIR = /home/tom//Documents/realHtml4Natural/
 
 STANDARD_PATH    	=   $(HOMEDIR)/include
 
@@ -38,8 +38,8 @@ LIBS    = -L$(CFG_PATH) -lcfg \
           -L$(VAR_PATH) -lvarhandle \
           -L$(UTILS_PATH) -lutils \
 
-CC = gcc
-CFLAGS = -c
+CC = xlc
+CFLAGS = -c -g
 
 ARFLAGS = -vcru
 
@@ -104,15 +104,15 @@ varhandle:
 clean_varhandle:
 	-rm -f $(VAR_PATH)/bin/*.o $(VAR_PATH)/*.a
 
-var2names:
+var2name:
 	$(CC) $(CFLAGS) -o $(NAMES_PATH)/bin/var2name.o $(NAMES_PATH)/var2name.c $(INCDIR)
 	$(CC) $(CFLAGS) -o $(NAMES_PATH)/bin/genpage.o $(NAMES_PATH)/genpage.c $(INCDIR)
 	ar $(ARFLAGS) $(NAMES_PATH)/libvar2name.a $(NAMES_PATH)/bin/*.o
 
-clean_var2names:
+clean_var2name:
 	-rm -f $(NAMES_PATH)/bin/*.o $(NAMES_PATH)/*.a
 
-test_var2names:
+test_var2name:
 	$(CC) -g -o $(NAMES_PATH)/testprogs/main $(NAMES_PATH)/testprogs/main.c \
 		$(INCDIR) $(LIBS)
 
@@ -127,6 +127,14 @@ webserver:
 clean_webserver:
 	-rm -f $(WEB_PATH)/bin/*.o $(WEB_PATH)/*.a
 
+test_webserver:
+	$(CC) -o $(WEB_PATH)/test/main $(WEB_PATH)/test/main.c \
+		$(INCDIR) $(LIBS)
+
+glob_test:
+	$(CC) -g -o $(HOMEDIR)/test/main $(HOMEDIR)/test/main.c $(INCDIR) $(LIBS)
+
+
 clean:
 	$(MAKE) clean_cfgreader
 	$(MAKE) clean_hexdump
@@ -135,7 +143,7 @@ clean:
 	$(MAKE) clean_sockets
 	$(MAKE) clean_utils
 	$(MAKE) clean_varhandle
-	$(MAKE) clean_var2names
+	$(MAKE) clean_var2name
 	$(MAKE) clean_webserver
 
 all:
@@ -146,5 +154,5 @@ all:
 	$(MAKE) sockets
 	$(MAKE) utils
 	$(MAKE) varhandle
-	$(MAKE) var2names
+	$(MAKE) var2name
 	$(MAKE) webserver

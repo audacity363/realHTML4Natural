@@ -38,7 +38,7 @@ bool checkforFile(char *requestpath)
 }
 
 
-void handleclient(int client, char *ip, int (*nat_handler)(char*, char*))
+void handleclient(int client, char *ip, int (*nat_handler)(char*, char*, httpheader))
 {
     char *headerbuffer = malloc(BUFFERSIZE);
     char *deliver_file = malloc(100);
@@ -107,7 +107,7 @@ void handleclient(int client, char *ip, int (*nat_handler)(char*, char*))
         //Programm ausfueren und auf return warten
         //sendSuccessHeader(client, "text/html", 7);
         printf("Start Subprog\n");
-        natrc = nat_handler(settings.programm, deliver_file);
+        natrc = nat_handler(settings.programm, deliver_file, header);
         printf("Nat Returncode: [%d]\n", natrc);
 
         deliverFile(deliver_file, client, 0);
@@ -123,7 +123,7 @@ void handleclient(int client, char *ip, int (*nat_handler)(char*, char*))
     printf("IP: [%s] ERROR: 404 (%s)\n", ip, header.page);
 }
 
-int start_web_server_from_nat(int (*nat_handler)(char*, char*))
+int start_web_server_from_nat(int (*nat_handler)(char*, char*, httpheader))
 {
     int socket, client, bytes_read;
     char ip[15], buff[BUFFERSIZE];
@@ -138,7 +138,7 @@ int start_web_server_from_nat(int (*nat_handler)(char*, char*))
     dup2(fileno(logfile), 1);
     close(fileno(logfile));
 
-    strcpy(webserver_settings.templatepath, "/u/it/a140734/C/sharedlib_jinja2/web_server/templates");
+    strcpy(webserver_settings.templatepath, "/u/it/a140734/C/realHtml4Natural/web_server/templates");
     strcpy(webserver_settings.natlibrary, "TGAP0734");
     strcpy(webserver_settings.nat_sourcepath, "/VAW/natural/logi/fuser63/");
 

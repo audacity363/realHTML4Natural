@@ -24,6 +24,13 @@ void handleRedefine(struct variables *var_anker, int valueoffset, struct varname
 
     while(ptr != NULL)
     {
+        if(dataoffset >= strlen(hptr->data))
+        {
+            newStringVar(var_anker, ptr->name, " ");
+            dataoffset += ptr->length;
+            ptr = ptr->next;
+            continue;
+        }
         tmpbuffer = malloc(ptr->length);
         memcpy(tmpbuffer, hptr->data+dataoffset, ptr->length);
 
@@ -43,14 +50,15 @@ int var2name(struct variables *var_anker, char *ldaname, char *error_str)
     int varoffset = 0,
         i = 0;
     bool ingrp = false;
-    char l_error_str[2048];
+    char *l_error_str = malloc(2048);
+    strcpy(error_str, "Test");
 
     if((names_hptr = getVarNames(ldaname, l_error_str)) == NULL)
     {
+        printf("Error while parsing LDA\n");
         strcpy(error_str, l_error_str);
         return(-1);
     }
-
     names_ptr = names_hptr = names_hptr->next->nextlevel;
 
     while(true)

@@ -255,15 +255,19 @@ long print_all_vars(WORD nparm, void *parmhandle, void *traditional)
     switch(ncxr_get_parm_info(0, parmhandle, &lda))
     {
         case -1:
+            printf("Error while reading lda infos\n");
             return((long)1);
         case -2:
+            printf("Error while reading lda infos\n");
             return((long)2);
         case -7:
+            printf("Error while reading lda infos\n");
             return((long)3);
     }
 
     if(lda.format != 'A' || lda.length_all != 20 || lda.dimensions != 0)
     {
+        printf("LDA Formatierung stimmt nicht\n");
         return((long)4);
     }
 
@@ -271,10 +275,13 @@ long print_all_vars(WORD nparm, void *parmhandle, void *traditional)
     switch(ncxr_get_parm(0, parmhandle, 20, ldaname))
     {
         case -1:
+            printf("Error while reading ldaname\n");
             return((long)4);
         case -2:
+            printf("Error while reading ldaname\n");
             return((long)5);
         case -3:
+            printf("Error while reading ldaname\n");
             return((long)6);
     }
 
@@ -282,15 +289,19 @@ long print_all_vars(WORD nparm, void *parmhandle, void *traditional)
     switch(ncxr_get_parm_info(1, parmhandle, &template))
     {
         case -1:
+            printf("Error while reading template infos\n");
             return((long)7);
         case -2:
+            printf("Error while reading template infos\n");
             return((long)8);
         case -7:
+            printf("Error while reading template infos\n");
             return((long)9);
     }
 
     if(template.format != 'A' || template.length_all != 20 || template.dimensions != 0)
     {
+        printf("Template Formatierung stimmt nicht\n");
         return((long)10);
     }
 

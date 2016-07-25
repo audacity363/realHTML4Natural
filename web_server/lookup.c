@@ -74,7 +74,7 @@ path_struct getConfig(char *requestpath, char *filepath, char **error_str)
 path_struct getpathsettings(char *requestpath, FILE *logfile)
 {
     char *error_str = malloc(100);
-    path_struct settings = getConfig(requestpath, "/u/it/a140734/C/sharedlib_jinja2/web_server/test.cfg", &error_str);
+    path_struct settings = getConfig(requestpath, "/u/it/a140734/C/realHtml4Natural/web_server/test.cfg", &error_str);
     if(settings.found == 0)
     {
         fprintf(logfile, "Error: [%s]\n", error_str);
