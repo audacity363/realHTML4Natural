@@ -1,0 +1,21 @@
+<html>
+<head>
+    <title>User Liste</title>
+</head>
+<body>
+    <table border="1" style="margin-right: auto; margin-left: auto">
+        <thead>
+            <td>ID</td>
+            <td>Name</td>
+        </thead>
+        <tbody>
+        {%for user in username%}
+            <tr>
+                <td>{{loop.i}}</td>
+                <td>{{user}}</td>
+            </tr>
+        {%end-for%}
+        </tbody>
+    </table>
+</body>
+</html>
