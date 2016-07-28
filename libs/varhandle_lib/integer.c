@@ -30,7 +30,7 @@ int getIntValuefromArray(struct variables *anker, char *name, int index)
 
     if(index >= ptr->length)
     {
-        return(-1);
+        return(-2);
     }
 
     return(((int*)ptr->data)[index]);
@@ -43,6 +43,7 @@ int getIntValuefrom2DArray(struct variables *anker, char *name, int x,
 
     if((ptr = searchVar(anker, name)) == NULL)
     {
+        sprintf(varhandle_error_str, "Unkown Variable [%s]", name);
         return(-1);
     }
 

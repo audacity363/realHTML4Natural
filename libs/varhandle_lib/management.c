@@ -63,7 +63,6 @@ int deleteVar(struct variables *anker, char *name)
     {
         if(ptr->next == NULL)
         {
-            ptr = NULL;
             break;
         }
         if(cmp(ptr->next->name, name))

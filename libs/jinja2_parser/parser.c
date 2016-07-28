@@ -10,7 +10,7 @@
 //#include "for.h"
 //
 
-int getIndex(char *word)
+int getIndex(char *word, struct variables *anker)
 {
     char index[10];
     int i;
@@ -50,10 +50,21 @@ int getIndex(char *word)
         strcpy(error_str, "Syntax Error");
         return(-2);
     }
+
+    if(ncmp(index, "loop.i"))
+    {
+        int loop_i;
+        if(loop_i = getIntValue(anker, "loop.i") == -1)
+        {
+            strcpy(error_str, "Unkown Variable [loop.i]");
+            return(-1);
+        }
+        return(loop_i);
+    }
     return(atoi(index));
 }
 
-int getIndex2D(char *word, int *x, int *y)
+int getIndex2D(char *word, int *x, int *y, struct variables *anker)
 {
     char x_str[10];
     char y_str[10];
@@ -62,6 +73,7 @@ int getIndex2D(char *word, int *x, int *y)
     int length = strlen(word);
     bool found_open = false;
     bool glob_found = false;
+    int loop_i;
 
     x_str[0] = '\0';
     y_str[0] = '\0';
@@ -100,7 +112,21 @@ int getIndex2D(char *word, int *x, int *y)
     }
 
     x_str[index] = '\0';
-    *x = atoi(x_str);
+
+    if(ncmp(x_str, "loop.i"))
+    {
+        if(loop_i = getIntValue(anker, "loop.i") == -1)
+        {
+            strcpy(error_str, "Unkown Variable [loop.i]");
+            return(-1);
+        }
+        *x = loop_i;
+        
+    }
+    else
+    {
+        *x = atoi(x_str);
+    }
 
     i++;
     if(word[i] != '[')
@@ -124,8 +150,19 @@ int getIndex2D(char *word, int *x, int *y)
     if(strlen(y_str) == 0)
         return(-3);
 
-
-    *y = atoi(y_str);
+    if(ncmp(y_str, "loop.i"))
+    {
+        if(loop_i = getIntValue(anker, "loop.i") == -1)
+        {
+            strcpy(error_str, "Unkown Variable [loop.i]");
+            return(-1);
+        }
+        *y = loop_i;
+    }
+    else
+    {
+        *y = atoi(y_str);
+    }
     return(0);
 }
 
@@ -254,7 +291,7 @@ int local_jinja_parser(parser_info *status, struct variables *anker, char *line,
                     printf("%d", getIntValue(anker, status->statement));
                     break;
                 case STRINGARRAY:
-                    status->index = getIndex(status->attrbuf);
+                    status->index = getIndex(status->attrbuf, anker);
                     if(function == true)
                     {
                         arguments.cargs = malloc(strlen(status->statement));
@@ -273,11 +310,11 @@ int local_jinja_parser(parser_info *status, struct variables *anker, char *line,
                         printArray(anker, status->statement, false, NULL);
                     break;
                 case INTARRAY:
-                    status->index = getIndex(status->attrbuf);
+                    status->index = getIndex(status->attrbuf, anker);
                     printArray(anker, status->statement, false, NULL);
                     break;
                 case TWO_DSTRINGARRAY:
-                    if((rv = getIndex2D(status->attrbuf, &x_index, &y_index)) == 0)
+                    if((rv = getIndex2D(status->attrbuf, &x_index, &y_index, anker)) == 0)
                     {
                         if(y_index > -1)
                         {
@@ -306,7 +343,7 @@ int local_jinja_parser(parser_info *status, struct variables *anker, char *line,
                     print2DArray(anker, status->statement, false, NULL);
                     break;
                 case TWO_DINTARRAY:
-                    if((rv = getIndex2D(status->attrbuf, &x_index, &y_index)) == 0)
+                    if((rv = getIndex2D(status->attrbuf, &x_index, &y_index, anker)) == 0)
                     {
                         if(y_index > -1)
                         {

@@ -1,0 +1,16 @@
+<html>
+<head>
+    <title>Hello World</title>
+    <style>
+    table {
+        margin-right: auto;
+        margin-left: auto;
+    }
+</head>
+<body>
+{% for entry in itestarray%}
+    <p>Hello World {{loop.i}}</p>
+    <p>{{entry}}</p>
+{%end-for%}
+</body>
+</html>

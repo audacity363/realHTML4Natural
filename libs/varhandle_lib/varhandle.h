@@ -45,6 +45,7 @@ void new2DStringArray(struct variables *anker, char *name, int x_length,
                       int y_length);
 void appendStringArray(struct variables *anker, char *name, char *value);
 int editStringVar(struct variables *anker, char *name, char *value);
+int editStringVarArray(struct variables *anker, char *name, char *value, int x);
 int editStringVar2DArray(struct variables *anker, char *name, char *value,
                          int x, int y);
 char *getStringValuefrom2DArray(struct variables *anker, char *name, int x, 
@@ -60,12 +61,13 @@ void appendIntArray(struct variables *anker, char *name, int value);
 
 void new2DIntArray(struct variables *anker, char *name, int x_length,
                    int y_length);
+int editIntVar(struct variables *anker, char *name, int value);
+int editIntVarArray(struct variables *anker, char *name, int value, int x);
 int editIntVar2DArray(struct variables *anker, char *name, int value, int x,
                       int y);
-int editIntVar(struct variables *anker, char *name, int value);
 
 char *generateStringValuefromArray(struct variables *ankerchar, char *name);
-void printArrayfromPtr(struct variables *ptr);
+void printArrayfromPtr(struct variables *ptr, FILE *output);
 struct variables* createTmpArrayOut2DArray(struct variables *anker, char *name,
                                            int x);
 struct variables* getVarPointer(struct variables *anker, char *name);

@@ -7,21 +7,21 @@
 
 char varhandle_error_str[2048];
 
-void printArrayfromPtr(struct variables *ptr)
+void printArrayfromPtr(struct variables *ptr, FILE *output)
 {
     int x;
 
-    printf("[");
+    fprintf(output, "[");
     for(x=0; x < ptr->length; x++)
     {
         if(ptr->type == STRINGARRAY)
-            printf("\"%s\"", ((char**)ptr->data)[x]);
+            fprintf(output, "\"%s\"", ((char**)ptr->data)[x]);
         else
-            printf("%d", ((int*)ptr->data)[x]);
+            fprintf(output, "%d", ((int*)ptr->data)[x]);
         if(x+1 < ptr->length)
-            printf(",");
+            fprintf(output, ",");
     }
-    printf("]");
+    fprintf(output, "]");
 }
 
 void printArray(struct variables *anker, char *name, bool showname, 
@@ -108,7 +108,7 @@ char *generateStringValuefromArray(struct variables *anker, char *name)
     struct variables *hptr;
     char *returnstr;
     char buf[1024];
-    int i;
+    int i, x;
 
     hptr = anker;
 
@@ -137,6 +137,90 @@ char *generateStringValuefromArray(struct variables *anker, char *name)
                         strlen(returnstr)+strlen(buf));
             strcat(returnstr, buf);
             if(i+1 < hptr->length)
+            {
+                returnstr = realloc(returnstr, strlen(returnstr)+1);
+                strcat(returnstr, ",");
+            }
+        }
+        returnstr = realloc(returnstr, strlen(returnstr)+1);
+        strcat(returnstr, "]");
+    }
+    else if(hptr->type == INTARRAY)
+    {
+        returnstr = malloc(2);
+        sprintf(returnstr, "[");
+
+        for(i=0; i < hptr->length; i++)
+        {
+            sprintf(buf, "%d", ((int*)hptr->data)[i]);
+            returnstr = realloc(returnstr,
+                        strlen(returnstr)+strlen(buf));
+            strcat(returnstr, buf);
+            if(i+1 < hptr->length)
+            {
+                returnstr = realloc(returnstr, strlen(returnstr)+1);
+                strcat(returnstr, ",");
+            }
+        }
+        returnstr = realloc(returnstr, strlen(returnstr)+1);
+        strcat(returnstr, "]");
+    }
+    else if(hptr->type == TWO_DSTRINGARRAY)
+    {
+        returnstr = malloc(3);
+        sprintf(returnstr, "[");
+
+        for(i=0; i < hptr->x_length; i++)
+        {
+            strcat(returnstr, "[");
+
+            for(x=0; x < hptr->y_length; x++)
+            {
+                sprintf(buf, "\"%s\"", ((char**)hptr->data)[hptr->x_length*i+x]);
+                returnstr = realloc(returnstr,
+                            strlen(returnstr)+strlen(buf));
+                strcat(returnstr, buf);
+                if(x+1 < hptr->y_length)
+                {
+                    returnstr = realloc(returnstr, strlen(returnstr)+1);
+                    strcat(returnstr, ",");
+                }
+            }
+            returnstr = realloc(returnstr, strlen(returnstr)+1);
+            strcat(returnstr, "]");
+            if(i+1 < hptr->x_length)
+            {
+                returnstr = realloc(returnstr, strlen(returnstr)+1);
+                strcat(returnstr, ",");
+            }
+        }
+        returnstr = realloc(returnstr, strlen(returnstr)+1);
+        strcat(returnstr, "]");
+    }
+    else if(hptr->type == TWO_DINTARRAY)
+    {
+        returnstr = malloc(3);
+        sprintf(returnstr, "[");
+
+        for(i=0; i < hptr->x_length; i++)
+        {
+            strcat(returnstr, "[");
+
+            for(x=0; x < hptr->y_length; x++)
+            {
+                sprintf(buf, "%d", ((int*)hptr->data)[hptr->x_length*i+x]);
+                returnstr = realloc(returnstr,
+                            strlen(returnstr)+strlen(buf));
+                strcat(returnstr, buf);
+                if(x+1 < hptr->y_length)
+                {
+                    returnstr = realloc(returnstr, strlen(returnstr)+1);
+                    strcat(returnstr, ",");
+                }
+            }
+            returnstr = realloc(returnstr, strlen(returnstr)+1);
+            strcat(returnstr, "]");
+            if(i+1 < hptr->x_length)
             {
                 returnstr = realloc(returnstr, strlen(returnstr)+1);
                 strcat(returnstr, ",");
@@ -237,18 +321,12 @@ int getVarType(struct variables *anker, char *name)
 {
     struct variables *ptr;
 
-    ptr = anker;
-
-    while(ptr != NULL)
+    if((ptr = searchVar(anker, name)) == NULL)
     {
-        if(cmp(ptr->name, name))
-        {
-            return(ptr->type);
-        }
-        ptr = ptr->next;
+        sprintf(varhandle_error_str, "Unknown Variable: [%s]", name);
+        return(-1);
     }
-    sprintf(varhandle_error_str, "Unknown Variable: [%s]", name);
-    return(-1);
+    return(ptr->type);
 }
 
 void printVars(struct variables *anker)

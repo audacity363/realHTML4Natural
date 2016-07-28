@@ -28,6 +28,19 @@ char *StripTrailingSpaces(char *str)
     return str;
 }
 
+void TrimSpaces(char *str)
+{
+    int length = strlen(str), i;
+    for(i=0; i < length; i++)
+    {
+        if(!isspace(str[i]))
+            break;
+    }
+
+    memmove(str, str+i, length);
+
+}
+
 char* getLineFromFile(char *filename, int line)
 {
     FILE *file;
@@ -50,4 +63,17 @@ char* getLineFromFile(char *filename, int line)
     linebuff[strlen(linebuff)-1] = '\0';
 
     return(linebuff);
+}
+
+int str_isdigit(char *str)
+{
+    int length = strlen(str);
+    int i;
+
+    for(i=0; i < length; i++)
+    {
+        if(isdigit(str[i]) == 0)
+            return(-1);
+    }
+    return(0);
 }
