@@ -20,6 +20,7 @@
 int searchCommand(char *line)
 {
     char *found_cmd;
+    printf("search in: [%s]\n", line);
 
     if((found_cmd = strstr(line, "end-for")) != NULL)
     {
@@ -63,6 +64,7 @@ int for_getArrayLength(struct variables *anker, char *name, int var_type,
     }
     else if(var_type == STRINGARRAY)
     {
+        printf("Get Length 1D Array\n");
         if(index_type == 0)
         {
             if((length = getArrayLength(anker, name, NULL, NULL)) < 0)
@@ -80,6 +82,7 @@ int for_getArrayLength(struct variables *anker, char *name, int var_type,
     }
     else if(var_type == TWO_DSTRINGARRAY)
     {
+        printf("Get Length 2D Array\n");
         if(index_type == 0)
         {
             if((length = getArrayLength(anker, name, &l_x_index, &l_y_index)) < 0)
@@ -145,6 +148,7 @@ int createTmpVar(struct variables *anker, char *tmp_name, char *variable,
     int i_value;
     int i, x, y, length;
 
+    printf("Create tmp Var with: [%s]\n", tmp_name);
 
     tmp_str[1] = '\0';
 
@@ -370,11 +374,16 @@ int for_handle(struct variables *anker, char *cmd_buff, FILE *p_output,
         strcpy(((char**)for_block)[block_length-1], tmp_buff);
     }
 
+    for(i=1; i < block_length; i++)
+    {
+        printf("zeile: [%s]\n", ((char**)for_block)[i]);
+    }
 
     //For Befehl vorne und hinten von Leerzeichen befreien
     for_cmd = ((char**)for_block)[0];
     TrimSpaces(for_cmd);
     for_cmd = StripTrailingSpaces(for_cmd);
+    printf("CMD: [%s]\n", for_cmd);
 
     //for Token
     tmp_buff = strtok(for_cmd, " ");

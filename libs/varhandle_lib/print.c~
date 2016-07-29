@@ -496,7 +496,7 @@ int print2DArraytoFile(struct variables *anker, char *name, FILE *p_output)
             }
         }
         fprintf(p_output, "]");
-        if(x+1 < ptr->x_length)
+        if(x+1 < ptro->x_length)
             fprintf(p_output, ",");
         fprintf(p_output, "\n");
 

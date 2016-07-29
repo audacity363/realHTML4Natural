@@ -101,6 +101,7 @@ int parse_line(struct variables *anker, char *line, FILE *p_output,
     }
     else if(*parser_status > 0)
     {
+save_line:
         *cmd_buff = realloc(*cmd_buff, strlen(*cmd_buff)+strlen(line));
         strcat(*cmd_buff, line);
     }
