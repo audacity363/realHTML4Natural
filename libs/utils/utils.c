@@ -77,3 +77,12 @@ int str_isdigit(char *str)
     }
     return(0);
 }
+
+void char_strcat(char *str, char character)
+{
+    char tmp_str[2];
+    tmp_str[0] = character;
+    tmp_str[1] = '\0';
+
+    strcat(str, tmp_str);
+}

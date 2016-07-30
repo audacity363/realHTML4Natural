@@ -7,13 +7,14 @@
 #include "file_handling.h"
 
 int parse_line(struct variables *anker, char *line, FILE *p_output,
-               char **cmd_buff, int *parser_status, int *in_for, char *error_str)
+               char **cmd_buff, int *just_save, int *in_for, int *in_if,
+               char *error_str)
 {
     char *pos_open_var, *pos_close_var;
     char *pos_open_cmd, *pos_close_cmd;
     int cmd_type;
 
-    if((pos_open_var = strstr(line, "{{")) != NULL && *parser_status == 0)
+    if((pos_open_var = strstr(line, "{{")) != NULL && *just_save == 0)
     {
         pos_open_var[0] = '\0';
         fprintf(p_output, "%s", line);
@@ -52,9 +53,9 @@ int parse_line(struct variables *anker, char *line, FILE *p_output,
             //Forschleife:
             case 1:
                 *in_for = *in_for + 1;
-                if(*parser_status != 0)
+                if(*just_save != 0)
                 {
-                    *cmd_buff = realloc(*cmd_buff, strlen(*cmd_buff)+strlen(line)+5);
+                    *cmd_buff = realloc(*cmd_buff, strlen(*cmd_buff)+strlen(line)+6);
                     strcat(*cmd_buff, "{%");
                     strcat(*cmd_buff, line);
                     strcat(*cmd_buff, "%}\n");
@@ -66,8 +67,8 @@ int parse_line(struct variables *anker, char *line, FILE *p_output,
                     free(*cmd_buff);
                     *cmd_buff = NULL;
                 }
-                *parser_status = 1;
-                *cmd_buff = malloc(strlen(line)+1);
+                *just_save = 1;
+                *cmd_buff = malloc(strlen(line)+2);
                 strcpy(*cmd_buff, line);
                 strcat(*cmd_buff, "\n");
                 return(0);
@@ -75,20 +76,62 @@ int parse_line(struct variables *anker, char *line, FILE *p_output,
             case 2:
                 if(--*in_for != 0)
                 {
-                    *cmd_buff = realloc(*cmd_buff, strlen(*cmd_buff)+strlen(line)+5);
+                    *cmd_buff = realloc(*cmd_buff, strlen(*cmd_buff)+strlen(line)+6);
                     strcat(*cmd_buff, "{%");
                     strcat(*cmd_buff, line);
                     strcat(*cmd_buff, "%}\n");
                     return(0);
                 }
-                if(for_handle(anker, *cmd_buff, p_output, error_str) < 0)
+                if(start_for(anker, *cmd_buff, p_output, error_str) < 0)
                 {
                     free(*cmd_buff);
                     return(-1);
                 }
                 free(*cmd_buff);
                 *cmd_buff = NULL;
-                *parser_status = 0;
+                *just_save = 0;
+                return(0);
+            //If abfrage
+            case 3:
+                *in_if = *in_if + 1;
+                if(*just_save != 0)
+                {
+                    *cmd_buff = realloc(*cmd_buff, strlen(*cmd_buff)+strlen(line)+6);
+                    strcat(*cmd_buff, "{%");
+                    strcat(*cmd_buff, line);
+                    strcat(*cmd_buff, "%}\n");
+                    return(0);
+                }
+                *just_save = 1;
+                if(*cmd_buff != NULL);
+                {
+                    free(*cmd_buff);
+                    *cmd_buff = NULL;
+                }
+                *cmd_buff = malloc(strlen(line)+1);
+                strcpy(*cmd_buff, line);
+                strcat(*cmd_buff, "\n");
+                return(0);
+            //Close if
+            case 4:
+                if((*just_save != 0 || *in_if-1 != 0) && *in_for != 0)
+                {
+                    *in_if--;
+                    *cmd_buff = realloc(*cmd_buff, strlen(*cmd_buff)+strlen(line)+6);
+                    strcat(*cmd_buff, "{%");
+                    strcat(*cmd_buff, line);
+                    strcat(*cmd_buff, "%}\n");
+                    return(0);
+                }
+                *in_if--;
+                if(start_if(anker, *cmd_buff, p_output, error_str) < 0)
+                {
+                    free(*cmd_buff);
+                    return(-1);
+                }
+                free(*cmd_buff);
+                *cmd_buff = NULL;
+                *just_save = 0;
                 return(0);
             //Found printVars()
             case 5:
@@ -99,9 +142,9 @@ int parse_line(struct variables *anker, char *line, FILE *p_output,
                 return(-5);
         }
     }
-    else if(*parser_status > 0)
+    else if(*just_save > 0)
     {
-        *cmd_buff = realloc(*cmd_buff, strlen(*cmd_buff)+strlen(line));
+        *cmd_buff = realloc(*cmd_buff, strlen(*cmd_buff)+strlen(line)+1);
         strcat(*cmd_buff, line);
     }
     else
@@ -128,7 +171,7 @@ int start_jinjaparser(struct variables *anker, char *outputfile,
 {
     FILE *p_template, *p_output;
     char *line, *cmd_buff = NULL;
-    int parser_status = 0, in_for = 0;
+    int parser_status = 0, in_for = 0, in_if = 0;
 
     if((p_template = openTemplateFile(templatefile, error_str)) == NULL)
     {
@@ -160,13 +203,30 @@ int start_jinjaparser(struct variables *anker, char *outputfile,
             return(-5);
         }*/
         if(parse_line(anker, line, p_output, &cmd_buff, &parser_status, 
-                      &in_for, error_str) < 0)
+                      &in_for, &in_if, error_str) < 0)
         {
             close_jinjaparser(p_output, p_template);
             return(-4);
         }
     }
 
+    /*if(in_for != 0)
+    {
+        strcpy(error_str, "Missing \"end-for\"");;
+        return(-5);
+    }
+
+    if(in_if != 0)
+    {
+        strcpy(error_str, "Missing \"end-if\"");;
+        return(-6);
+    }*/
+
+    if(parser_status != 0)
+    {
+        strcpy(error_str, "Missing End-Token");
+        return(-7);
+    }
     close_jinjaparser(p_output, p_template);
     return(0);
 }

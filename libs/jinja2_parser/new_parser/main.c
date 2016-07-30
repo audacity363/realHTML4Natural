@@ -4,6 +4,7 @@
 
 #include "standard.h"
 #include "varhandle.h"
+#include "hexdump.h"
 
 void fillTestvalues(struct variables *anker)
 {
@@ -46,6 +47,13 @@ void fillTestvalues(struct variables *anker)
         sprintf(tmpbuff, "value %d", i);
         appendStringArray(anker, "testarray", tmpbuff);
     }
+
+    newStringArray(anker, "testarray2", "value2 0");
+    for(i=1; i < 10; i++)
+    {
+        sprintf(tmpbuff, "value2 %d", i);
+        appendStringArray(anker, "testarray2", tmpbuff);
+    }
 }
 
 int main()
@@ -54,6 +62,8 @@ int main()
     struct variables *anker = malloc(sizeof(struct variables));
     anker->next = NULL;
     fillTestvalues(anker);
+
+    logHexDump(" ", 2, stdout);
 
     printVars(anker);
     

@@ -67,7 +67,8 @@ int editIntVar2DArray(struct variables *anker, char *name, int value, int x,
                       int y);
 
 char *generateStringValuefromArray(struct variables *ankerchar, char *name);
-void printArrayfromPtr(struct variables *ptr, FILE *output);
+void printArrayfromPtrtoFile(struct variables *ptr, FILE *output);
+void printArrayfromPtr(struct variables *ptr);
 struct variables* createTmpArrayOut2DArray(struct variables *anker, char *name,
                                            int x);
 struct variables* getVarPointer(struct variables *anker, char *name);

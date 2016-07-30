@@ -6,12 +6,16 @@
         margin-right: auto;
         margin-left: auto;
     }
+    </style>
 </head>
 <body>
-{% for entry in testarray%}
-    {% for bla in entry %}
+{%for entry in testarray %}
+    {%for bla in entry%}
         <p>{{bla}}</p>
-    {% end-for %}
-{%end-for%}
+    {%end-for%}
+{% if test == "Hello World" %}
+    <p>Jop</p>
+{%end-if%}
+{% end-for %}
 </body>
 </html>

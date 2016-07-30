@@ -45,6 +45,7 @@ int getIndex(struct variables *anker, char *variable, int *x, int *y,
             free(index_buff);
             return(-3);
         }
+        return(1);
     }
     else
     {
@@ -211,7 +212,7 @@ int handleInt2DArray(struct variables *anker, FILE *p_output, char *variable,
     {
         //1D Array aus index generieren und ausgeben
         tmp_array = createTmpArrayOut2DArray(anker, variable, x_index);
-        printArrayfromPtr(tmp_array, p_output);
+        printArrayfromPtrtoFile(tmp_array, p_output);
     }
     else if(index_type == 1 && has_function == 1)
     {
@@ -348,7 +349,7 @@ int handleString2DArray(struct variables *anker, FILE *p_output, char *variable,
     {
         //Nur Index als Array ausgeben
         tmp_array = createTmpArrayOut2DArray(anker, variable, x_index);
-        printArrayfromPtr(tmp_array, p_output);
+        printArrayfromPtrtoFile(tmp_array, p_output);
     }
     else if(index_type == 1 && has_function == 1)
     {
@@ -374,7 +375,7 @@ int handle_variable(struct variables *anker, char *variable, FILE *p_output,
     char function_buffer[100];
     int has_function = 0;
 
-    if(strcmp(variable, "loop.i") != 0)
+    if(strcmp(variable, "loop.i") != 0 && strstr(variable, "loop.i") == NULL)
     {
         has_function = getFunction(anker, variable, function_buffer, error_str);
     }

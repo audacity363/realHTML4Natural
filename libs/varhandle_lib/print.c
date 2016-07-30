@@ -7,7 +7,7 @@
 
 char varhandle_error_str[2048];
 
-void printArrayfromPtr(struct variables *ptr, FILE *output)
+void printArrayfromPtrtoFile(struct variables *ptr, FILE *output)
 {
     int x;
 
@@ -22,6 +22,23 @@ void printArrayfromPtr(struct variables *ptr, FILE *output)
             fprintf(output, ",");
     }
     fprintf(output, "]");
+}
+
+void printArrayfromPtr(struct variables *ptr)
+{
+    int x;
+
+    printf("[");
+    for(x=0; x < ptr->length; x++)
+    {
+        if(ptr->type == STRINGARRAY)
+            printf("\"%s\"", ((char**)ptr->data)[x]);
+        else
+            printf("%d", ((int*)ptr->data)[x]);
+        if(x+1 < ptr->length)
+            printf(",");
+    }
+    printf("]");
 }
 
 void printArray(struct variables *anker, char *name, bool showname, 
