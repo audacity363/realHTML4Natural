@@ -428,8 +428,9 @@ int for_handle(struct variables *anker, char *cmd_buff, FILE *p_output,
         for(x=1; x < block_length; x++)
         {
             editIntVar(anker, "loop.i", i);
-            line = malloc(strlen(((char**)for_block)[x]));
+            line = malloc(strlen(((char**)for_block)[x])+2);
             strcpy(line, ((char**)for_block)[x]);
+            strcat(line, "\n");
             if(parse_line(anker, line, p_output, &l_cmd_buff,
                        &parser_status, &l_in_for, &l_in_if, error_str) < 0)
             {
@@ -437,7 +438,7 @@ int for_handle(struct variables *anker, char *cmd_buff, FILE *p_output,
                 return(-10);
             }
             free(line);
-            fprintf(p_output, "\n");
+            //fprintf(p_output, "\n");
         }
     }
 

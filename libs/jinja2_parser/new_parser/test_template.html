@@ -9,13 +9,10 @@
     </style>
 </head>
 <body>
-{%for entry in testarray %}
-    {%for bla in entry%}
-        <p>{{bla}}</p>
-    {%end-for%}
-{% if test == "Hello World" %}
-    <p>Jop</p>
+{% if itest == 25 %}
+    <p>OK</p>
+{%else%}
+    <p>NOPE</p>
 {%end-if%}
-{% end-for %}
 </body>
 </html>

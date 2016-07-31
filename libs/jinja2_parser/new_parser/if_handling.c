@@ -182,13 +182,13 @@ int if_handle(struct variables *anker, char *cmd_buff, FILE *p_output,
 {
     char *if_block, *tmp_buff, *if_cmd, *if_cmd_detail, *line, *l_cmd_buff = NULL;
     int block_length = 0, detail_length = 0, i, x, y, var_type, found_str = 0;
-    int if_rc, parser_status = 0, l_in_for = 0;
+    int if_rc, parser_status = 0, l_in_for = 0, l_in_if = 0;
     int index_type, x_index, y_index;
 
     tmp_buff = strtok(cmd_buff, "\n");
 
     if_block = malloc(sizeof(char*));
-    ((char**)if_block)[0] = malloc(strlen(tmp_buff));
+    ((char**)if_block)[0] = malloc(strlen(tmp_buff)+1);
     strcpy(((char**)if_block)[0], tmp_buff);
     block_length++;
 
@@ -202,7 +202,7 @@ int if_handle(struct variables *anker, char *cmd_buff, FILE *p_output,
         block_length++;
 
         if_block = realloc(if_block, sizeof(char*)*block_length);
-        ((char**)if_block)[block_length-1] = malloc(strlen(tmp_buff));
+        ((char**)if_block)[block_length-1] = malloc(strlen(tmp_buff)+1);
         strcpy(((char**)if_block)[block_length-1], tmp_buff);
     }
 
@@ -261,16 +261,17 @@ int if_handle(struct variables *anker, char *cmd_buff, FILE *p_output,
     }
     for(i=1; i < block_length; i++)
     {
-        line = malloc(strlen(((char**)if_block)[i]));
+        line = malloc(strlen(((char**)if_block)[i])+2);
         strcpy(line, ((char**)if_block)[i]);
+        strcat(line, "\n");
         if(parse_line(anker, line, p_output, &l_cmd_buff,
-                   &parser_status, &l_in_for, error_str) < 0)
+                   &parser_status, &l_in_for, &l_in_if, error_str) < 0)
         {
             free(line);
             return(-10);
         }
         free(line);
-        fprintf(p_output, "\n");
+        //fprintf(p_output, "\n");
 
     }
 

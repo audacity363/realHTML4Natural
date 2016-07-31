@@ -14,6 +14,9 @@ int parse_line(struct variables *anker, char *line, FILE *p_output,
     char *pos_open_cmd, *pos_close_cmd;
     int cmd_type;
 
+    printf("in for: [%d]\n", *in_for);
+    printf("in if: [%d]\n", *in_if);
+
     if((pos_open_var = strstr(line, "{{")) != NULL && *just_save == 0)
     {
         pos_open_var[0] = '\0';
@@ -74,14 +77,25 @@ int parse_line(struct variables *anker, char *line, FILE *p_output,
                 return(0);
             //Forschleife ist geschlossen worden 
             case 2:
-                if(--*in_for != 0)
+                if(*in_for-1 != 0)
                 {
+                    *in_for = *in_for -1; 
                     *cmd_buff = realloc(*cmd_buff, strlen(*cmd_buff)+strlen(line)+6);
                     strcat(*cmd_buff, "{%");
                     strcat(*cmd_buff, line);
                     strcat(*cmd_buff, "%}\n");
                     return(0);
                 }
+                if(*in_if != 0)
+                {
+                    *in_for = *in_for -1; 
+                    *cmd_buff = realloc(*cmd_buff, strlen(*cmd_buff)+strlen(line)+6);
+                    strcat(*cmd_buff, "{%");
+                    strcat(*cmd_buff, line);
+                    strcat(*cmd_buff, "%}\n");
+                    return(0);
+                }
+                *in_for = *in_for - 1;
                 if(start_for(anker, *cmd_buff, p_output, error_str) < 0)
                 {
                     free(*cmd_buff);
@@ -114,16 +128,27 @@ int parse_line(struct variables *anker, char *line, FILE *p_output,
                 return(0);
             //Close if
             case 4:
-                if((*just_save != 0 || *in_if-1 != 0) && *in_for != 0)
+                if(*in_if-1 != 0)
                 {
-                    *in_if--;
+                    *in_if = *in_if -1;
                     *cmd_buff = realloc(*cmd_buff, strlen(*cmd_buff)+strlen(line)+6);
                     strcat(*cmd_buff, "{%");
                     strcat(*cmd_buff, line);
                     strcat(*cmd_buff, "%}\n");
                     return(0);
+
                 }
-                *in_if--;
+                if(*in_for != 0)
+                {
+                    *in_if = *in_if -1;
+                    *cmd_buff = realloc(*cmd_buff, strlen(*cmd_buff)+strlen(line)+6);
+                    strcat(*cmd_buff, "{%");
+                    strcat(*cmd_buff, line);
+                    strcat(*cmd_buff, "%}\n");
+                    return(0);
+
+                }
+                *in_if = *in_if -1;
                 if(start_if(anker, *cmd_buff, p_output, error_str) < 0)
                 {
                     free(*cmd_buff);
@@ -136,6 +161,13 @@ int parse_line(struct variables *anker, char *line, FILE *p_output,
             //Found printVars()
             case 5:
                 printVarstoFile(anker, p_output);
+                return(0);
+            //Else
+            case 6:
+                *cmd_buff = realloc(*cmd_buff, strlen(*cmd_buff)+strlen(line)+6);
+                strcat(*cmd_buff, "{%");
+                strcat(*cmd_buff, line);
+                strcat(*cmd_buff, "%}\n");
                 return(0);
             default:
                 strcpy(error_str, "Internal Error: searchCommand() return something unkown");

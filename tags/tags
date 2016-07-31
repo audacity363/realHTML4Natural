@@ -1,0 +1,645 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+AIX_VERSION	TestProgs/Makefile	/^AIX_VERSION     =   6.1$/;"	m
+ALIAS	web_server/lookup.h	2;"	d
+ALPHA	libs/nat-lda-parser/compiled_lda/lda_parser.h	2;"	d
+ARFLAGS	Makefile	/^ARFLAGS = -vcru$/;"	m
+ARGS	libs/varhandle_lib/varhandle.h	8;"	d
+ARRAYLENGTH	start_server.c	19;"	d	file:
+ARRAY_1D	libs/nat-lda-parser/compiled_lda/lda_parser.h	8;"	d
+ARRAY_2D	libs/nat-lda-parser/compiled_lda/lda_parser.h	9;"	d
+BUFFERSIZE	include/standard.h	4;"	d
+BUFFERSIZE	libs/jinja2_parser/include/standard.h	4;"	d
+BUFFERSIZE	libs/varhandle_lib/standard.h	4;"	d
+BYTE	natuser.h	24;"	d
+CARRIAGERETURN	web_server/header.h	5;"	d
+CC	Makefile	/^CC = gcc$/;"	m
+CC	libs/jinja2_parser/Makefile	/^CC = gcc$/;"	m
+CC	libs/jinja2_parser/new_parser/Makefile	/^CC = gcc$/;"	m
+CC	libs/nat-lda-parser/compiled_lda/Makefile	/^CC = xlc$/;"	m
+CC	libs/varhandle_lib/Makefile	/^CC = gcc$/;"	m
+CC	var2names/Makefile	/^CC = xlc$/;"	m
+CC	web_server/Makefile	/^CC = xlc$/;"	m
+CFGPATH	libs/CfgReader/cfg.c	35;"	d	file:
+CFG_FILE	libs/CfgReader/cfg.h	23;"	d
+CFG_PATH	Makefile	/^CFG_PATH    = $(HOMEDIR)\/libs\/CfgReader\/$/;"	m
+CFG_PATH	TestProgs/Makefile	/^CFG_PATH        	 =  $(DEVSYS)\/lib\/Cfg_v1.0.1$/;"	m
+CFG_PATH	libs/jinja2_parser/Makefile	/^CFG_PATH    = $(HOMEDIR)\/libs\/CfgReader\/$/;"	m
+CFG_PATH	libs/jinja2_parser/new_parser/Makefile	/^CFG_PATH    = $(HOMEDIR)\/libs\/CfgReader\/$/;"	m
+CFG_PATH	libs/nat-lda-parser/compiled_lda/Makefile	/^CFG_PATH    = $(HOMEDIR)\/libs\/CfgReader\/$/;"	m
+CFG_PATH	var2names/Makefile	/^CFG_PATH    = $(HOMEDIR)\/libs\/CfgReader\/$/;"	m
+CFG_PATH	web_server/Makefile	/^CFG_PATH    = $(HOMEDIR)\/libs\/CfgReader\/$/;"	m
+CFG_VERSION	TestProgs/Makefile	/^CFG_VERSION     =   1.0.1$/;"	m
+CFLAGS	Makefile	/^CFLAGS = -c -g$/;"	m
+CFLAGS	TestProgs/Makefile	/^CFLAGS	=	-g $(INCDIR)$/;"	m
+CHARS_PRO_ZEILE	libs/hexdump/hexdump.c	7;"	d	file:
+CLOSE	web_server/lookup.h	12;"	d
+CfgInfo	libs/CfgReader/cfg.c	/^char *CfgInfo(void)$/;"	f
+CloseCfg	libs/CfgReader/cfg.c	/^int	CloseCfg(void)$/;"	f
+DEBUG	include/standard.h	8;"	d
+DEBUG	web_server/lookup.h	7;"	d
+DEF_NATTAB	nattab.h	16;"	d
+DEF_NATUSER	natuser.h	12;"	d
+DEVELOP	TestProgs/Makefile	/^DEVELOP         =   \/develop_global$/;"	m
+DEVSYS	TestProgs/Makefile	/^DEVSYS          =   $(DEVELOP)\/sys_$(AIX_VERSION)\/$(OBJECT_MODE)$/;"	m
+DYNAMIC	libs/nat-lda-parser/compiled_lda/lda_parser.h	6;"	d
+ENDFOR	libs/jinja2_parser/jinja2_parser.h	10;"	d
+ENDIF	libs/jinja2_parser/jinja2_parser.h	7;"	d
+FALSE	libs/CfgReader/cfg.c	37;"	d	file:
+FILELENGTH	start_server.c	22;"	d	file:
+FINFO	natuser.h	/^  } FINFO;$/;"	t	typeref:struct:__anon5
+FOR	libs/jinja2_parser/jinja2_parser.h	9;"	d
+FORBIDDEN	web_server/httpcodes.h	2;"	d
+GET	web_server/header.h	1;"	d
+GROUP	libs/nat-lda-parser/normale_lda/main.c	15;"	d	file:
+GROUP_LEADER	libs/nat-lda-parser/compiled_lda/lda_parser.h	4;"	d
+GetCfgToken	libs/CfgReader/cfg.c	/^char *GetCfgToken(char *p_token, char **p_error, char PrintInfo)$/;"	f
+HEXD_PATH	Makefile	/^HEXD_PATH   = $(HOMEDIR)\/libs\/hexdump\/$/;"	m
+HEXD_PATH	TestProgs/Makefile	/^HEXD_PATH			= 	$(DEVSYS)\/lib\/HexDump_v1.1$/;"	m
+HEXD_PATH	libs/jinja2_parser/Makefile	/^HEXD_PATH   = $(HOMEDIR)\/libs\/hexdump\/$/;"	m
+HEXD_PATH	libs/jinja2_parser/new_parser/Makefile	/^HEXD_PATH   = $(HOMEDIR)\/libs\/hexdump\/$/;"	m
+HEXD_PATH	libs/nat-lda-parser/compiled_lda/Makefile	/^HEXD_PATH   = $(HOMEDIR)\/libs\/hexdump\/$/;"	m
+HEXD_PATH	var2names/Makefile	/^HEXD_PATH   = $(HOMEDIR)\/libs\/hexdump\/$/;"	m
+HEXD_PATH	web_server/Makefile	/^HEXD_PATH   = $(HOMEDIR)\/libs\/hexdump\/$/;"	m
+HOMEDIR	Makefile	/^HOMEDIR = \/home\/tom\/\/Documents\/realHtml4Natural\/$/;"	m
+HOMEDIR	libs/jinja2_parser/Makefile	/^HOMEDIR = \/home\/tom\/Documents\/realHtml4Natural$/;"	m
+HOMEDIR	libs/jinja2_parser/new_parser/Makefile	/^HOMEDIR = \/home\/tom\/\/Documents\/realHtml4Natural\/$/;"	m
+HOMEDIR	libs/nat-lda-parser/compiled_lda/Makefile	/^HOMEDIR = \/u\/it\/a140734\/C\/sharedlib_jinja2\/$/;"	m
+HOMEDIR	var2names/Makefile	/^HOMEDIR = \/u\/it\/a140734\/C\/sharedlib_jinja2$/;"	m
+HOMEDIR	web_server/Makefile	/^HOMEDIR = \/u\/it\/a140734\/C\/sharedlib_jinja2$/;"	m
+HTDOCS	web_server/filehandling.c	10;"	d	file:
+IF	libs/jinja2_parser/jinja2_parser.h	6;"	d
+IF4_FLG_AIV	natuser.h	80;"	d
+IF4_FLG_DYNAMIC	natuser.h	78;"	d
+IF4_FLG_DYNVAR	natuser.h	81;"	d
+IF4_FLG_LBVAR_0	natuser.h	83;"	d
+IF4_FLG_LBVAR_1	natuser.h	85;"	d
+IF4_FLG_LBVAR_2	natuser.h	87;"	d
+IF4_FLG_NOT_CONTIGUOUS	natuser.h	79;"	d
+IF4_FLG_PROTECTED	natuser.h	77;"	d
+IF4_FLG_UBVAR_0	natuser.h	84;"	d
+IF4_FLG_UBVAR_1	natuser.h	86;"	d
+IF4_FLG_UBVAR_2	natuser.h	88;"	d
+IF4_FLG_XARRAY	natuser.h	82;"	d
+IF4_MAX_DIM	natuser.h	74;"	d
+IF4_RC_BAD_BOUNDS	natuser.h	140;"	d
+IF4_RC_BAD_DIM	natuser.h	139;"	d
+IF4_RC_BAD_FORMAT	natuser.h	137;"	d
+IF4_RC_BAD_INDEX_0	natuser.h	143;"	d
+IF4_RC_BAD_INDEX_1	natuser.h	144;"	d
+IF4_RC_BAD_INDEX_2	natuser.h	145;"	d
+IF4_RC_BAD_LENGTH	natuser.h	138;"	d
+IF4_RC_BAD_VERSION	natuser.h	136;"	d
+IF4_RC_DATA_TRUNCATED	natuser.h	132;"	d
+IF4_RC_ILL_PNUM	natuser.h	130;"	d
+IF4_RC_INCOMPL_UCHAR	natuser.h	142;"	d
+IF4_RC_INT_ERROR	natuser.h	131;"	d
+IF4_RC_NOT_ARRAY	natuser.h	133;"	d
+IF4_RC_NOT_RESIZABLE	natuser.h	141;"	d
+IF4_RC_NO_MEMORY	natuser.h	135;"	d
+IF4_RC_OK	natuser.h	129;"	d
+IF4_RC_WRT_PROTECTED	natuser.h	134;"	d
+IMPORT	libs/jinja2_parser/jinja2_parser.h	8;"	d
+INCDIR	Makefile	/^INCDIR   =  -I$(STANDARD_PATH)  \\$/;"	m
+INCDIR	TestProgs/Makefile	/^INCDIR = -I. 	-I..\\$/;"	m
+INCDIR	libs/jinja2_parser/Makefile	/^INCDIR   =  -I$(STANDARD_PATH)  \\$/;"	m
+INCDIR	libs/jinja2_parser/new_parser/Makefile	/^INCDIR   =  -I$(STANDARD_PATH)  \\$/;"	m
+INCDIR	libs/nat-lda-parser/compiled_lda/Makefile	/^INCDIR   =  -I$(STANDARD_PATH)  \\$/;"	m
+INCDIR	var2names/Makefile	/^INCDIR   =  -I$(STANDARD_PATH)  \\$/;"	m
+INCDIR	web_server/Makefile	/^INCDIR   =  -I$(STANDARD_PATH)  \\$/;"	m
+INT	libs/jinja2_parser/jinja2_parser.h	13;"	d
+INT	libs/nat-lda-parser/normale_lda/main.c	9;"	d	file:
+INT	libs/varhandle_lib/varhandle.h	1;"	d
+INTARRAY	libs/jinja2_parser/jinja2_parser.h	17;"	d
+INTARRAY	libs/nat-lda-parser/normale_lda/main.c	13;"	d	file:
+INTARRAY	libs/varhandle_lib/varhandle.h	5;"	d
+INTEGER	libs/nat-lda-parser/compiled_lda/lda_parser.h	3;"	d
+JINJA_PATH	Makefile	/^JINJA_PATH  = $(HOMEDIR)\/libs\/jinja2_parser\/$/;"	m
+JINJA_PATH	libs/jinja2_parser/Makefile	/^JINJA_PATH  = $(HOMEDIR)\/libs\/jinja2_parser\/$/;"	m
+JINJA_PATH	libs/jinja2_parser/new_parser/Makefile	/^JINJA_PATH  = $(HOMEDIR)\/libs\/jinja2_parser\/$/;"	m
+JINJA_PATH	libs/nat-lda-parser/compiled_lda/Makefile	/^JINJA_PATH  = $(HOMEDIR)\/libs\/jinja2_parser\/$/;"	m
+JINJA_PATH	var2names/Makefile	/^JINJA_PATH  = $(HOMEDIR)\/libs\/jinja2_parser\/$/;"	m
+JINJA_PATH	web_server/Makefile	/^JINJA_PATH  = $(HOMEDIR)\/libs\/jinja2_parser\/$/;"	m
+LDA_PATH	Makefile	/^LDA_PATH    = $(HOMEDIR)\/libs\/nat-lda-parser\/compiled_lda\/$/;"	m
+LDA_PATH	libs/jinja2_parser/Makefile	/^LDA_PATH    = $(HOMEDIR)\/libs\/nat-lda-parser\/compiled_lda\/$/;"	m
+LDA_PATH	libs/jinja2_parser/new_parser/Makefile	/^LDA_PATH    = $(HOMEDIR)\/libs\/nat-lda-parser\/compiled_lda\/$/;"	m
+LDA_PATH	libs/nat-lda-parser/compiled_lda/Makefile	/^LDA_PATH    = $(HOMEDIR)\/libs\/nat-lda-parser\/compiled_lda\/$/;"	m
+LDA_PATH	var2names/Makefile	/^LDA_PATH    = $(HOMEDIR)\/libs\/nat-lda-parser\/compiled_lda\/$/;"	m
+LDA_PATH	web_server/Makefile	/^LDA_PATH    = $(HOMEDIR)\/libs\/nat-lda-parser\/compiled_lda\/$/;"	m
+LIBRARY	web_server/lookup.h	6;"	d
+LIBS	Makefile	/^LIBS    = -L$(CFG_PATH) -lcfg \\$/;"	m
+LIBS	libs/jinja2_parser/Makefile	/^LIBS     =  -L$(VAR_PATH) -lvarhandle \\$/;"	m
+LIBS	libs/jinja2_parser/new_parser/Makefile	/^LIBS    = -L$(CFG_PATH) -lcfg \\$/;"	m
+LINEFEED	web_server/header.h	6;"	d
+LINELENGTH	libs/jinja2_parser/new_parser/file_handling.h	1;"	d
+LOGFILEPATH	start_server.c	20;"	d	file:
+MAXATTRLENGTH	include/standard.h	5;"	d
+MAXATTRLENGTH	libs/jinja2_parser/include/standard.h	5;"	d
+MAXATTRLENGTH	libs/varhandle_lib/standard.h	5;"	d
+MAXSTRINGLENGTH	include/standard.h	6;"	d
+MAXSTRINGLENGTH	libs/jinja2_parser/include/standard.h	6;"	d
+MAXSTRINGLENGTH	libs/varhandle_lib/standard.h	6;"	d
+NAMES_PATH	Makefile	/^NAMES_PATH = $(HOMEDIR)\/var2names$/;"	m
+NAMES_PATH	libs/jinja2_parser/new_parser/Makefile	/^NAMES_PATH = $(HOMEDIR)\/var2names$/;"	m
+NAME_SIZE	nattab.h	18;"	d
+NATARGDCL	natuser.h	58;"	d
+NATARGDCL4	natuser.h	66;"	d
+NATARGDEF	natuser.h	55;"	d
+NATARGDEF4	natuser.h	64;"	d
+NATFCT	natuser.h	54;"	d
+NATTIMEOUT	start_server.c	21;"	d	file:
+NATTYP_FCT	natuser.h	53;"	d
+NATTYP_I1	natuser.h	50;"	d
+NATTYP_I2	natuser.h	51;"	d
+NATTYP_I4	natuser.h	52;"	d
+NATVAR_PATH	Makefile	/^NATVAR_PATH = $(HOMEDIR)\/var2names\/$/;"	m
+NATVAR_PATH	libs/jinja2_parser/Makefile	/^NATVAR_PATH = $(HOMEDIR)\/var2names\/$/;"	m
+NATVAR_PATH	libs/jinja2_parser/new_parser/Makefile	/^NATVAR_PATH = $(HOMEDIR)\/var2names\/$/;"	m
+NATVAR_PATH	libs/nat-lda-parser/compiled_lda/Makefile	/^NATVAR_PATH = $(HOMEDIR)\/var2names\/$/;"	m
+NATVAR_PATH	var2names/Makefile	/^NATVAR_PATH = $(HOMEDIR)\/var2names\/$/;"	m
+NATVAR_PATH	web_server/Makefile	/^NATVAR_PATH = $(HOMEDIR)\/var2names\/$/;"	m
+NC_TAB_STRUCT	nattab.h	/^} NC_TAB_STRUCT;$/;"	t	typeref:struct:nc_tab_struct
+NOT_ALLOWED	web_server/httpcodes.h	4;"	d
+NOT_FOUND	web_server/httpcodes.h	3;"	d
+NUMERIC	libs/nat-lda-parser/compiled_lda/lda_parser.h	1;"	d
+OBJECT_MODE	TestProgs/Makefile	/^OBJECT_MODE     =   64$/;"	m
+OPEN	web_server/lookup.h	11;"	d
+OpenCfg	libs/CfgReader/cfg.c	/^int	OpenCfg(char *p_cfg, char *p_ident, char **p_error)$/;"	f
+PORT	include/standard.h	1;"	d
+PORT	libs/jinja2_parser/include/standard.h	1;"	d
+PORT	libs/varhandle_lib/standard.h	1;"	d
+PORT	web_server/main.c	16;"	d	file:
+PORT	web_server/main.c	17;"	d	file:
+POST	web_server/header.h	2;"	d
+PRINTVARS	libs/jinja2_parser/jinja2_parser.h	11;"	d
+PROGRAMM	web_server/lookup.h	4;"	d
+RC_OK	TestProgs/main.c	6;"	d	file:
+REDEFINE	libs/nat-lda-parser/compiled_lda/lda_parser.h	5;"	d
+REDEFINE	libs/nat-lda-parser/normale_lda/main.c	16;"	d	file:
+RETURN	web_server/lookup.h	3;"	d
+ROUTE	web_server/lookup.h	5;"	d
+RemoveSpaces	libs/utils/utils.c	/^void RemoveSpaces(char* source)$/;"	f
+SAG_ALPHA_CHAR	libs/nat-lda-parser/compiled_lda/lda_parser.h	11;"	d
+SAG_COMMENT	libs/nat-lda-parser/compiled_lda/lda_parser.h	17;"	d
+SAG_COMMENT_STR	libs/nat-lda-parser/compiled_lda/natone.c	9;"	d	file:
+SAG_COMMENT_STR	libs/nat-lda-parser/compiled_lda/unix.c	9;"	d	file:
+SAG_CONTROL_CHAR	libs/nat-lda-parser/compiled_lda/lda_parser.h	14;"	d
+SAG_DEFINE	libs/nat-lda-parser/compiled_lda/lda_parser.h	18;"	d
+SAG_DEFINE_CONST	libs/nat-lda-parser/compiled_lda/lda_parser.h	19;"	d
+SAG_DEFINE_CONST_STR	libs/nat-lda-parser/compiled_lda/natone.c	11;"	d	file:
+SAG_DEFINE_CONST_STR	libs/nat-lda-parser/compiled_lda/unix.c	11;"	d	file:
+SAG_DEFINE_STR	libs/nat-lda-parser/compiled_lda/natone.c	10;"	d	file:
+SAG_DEFINE_STR	libs/nat-lda-parser/compiled_lda/unix.c	10;"	d	file:
+SAG_DYNAMIC	libs/nat-lda-parser/compiled_lda/lda_parser.h	15;"	d
+SAG_DYNAMIC_DF	libs/nat-lda-parser/compiled_lda/lda_parser.h	26;"	d
+SAG_DYNAMIC_DF_STR	libs/nat-lda-parser/compiled_lda/unix.c	18;"	d	file:
+SAG_GROUP_HEAD	libs/nat-lda-parser/compiled_lda/lda_parser.h	21;"	d
+SAG_GROUP_HEAD_STR	libs/nat-lda-parser/compiled_lda/natone.c	13;"	d	file:
+SAG_GROUP_HEAD_STR	libs/nat-lda-parser/compiled_lda/unix.c	13;"	d	file:
+SAG_GROUP_MEMBER	libs/nat-lda-parser/compiled_lda/lda_parser.h	20;"	d
+SAG_GROUP_MEMBER_STR	libs/nat-lda-parser/compiled_lda/natone.c	12;"	d	file:
+SAG_GROUP_MEMBER_STR	libs/nat-lda-parser/compiled_lda/unix.c	12;"	d	file:
+SAG_INIT	libs/nat-lda-parser/compiled_lda/lda_parser.h	24;"	d
+SAG_INIT_STR	libs/nat-lda-parser/compiled_lda/unix.c	16;"	d	file:
+SAG_INTEGER_CHAR	libs/nat-lda-parser/compiled_lda/lda_parser.h	12;"	d
+SAG_NATONE	libs/nat-lda-parser/compiled_lda/main.c	9;"	d	file:
+SAG_NUMERIK_CHAR	libs/nat-lda-parser/compiled_lda/lda_parser.h	13;"	d
+SAG_PRE_INIT	libs/nat-lda-parser/compiled_lda/lda_parser.h	25;"	d
+SAG_PRE_INIT_STR	libs/nat-lda-parser/compiled_lda/unix.c	17;"	d	file:
+SAG_REDEFINE	libs/nat-lda-parser/compiled_lda/lda_parser.h	22;"	d
+SAG_REDEFINED_VALUES	libs/nat-lda-parser/compiled_lda/lda_parser.h	23;"	d
+SAG_REDEFINED_VALUES_STR	libs/nat-lda-parser/compiled_lda/natone.c	15;"	d	file:
+SAG_REDEFINED_VALUES_STR	libs/nat-lda-parser/compiled_lda/unix.c	15;"	d	file:
+SAG_REDEFINE_STR	libs/nat-lda-parser/compiled_lda/natone.c	14;"	d	file:
+SAG_REDEFINE_STR	libs/nat-lda-parser/compiled_lda/unix.c	14;"	d	file:
+SAG_UNIX	libs/nat-lda-parser/compiled_lda/main.c	10;"	d	file:
+SERVER_ERROR	web_server/httpcodes.h	5;"	d
+SERVER_STRING	web_server/response.c	7;"	d	file:
+SHARED_MODE	ncuxinit.c	16;"	d	file:
+SOC_PATH	Makefile	/^SOC_PATH    = $(HOMEDIR)\/libs\/Sockets\/$/;"	m
+SOC_PATH	libs/jinja2_parser/Makefile	/^SOC_PATH    = $(HOMEDIR)\/libs\/Sockets\/$/;"	m
+SOC_PATH	libs/jinja2_parser/new_parser/Makefile	/^SOC_PATH    = $(HOMEDIR)\/libs\/Sockets\/$/;"	m
+SOC_PATH	libs/nat-lda-parser/compiled_lda/Makefile	/^SOC_PATH    = $(HOMEDIR)\/libs\/Sockets\/$/;"	m
+SOC_PATH	var2names/Makefile	/^SOC_PATH    = $(HOMEDIR)\/libs\/Sockets\/$/;"	m
+SOC_PATH	web_server/Makefile	/^SOC_PATH    = $(HOMEDIR)\/libs\/Sockets\/$/;"	m
+STANDARD_PATH	Makefile	/^STANDARD_PATH    	=   $(HOMEDIR)\/include$/;"	m
+STANDARD_PATH	TestProgs/Makefile	/^STANDARD_PATH    	=   $(DEVSYS)\/include$/;"	m
+STANDARD_PATH	libs/jinja2_parser/Makefile	/^STANDARD_PATH    	=   $(HOMEDIR)\/include$/;"	m
+STANDARD_PATH	libs/jinja2_parser/new_parser/Makefile	/^STANDARD_PATH    	=   $(HOMEDIR)\/include$/;"	m
+STANDARD_PATH	libs/nat-lda-parser/compiled_lda/Makefile	/^STANDARD_PATH    	=   $(HOMEDIR)\/include$/;"	m
+STANDARD_PATH	var2names/Makefile	/^STANDARD_PATH    	=   $(HOMEDIR)\/include$/;"	m
+STANDARD_PATH	web_server/Makefile	/^STANDARD_PATH    	=   $(HOMEDIR)\/include$/;"	m
+STND_PATH	var2names/Makefile	/^STND_PATH   = $(HOMEDIR)\/include\/$/;"	m
+STRING	libs/jinja2_parser/jinja2_parser.h	14;"	d
+STRING	libs/nat-lda-parser/normale_lda/main.c	10;"	d	file:
+STRING	libs/varhandle_lib/varhandle.h	2;"	d
+STRINGARRAY	libs/jinja2_parser/jinja2_parser.h	15;"	d
+STRINGARRAY	libs/nat-lda-parser/normale_lda/main.c	11;"	d	file:
+STRINGARRAY	libs/varhandle_lib/varhandle.h	3;"	d
+StripTrailingSpaces	libs/utils/utils.c	/^char *StripTrailingSpaces(char *str)$/;"	f
+TAB_SIZE	nattab.h	38;"	d
+TAB_SIZE	nattab.h	43;"	d
+TAB_STRUCT	nattab.h	37;"	d
+TAB_STRUCT	nattab.h	42;"	d
+TEXT	web_server/lookup.h	8;"	d
+TOKEN_PRO_ZEILE	libs/CfgReader/cfg.c	36;"	d	file:
+TRUE	libs/CfgReader/cfg.c	38;"	d	file:
+TS_PATH	TestProgs/Makefile	/^TS_PATH           	 =  $(DEVSYS)\/lib\/TS_v1.0$/;"	m
+TWO_DINTARRAY	libs/jinja2_parser/jinja2_parser.h	18;"	d
+TWO_DINTARRAY	libs/nat-lda-parser/normale_lda/main.c	14;"	d	file:
+TWO_DINTARRAY	libs/varhandle_lib/varhandle.h	6;"	d
+TWO_DSTRINGARRAY	libs/jinja2_parser/jinja2_parser.h	16;"	d
+TWO_DSTRINGARRAY	libs/nat-lda-parser/normale_lda/main.c	12;"	d	file:
+TWO_DSTRINGARRAY	libs/varhandle_lib/varhandle.h	4;"	d
+TrimSpaces	libs/utils/utils.c	/^void TrimSpaces(char *str)$/;"	f
+UNAUTHORIZED	web_server/httpcodes.h	1;"	d
+UNIT_SEPERATOR	send_values_to_page.c	18;"	d	file:
+UTILITY_PATH	TestProgs/Makefile	/^UTILITY_PATH     	=   $(DEVSYS)\/lib\/Utility_v1.2$/;"	m
+UTILITY_VERSION	TestProgs/Makefile	/^UTILITY_VERSION	=	1.0$/;"	m
+UTILS_PATH	Makefile	/^UTILS_PATH  = $(HOMEDIR)\/libs\/utils\/$/;"	m
+UTILS_PATH	libs/jinja2_parser/Makefile	/^UTILS_PATH  = $(HOMEDIR)\/libs\/utils\/$/;"	m
+UTILS_PATH	libs/jinja2_parser/new_parser/Makefile	/^UTILS_PATH  = $(HOMEDIR)\/libs\/utils\/$/;"	m
+UTILS_PATH	libs/nat-lda-parser/compiled_lda/Makefile	/^UTILS_PATH  = $(HOMEDIR)\/libs\/utils\/$/;"	m
+UTILS_PATH	var2names/Makefile	/^UTILS_PATH  = $(HOMEDIR)\/libs\/utils\/$/;"	m
+UTILS_PATH	web_server/Makefile	/^UTILS_PATH  = $(HOMEDIR)\/libs\/utils\/$/;"	m
+VARLENGTH	start_server.c	18;"	d	file:
+VAR_PATH	Makefile	/^VAR_PATH    = $(HOMEDIR)\/libs\/varhandle_lib\/$/;"	m
+VAR_PATH	libs/jinja2_parser/Makefile	/^VAR_PATH    = $(HOMEDIR)\/libs\/varhandle_lib\/$/;"	m
+VAR_PATH	libs/jinja2_parser/new_parser/Makefile	/^VAR_PATH    = $(HOMEDIR)\/libs\/varhandle_lib\/$/;"	m
+VAR_PATH	libs/nat-lda-parser/compiled_lda/Makefile	/^VAR_PATH    = $(HOMEDIR)\/libs\/varhandle_lib\/$/;"	m
+VAR_PATH	var2names/Makefile	/^VAR_PATH    = $(HOMEDIR)\/libs\/varhandle_lib\/$/;"	m
+VAR_PATH	web_server/Makefile	/^VAR_PATH    = $(HOMEDIR)\/libs\/varhandle_lib\/$/;"	m
+WEB_PATH	Makefile	/^WEB_PATH    = $(HOMEDIR)\/web_server\/$/;"	m
+WEB_PATH	Makefile	/^WEB_PATH   = $(HOMEDIR)\/web_server$/;"	m
+WEB_PATH	libs/jinja2_parser/Makefile	/^WEB_PATH    = $(HOMEDIR)\/web_server\/$/;"	m
+WEB_PATH	libs/jinja2_parser/new_parser/Makefile	/^WEB_PATH    = $(HOMEDIR)\/web_server\/$/;"	m
+WEB_PATH	libs/jinja2_parser/new_parser/Makefile	/^WEB_PATH   = $(HOMEDIR)\/web_server$/;"	m
+WEB_PATH	libs/nat-lda-parser/compiled_lda/Makefile	/^WEB_PATH    = $(HOMEDIR)\/web_server\/$/;"	m
+WEB_PATH	var2names/Makefile	/^WEB_PATH    = $(HOMEDIR)\/web_server\/$/;"	m
+WEB_PATH	web_server/Makefile	/^WEB_PATH    = $(HOMEDIR)\/web_server\/$/;"	m
+WORD	natuser.h	20;"	d
+_CFG_H_	libs/CfgReader/cfg.h	21;"	d
+accept_con	libs/Sockets/sockets.c	/^int accept_con(int handle, char *ip)$/;"	f
+address	natuser.h	/^    void *address;              \/* not aligned, realloc()\/free() is not allowed           *\/$/;"	m	struct:parameter_description
+akt_level	libs/nat-lda-parser/compiled_lda/lda_parser.h	/^    int akt_level;$/;"	m	struct:status_p
+akt_level	libs/nat-lda-parser/normale_lda/main.c	/^    int akt_level;$/;"	m	struct:status_p	file:
+alias	web_server/lookup.h	/^    char alias[100];$/;"	m	struct:__anon2
+appendIntArray	libs/jinja2_parser/old/varhandle.c	/^void appendIntArray(struct variables *anker, char *name, int value)$/;"	f
+appendIntArray	libs/varhandle_lib/integer.c	/^void appendIntArray(struct variables *anker, char *name, int value)$/;"	f
+appendStringArray	libs/jinja2_parser/old/varhandle.c	/^void appendStringArray(struct variables *anker, char *name, char *value)$/;"	f
+appendStringArray	libs/varhandle_lib/string.c	/^void appendStringArray(struct variables *anker, char *name, char *value)$/;"	f
+args	libs/varhandle_lib/varhandle.h	/^struct args {$/;"	s
+array	libs/nat-lda-parser/compiled_lda/lda_parser.h	/^    int array; \/\/true|false$/;"	m	struct:varnames
+array	libs/varhandle_lib/varhandle.h	/^    int array;$/;"	m	struct:variables
+attrbuf	libs/jinja2_parser/jinja2_parser.h	/^    char attrbuf[200];$/;"	m	struct:__anon1
+binary_extensions	web_server/filehandling.c	/^static char binary_extensions[6][3] = {"jpg",$/;"	v	file:
+bool	include/standard.h	/^typedef int bool;$/;"	t
+bool	libs/jinja2_parser/include/standard.h	/^typedef int bool;$/;"	t
+bool	libs/varhandle_lib/standard.h	/^typedef int bool;$/;"	t
+bool	libs/varhandle_lib/varhandle.h	/^typedef int bool;$/;"	t
+byte_length	natuser.h	/^    int byte_length;            \/* length of field in bytes                               *\/$/;"	m	struct:parameter_description
+calculateBufferSize	send_values_to_page.c	/^int calculateBufferSize(struct variables *anker)$/;"	f
+callFunction	libs/jinja2_parser/main.c	/^void callFunction(struct args *word, struct variables *anker, char *functionname, int vartype)$/;"	f
+call_subprog	start_server.c	/^int call_subprog(char *programm, char *server_deliver_filename, httpheader request_header)$/;"	f
+cargs	libs/varhandle_lib/varhandle.h	/^        char *cargs;$/;"	m	struct:args
+char_strcat	libs/utils/utils.c	/^void char_strcat(char *str, char character)$/;"	f
+checkFileExtension	web_server/filehandling.c	/^bool checkFileExtension(char *ext)$/;"	f
+checkInt	libs/jinja2_parser/utils.c	/^bool checkInt(char *cmd)$/;"	f
+checkforFile	web_server/main.c	/^bool checkforFile(char *requestpath)$/;"	f
+checkifArray	libs/nat-lda-parser/normale_lda/main.c	/^bool checkifArray(char *line, char *result)$/;"	f
+closeOutputFile	libs/jinja2_parser/new_parser/file_handling.c	/^int closeOutputFile(FILE *p_output, char *error_str)$/;"	f
+closeTemplateFile	libs/jinja2_parser/new_parser/file_handling.c	/^int  closeTemplateFile(FILE *p_template, char *error_str)$/;"	f
+close_jinjaparser	libs/jinja2_parser/new_parser/start_jinjaparser.c	/^int close_jinjaparser(FILE *p_output, FILE *p_template)$/;"	f
+close_socket	libs/Sockets/sockets.c	/^int close_socket(int handle)$/;"	f
+cmdclose	libs/jinja2_parser/jinja2_parser.h	4;"	d
+cmdopen	libs/jinja2_parser/jinja2_parser.h	3;"	d
+cmp	include/standard.h	11;"	d
+cmp	libs/jinja2_parser/include/standard.h	9;"	d
+cmp	libs/varhandle_lib/standard.h	9;"	d
+compare	libs/jinja2_parser/new_parser/if_handling.c	/^int compare(struct variables *anker, char *var1, char *var2, char *symbol, $/;"	f
+connection	web_server/header.h	/^    char *connection;$/;"	m	struct:__anon4
+count_for	libs/jinja2_parser/jinja2_parser.h	/^    int count_for;$/;"	m	struct:__anon1
+createTmpArrayOut2DArray	libs/jinja2_parser/old/varhandle.c	/^struct variables* createTmpArrayOut2DArray(struct variables *anker, char *name,$/;"	f
+createTmpArrayOut2DArray	libs/varhandle_lib/management.c	/^struct variables* createTmpArrayOut2DArray(struct variables *anker, char *name,$/;"	f
+createTmpVar	libs/jinja2_parser/new_parser/for_handling.c	/^int createTmpVar(struct variables *anker, char *tmp_name, char *variable,$/;"	f
+create_tcp_client	libs/Sockets/sockets.c	/^int create_tcp_client(char *ip, int port)$/;"	f
+create_tcp_server	libs/Sockets/sockets.c	/^int create_tcp_server(int port)$/;"	f
+cur_dataset	libs/nat-lda-parser/compiled_lda/lda_parser.h	/^    struct varnames *cur_dataset;$/;"	m	struct:status_p	typeref:struct:status_p::varnames
+cur_dataset	libs/nat-lda-parser/normale_lda/main.c	/^    struct varnames *cur_dataset;$/;"	m	struct:status_p	typeref:struct:status_p::varnames	file:
+data	libs/varhandle_lib/varhandle.h	/^    void *data;$/;"	m	struct:variables
+debug	web_server/lookup.h	/^    bool debug;$/;"	m	struct:__anon2
+deleteVar	libs/jinja2_parser/old/varhandle.c	/^int deleteVar(struct variables *anker, char *name)$/;"	f
+deleteVar	libs/varhandle_lib/management.c	/^int deleteVar(struct variables *anker, char *name)$/;"	f
+deliverBinaryFile	web_server/filehandling.c	/^int deliverBinaryFile(int client, char *file)$/;"	f
+deliverFile	web_server/filehandling.c	/^void deliverFile(char *requestfile, int client, int htdocs)$/;"	f
+deliverTextFile	web_server/filehandling.c	/^int deliverTextFile(int client, char *file)$/;"	f
+dimensions	natuser.h	/^    int dimensions;             \/* number of dimensions: 0 ... IF4_MAX_DIM                *\/$/;"	m	struct:parameter_description
+dummyhandle	web_server/test/main.c	/^int dummyhandle(char *prog)$/;"	f
+dynp	natuser.h	/^    void *dynp;                 \/* internal use only (for dynamic variables)              *\/$/;"	m	struct:parameter_description
+editIntVar	libs/jinja2_parser/old/varhandle.c	/^int editIntVar(struct variables *anker, char *name, int value)$/;"	f
+editIntVar	libs/varhandle_lib/integer.c	/^int editIntVar(struct variables *anker, char *name, int value)$/;"	f
+editIntVar2DArray	libs/jinja2_parser/old/varhandle.c	/^int editIntVar2DArray(struct variables *anker, char *name, int value, int x,$/;"	f
+editIntVar2DArray	libs/varhandle_lib/integer.c	/^int editIntVar2DArray(struct variables *anker, char *name, int value, int x,$/;"	f
+editIntVarArray	libs/jinja2_parser/old/varhandle.c	/^int editIntVarArray(struct variables *anker, char *name, int value, int x)$/;"	f
+editIntVarArray	libs/varhandle_lib/integer.c	/^int editIntVarArray(struct variables *anker, char *name, int value, int x)$/;"	f
+editStringVar	libs/jinja2_parser/old/varhandle.c	/^int editStringVar(struct variables *anker, char *name, char *value)$/;"	f
+editStringVar	libs/varhandle_lib/string.c	/^int editStringVar(struct variables *anker, char *name, char *value)$/;"	f
+editStringVar2DArray	libs/jinja2_parser/old/varhandle.c	/^int editStringVar2DArray(struct variables *anker, char *name, char *value,$/;"	f
+editStringVar2DArray	libs/varhandle_lib/string.c	/^int editStringVar2DArray(struct variables *anker, char *name, char *value,$/;"	f
+editStringVarArray	libs/jinja2_parser/old/varhandle.c	/^int editStringVarArray(struct variables *anker, char *name, char *value, int x)$/;"	f
+editStringVarArray	libs/varhandle_lib/string.c	/^int editStringVarArray(struct variables *anker, char *name, char *value, int x)$/;"	f
+error_str	libs/jinja2_parser/main.c	/^char error_str[2048];$/;"	v
+exec_stat	send_values_to_page.c	/^int exec_stat = 0;$/;"	v
+false	include/standard.h	3;"	d
+false	libs/jinja2_parser/include/standard.h	3;"	d
+false	libs/varhandle_lib/standard.h	3;"	d
+fctn_name	nattab.h	/^  char fctn_name[NAME_SIZE]; \/* natural name of function *\/$/;"	m	struct:nc_tab_struct
+fillTestValues	libs/jinja2_parser/main.c	/^void fillTestValues(struct variables *anker)$/;"	f
+fillTestvalues	libs/jinja2_parser/new_parser/main.c	/^void fillTestvalues(struct variables *anker)$/;"	f
+fillTmpVar	libs/jinja2_parser/new_parser/for_handling.c	/^int fillTmpVar(struct variables *anker, char *tmp_name, char *variable,$/;"	f
+first	libs/jinja2_parser/for.c	/^    int first;$/;"	m	struct:for_infos	file:
+flags	natuser.h	/^    int flags;                  \/* IF4_PROTECTED, IF4_DYNAMIC, IF4_FLG_NOT_CONTIGUOUS     *\/$/;"	m	struct:parameter_description
+flen	natuser.h	/^    } flen;                     \/*  pb[1] = #dig aft.dec.point *\/$/;"	m	struct:__anon5	typeref:union:__anon5::__anon6
+fncPnt	libs/jinja2_parser/jinja2_parser.h	/^    void (*fncPnt)(struct args*, struct variables*);$/;"	m	struct:functions
+for_getArrayLength	libs/jinja2_parser/new_parser/for_handling.c	/^int for_getArrayLength(struct variables *anker, char *name, int var_type,$/;"	f
+for_handle	libs/jinja2_parser/new_parser/for_handling.c	/^int for_handle(struct variables *anker, char *cmd_buff, FILE *p_output,$/;"	f
+for_infos	libs/jinja2_parser/for.c	/^struct for_infos {$/;"	s	file:
+for_length	libs/jinja2_parser/jinja2_parser.h	/^    int for_length;$/;"	m	struct:__anon1
+forbuffer	libs/jinja2_parser/jinja2_parser.h	/^    char *forbuffer;$/;"	m	struct:__anon1
+forhandle	libs/jinja2_parser/for.c	/^int forhandle(struct variables *anker, char *data)$/;"	f
+format	natuser.h	/^    int format;                 \/* field type: ALPHA -> 'A', INT -> 'I', etc.             *\/$/;"	m	struct:parameter_description
+found	web_server/lookup.h	/^    bool found;$/;"	m	struct:__anon2
+found_alias	web_server/lookup.h	/^    bool found_alias;$/;"	m	struct:__anon2
+found_alias	web_server/lookup.h	/^    bool found_alias;$/;"	m	struct:__anon3
+found_cmd_open	libs/jinja2_parser/jinja2_parser.h	/^    bool found_cmd_open;$/;"	m	struct:__anon1
+found_debug	web_server/lookup.h	/^    bool found_debug;$/;"	m	struct:__anon2
+found_library	web_server/lookup.h	/^    bool found_library;$/;"	m	struct:__anon2
+found_library	web_server/lookup.h	/^    bool found_library;$/;"	m	struct:__anon3
+found_prog	web_server/lookup.h	/^    bool found_prog;$/;"	m	struct:__anon3
+found_programm	web_server/lookup.h	/^    bool found_programm;$/;"	m	struct:__anon2
+found_return	web_server/lookup.h	/^    bool found_return;$/;"	m	struct:__anon3
+found_returncode	web_server/lookup.h	/^    bool found_returncode;$/;"	m	struct:__anon2
+found_root	web_server/lookup.h	/^    bool found_root;$/;"	m	struct:__anon3
+found_struct	web_server/lookup.h	/^} found_struct;$/;"	t	typeref:struct:__anon3
+found_var_open	libs/jinja2_parser/jinja2_parser.h	/^    bool found_var_open;$/;"	m	struct:__anon1
+foundpage_grp	libs/nat-lda-parser/compiled_lda/lda_parser.h	/^    bool foundpage_grp;$/;"	m	struct:status_p
+foundpage_grp	libs/nat-lda-parser/normale_lda/main.c	/^    bool foundpage_grp;$/;"	m	struct:status_p	file:
+full_length	libs/varhandle_lib/varhandle.h	/^    int full_length;$/;"	m	struct:variables
+functions	libs/jinja2_parser/jinja2_parser.h	/^struct functions {$/;"	s
+generateStringValuefromArray	libs/varhandle_lib/print.c	/^char *generateStringValuefromArray(struct variables *anker, char *name)$/;"	f
+generate_500errPage_lda	var2names/genpage.c	/^int generate_500errPage_lda(char *output, char *error_str, char *ldaname)$/;"	f
+generate_500errPage_parser	var2names/genpage.c	/^int generate_500errPage_parser(char *output, struct variables *anker, $/;"	f
+generate_page	var2names/genpage.c	/^int generate_page(struct variables *anker, char *ldaname, char *templatename,$/;"	f
+getArrayLength	libs/jinja2_parser/old/varhandle.c	/^int getArrayLength(struct variables *anker, char *name, int *x, int *y)$/;"	f
+getArrayLength	libs/varhandle_lib/management.c	/^int getArrayLength(struct variables *anker, char *name, int *x, int *y)$/;"	f
+getAttributes	libs/jinja2_parser/parser.c	/^void getAttributes(char *word, char *attr)$/;"	f
+getConfig	web_server/lookup.c	/^path_struct getConfig(char *requestpath, char *filepath, char **error_str)$/;"	f
+getFilesize	web_server/filehandling.c	/^int getFilesize(char *file)$/;"	f
+getFunction	libs/jinja2_parser/new_parser/variable_handle.c	/^int getFunction(struct variables *anker, char *variable, char *function_buffer,$/;"	f
+getFunction	libs/jinja2_parser/utils.c	/^void getFunction(char *word, char *functionname)$/;"	f
+getIndex	libs/jinja2_parser/new_parser/variable_handle.c	/^int getIndex(struct variables *anker, char *variable, int *x, int *y,$/;"	f
+getIndex	libs/jinja2_parser/parser.c	/^int getIndex(char *word, struct variables *anker)$/;"	f
+getIndex2D	libs/jinja2_parser/parser.c	/^int getIndex2D(char *word, int *x, int *y, struct variables *anker)$/;"	f
+getIntValue	libs/jinja2_parser/old/varhandle.c	/^int getIntValue(struct variables *anker, char *name)$/;"	f
+getIntValue	libs/varhandle_lib/integer.c	/^int getIntValue(struct variables *anker, char *name)$/;"	f
+getIntValuefrom2DArray	libs/jinja2_parser/old/varhandle.c	/^int getIntValuefrom2DArray(struct variables *anker, char *name, int x, $/;"	f
+getIntValuefrom2DArray	libs/varhandle_lib/integer.c	/^int getIntValuefrom2DArray(struct variables *anker, char *name, int x, $/;"	f
+getIntValuefromArray	libs/jinja2_parser/old/varhandle.c	/^int getIntValuefromArray(struct variables *anker, char *name, int index)$/;"	f
+getIntValuefromArray	libs/varhandle_lib/integer.c	/^int getIntValuefromArray(struct variables *anker, char *name, int index)$/;"	f
+getLineFromFile	libs/utils/utils.c	/^char* getLineFromFile(char *filename, int line)$/;"	f
+getLinefromTemplate	libs/jinja2_parser/new_parser/file_handling.c	/^char *getLinefromTemplate(FILE *p_template, char *error_str)$/;"	f
+getStringValue	libs/jinja2_parser/old/varhandle.c	/^char* getStringValue(struct variables *anker, char *name)$/;"	f
+getStringValue	libs/varhandle_lib/string.c	/^char* getStringValue(struct variables *anker, char *name)$/;"	f
+getStringValuefrom2DArray	libs/jinja2_parser/old/varhandle.c	/^char *getStringValuefrom2DArray(struct variables *anker, char *name, int x, $/;"	f
+getStringValuefrom2DArray	libs/varhandle_lib/string.c	/^char *getStringValuefrom2DArray(struct variables *anker, char *name, int x, $/;"	f
+getStringValuefromArray	libs/jinja2_parser/old/varhandle.c	/^char *getStringValuefromArray(struct variables *anker, char *name, int index)$/;"	f
+getStringValuefromArray	libs/varhandle_lib/string.c	/^char *getStringValuefromArray(struct variables *anker, char *name, int index)$/;"	f
+getVar	send_values_to_page.c	/^int getVar(void *parmhandle, int index, struct variables *nat_vars, int *complete_size)$/;"	f
+getVarNames	libs/nat-lda-parser/compiled_lda/main.c	/^struct varnames* getVarNames(char *ldaname, char *error_str)$/;"	f
+getVarPointer	libs/jinja2_parser/old/varhandle.c	/^struct variables* getVarPointer(struct variables *anker, char* name)$/;"	f
+getVarPointer	libs/varhandle_lib/print.c	/^struct variables* getVarPointer(struct variables *anker, char* name)$/;"	f
+getVarType	libs/jinja2_parser/old/varhandle.c	/^int getVarType(struct variables *anker, char *name)$/;"	f
+getVarType	libs/varhandle_lib/print.c	/^int getVarType(struct variables *anker, char *name)$/;"	f
+getdefinetype	libs/nat-lda-parser/compiled_lda/natone.c	/^int getdefinetype(char *line)$/;"	f
+getdefinetype_unix	libs/nat-lda-parser/compiled_lda/unix.c	/^int getdefinetype_unix(char *line)$/;"	f
+getlength	libs/jinja2_parser/utils.c	/^void getlength(struct args *word, struct variables *anker)$/;"	f
+getpathsettings	web_server/lookup.c	/^path_struct getpathsettings(char *requestpath, FILE *logfile)$/;"	f
+gotoendofAnker	send_values_to_page.c	/^struct variables *gotoendofAnker(struct variables *anker)$/;"	f
+handleArray	libs/jinja2_parser/parser.c	/^int handleArray(struct variables *anker, parser_info *status,$/;"	f
+handleInt1DArray	libs/jinja2_parser/new_parser/variable_handle.c	/^int handleInt1DArray(struct variables *anker, FILE *p_output, char *variable,$/;"	f
+handleInt2DArray	libs/jinja2_parser/new_parser/variable_handle.c	/^int handleInt2DArray(struct variables *anker, FILE *p_output, char *variable,$/;"	f
+handleIntVar	libs/jinja2_parser/new_parser/variable_handle.c	/^int handleIntVar(struct variables *anker, FILE *p_output, char *variable,$/;"	f
+handleRedefine	var2names/var2name.c	/^void handleRedefine(struct variables *var_anker, int valueoffset, struct varnames *redefanker)$/;"	f
+handleString1DArray	libs/jinja2_parser/new_parser/variable_handle.c	/^int handleString1DArray(struct variables *anker, FILE *p_output, char *variable,$/;"	f
+handleString2DArray	libs/jinja2_parser/new_parser/variable_handle.c	/^int handleString2DArray(struct variables *anker, FILE *p_output, char *variable,$/;"	f
+handleStringVar	libs/jinja2_parser/new_parser/variable_handle.c	/^int handleStringVar(struct variables *anker, FILE *p_output, char *variable,$/;"	f
+handle_timeout	start_server.c	/^int handle_timeout(char *deliver_file, char *program)$/;"	f
+handle_variable	libs/jinja2_parser/new_parser/variable_handle.c	/^int handle_variable(struct variables *anker, char *variable, FILE *p_output,$/;"	f
+handleclient	web_server/main.c	/^void handleclient(int client, char *ip, int (*nat_handler)(char*, char*, httpheader))$/;"	f
+hasFunction	libs/jinja2_parser/utils.c	/^int hasFunction(char *word)$/;"	f
+host	web_server/header.h	/^    char host[100];$/;"	m	struct:__anon4
+http_version	web_server/header.h	/^    char http_version[8];$/;"	m	struct:__anon4
+httpheader	web_server/header.h	/^} httpheader;$/;"	t	typeref:struct:__anon4
+iargs	libs/varhandle_lib/varhandle.h	/^        int iargs;$/;"	m	struct:args
+if_handle	libs/jinja2_parser/new_parser/if_handling.c	/^int if_handle(struct variables *anker, char *cmd_buff, FILE *p_output,$/;"	f
+if_ret	libs/jinja2_parser/jinja2_parser.h	/^    bool if_ret;$/;"	m	struct:__anon1
+ifhandler	libs/jinja2_parser/if.c	/^bool ifhandler(struct variables *anker, char *cmd)$/;"	f
+importHandler	libs/jinja2_parser/main.c	/^int importHandler(struct variables *anker, char *statement)$/;"	f
+in_for	libs/jinja2_parser/jinja2_parser.h	/^    bool in_for;$/;"	m	struct:__anon1
+in_if	libs/jinja2_parser/jinja2_parser.h	/^    bool in_if;$/;"	m	struct:__anon1
+index	libs/jinja2_parser/for.c	/^    int index;$/;"	m	struct:for_infos	file:
+index	libs/jinja2_parser/jinja2_parser.h	/^    int index;$/;"	m	struct:__anon1
+indexfactors	natuser.h	/^    int indexfactors[10];       \/* array indexfactors in each dimension                   *\/$/;"	m	struct:parameter_description
+info	libs/CfgReader/cfg.c	/^static char	info[200];$/;"	v	file:
+initAnker	libs/nat-lda-parser/compiled_lda/main.c	/^int initAnker(struct varnames **anker)$/;"	f
+initAnker	libs/nat-lda-parser/normale_lda/main.c	/^int initAnker(struct varnames **anker)$/;"	f
+initVariable	libs/jinja2_parser/old/varhandle.c	/^void initVariable(struct variables *anker)$/;"	f
+initVariable	libs/varhandle_lib/management.c	/^void initVariable(struct variables *anker)$/;"	f
+internal_error	web_server/response.c	/^void internal_error(int client)$/;"	f
+length	libs/nat-lda-parser/compiled_lda/lda_parser.h	/^    int length; \/\/Laenge der Variable (Vor dem Komma)$/;"	m	struct:varnames
+length	libs/nat-lda-parser/normale_lda/main.c	/^    int length; \/\/Laenge derVariable $/;"	m	struct:varnames	file:
+length	libs/varhandle_lib/varhandle.h	/^    int length;$/;"	m	struct:variables
+length	natuser.h	/^    int length;                 \/* length (before decimal point)                          *\/$/;"	m	struct:parameter_description
+length_all	natuser.h	/^    int length_all;             \/* total length of array in bytes                         *\/$/;"	m	struct:parameter_description
+length_comma	libs/nat-lda-parser/compiled_lda/lda_parser.h	/^    int length_comma;$/;"	m	struct:varnames
+level	libs/nat-lda-parser/compiled_lda/lda_parser.h	/^    int level;$/;"	m	struct:varnames
+level	libs/nat-lda-parser/normale_lda/main.c	/^    int level;$/;"	m	struct:varnames	file:
+lfield	natuser.h	/^      WORD lfield;              \/*  pb[0] = #dig bef.dec.point *\/$/;"	m	union:__anon5::__anon6
+library	web_server/lookup.h	/^    char library[20];$/;"	m	struct:__anon2
+local_jinja_parser	libs/jinja2_parser/parser.c	/^int local_jinja_parser(parser_info *status, struct variables *anker, char *line, int length)$/;"	f
+logHexDump	libs/hexdump/hexdump.c	/^void logHexDump(void *data, int size, FILE *fp) {$/;"	f
+logfile	web_server/main.c	/^FILE *logfile;$/;"	v
+main	TestProgs/main.c	/^int main() $/;"	f
+main	TestProgs/test.c	/^long main()$/;"	f
+main	libs/Sockets/test/main.c	/^int main()$/;"	f
+main	libs/Sockets/testsocket.c	/^int main()$/;"	f
+main	libs/hexdump/test/main.c	/^int main()$/;"	f
+main	libs/jinja2_parser/new_parser/main.c	/^int main()$/;"	f
+main	libs/jinja2_parser/test/main.c	/^int main()$/;"	f
+main	libs/jinja2_parser/testprogs/main.c	/^int main()$/;"	f
+main	libs/jinja2_parser/testprogs/test.c	/^int main()$/;"	f
+main	libs/nat-lda-parser/compiled_lda/test.c	/^int main()$/;"	f
+main	libs/nat-lda-parser/normale_lda/main.c	/^int main()$/;"	f
+main	libs/utils/test/main.c	/^int main()$/;"	f
+main	test/main.c	/^int main()$/;"	f
+main	var2names/testprogs/main.c	/^int main()$/;"	f
+main	var2names/testprogs/reader.c	/^int main(int argc, char *argv[])$/;"	f
+main	web_server/test/main.c	/^int main()$/;"	f
+method_not_allowed	web_server/response.c	/^void method_not_allowed(int client)$/;"	f
+n_call_tab	jumptab.c	/^TAB_SIZE n_call_tab = sizeof(n_call_table) \/ sizeof(n_call_table[0]);$/;"	v
+n_call_table	jumptab.c	/^TAB_STRUCT n_call_table[] = {$/;"	v
+name	libs/jinja2_parser/jinja2_parser.h	/^    char name[100];$/;"	m	struct:functions
+name	libs/nat-lda-parser/compiled_lda/lda_parser.h	/^    char name[200];$/;"	m	struct:varnames
+name	libs/nat-lda-parser/normale_lda/main.c	/^    char name[200];$/;"	m	struct:varnames	file:
+name	libs/varhandle_lib/varhandle.h	/^    char name[200];$/;"	m	struct:variables
+nat_signalHandler	start_server.c	/^void nat_signalHandler(int signal)$/;"	f
+nat_sourcepath	include/standard.h	/^    char nat_sourcepath[1024];$/;"	m	struct:web_server_settings
+natlibrary	include/standard.h	/^    char natlibrary[10];$/;"	m	struct:web_server_settings
+natone_parser	libs/nat-lda-parser/compiled_lda/natone.c	/^void natone_parser(struct varnames *anker, struct status_p *status, char *line)$/;"	f
+nc_tab_struct	nattab.h	/^typedef struct nc_tab_struct {$/;"	s
+ncmp	include/standard.h	12;"	d
+ncmp	libs/jinja2_parser/include/standard.h	10;"	d
+ncmp	libs/varhandle_lib/standard.h	10;"	d
+ncsy_dyuxinit	ncuxinit.c	/^int ncsy_dyuxinit(table, size)$/;"	f
+new2DIntArray	libs/jinja2_parser/old/varhandle.c	/^void new2DIntArray(struct variables *anker, char *name, int x_length,$/;"	f
+new2DIntArray	libs/varhandle_lib/integer.c	/^void new2DIntArray(struct variables *anker, char *name, int x_length,$/;"	f
+new2DStringArray	libs/jinja2_parser/old/varhandle.c	/^void new2DStringArray(struct variables *anker, char *name, int x_length, $/;"	f
+new2DStringArray	libs/varhandle_lib/string.c	/^void new2DStringArray(struct variables *anker, char *name, int x_length, $/;"	f
+newIntArray	libs/jinja2_parser/old/varhandle.c	/^void newIntArray(struct variables *anker, char *name, int initvalue)$/;"	f
+newIntArray	libs/varhandle_lib/integer.c	/^void newIntArray(struct variables *anker, char *name, int initvalue)$/;"	f
+newIntVar	libs/jinja2_parser/old/varhandle.c	/^void newIntVar(struct variables *anker, char *name, int value)$/;"	f
+newIntVar	libs/varhandle_lib/integer.c	/^void newIntVar(struct variables *anker, char *name, int value)$/;"	f
+newStringArray	libs/jinja2_parser/old/varhandle.c	/^void newStringArray(struct variables *anker, char *name, char *initvalue)$/;"	f
+newStringArray	libs/varhandle_lib/string.c	/^void newStringArray(struct variables *anker, char *name, char *initvalue)$/;"	f
+newStringVar	libs/jinja2_parser/old/varhandle.c	/^void newStringVar(struct variables *anker, char *name, char *value)$/;"	f
+newStringVar	libs/varhandle_lib/string.c	/^void newStringVar(struct variables *anker, char *name, char *value)$/;"	f
+next	libs/nat-lda-parser/compiled_lda/lda_parser.h	/^    struct varnames *next;$/;"	m	struct:varnames	typeref:struct:varnames::varnames
+next	libs/nat-lda-parser/normale_lda/main.c	/^    struct varnames *next;$/;"	m	struct:varnames	typeref:struct:varnames::varnames	file:
+next	libs/varhandle_lib/varhandle.h	/^    struct variables *next; \/\/Pointer to next Variable in Stack$/;"	m	struct:variables	typeref:struct:variables::variables
+nextlevel	libs/nat-lda-parser/compiled_lda/lda_parser.h	/^    struct varnames *nextlevel;$/;"	m	struct:varnames	typeref:struct:varnames::varnames
+nextlevel	libs/nat-lda-parser/normale_lda/main.c	/^    struct varnames *nextlevel;$/;"	m	struct:varnames	typeref:struct:varnames::varnames	file:
+occurrences	natuser.h	/^    int occurrences[10];        \/* array occurrences in each dimension                    *\/$/;"	m	struct:parameter_description
+openOutputFile	libs/jinja2_parser/new_parser/file_handling.c	/^FILE *openOutputFile(char *filename, char *error_str)$/;"	f
+openTemplateFile	libs/jinja2_parser/new_parser/file_handling.c	/^FILE *openTemplateFile(char *filename, char *error_str)$/;"	f
+p_config_file	libs/CfgReader/cfg.c	/^FILE		*p_config_file;$/;"	v
+page	web_server/header.h	/^    char *page;$/;"	m	struct:__anon4
+page_forbidden	web_server/response.c	/^void page_forbidden(int client)$/;"	f
+page_not_found	web_server/response.c	/^void page_not_found(int client)$/;"	f
+page_unauthorized	web_server/response.c	/^void page_unauthorized(int client)$/;"	f
+parameter_description	natuser.h	/^  struct parameter_description$/;"	s
+parseGETRequest	web_server/header.c	/^int parseGETRequest(httpheader *header)$/;"	f
+parse_line	libs/jinja2_parser/new_parser/start_jinjaparser.c	/^int parse_line(struct variables *anker, char *line, FILE *p_output,$/;"	f
+parseheader	web_server/header.c	/^httpheader parseheader(char *header, int headerlength)$/;"	f
+parser	libs/nat-lda-parser/normale_lda/main.c	/^void parser(struct varnames *anker, struct status_p *status, char *line)$/;"	f
+parser_info	libs/jinja2_parser/jinja2_parser.h	/^} parser_info;$/;"	t	typeref:struct:__anon1
+parser_start	libs/jinja2_parser/main.c	/^int parser_start(char *templatefile, struct variables *anker, char *deliverfile,$/;"	f
+path_struct	web_server/lookup.h	/^} path_struct;$/;"	t	typeref:struct:__anon2
+pb	natuser.h	/^      BYTE pb[2];               \/* if type == (N or P) ==>     *\/$/;"	m	union:__anon5::__anon6
+pb2	natuser.h	/^    BYTE pb2;                   \/* if type == (N or P) ==>     *\/$/;"	m	struct:__anon5
+pops	natuser.h	/^    void *pops;                 \/* internal use only (for dynamic variables and x-arrays) *\/$/;"	m	struct:parameter_description
+position	libs/CfgReader/cfg.c	/^fpos_t		position;$/;"	v
+precision	natuser.h	/^    int precision;              \/* length after decimal point (PACKED, NUMERIC)           *\/$/;"	m	struct:parameter_description
+prev	libs/nat-lda-parser/compiled_lda/lda_parser.h	/^    struct varnames *prev;$/;"	m	struct:varnames	typeref:struct:varnames::varnames
+prev	libs/nat-lda-parser/normale_lda/main.c	/^    struct varnames *prev;$/;"	m	struct:varnames	typeref:struct:varnames::varnames	file:
+print2DArray	libs/jinja2_parser/old/varhandle.c	/^void print2DArray(struct variables *anker, char *name, bool rt,$/;"	f
+print2DArray	libs/varhandle_lib/print.c	/^int print2DArray(struct variables *anker, char *name, bool rt,$/;"	f
+print2DArraytoFile	libs/varhandle_lib/print.c	/^int print2DArraytoFile(struct variables *anker, char *name, FILE *p_output)$/;"	f
+printArray	libs/jinja2_parser/old/varhandle.c	/^void printArray(struct variables *anker, char *name, bool showname, $/;"	f
+printArray	libs/varhandle_lib/print.c	/^void printArray(struct variables *anker, char *name, bool showname, $/;"	f
+printArrayfromPtr	libs/jinja2_parser/old/varhandle.c	/^void printArrayfromPtr(struct variables *ptr)$/;"	f
+printArrayfromPtr	libs/varhandle_lib/print.c	/^void printArrayfromPtr(struct variables *ptr)$/;"	f
+printArrayfromPtrtoFile	libs/varhandle_lib/print.c	/^void printArrayfromPtrtoFile(struct variables *ptr, FILE *output)$/;"	f
+printArraytoFile	libs/varhandle_lib/print.c	/^void printArraytoFile(struct variables *anker, char *name, FILE *p_output)$/;"	f
+printSingleVar	libs/nat-lda-parser/compiled_lda/main.c	/^void printSingleVar(struct varnames *hptr)$/;"	f
+printTabs	libs/nat-lda-parser/compiled_lda/main.c	/^void printTabs(int level)$/;"	f
+printTabs	libs/nat-lda-parser/normale_lda/main.c	/^void printTabs(int level)$/;"	f
+printVar	libs/jinja2_parser/old/varhandle.c	/^void printVar(struct args word)$/;"	f
+printVar	libs/varhandle_lib/print.c	/^void printVar(struct variables *anker, char *name)$/;"	f
+printVarType	libs/nat-lda-parser/compiled_lda/main.c	/^char *printVarType(int type)$/;"	f
+printVarType	libs/nat-lda-parser/normale_lda/main.c	/^char *printVarType(int type)$/;"	f
+printVars	libs/jinja2_parser/old/varhandle.c	/^void printVars(struct variables *anker)$/;"	f
+printVars	libs/varhandle_lib/print.c	/^void printVars(struct variables *anker)$/;"	f
+printVarstoFile	libs/varhandle_lib/print.c	/^void printVarstoFile(struct variables *anker, FILE *p_output)$/;"	f
+print_all_vars	send_values_to_page.c	/^long print_all_vars(WORD nparm, void *parmhandle, void *traditional)$/;"	f
+printall	libs/nat-lda-parser/normale_lda/main.c	/^void printall(struct varnames *anker)$/;"	f
+printfork	libs/nat-lda-parser/compiled_lda/main.c	/^void printfork(struct varnames *ptr)$/;"	f
+printfork	libs/nat-lda-parser/normale_lda/main.c	/^void printfork(struct varnames *ptr)$/;"	f
+printheader	web_server/header.c	/^void printheader(char **parsedheader, int size)$/;"	f
+proc_ptr	nattab.h	/^  long (*proc_ptr)(); \/* pointer to function entry *\/$/;"	m	struct:nc_tab_struct
+programm	web_server/lookup.h	/^    char programm[10];$/;"	m	struct:__anon2
+read_socket	libs/Sockets/sockets.c	/^int read_socket(int handle, char *daten, int nbytes)$/;"	f
+remove_tailing_spaces	libs/nat-lda-parser/normale_lda/main.c	/^void remove_tailing_spaces(char *buffer)$/;"	f
+removespaces	libs/nat-lda-parser/compiled_lda/main.c	/^void removespaces(char *line)$/;"	f
+rename	libs/nat-lda-parser/compiled_lda/lda_parser.h	/^    char rename[200];$/;"	m	struct:varnames
+rename	libs/nat-lda-parser/normale_lda/main.c	/^    char rename[200];$/;"	m	struct:varnames	file:
+request_arguments	web_server/header.h	/^    int request_arguments;$/;"	m	struct:__anon4
+request_keys	web_server/header.h	/^    char *request_keys;$/;"	m	struct:__anon4
+request_type	web_server/header.h	/^    char request_type[5];$/;"	m	struct:__anon4
+request_values	web_server/header.h	/^    char *request_values;$/;"	m	struct:__anon4
+reservedi1	natuser.h	/^    int reservedi1;             \/* for future use *\/$/;"	m	struct:parameter_description
+reservedi2	natuser.h	/^    int reservedi2;             \/* for future use *\/$/;"	m	struct:parameter_description
+reservedi3	natuser.h	/^    int reservedi3;             \/* for future use *\/$/;"	m	struct:parameter_description
+reservedi4	natuser.h	/^    int reservedi4;             \/* for future use *\/$/;"	m	struct:parameter_description
+reservedi5	natuser.h	/^    int reservedi5;             \/* for future use *\/$/;"	m	struct:parameter_description
+reservedi6	natuser.h	/^    int reservedi6;             \/* for future use *\/$/;"	m	struct:parameter_description
+reservedi7	natuser.h	/^    int reservedi7;             \/* for future use *\/$/;"	m	struct:parameter_description
+reservedi8	natuser.h	/^    int reservedi8;             \/* for future use *\/$/;"	m	struct:parameter_description
+reservedp1	natuser.h	/^    void *reservedp1;           \/* for future use *\/$/;"	m	struct:parameter_description
+reservedp2	natuser.h	/^    void *reservedp2;           \/* for future use *\/$/;"	m	struct:parameter_description
+returncode	web_server/lookup.h	/^    char returncode[4];$/;"	m	struct:__anon2
+searchCommand	libs/jinja2_parser/new_parser/command_handling.c	/^int searchCommand(char *line)$/;"	f
+searchVar	libs/varhandle_lib/management.c	/^struct variables *searchVar(struct variables *anker, char *name)$/;"	f
+second	libs/jinja2_parser/for.c	/^    int second;$/;"	m	struct:for_infos	file:
+sendSuccessHeader	web_server/response.c	/^void sendSuccessHeader(int client, char *filetype, int content_length)$/;"	f
+serverhandle	web_server/main.c	/^int serverhandle;$/;"	v
+shiftInt	send_values_to_page.c	/^int shiftInt(int input, int length)$/;"	f
+signalHandler	send_values_to_page.c	/^void signalHandler(int signal)$/;"	f
+signalhandler	web_server/main.c	/^void signalhandler(int signal)$/;"	f
+start_for	libs/jinja2_parser/new_parser/command_handling.c	/^int start_for(struct variables *anker, char *cmd_buff, FILE *p_output,$/;"	f
+start_if	libs/jinja2_parser/new_parser/command_handling.c	/^int start_if(struct variables *anker, char *cmd_buff, FILE *p_output,$/;"	f
+start_jinjaparser	libs/jinja2_parser/new_parser/start_jinjaparser.c	/^int start_jinjaparser(struct variables *anker, char *outputfile,$/;"	f
+start_web_server	start_server.c	/^long start_web_server( WORD nparm, void *parmhandle, void *traditional )$/;"	f
+start_web_server_from_nat	web_server/main.c	/^int start_web_server_from_nat(int (*nat_handler)(char*, char*, httpheader))$/;"	f
+statement	libs/jinja2_parser/jinja2_parser.h	/^    char statement[200];$/;"	m	struct:__anon1
+status_p	libs/nat-lda-parser/compiled_lda/lda_parser.h	/^struct status_p {$/;"	s
+status_p	libs/nat-lda-parser/normale_lda/main.c	/^struct status_p {$/;"	s	file:
+str_isdigit	libs/utils/utils.c	/^int str_isdigit(char *str)$/;"	f
+striptrailspace	libs/nat-lda-parser/compiled_lda/main.c	/^void striptrailspace( char *line )$/;"	f
+striptrailspace	libs/nat-lda-parser/normale_lda/main.c	/^void striptrailspace( char *line )$/;"	f
+strtoupper	libs/nat-lda-parser/normale_lda/main.c	/^char *strtoupper(char *str)$/;"	f
+templatepath	include/standard.h	/^    char templatepath[1024];$/;"	m	struct:web_server_settings
+toLower	libs/jinja2_parser/utils.c	/^void toLower(struct args *word, struct variables *anker)$/;"	f
+toUpper	libs/jinja2_parser/utils.c	/^void toUpper(struct args *word, struct variables *anker)$/;"	f
+true	include/standard.h	2;"	d
+true	libs/jinja2_parser/include/standard.h	2;"	d
+true	libs/varhandle_lib/standard.h	2;"	d
+type	libs/nat-lda-parser/compiled_lda/lda_parser.h	/^    int type;$/;"	m	struct:varnames
+type	libs/nat-lda-parser/normale_lda/main.c	/^    int type;$/;"	m	struct:varnames	file:
+type	libs/varhandle_lib/varhandle.h	/^        int type;$/;"	m	struct:args
+type	libs/varhandle_lib/varhandle.h	/^    int type;$/;"	m	struct:variables
+typevar	natuser.h	/^    char typevar;               \/* type of variable            *\/$/;"	m	struct:__anon5
+unix_parser	libs/nat-lda-parser/compiled_lda/unix.c	/^void unix_parser(struct varnames *anker, struct status_p *status, char *line)$/;"	f
+url	web_server/lookup.h	/^    char url[500];$/;"	m	struct:__anon2
+user_agent	web_server/header.h	/^    char *user_agent;$/;"	m	struct:__anon4
+var2name	var2names/var2name.c	/^int var2name(struct variables *var_anker, char *ldaname, char *error_str)$/;"	f
+varclose	libs/jinja2_parser/jinja2_parser.h	2;"	d
+varhandle_error_str	libs/varhandle_lib/print.c	/^char varhandle_error_str[2048];$/;"	v
+variables	libs/varhandle_lib/varhandle.h	/^struct variables{$/;"	s
+varnames	libs/nat-lda-parser/compiled_lda/lda_parser.h	/^struct varnames {$/;"	s
+varnames	libs/nat-lda-parser/normale_lda/main.c	/^struct varnames {$/;"	s	file:
+varopen	libs/jinja2_parser/jinja2_parser.h	1;"	d
+vartypes	libs/jinja2_parser/jinja2_parser.h	/^    int vartypes[4];$/;"	m	struct:functions
+web_server_settings	include/standard.h	/^struct web_server_settings {$/;"	s
+webserver_settings	include/standard.c	/^struct web_server_settings webserver_settings;$/;"	v	typeref:struct:web_server_settings
+write_socket	libs/Sockets/sockets.c	/^int write_socket(int handle, char *daten, int nbytes)$/;"	f
+x_length	libs/nat-lda-parser/compiled_lda/lda_parser.h	/^    int x_length; \/\/ X Laenge des Arrays$/;"	m	struct:varnames
+x_length	libs/nat-lda-parser/normale_lda/main.c	/^    int x_length; \/\/ X Laenge des Arrays$/;"	m	struct:varnames	file:
+x_length	libs/varhandle_lib/varhandle.h	/^    int x_length;$/;"	m	struct:variables
+y_length	libs/nat-lda-parser/compiled_lda/lda_parser.h	/^    int y_length; \/\/ Y Laenge des Arrays (Nur bei 2D)$/;"	m	struct:varnames
+y_length	libs/nat-lda-parser/normale_lda/main.c	/^    int y_length; \/\/ Y Laenge des Arrays (Nur bei 2D)$/;"	m	struct:varnames	file:
+y_length	libs/varhandle_lib/varhandle.h	/^    int y_length;$/;"	m	struct:variables
+zeile	libs/CfgReader/cfg.c	/^char		zeile[200];$/;"	v

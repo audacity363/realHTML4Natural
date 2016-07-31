@@ -41,6 +41,10 @@ int searchCommand(char *line)
     {
         return(5);
     }
+    else if((found_cmd = strstr(line, "else")) != NULL)
+    {
+        return(6);
+    }
     else
     {
         return(-1);
