@@ -9,10 +9,14 @@
     </style>
 </head>
 <body>
-{% if itest == 25 %}
-    <p>OK</p>
-{%else%}
-    <p>NOPE</p>
+{% if itest == 26 %}
+    {% if test != "Hello World" %}
+        <p>OK</p>
+     {%else%}
+        <p>Kein Hello World</p>
+    {%end-if%}
+{% else %}
+    <p>Nope</p>
 {%end-if%}
 </body>
 </html>

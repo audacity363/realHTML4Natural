@@ -6,12 +6,17 @@
         margin-right: auto;
         margin-left: auto;
     }
+    </style>
 </head>
 <body>
-{% for entry in s2dtestarray%}
-    {% for bla in entry %}
-        <p>{{bla}}</p>
-    {% end-for %}
-{%end-for%}
+{% if itest != 26 %}
+    {% if test != "Hello World" %}
+        <p>OK</p>
+     {%else%}
+        <p>Kein Hello World</p>
+    {%end-if%}
+{% else %}
+    <p>Nope</p>
+{%end-if%}
 </body>
 </html>

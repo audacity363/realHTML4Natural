@@ -16,6 +16,7 @@ int compare(struct variables *anker, char *var1, char *var2, char *symbol,
 
     printf("var1: [%s]\n", var1);
     printf("var2: [%s]\n", var2);
+    printf("Operator: [%s]\n", symbol);
 
     if((var_type1 = getVarType(anker, var1)) < 0)
     {
@@ -183,7 +184,8 @@ int if_handle(struct variables *anker, char *cmd_buff, FILE *p_output,
     char *if_block, *tmp_buff, *if_cmd, *if_cmd_detail, *line, *l_cmd_buff = NULL;
     int block_length = 0, detail_length = 0, i, x, y, var_type, found_str = 0;
     int if_rc, parser_status = 0, l_in_for = 0, l_in_if = 0;
-    int index_type, x_index, y_index;
+    int index_type, x_index, y_index, else_offset = 0, found_ifs = 0;
+    FILE *tmp_stdout = stdout;
 
     tmp_buff = strtok(cmd_buff, "\n");
 
@@ -211,10 +213,9 @@ int if_handle(struct variables *anker, char *cmd_buff, FILE *p_output,
     TrimSpaces(if_cmd);
     if_cmd = StripTrailingSpaces(if_cmd);
 
-    //for Token
     if_cmd_detail = malloc(sizeof(char*));
 
-
+    free(tmp_buff);
     tmp_buff = malloc(1);
     tmp_buff[0] = '\0';
 
@@ -226,26 +227,32 @@ int if_handle(struct variables *anker, char *cmd_buff, FILE *p_output,
         }
         if(if_cmd[i] == ' ' && found_str == 0)
         {
-            ((char**)if_cmd_detail)[detail_length] = malloc(strlen(tmp_buff));
-            strcpy(((char**)if_cmd_detail)[detail_length], tmp_buff);
+            if((((char**)if_cmd_detail)[detail_length] = malloc(strlen(tmp_buff)+1)) == NULL)
+            {
+                sprintf(error_str, "Error while allocate memory. detail_length=[%d]", detail_length);
+                return(-1);
+            }
+            memcpy(((char**)if_cmd_detail)[detail_length], tmp_buff, strlen(tmp_buff)+1);
 
-            //free(tmp_buff);
+            free(tmp_buff);
+
             tmp_buff = malloc(1);
+
             tmp_buff[0] = '\0';
 
             detail_length++;
 
-            if_cmd_detail = realloc(if_cmd_detail, sizeof(char*)*detail_length);
+            if_cmd_detail = realloc(if_cmd_detail, sizeof(char*)*(detail_length+1));
         }
         else
         {
-            tmp_buff = realloc(tmp_buff, strlen(tmp_buff)+1);
+            tmp_buff = realloc(tmp_buff, strlen(tmp_buff)+2);
             char_strcat(tmp_buff, if_cmd[i]);
         }
     }
 
     //Letzen Token auslesen
-    ((char**)if_cmd_detail)[detail_length] = malloc(strlen(tmp_buff));
+    ((char**)if_cmd_detail)[detail_length] = malloc(strlen(tmp_buff)+1);
     strcpy(((char**)if_cmd_detail)[detail_length], tmp_buff);
     free(tmp_buff);
     detail_length++;
@@ -257,13 +264,53 @@ int if_handle(struct variables *anker, char *cmd_buff, FILE *p_output,
     }
     else if(if_rc == 0)
     {
-        return(0);
+        found_ifs = 0;
+        for(i=1; i < block_length; i++)
+        {
+            if(strstr(((char**)if_block)[i], "end-if") != NULL)
+            {
+                found_ifs--;
+                continue;
+            }
+            else if(strstr(((char**)if_block)[i], "if") != NULL)
+            {
+                found_ifs++;
+                continue;
+            }
+            if(strstr(((char**)if_block)[i], "else") != NULL && found_ifs == 0)
+            {
+                else_offset = i;
+                break;
+            }
+        }
     }
-    for(i=1; i < block_length; i++)
+    else
+    {
+        else_offset = 1;
+    }
+    
+    found_ifs = 0;
+
+    for(i=else_offset; i < block_length; i++)
     {
         line = malloc(strlen(((char**)if_block)[i])+2);
         strcpy(line, ((char**)if_block)[i]);
         strcat(line, "\n");
+        if(strstr(line, "if") != NULL && strstr(line, "end-if") == NULL)
+        {
+            found_ifs++;
+        }
+        else if(strstr(line, "end-if"))
+        {
+            found_ifs--;
+        }
+        if(if_rc == 1 && found_ifs == 0)
+        {
+            if(strstr(line, "else") != NULL)
+            {
+                return(0);
+            }
+        }
         if(parse_line(anker, line, p_output, &l_cmd_buff,
                    &parser_status, &l_in_for, &l_in_if, error_str) < 0)
         {
