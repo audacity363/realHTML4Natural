@@ -48,7 +48,10 @@ int getIntValuefrom2DArray(struct variables *anker, char *name, int x,
     }
 
     if(x >= ptr->x_length || y >= ptr->y_length)
+    {
+        strcpy(varhandle_error_str, "Index Error: index out of range");
         return(-2);
+    }
 
     *value = ((int*)ptr->data)[ptr->x_length*x+y];
 

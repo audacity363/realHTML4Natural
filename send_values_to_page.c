@@ -18,7 +18,6 @@
 #define UNIT_SEPERATOR 0x1F
 
 void signalHandler(int signal);
-extern char *StripTrailingSpaces(char *str);
 int exec_stat = 0;
 
 struct variables *gotoendofAnker(struct variables *anker)
@@ -99,12 +98,11 @@ int getVar(void *parmhandle, int index, struct variables *nat_vars, int *complet
 	dynamic_flag = var_info.flags & IF4_FLG_DYNVAR;
 	protected_flag = var_info.flags & IF4_FLG_PROTECTED;
     x_array_flag = var_info.flags & IF4_FLG_XARRAY;
-#ifdef DEBUG
+
     printf("Format:     [%c]\n", var_info.format);
     printf("Length:     [%d]\n", var_info.length);
     printf("Length All: [%d]\n", var_info.length_all);
     printf("Dimensions: [%d]\n", var_info.dimensions);
-#endif
 
     data = malloc(var_info.length_all);
 
@@ -118,24 +116,28 @@ int getVar(void *parmhandle, int index, struct variables *nat_vars, int *complet
     {
         exec_stat = 450;
         sprintf(namebuff, "var%d", index);
-        //data = StripTrailingSpaces(data);
+        data = StripTrailingSpaces(data);
         newStringVar(nat_vars, namebuff, data);
     }
     else if((var_info.format == 'A' || var_info.format == 'N') && var_info.dimensions == 1)
     {
         exec_stat = 500;
-        tmpdata = malloc(var_info.length);
+        tmpdata = malloc(var_info.length+1);
 
         memcpy(tmpdata, data, var_info.length);
-        //tmpdata = StripTrailingSpaces(tmpdata);
+        tmpdata[var_info.length+1] = '\0';
+        tmpdata = StripTrailingSpaces(tmpdata);
 
         sprintf(namebuff, "var%d", index);
 
         newStringArray(nat_vars, namebuff, tmpdata);
         for(i=1; i < var_info.occurrences[0]; i++)
         {
+            bzero(tmpdata, var_info.length+1);
             memcpy(tmpdata, data+(i*var_info.length), var_info.length);
-            //tmpdata = StripTrailingSpaces(tmpdata);
+            tmpdata[var_info.length+1] = '\0';
+            HexDump(tmpdata, var_info.length);
+            tmpdata = StripTrailingSpaces(tmpdata);
             appendStringArray(nat_vars, namebuff, tmpdata);
         }
     }
@@ -148,7 +150,7 @@ int getVar(void *parmhandle, int index, struct variables *nat_vars, int *complet
         sprintf(namebuff, "var%d", index);
 
         memcpy(tmpdata, data, var_info.length);
-        //tmpdata = StripTrailingSpaces(tmpdata);
+        tmpdata = StripTrailingSpaces(tmpdata);
 
         new2DStringArray(nat_vars, namebuff, var_info.occurrences[0], var_info.occurrences[1]);
         for(i=0; i < var_info.occurrences[0]; i++)
@@ -158,7 +160,7 @@ int getVar(void *parmhandle, int index, struct variables *nat_vars, int *complet
                 offset = ((var_info.occurrences[1]*var_info.length)*i)+(var_info.length*x);
                 printf("Offset [%d]Bytes\n", offset);
                 memcpy(tmpdata, data+offset, var_info.length);
-                //tmpdata = StripTrailingSpaces(tmpdata);
+                tmpdata = StripTrailingSpaces(tmpdata);
                 editStringVar2DArray(nat_vars, namebuff, tmpdata, i, x);
             }
         }

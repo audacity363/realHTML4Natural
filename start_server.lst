@@ -1,4 +1,4 @@
-IBM XL C for AIX, Version 12.1.0.0 start_server.c 07/26/16 07:38:12 (C)
+IBM XL C for AIX, Version 12.1.0.0 start_server.c 08/02/16 09:25:45 (C)
 
 >>>>> SOURCE SECTION <<<<<
 
@@ -18,280 +18,282 @@ IBM XL C for AIX, Version 12.1.0.0 start_server.c 07/26/16 07:38:12 (C)
        14 | #include "varhandle.h"
        15 | #include "header.h"
        16 | #include "utils.h"
-       17 | 
-       18 | #define VARLENGTH 20 
-       19 | #define ARRAYLENGTH 20
-       20 | #define LOGFILEPATH "/tmp/t_engemann.log"
-       21 | #define NATTIMEOUT 5
-       22 | #define FILELENGTH 100
-       23 | 
-       24 | int call_subprog(char*, char*, httpheader);
-       25 | 
-       26 | /*
-       27 |  * This function just starts the webserver with the context of natural.
-       28 |  * It is importent for the callnat function from the SAG.
-       29 |  */
-       30 | long start_web_server( WORD nparm, void *parmhandle, void *traditional )
-       30 + long start_web_server( unsigned short nparm, void *parmhandle, void *traditional )
-       31 | {
-       32 |     start_web_server_from_nat(&call_subprog);
-       33 |     return((long)0);
-       34 | }
-       35 | 
-       36 | void nat_signalHandler(int signal)
-       37 | {
-       38 |     FILE *errfile = fopen("/tmp/nat_call_error", "w");
-       39 |     fprintf(errfile, "Recv Signal: [%d]\n", signal);
-       40 |     fclose(errfile);
-       41 | }
-       42 | 
-       43 | /*
-       44 |  * This function will redner a 500 Error Page with the Name 
-       45 |  * of the called subprog and the errorcode from Natural.
-       46 |  * The Templatefile can be found in the template/error folder.
-       47 |  */
-       48 | int handle_timeout(char *deliver_file, char *program)
-       49 | {
-       50 |     struct variables *anker = malloc(sizeof(struct variables));
-       51 |     char *error_filename = malloc(strlen(deliver_file)+6);
-       51 +     char *error_filename = malloc(__strlen(deliver_file)+6);
-       52 |     char *template = malloc(sizeof(webserver_settings.templatepath)+15);
-       53 |     char error_str[1024];
-       54 |     FILE *p_errorfile;
-       55 | 
-       56 | 
-       57 |     /*Init Anker*/
-       58 |     strcpy(anker->name, "anker");
-       58 +     __strcpy(anker->name,"anker");
-       59 |     anker->next = NULL;
-       59 +     anker->next = 0;
-       60 | 
-       61 |     sprintf(error_filename, "%s_error", deliver_file);
-       62 |     sprintf(template, "%s/error/500.html", webserver_settings.templatepath);
-       63 | 
-       64 |     if((p_errorfile = fopen(error_filename, "r")) == NULL)
-       64 +     if((p_errorfile = fopen(error_filename, "r")) == 0)
-       65 |     {
-       66 |         printf("%s\n", strerror(errno));
-       66 +         printf("%s\n", strerror((*_Errno())));
-       67 |         return(-1);
-       68 |     }
-       69 | 
-       70 |     fseek(p_errorfile, 1371, SEEK_SET);
-       70 +     fseek(p_errorfile, 1371, 0);
+       17 | #include "jinja_parser.h"
+       18 | 
+       19 | #define VARLENGTH 20 
+       20 | #define ARRAYLENGTH 20
+       21 | #define LOGFILEPATH "/tmp/t_engemann.log"
+       22 | #define NATTIMEOUT 5
+       23 | #define FILELENGTH 100
+       24 | 
+       25 | int call_subprog(char*, char*, httpheader);
+       26 | 
+       27 | /*
+       28 |  * This function just starts the webserver with the context of natural.
+       29 |  * It is importent for the callnat function from the SAG.
+       30 |  */
+       31 | long start_web_server( WORD nparm, void *parmhandle, void *traditional )
+       31 + long start_web_server( unsigned short nparm, void *parmhandle, void *traditional )
+       32 | {
+       33 |     start_web_server_from_nat(&call_subprog);
+       34 |     return((long)0);
+       35 | }
+       36 | 
+       37 | void nat_signalHandler(int signal)
+       38 | {
+       39 |     FILE *errfile = fopen("/tmp/nat_call_error", "w");
+       40 |     fprintf(errfile, "Recv Signal: [%d]\n", signal);
+       41 |     fclose(errfile);
+       42 | }
+       43 | 
+       44 | /*
+       45 |  * This function will redner a 500 Error Page with the Name 
+       46 |  * of the called subprog and the errorcode from Natural.
+       47 |  * The Templatefile can be found in the template/error folder.
+       48 |  */
+       49 | int handle_timeout(char *deliver_file, char *program)
+       50 | {
+       51 |     struct variables *anker = malloc(sizeof(struct variables));
+       52 |     char *error_filename = malloc(strlen(deliver_file)+6);
+       52 +     char *error_filename = malloc(__strlen(deliver_file)+6);
+       53 |     char *template = malloc(sizeof(webserver_settings.templatepath)+15);
+       54 |     char error_str[2048];
+       55 |     FILE *p_errorfile;
+       56 |     int error_line;
+       57 | 
+       58 | 
+       59 |     /*Init Anker*/
+       60 |     strcpy(anker->name, "anker");
+       60 +     __strcpy(anker->name,"anker");
+       61 |     anker->next = NULL;
+       61 +     anker->next = 0;
+       62 | 
+       63 |     sprintf(error_filename, "%s_error", deliver_file);
+       64 |     sprintf(template, "%s/error/500.html", webserver_settings.templatepath);
+       65 | 
+       66 |     if((p_errorfile = fopen(error_filename, "r")) == NULL)
+       66 +     if((p_errorfile = fopen(error_filename, "r")) == 0)
+       67 |     {
+       68 |         printf("%s\n", strerror(errno));
+       68 +         printf("%s\n", strerror((*_Errno())));
+       69 |         return(-1);
+       70 |     }
        71 | 
-       72 |     fgets(error_str, sizeof(error_str), p_errorfile);
-       73 |     fclose(p_errorfile);
-       74 |     remove(error_filename);
-       75 | 
-       76 |     error_str[strlen(error_str)-5] = '\0';
-       76 +     error_str[__strlen(error_str)-5] = '\0';
+       72 |     fseek(p_errorfile, 1371, SEEK_SET);
+       72 +     fseek(p_errorfile, 1371, 0);
+       73 | 
+       74 |     fgets(error_str, sizeof(error_str), p_errorfile);
+       75 |     fclose(p_errorfile);
+       76 |     remove(error_filename);
        77 | 
-       78 |     newStringVar(anker, "error_str", error_str);
-       79 |     newStringVar(anker, "programm", program);
-       80 |     parser_start(template, anker, deliver_file);
-       81 | }
-       82 | 
-       83 | /*
-       84 |  * This function will call the given Natural Subprog with the parameters:
-       85 |  *    Request Values (Length: 20; Type Alpha; Array with index of 20)
-       86 |  *    Request Keys   (Length: 30; Type Alpha; Array with index of 20)
-       87 |  *    Request Type   (Length:  5; Type Alpha)
-       88 |  *    Request File   (!!!Only for internal use!!! 
-       89 |  *                    This is the file where the rendered template will writen to)
-       90 |  *                   (Length: 100; Type Alpha)
-       91 |  *    Request Settings (!!!Only for internal use!!)
-       92 |  *                      Settings from the webserver for the jinja parser with settings
-       93 |  *                      in the format: "key1=value1;key2=value2"
-       94 |  *                      (Length: Dynamic; Type Alpha)
-       95 |  */      
-       96 | int call_subprog(char *programm, char *server_deliver_filename, httpheader request_header)
-       97 | {
-       98 |     int i,
-       99 |         arraylength = ARRAYLENGTH;
-       99 +         arraylength = 20;
-      100 |     pid_t nat_pid;
-      101 |     sigset_t mask;
-      102 |     sigset_t orig_mask;
-      103 |     int timeout_bool = 0;
-      104 | 
-      105 |     char req_type[] = "POST"; 
-      106 |     char req_settings[] = "debug=1";
-      107 |     char req_file[] = " ";
-      108 |     char keys[VARLENGTH];
-      108 +     char keys[20];
-      109 |     char testbuff[100];
-      110 |     char values[VARLENGTH];
-      110 +     char values[20];
-      111 |     FILE *f_deliver_file;
-      112 |     key_t sharedmem_key;
-      113 | 
-      114 |     char *deliver_file = tempnam("/tmp", "rh4N");
-      115 |     strcpy(server_deliver_filename, deliver_file);
-      115 +     __strcpy(server_deliver_filename,deliver_file);
-      116 |     /*Touch tmp file*/
-      117 |     if((f_deliver_file = fopen(deliver_file, "w")) == NULL)
-      117 +     if((f_deliver_file = fopen(deliver_file, "w")) == 0)
-      118 |     {
-      119 |         printf("Error: [%s]\n", strerror(errno));
-      119 +         printf("Error: [%s]\n", strerror((*_Errno())));
-      120 |         return(-1);
-      121 |     }
-      122 |     fclose(f_deliver_file);
-      123 | 
-      124 | 
-      125 |     printf("generated Deliver File: [%s]\n", deliver_file);
+       78 |     error_str[strlen(error_str)-5] = '\0';
+       78 +     error_str[__strlen(error_str)-5] = '\0';
+       79 | 
+       80 |     newStringVar(anker, "error_str", error_str);
+       81 |     newStringVar(anker, "programm", program);
+       82 |     start_jinjaparser(anker, deliver_file, template, error_str, &error_line);
+       83 | }
+       84 | 
+       85 | /*
+       86 |  * This function will call the given Natural Subprog with the parameters:
+       87 |  *    Request Values (Length: 20; Type Alpha; Array with index of 20)
+       88 |  *    Request Keys   (Length: 30; Type Alpha; Array with index of 20)
+       89 |  *    Request Type   (Length:  5; Type Alpha)
+       90 |  *    Request File   (!!!Only for internal use!!! 
+       91 |  *                    This is the file where the rendered template will writen to)
+       92 |  *                   (Length: 100; Type Alpha)
+       93 |  *    Request Settings (!!!Only for internal use!!)
+       94 |  *                      Settings from the webserver for the jinja parser with settings
+       95 |  *                      in the format: "key1=value1;key2=value2"
+       96 |  *                      (Length: Dynamic; Type Alpha)
+       97 |  */      
+       98 | int call_subprog(char *programm, char *server_deliver_filename, httpheader request_header)
+       99 | {
+      100 |     int i,
+      101 |         arraylength = ARRAYLENGTH;
+      101 +         arraylength = 20;
+      102 |     pid_t nat_pid;
+      103 |     sigset_t mask;
+      104 |     sigset_t orig_mask;
+      105 |     int timeout_bool = 0;
+      106 | 
+      107 |     char req_type[] = "POST"; 
+      108 |     char req_settings[] = "debug=1";
+      109 |     char req_file[] = " ";
+      110 |     char keys[VARLENGTH];
+      110 +     char keys[20];
+      111 |     char testbuff[100];
+      112 |     char values[VARLENGTH];
+      112 +     char values[20];
+      113 |     FILE *f_deliver_file;
+      114 |     key_t sharedmem_key;
+      115 | 
+      116 |     char *deliver_file = tempnam("/tmp", "rh4N");
+      117 |     strcpy(server_deliver_filename, deliver_file);
+      117 +     __strcpy(server_deliver_filename,deliver_file);
+      118 |     /*Touch tmp file*/
+      119 |     if((f_deliver_file = fopen(deliver_file, "w")) == NULL)
+      119 +     if((f_deliver_file = fopen(deliver_file, "w")) == 0)
+      120 |     {
+      121 |         printf("Error: [%s]\n", strerror(errno));
+      121 +         printf("Error: [%s]\n", strerror((*_Errno())));
+      122 |         return(-1);
+      123 |     }
+      124 |     fclose(f_deliver_file);
+      125 | 
       126 | 
-      127 |     printf("Starting Subprog [%s]\n", programm);
-      128 |     nat_pid = fork();
-      129 |     if(nat_pid == 0)
-      130 |     {
-      131 |         //Child
-      132 |         FILE *error_file;
-      133 |         int nat_rc;
-      134 |         struct parameter_description pass[5], test;
-      135 |         void *myparmhandle;
-      136 |         char *error_logfile = malloc(strlen(deliver_file)+6);
-      136 +         char *error_logfile = malloc(__strlen(deliver_file)+6);
-      137 |         int arraylength = ARRAYLENGTH,
-      137 +         int arraylength = 20,
-      138 |             shID = 0;
-      139 | 
-      140 |         sprintf(error_logfile, "%s_error", deliver_file);
-      141 |         printf("Logging Nat Error into [%s]\n", error_logfile);
-      142 | 
-      143 |         error_file = fopen(error_logfile, "w");
-      144 |         dup2(fileno(error_file), 1);
-      144 +         dup2(((error_file)->_file), 1);
-      145 |         close(fileno(error_file));
-      145 +         close(((error_file)->_file));
-      146 | 
-      147 |         fprintf(stderr, "Create Signal handler\n");
-      147 +         fprintf((&_iob[2]), "Create Signal handler\n");
-      148 |         for(i=0; i < NSIG; i++)
-      148 +         for(i=0; i < (255+1); i++)
-      149 |         {
-      150 |             signal(i, nat_signalHandler);
-      151 |         }
-      152 | 
-      153 |         
-      154 |         /*Create Datasets for Subprog Call*/
-      155 |         ncxr_create_parm(5, &myparmhandle);
-      156 |         ncxr_init_parm_sa(0, myparmhandle, 'A', VARLENGTH, 0, 1, &arraylength, 0);
-      156 +         ncxr_init_parm_sa(0, myparmhandle, 'A', 20, 0, 1, &arraylength, 0);
-      157 |         ncxr_init_parm_sa(1, myparmhandle, 'A', VARLENGTH, 0, 1, &arraylength, 0);
-      157 +         ncxr_init_parm_sa(1, myparmhandle, 'A', 20, 0, 1, &arraylength, 0);
-      158 |         ncxr_init_parm_s (2, myparmhandle, 'A', 5,         0, 0);
-      159 |         ncxr_init_parm_s (3, myparmhandle, 'A', FILELENGTH,0, 0);
-      159 +         ncxr_init_parm_s (3, myparmhandle, 'A', 100,0, 0);
-      160 |         ncxr_init_parm_d (4, myparmhandle, 'A', 0);
-      161 | 
-      162 | 
-      163 |         for(i=0; i < 20; i++)
-      164 |         {
-      165 |             memset(keys, 0x20, VARLENGTH);
-      165 +             __memset(keys,0x20,20);
-      166 |             memset(values, 0x20, VARLENGTH);
-      166 +             __memset(values,0x20,20);
-      167 |             if(i < request_header.request_arguments)
-      168 |             {
-      169 |                 strcpy(keys, ((char**)request_header.request_keys)[i]);
-      169 +                 __strcpy(keys,((char**)request_header.request_keys)[i]);
-      170 |                 strcpy(values, ((char**)request_header.request_values)[i]);
-      170 +                 __strcpy(values,((char**)request_header.request_values)[i]);
-      171 |             }
-      172 |             else
-      173 |             {
-      174 |                 strcpy(keys, " ");
-      174 +                 __strcpy(keys," ");
-      175 |                 strcpy(values, " ");
-      175 +                 __strcpy(values," ");
-      176 |             }
-      177 |             ncxr_put_parm_array(0, myparmhandle, VARLENGTH, values, &i);
-      177 +             ncxr_put_parm_array(0, myparmhandle, 20, values, &i);
-      178 |             ncxr_put_parm_array(1, myparmhandle, VARLENGTH, keys, &i);
-      178 +             ncxr_put_parm_array(1, myparmhandle, 20, keys, &i);
-      179 |         }
-      180 | 
-      181 |         if(ncxr_put_parm(2, myparmhandle, 5, request_header.request_type) < 0)
-      182 |         {
-      183 |             exit(7);
-      184 |         }
-      185 | 
-      186 |         ncxr_put_parm(3, myparmhandle, strlen(deliver_file), deliver_file);
-      186 +         ncxr_put_parm(3, myparmhandle, __strlen(deliver_file), deliver_file);
-      187 |         ncxr_put_parm(4, myparmhandle, sizeof(req_settings), req_settings);
-      188 | 
-      189 | 
-      190 |         memset(pass, 0, sizeof(pass));
-      190 +         __memset(pass,0,sizeof(pass));
+      127 |     printf("generated Deliver File: [%s]\n", deliver_file);
+      128 | 
+      129 |     printf("Starting Subprog [%s]\n", programm);
+      130 |     nat_pid = fork();
+      131 |     if(nat_pid == 0)
+      132 |     {
+      133 |         //Child
+      134 |         FILE *error_file;
+      135 |         int nat_rc;
+      136 |         struct parameter_description pass[5], test;
+      137 |         void *myparmhandle;
+      138 |         char *error_logfile = malloc(strlen(deliver_file)+6);
+      138 +         char *error_logfile = malloc(__strlen(deliver_file)+6);
+      139 |         int arraylength = ARRAYLENGTH,
+      139 +         int arraylength = 20,
+      140 |             shID = 0;
+      141 | 
+      142 |         sprintf(error_logfile, "%s_error", deliver_file);
+      143 |         printf("Logging Nat Error into [%s]\n", error_logfile);
+      144 | 
+      145 |         error_file = fopen(error_logfile, "w");
+      146 |         dup2(fileno(error_file), 1);
+      146 +         dup2(((error_file)->_file), 1);
+      147 |         close(fileno(error_file));
+      147 +         close(((error_file)->_file));
+      148 | 
+      149 |         fprintf(stderr, "Create Signal handler\n");
+      149 +         fprintf((&_iob[2]), "Create Signal handler\n");
+      150 |         for(i=0; i < NSIG; i++)
+      150 +         for(i=0; i < (255+1); i++)
+      151 |         {
+      152 |             signal(i, nat_signalHandler);
+      153 |         }
+      154 | 
+      155 |         
+      156 |         /*Create Datasets for Subprog Call*/
+      157 |         ncxr_create_parm(5, &myparmhandle);
+      158 |         ncxr_init_parm_sa(0, myparmhandle, 'A', VARLENGTH, 0, 1, &arraylength, 0);
+      158 +         ncxr_init_parm_sa(0, myparmhandle, 'A', 20, 0, 1, &arraylength, 0);
+      159 |         ncxr_init_parm_sa(1, myparmhandle, 'A', VARLENGTH, 0, 1, &arraylength, 0);
+      159 +         ncxr_init_parm_sa(1, myparmhandle, 'A', 20, 0, 1, &arraylength, 0);
+      160 |         ncxr_init_parm_s (2, myparmhandle, 'A', 5,         0, 0);
+      161 |         ncxr_init_parm_s (3, myparmhandle, 'A', FILELENGTH,0, 0);
+      161 +         ncxr_init_parm_s (3, myparmhandle, 'A', 100,0, 0);
+      162 |         ncxr_init_parm_d (4, myparmhandle, 'A', 0);
+      163 | 
+      164 | 
+      165 |         for(i=0; i < 20; i++)
+      166 |         {
+      167 |             memset(keys, 0x20, VARLENGTH);
+      167 +             __memset(keys,0x20,20);
+      168 |             memset(values, 0x20, VARLENGTH);
+      168 +             __memset(values,0x20,20);
+      169 |             if(i < request_header.request_arguments)
+      170 |             {
+      171 |                 strcpy(keys, ((char**)request_header.request_keys)[i]);
+      171 +                 __strcpy(keys,((char**)request_header.request_keys)[i]);
+      172 |                 strcpy(values, ((char**)request_header.request_values)[i]);
+      172 +                 __strcpy(values,((char**)request_header.request_values)[i]);
+      173 |             }
+      174 |             else
+      175 |             {
+      176 |                 strcpy(keys, " ");
+      176 +                 __strcpy(keys," ");
+      177 |                 strcpy(values, " ");
+      177 +                 __strcpy(values," ");
+      178 |             }
+      179 |             ncxr_put_parm_array(0, myparmhandle, VARLENGTH, values, &i);
+      179 +             ncxr_put_parm_array(0, myparmhandle, 20, values, &i);
+      180 |             ncxr_put_parm_array(1, myparmhandle, VARLENGTH, keys, &i);
+      180 +             ncxr_put_parm_array(1, myparmhandle, 20, keys, &i);
+      181 |         }
+      182 | 
+      183 |         if(ncxr_put_parm(2, myparmhandle, 5, request_header.request_type) < 0)
+      184 |         {
+      185 |             exit(7);
+      186 |         }
+      187 | 
+      188 |         ncxr_put_parm(3, myparmhandle, strlen(deliver_file), deliver_file);
+      188 +         ncxr_put_parm(3, myparmhandle, __strlen(deliver_file), deliver_file);
+      189 |         ncxr_put_parm(4, myparmhandle, sizeof(req_settings), req_settings);
+      190 | 
       191 | 
-      192 |         ncxr_get_parm_info(0, myparmhandle, &pass[0]);
-      193 |         ncxr_get_parm_info(1, myparmhandle, &pass[1]);
-      194 |         ncxr_get_parm_info(2, myparmhandle, &pass[2]);
-      195 |         ncxr_get_parm_info(3, myparmhandle, &pass[3]);
-      196 |         ncxr_get_parm_info(4, myparmhandle, &pass[4]);
-      197 |         /*End Datasets*/
-      198 | 
-      199 |         fprintf(stderr, "Calling ncxr_if4_callnat\n"); 
-      199 +         fprintf((&_iob[2]), "Calling ncxr_if4_callnat\n"); 
+      192 |         memset(pass, 0, sizeof(pass));
+      192 +         __memset(pass,0,sizeof(pass));
+      193 | 
+      194 |         ncxr_get_parm_info(0, myparmhandle, &pass[0]);
+      195 |         ncxr_get_parm_info(1, myparmhandle, &pass[1]);
+      196 |         ncxr_get_parm_info(2, myparmhandle, &pass[2]);
+      197 |         ncxr_get_parm_info(3, myparmhandle, &pass[3]);
+      198 |         ncxr_get_parm_info(4, myparmhandle, &pass[4]);
+      199 |         /*End Datasets*/
       200 | 
-      201 |         nat_rc = ncxr_if4_callnat(programm, 5, pass);
+      201 |         fprintf(stderr, "Calling ncxr_if4_callnat\n"); 
+      201 +         fprintf((&_iob[2]), "Calling ncxr_if4_callnat\n"); 
       202 | 
-      203 |         exit(0);
-      204 |     }
-      205 |     //Parent
-      206 | 
-      207 |     int status, waitrc, i_timeout = 0,
-      208 |         shID = 0;
-      209 |     bool timeout = false;
-      209 +     bool timeout = 0;
-      210 |     char *mem;
-      211 |     char deliver_filename[FILELENGTH];
-      211 +     char deliver_filename[100];
-      212 | 
-      213 |     /*Wait NATTIMEOUT Seconds for the Natural Subprog
-      214 |      * to exit. After that it will be killed*/
-      215 |     printf("Wait for Child to exit\n");    
-      216 |     do
-      217 |     {
-      218 |         waitrc = waitpid(nat_pid, &status, WNOHANG);
-      218 +         waitrc = waitpid(nat_pid, &status, 0x1);
-      219 |         if(waitrc < 0)
-      220 |         {
-      221 |             printf("ErrorNr: [%d]\nError [%s]\n", errno, strerror(errno));
-      221 +             printf("ErrorNr: [%d]\nError [%s]\n", (*_Errno()), strerror((*_Errno())));
-      222 |             printf("Exit Stat: [%d]\n", status);
-      223 |             break;
-      224 |         }
-      225 |         if(waitrc > 0) 
-      226 |         {
-      227 |             printf("Exit Stat: [%d]\n", status);
-      228 |             break;
-      229 |         }
-      230 |         if(++i_timeout >= NATTIMEOUT)
-      230 +         if(++i_timeout >= 5)
-      231 |         {
-      232 |             printf("Timeout\n");
-      233 |             timeout = true;
-      233 +             timeout = 1;
-      234 |             kill(nat_pid, SIGKILL);
-      234 +             kill(nat_pid, 9);
-      235 |             break;
-      236 |         }
-      237 |         sleep(1);
-      238 |         
-      239 |     }while(1);
-      240 |     if(timeout == true)
-      240 +     if(timeout == 1)
-      241 |     {    
-      242 |         /*The Natural Prozess timed out. Probably with an Error*/
-      243 |         handle_timeout(deliver_file, programm);
-      244 |     }
-      245 | 
-      246 |     /*Return to the Webserver*/
-      247 |     return(0);
-      248 | }
+      203 |         nat_rc = ncxr_if4_callnat(programm, 5, pass);
+      204 | 
+      205 |         exit(0);
+      206 |     }
+      207 |     //Parent
+      208 | 
+      209 |     int status, waitrc, i_timeout = 0,
+      210 |         shID = 0;
+      211 |     bool timeout = false;
+      211 +     bool timeout = 0;
+      212 |     char *mem;
+      213 |     char deliver_filename[FILELENGTH];
+      213 +     char deliver_filename[100];
+      214 | 
+      215 |     /*Wait NATTIMEOUT Seconds for the Natural Subprog
+      216 |      * to exit. After that it will be killed*/
+      217 |     printf("Wait for Child to exit\n");    
+      218 |     do
+      219 |     {
+      220 |         waitrc = waitpid(nat_pid, &status, WNOHANG);
+      220 +         waitrc = waitpid(nat_pid, &status, 0x1);
+      221 |         if(waitrc < 0)
+      222 |         {
+      223 |             printf("ErrorNr: [%d]\nError [%s]\n", errno, strerror(errno));
+      223 +             printf("ErrorNr: [%d]\nError [%s]\n", (*_Errno()), strerror((*_Errno())));
+      224 |             printf("Exit Stat: [%d]\n", status);
+      225 |             break;
+      226 |         }
+      227 |         if(waitrc > 0) 
+      228 |         {
+      229 |             printf("Exit Stat: [%d]\n", status);
+      230 |             break;
+      231 |         }
+      232 |         if(++i_timeout >= NATTIMEOUT)
+      232 +         if(++i_timeout >= 5)
+      233 |         {
+      234 |             printf("Timeout\n");
+      235 |             timeout = true;
+      235 +             timeout = 1;
+      236 |             kill(nat_pid, SIGKILL);
+      236 +             kill(nat_pid, 9);
+      237 |             break;
+      238 |         }
+      239 |         sleep(1);
+      240 |         
+      241 |     }while(1);
+      242 |     if(timeout == true)
+      242 +     if(timeout == 1)
+      243 |     {    
+      244 |         /*The Natural Prozess timed out. Probably with an Error*/
+      245 |         handle_timeout(deliver_file, programm);
+      246 |     }
+      247 | 
+      248 |     /*Return to the Webserver*/
+      249 |     return(0);
+      250 | }
 
 >>>>> OPTIONS SECTION <<<<<
 
@@ -313,7 +315,7 @@ MAXMEM=-1
 
                                        FILE CREATION        FROM
 FILE NO   FILENAME                    DATE       TIME       FILE    LINE
-     0    start_server.c              07/25/16   11:49:08
+     0    start_server.c              08/01/16   14:40:06
      1    /usr/include/stdio.h        02/20/13   00:22:36      0       1
      2    /usr/include/standards.h    05/22/12   18:32:38      1      43
      3    /usr/include/va_list.h      09/22/09   00:15:51      1     201
@@ -411,17 +413,19 @@ FILE NO   FILENAME                    DATE       TIME       FILE    LINE
     81    /usr/include/sys/m_shm.h    09/21/09   23:29:08     41     157
     82    /usr/include/signal.h       09/22/09   00:15:33      0       9
     83    /usr/include/errno.h        06/06/11   20:14:38      0      10
-    84    natuser.h                   07/24/16   15:52:44      0      12
+    84    natuser.h                   07/31/16   15:45:12      0      12
     85    /u/it/a140734/C/realHtml4Natural/include/standard.h
-                                      07/24/16   15:52:52      0      13
+                                      07/31/16   15:45:34      0      13
     86    /u/it/a140734/C/realHtml4Natural/include/standard.c
-                                      07/24/16   15:52:52     85      22
+                                      07/31/16   15:45:34     85      22
     87    /u/it/a140734/C/realHtml4Natural/libs/varhandle_lib/varhandle.h
-                                      07/24/16   15:52:54      0      14
+                                      07/31/16   15:45:38      0      14
     88    /u/it/a140734/C/realHtml4Natural/web_server/header.h
-                                      07/25/16   10:39:38      0      15
+                                      07/31/16   15:45:40      0      15
     89    /u/it/a140734/C/realHtml4Natural/libs/utils/utils.h
-                                      07/24/16   15:52:54      0      16
+                                      07/31/16   15:45:38      0      16
+    90    /u/it/a140734/C/realHtml4Natural/libs/jinja2_parser/jinja_parser.h
+                                      08/01/16   14:22:30      0      17
 
 
 >>>>> COMPILATION EPILOGUE SECTION <<<<<
@@ -433,7 +437,7 @@ TOTAL   UNRECOVERABLE  SEVERE       ERROR     WARNING    INFORMATIONAL
     0           0         0           0          0            0
 
 
-Source records read.........................................   27920
+Source records read.........................................   27930
 
 1501-008  Compilation successful for file start_server.c. Object file created.
 
@@ -445,14 +449,14 @@ Source records read.........................................   27920
  FPR's set/used:   ssss ssss ssss ss--  ---- ---- ---- ----
  CCR's set/used:   ss-- -sss
      | 000000                           PDEF     handle_timeout
-   48|                                  PROC      deliver_file,program,gr3,gr4
+   49|                                  PROC      deliver_file,program,gr3,gr4
     0| 000000 mfspr    7C0802A6   1     LFLR      gr0=lr
     0| 000004 std      FBE1FFF8   1     ST8       #stack(gr1,-8)=gr31
     0| 000008 std      FBC1FFF0   1     ST8       #stack(gr1,-16)=gr30
     0| 00000C std      FBA1FFE8   1     ST8       #stack(gr1,-24)=gr29
     0| 000010 std      FB81FFE0   1     ST8       #stack(gr1,-32)=gr28
     0| 000014 ori      607F0000   1     LR        gr31=gr3
-   50| 000018 addi     386000F0   1     LI        gr3=240
+   51| 000018 addi     386000F0   1     LI        gr3=240
     0| 00001C std      FB61FFD8   1     ST8       #stack(gr1,-40)=gr27
     0| 000020 std      FB41FFD0   1     ST8       #stack(gr1,-48)=gr26
     0| 000024 ori      609E0000   1     LR        gr30=gr4
@@ -460,154 +464,156 @@ Source records read.........................................   27920
     0| 00002C std      FB01FFC0   1     ST8       #stack(gr1,-64)=gr24
     0| 000030 std      FAE1FFB8   1     ST8       #stack(gr1,-72)=gr23
     0| 000034 std      F8010010   1     ST8       #stack(gr1,16)=gr0
-    0| 000038 stdu     F821FB41   1     ST8U      gr1,#stack(gr1,-1216)=gr1
-   50| 00003C bl       4BFFFFC5   1     CALL      gr3=malloc,1,gr3,#ProcAlias",malloc",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-   50| 000040 ori      60000000   1
-   50| 000044 ori      607B0000   1     LR        gr27=gr3
-   51| 000048 ori      63E30000   1     LR        gr3=gr31
-   51| 00004C bl       4BFFFFB5   1     CALLN     gr3=strlen,1,gr3,(*)Cuchar,gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-   51| 000050 ori      60000000   1
-   51| 000054 addi     38630006   1     AI        gr3=gr3,6
-   51| 000058 bl       4BFFFFA9   1     CALL      gr3=malloc,1,gr3,#ProcAlias",malloc",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-   51| 00005C ori      60000000   1
-   51| 000060 ori      607D0000   1     LR        gr29=gr3
-   52| 000064 addi     3860040F   1     LI        gr3=1039
-   52| 000068 bl       4BFFFF99   1     CALL      gr3=malloc,1,gr3,#ProcAlias",malloc",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-   52| 00006C ori      60000000   1
-   52| 000070 ori      607C0000   1     LR        gr28=gr3
-   58| 000074 ld       EAE20008   1     L8        gr23=.$STATIC(gr2,0)
-   58| 000078 ori      63630000   1     LR        gr3=gr27
-   58| 00007C addi     38970038   1     AI        gr4=gr23,56
-   58| 000080 bl       4BFFFF81   1     CALLN     gr3,(*)uchar=strcpy,2,gr3,gr4,""9,gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-   58| 000084 ori      60000000   1
-   58| 000088 ori      607B0000   1     LR        gr27=gr3
-   59| 00008C addi     3B400000   1     LI        gr26=0
-   61| 000090 ori      63A30000   1     LR        gr3=gr29
-   61| 000094 addi     38970048   1     AI        gr4=gr23,72
-   61| 000098 ori      63E50000   1     LR        gr5=gr31
-   59| 00009C std      FB5B00E8   1     ST8       (*)variables.variables.next(gr27,232)=gr26
-   61| 0000A0 bl       4BFFFF61   1     CALL      gr3=sprintf,3,(*)uchar",gr3,(*)Cuchar",gr4,(*)uchar",gr5,#ProcAlias",sprintf",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-   61| 0000A4 ori      60000000   1
-   62| 0000A8 ori      63830000   1     LR        gr3=gr28
-   62| 0000AC ld       E8A20010   1     L8        gr5=.webserver_settings(gr2,0)
-   62| 0000B0 addi     389700BC   1     AI        gr4=gr23,188
-   62| 0000B4 bl       4BFFFF4D   1     CALL      gr3=sprintf,3,(*)uchar",gr3,(*)Cuchar",gr4,webserver_settings",gr5,#ProcAlias",sprintf",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-   62| 0000B8 ori      60000000   1
-   64| 0000BC ori      63A30000   1     LR        gr3=gr29
-   64| 0000C0 addi     38970004   1     AI        gr4=gr23,4
-   64| 0000C4 bl       4BFFFF3D   1     CALL      gr3=fopen,2,(*)Cuchar",gr3,(*)Cuchar",gr4,#ProcAlias",fopen",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-   64| 0000C8 ori      60000000   1
-   64| 0000CC cmpdi    2C230000   1     C8        cr0=gr3,0
-   70| 0000D0 ori      60790000   1     LR        gr25=gr3
-   64| 0000D4 bc       418200C8   1     BT        CL.38,cr0,0x4/eq,taken=30%(30,70)
-   70| 0000D8 addi     3880055B   1     LI        gr4=1371
-   70| 0000DC addi     38A00000   1     LI        gr5=0
-   70| 0000E0 bl       4BFFFF21   1     CALL      gr3=fseek,3,(*)aggr#1",gr3-gr5,#ProcAlias",fseek",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-   70| 0000E4 ori      60000000   1
-   72| 0000E8 addi     3B010070   1     AI        gr24=gr1,112
-   72| 0000EC ori      63250000   1     LR        gr5=gr25
-   72| 0000F0 addi     38610070   1     AI        gr3=gr1,112
-   72| 0000F4 addi     38800400   1     LI        gr4=1024
-   72| 0000F8 bl       4BFFFF09   1     CALL      gr3=fgets,3,(*)uchar",gr3,gr4,(*)aggr#1",gr5,#ProcAlias",fgets",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-   72| 0000FC ori      60000000   1
-   73| 000100 ori      63230000   1     LR        gr3=gr25
-   73| 000104 bl       4BFFFEFD   1     CALL      gr3=fclose,1,(*)aggr#1",gr3,#ProcAlias",fclose",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-   73| 000108 ori      60000000   1
-   74| 00010C ori      63A30000   1     LR        gr3=gr29
-   74| 000110 bl       4BFFFEF1   1     CALL      gr3=remove,1,(*)Cuchar",gr3,#ProcAlias",remove",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-   74| 000114 ori      60000000   1
-   76| 000118 addi     38610070   1     AI        gr3=gr1,112
-   76| 00011C bl       4BFFFEE5   1     CALLN     gr3=strlen,1,gr3,error_str,gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-   76| 000120 ori      60000000   1
-   76| 000124 addi     38C3FFFB   1     AI        gr6=gr3,-5
-   78| 000128 addi     38970078   1     AI        gr4=gr23,120
-   78| 00012C addi     38A10070   1     AI        gr5=gr1,112
-   78| 000130 ori      63630000   1     LR        gr3=gr27
-   76| 000134 stbx     7F5831AE   1     ST1Z      error_strweb_server_settings.[]0(gr24,gr6,0)=gr26
-   78| 000138 bl       4BFFFEC9   1     CALL      newStringVar,3,(*)variables",gr3,(*)uchar",gr4,(*)uchar",gr5,#ProcAlias",newStringVar",fcr",gr1,cr[01567]",gr0",gr3"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-   78| 00013C ori      60000000   1
-   79| 000140 addi     38970054   1     AI        gr4=gr23,84
-   79| 000144 ori      63630000   1     LR        gr3=gr27
-   79| 000148 ori      63C50000   1     LR        gr5=gr30
-   79| 00014C bl       4BFFFEB5   1     CALL      newStringVar,3,(*)variables",gr3,(*)uchar",gr4,(*)uchar",gr5,#ProcAlias",newStringVar",fcr",gr1,cr[01567]",gr0",gr3"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-   79| 000150 ori      60000000   1
-   80| 000154 ori      63830000   1     LR        gr3=gr28
-   80| 000158 ori      63640000   1     LR        gr4=gr27
-   80| 00015C ori      63E50000   1     LR        gr5=gr31
-   80| 000160 bl       4BFFFEA1   1     CALL      gr3=parser_start,3,(*)uchar",gr3,(*)variables",gr4,(*)uchar",gr5,#ProcAlias",parser_start",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-   80| 000164 ori      60000000   1
-   81| 000168 ld       E98104D0   1     L8        gr12=#stack(gr1,1232)
-   81| 00016C addi     382104C0   1     AI        gr1=gr1,1216
-   81| 000170 mtspr    7D8803A6   1     LLR       lr=gr12
-   81| 000174 ld       EAE1FFB8   1     L8        gr23=#stack(gr1,-72)
-   81| 000178 ld       EB01FFC0   1     L8        gr24=#stack(gr1,-64)
-   81| 00017C ld       EB21FFC8   1     L8        gr25=#stack(gr1,-56)
-   81| 000180 ld       EB41FFD0   1     L8        gr26=#stack(gr1,-48)
-   81| 000184 ld       EB61FFD8   1     L8        gr27=#stack(gr1,-40)
-   81| 000188 ld       EB81FFE0   1     L8        gr28=#stack(gr1,-32)
-   81| 00018C ld       EBA1FFE8   1     L8        gr29=#stack(gr1,-24)
-   81| 000190 ld       EBC1FFF0   1     L8        gr30=#stack(gr1,-16)
-   81| 000194 ld       EBE1FFF8   1     L8        gr31=#stack(gr1,-8)
-   81| 000198 bclr     4E800020   1     BA        lr
+    0| 000038 stdu     F821F741   1     ST8U      gr1,#stack(gr1,-2240)=gr1
+   51| 00003C bl       4BFFFFC5   1     CALL      gr3=malloc,1,gr3,#ProcAlias",malloc",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+   51| 000040 ori      60000000   1
+   51| 000044 ori      607B0000   1     LR        gr27=gr3
+   52| 000048 ori      63E30000   1     LR        gr3=gr31
+   52| 00004C bl       4BFFFFB5   1     CALLN     gr3=strlen,1,gr3,(*)Cuchar,gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+   52| 000050 ori      60000000   1
+   52| 000054 addi     38630006   1     AI        gr3=gr3,6
+   52| 000058 bl       4BFFFFA9   1     CALL      gr3=malloc,1,gr3,#ProcAlias",malloc",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+   52| 00005C ori      60000000   1
+   52| 000060 ori      607D0000   1     LR        gr29=gr3
+   53| 000064 addi     3860040F   1     LI        gr3=1039
+   53| 000068 bl       4BFFFF99   1     CALL      gr3=malloc,1,gr3,#ProcAlias",malloc",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+   53| 00006C ori      60000000   1
+   53| 000070 ori      607C0000   1     LR        gr28=gr3
+   60| 000074 ld       EAE20008   1     L8        gr23=.$STATIC(gr2,0)
+   60| 000078 ori      63630000   1     LR        gr3=gr27
+   60| 00007C addi     38970038   1     AI        gr4=gr23,56
+   60| 000080 bl       4BFFFF81   1     CALLN     gr3,(*)uchar=strcpy,2,gr3,gr4,""9,gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+   60| 000084 ori      60000000   1
+   60| 000088 ori      607B0000   1     LR        gr27=gr3
+   61| 00008C addi     3B400000   1     LI        gr26=0
+   63| 000090 ori      63A30000   1     LR        gr3=gr29
+   63| 000094 addi     38970048   1     AI        gr4=gr23,72
+   63| 000098 ori      63E50000   1     LR        gr5=gr31
+   61| 00009C std      FB5B00E8   1     ST8       (*)variables.variables.next(gr27,232)=gr26
+   63| 0000A0 bl       4BFFFF61   1     CALL      gr3=sprintf,3,(*)uchar",gr3,(*)Cuchar",gr4,(*)uchar",gr5,#ProcAlias",sprintf",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+   63| 0000A4 ori      60000000   1
+   64| 0000A8 ori      63830000   1     LR        gr3=gr28
+   64| 0000AC ld       E8A20010   1     L8        gr5=.webserver_settings(gr2,0)
+   64| 0000B0 addi     389700BC   1     AI        gr4=gr23,188
+   64| 0000B4 bl       4BFFFF4D   1     CALL      gr3=sprintf,3,(*)uchar",gr3,(*)Cuchar",gr4,webserver_settings",gr5,#ProcAlias",sprintf",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+   64| 0000B8 ori      60000000   1
+   66| 0000BC ori      63A30000   1     LR        gr3=gr29
+   66| 0000C0 addi     38970004   1     AI        gr4=gr23,4
+   66| 0000C4 bl       4BFFFF3D   1     CALL      gr3=fopen,2,(*)Cuchar",gr3,(*)Cuchar",gr4,#ProcAlias",fopen",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+   66| 0000C8 ori      60000000   1
+   66| 0000CC cmpdi    2C230000   1     C8        cr0=gr3,0
+   72| 0000D0 ori      60790000   1     LR        gr25=gr3
+   66| 0000D4 bc       418200D0   1     BT        CL.38,cr0,0x4/eq,taken=30%(30,70)
+   72| 0000D8 addi     3880055B   1     LI        gr4=1371
+   72| 0000DC addi     38A00000   1     LI        gr5=0
+   72| 0000E0 bl       4BFFFF21   1     CALL      gr3=fseek,3,(*)aggr#1",gr3-gr5,#ProcAlias",fseek",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+   72| 0000E4 ori      60000000   1
+   74| 0000E8 addi     3B010074   1     AI        gr24=gr1,116
+   74| 0000EC ori      63250000   1     LR        gr5=gr25
+   74| 0000F0 addi     38610074   1     AI        gr3=gr1,116
+   74| 0000F4 addi     38800800   1     LI        gr4=2048
+   74| 0000F8 bl       4BFFFF09   1     CALL      gr3=fgets,3,(*)uchar",gr3,gr4,(*)aggr#1",gr5,#ProcAlias",fgets",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+   74| 0000FC ori      60000000   1
+   75| 000100 ori      63230000   1     LR        gr3=gr25
+   75| 000104 bl       4BFFFEFD   1     CALL      gr3=fclose,1,(*)aggr#1",gr3,#ProcAlias",fclose",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+   75| 000108 ori      60000000   1
+   76| 00010C ori      63A30000   1     LR        gr3=gr29
+   76| 000110 bl       4BFFFEF1   1     CALL      gr3=remove,1,(*)Cuchar",gr3,#ProcAlias",remove",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+   76| 000114 ori      60000000   1
+   78| 000118 addi     38610074   1     AI        gr3=gr1,116
+   78| 00011C bl       4BFFFEE5   1     CALLN     gr3=strlen,1,gr3,error_str,gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+   78| 000120 ori      60000000   1
+   78| 000124 addi     38C3FFFB   1     AI        gr6=gr3,-5
+   80| 000128 addi     38970078   1     AI        gr4=gr23,120
+   80| 00012C addi     38A10074   1     AI        gr5=gr1,116
+   80| 000130 ori      63630000   1     LR        gr3=gr27
+   78| 000134 stbx     7F5831AE   1     ST1Z      error_strweb_server_settings.[]0(gr24,gr6,0)=gr26
+   80| 000138 bl       4BFFFEC9   1     CALL      newStringVar,3,(*)variables",gr3,(*)uchar",gr4,(*)uchar",gr5,#ProcAlias",newStringVar",fcr",gr1,cr[01567]",gr0",gr3"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+   80| 00013C ori      60000000   1
+   81| 000140 addi     38970054   1     AI        gr4=gr23,84
+   81| 000144 ori      63630000   1     LR        gr3=gr27
+   81| 000148 ori      63C50000   1     LR        gr5=gr30
+   81| 00014C bl       4BFFFEB5   1     CALL      newStringVar,3,(*)variables",gr3,(*)uchar",gr4,(*)uchar",gr5,#ProcAlias",newStringVar",fcr",gr1,cr[01567]",gr0",gr3"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+   81| 000150 ori      60000000   1
+   82| 000154 ori      63630000   1     LR        gr3=gr27
+   82| 000158 ori      63E40000   1     LR        gr4=gr31
+   82| 00015C addi     38E10070   1     AI        gr7=gr1,112
+   82| 000160 ori      63850000   1     LR        gr5=gr28
+   82| 000164 addi     38C10074   1     AI        gr6=gr1,116
+   82| 000168 bl       4BFFFE99   1     CALL      gr3=start_jinjaparser,5,(*)variables",gr3,(*)uchar",gr4,(*)uchar",gr5,(*)uchar",gr6,(*)int",gr7,#ProcAlias",start_jinjaparser",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+   82| 00016C ori      60000000   1
+   83| 000170 ld       E98108D0   1     L8        gr12=#stack(gr1,2256)
+   83| 000174 addi     382108C0   1     AI        gr1=gr1,2240
+   83| 000178 mtspr    7D8803A6   1     LLR       lr=gr12
+   83| 00017C ld       EAE1FFB8   1     L8        gr23=#stack(gr1,-72)
+   83| 000180 ld       EB01FFC0   1     L8        gr24=#stack(gr1,-64)
+   83| 000184 ld       EB21FFC8   1     L8        gr25=#stack(gr1,-56)
+   83| 000188 ld       EB41FFD0   1     L8        gr26=#stack(gr1,-48)
+   83| 00018C ld       EB61FFD8   1     L8        gr27=#stack(gr1,-40)
+   83| 000190 ld       EB81FFE0   1     L8        gr28=#stack(gr1,-32)
+   83| 000194 ld       EBA1FFE8   1     L8        gr29=#stack(gr1,-24)
+   83| 000198 ld       EBC1FFF0   1     L8        gr30=#stack(gr1,-16)
+   83| 00019C ld       EBE1FFF8   1     L8        gr31=#stack(gr1,-8)
+   83| 0001A0 bclr     4E800020   1     BA        lr
     0|                              CL.38:
-   66| 00019C bl       4BFFFE65   1     CALL      gr3=_Errno,0,#ProcAlias",_Errno",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-   66| 0001A0 ori      60000000   1
-   66| 0001A4 lwa      E8630002   1     L4A       gr3=(*)int(gr3,0)
-   66| 0001A8 bl       4BFFFE59   1     CALL      gr3=strerror,1,gr3,#ProcAlias",strerror",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-   66| 0001AC ori      60000000   1
-   66| 0001B0 ori      60640000   1     LR        gr4=gr3
-   66| 0001B4 addi     3877001C   1     AI        gr3=gr23,28
-   66| 0001B8 bl       4BFFFE49   1     CALL      gr3=printf,2,(*)Cuchar",gr3,(*)uchar",gr4,#ProcAlias",printf",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-   66| 0001BC ori      60000000   1
-   67| 0001C0 addi     3860FFFF   1     LI        gr3=-1
-   81| 0001C4 ld       EAE10478   1     L8        gr23=#stack(gr1,1144)
-   81| 0001C8 ld       E98104D0   1     L8        gr12=#stack(gr1,1232)
-   81| 0001CC addi     382104C0   1     AI        gr1=gr1,1216
-   81| 0001D0 mtspr    7D8803A6   1     LLR       lr=gr12
-   81| 0001D4 ld       EB21FFC8   1     L8        gr25=#stack(gr1,-56)
-   81| 0001D8 ld       EB41FFD0   1     L8        gr26=#stack(gr1,-48)
-   81| 0001DC ld       EB61FFD8   1     L8        gr27=#stack(gr1,-40)
-   81| 0001E0 ld       EB81FFE0   1     L8        gr28=#stack(gr1,-32)
-   81| 0001E4 ld       EBA1FFE8   1     L8        gr29=#stack(gr1,-24)
-   81| 0001E8 ld       EBC1FFF0   1     L8        gr30=#stack(gr1,-16)
-   81| 0001EC ld       EBE1FFF8   1     L8        gr31=#stack(gr1,-8)
-   81| 0001F0 bclr     4E800020   1     BA        lr
+   68| 0001A4 bl       4BFFFE5D   1     CALL      gr3=_Errno,0,#ProcAlias",_Errno",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+   68| 0001A8 ori      60000000   1
+   68| 0001AC lwa      E8630002   1     L4A       gr3=(*)int(gr3,0)
+   68| 0001B0 bl       4BFFFE51   1     CALL      gr3=strerror,1,gr3,#ProcAlias",strerror",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+   68| 0001B4 ori      60000000   1
+   68| 0001B8 ori      60640000   1     LR        gr4=gr3
+   68| 0001BC addi     3877001C   1     AI        gr3=gr23,28
+   68| 0001C0 bl       4BFFFE41   1     CALL      gr3=printf,2,(*)Cuchar",gr3,(*)uchar",gr4,#ProcAlias",printf",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+   68| 0001C4 ori      60000000   1
+   69| 0001C8 addi     3860FFFF   1     LI        gr3=-1
+   83| 0001CC ld       EAE10878   1     L8        gr23=#stack(gr1,2168)
+   83| 0001D0 ld       E98108D0   1     L8        gr12=#stack(gr1,2256)
+   83| 0001D4 addi     382108C0   1     AI        gr1=gr1,2240
+   83| 0001D8 mtspr    7D8803A6   1     LLR       lr=gr12
+   83| 0001DC ld       EB21FFC8   1     L8        gr25=#stack(gr1,-56)
+   83| 0001E0 ld       EB41FFD0   1     L8        gr26=#stack(gr1,-48)
+   83| 0001E4 ld       EB61FFD8   1     L8        gr27=#stack(gr1,-40)
+   83| 0001E8 ld       EB81FFE0   1     L8        gr28=#stack(gr1,-32)
+   83| 0001EC ld       EBA1FFE8   1     L8        gr29=#stack(gr1,-24)
+   83| 0001F0 ld       EBC1FFF0   1     L8        gr30=#stack(gr1,-16)
+   83| 0001F4 ld       EBE1FFF8   1     L8        gr31=#stack(gr1,-8)
+   83| 0001F8 bclr     4E800020   1     BA        lr
      |               Tag Table
-     | 0001F4        00000000 00002001 80090000 000001F4
-     |               Instruction count          125
-     |               Straight-line exec time    125
+     | 0001FC        00000000 00002001 80090000 000001FC
+     |               Instruction count          127
+     |               Straight-line exec time    127
  GPR's set/used:   ssus ssss ssss s---  ---- ---- ---- -sss
  FPR's set/used:   ssss ssss ssss ss--  ---- ---- ---- ----
  CCR's set/used:   ss-- -sss
      | 000000                           PDEF     nat_signalHandler
-   36|                                  PROC      signal,gr3
+   37|                                  PROC      signal,gr3
     0| 000220 mfspr    7C0802A6   1     LFLR      gr0=lr
     0| 000224 std      FBE1FFF8   1     ST8       #stack(gr1,-8)=gr31
     0| 000228 std      FBC1FFF0   1     ST8       #stack(gr1,-16)=gr30
     0| 00022C std      FBA1FFE8   1     ST8       #stack(gr1,-24)=gr29
     0| 000230 ori      607F0000   1     LR        gr31=gr3
-   38| 000234 ld       EBC20008   1     L8        gr30=.$STATIC(gr2,0)
+   39| 000234 ld       EBC20008   1     L8        gr30=.$STATIC(gr2,0)
     0| 000238 std      F8010010   1     ST8       #stack(gr1,16)=gr0
-   38| 00023C ori      63C40000   1     LR        gr4=gr30
-   38| 000240 addi     387E00E4   1     AI        gr3=gr30,228
+   39| 00023C ori      63C40000   1     LR        gr4=gr30
+   39| 000240 addi     387E00E4   1     AI        gr3=gr30,228
     0| 000244 stdu     F821FF71   1     ST8U      gr1,#stack(gr1,-144)=gr1
-   38| 000248 bl       4BFFFDB9   1     CALL      gr3=fopen,2,(*)Cuchar",gr3,(*)Cuchar",gr4,#ProcAlias",fopen",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-   38| 00024C ori      60000000   1
-   39| 000250 ori      607D0000   1     LR        gr29=gr3
-   39| 000254 extsw    7FE507B4   1     EXTS4     gr5=gr31
-   39| 000258 addi     389E00D0   1     AI        gr4=gr30,208
-   39| 00025C bl       4BFFFDA5   1     CALL      gr3=fprintf,3,(*)aggr#1",gr3,(*)Cuchar",gr4,gr5,#ProcAlias",fprintf",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-   39| 000260 ori      60000000   1
-   40| 000264 ori      63A30000   1     LR        gr3=gr29
-   40| 000268 bl       4BFFFD99   1     CALL      gr3=fclose,1,(*)aggr#1",gr3,#ProcAlias",fclose",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-   40| 00026C ori      60000000   1
-   41| 000270 ld       E98100A0   1     L8        gr12=#stack(gr1,160)
-   41| 000274 addi     38210090   1     AI        gr1=gr1,144
-   41| 000278 mtspr    7D8803A6   1     LLR       lr=gr12
-   41| 00027C ld       EBA1FFE8   1     L8        gr29=#stack(gr1,-24)
-   41| 000280 ld       EBC1FFF0   1     L8        gr30=#stack(gr1,-16)
-   41| 000284 ld       EBE1FFF8   1     L8        gr31=#stack(gr1,-8)
-   41| 000288 bclr     4E800020   1     BA        lr
+   39| 000248 bl       4BFFFDB9   1     CALL      gr3=fopen,2,(*)Cuchar",gr3,(*)Cuchar",gr4,#ProcAlias",fopen",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+   39| 00024C ori      60000000   1
+   40| 000250 ori      607D0000   1     LR        gr29=gr3
+   40| 000254 extsw    7FE507B4   1     EXTS4     gr5=gr31
+   40| 000258 addi     389E00D0   1     AI        gr4=gr30,208
+   40| 00025C bl       4BFFFDA5   1     CALL      gr3=fprintf,3,(*)aggr#1",gr3,(*)Cuchar",gr4,gr5,#ProcAlias",fprintf",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+   40| 000260 ori      60000000   1
+   41| 000264 ori      63A30000   1     LR        gr3=gr29
+   41| 000268 bl       4BFFFD99   1     CALL      gr3=fclose,1,(*)aggr#1",gr3,#ProcAlias",fclose",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+   41| 00026C ori      60000000   1
+   42| 000270 ld       E98100A0   1     L8        gr12=#stack(gr1,160)
+   42| 000274 addi     38210090   1     AI        gr1=gr1,144
+   42| 000278 mtspr    7D8803A6   1     LLR       lr=gr12
+   42| 00027C ld       EBA1FFE8   1     L8        gr29=#stack(gr1,-24)
+   42| 000280 ld       EBC1FFF0   1     L8        gr30=#stack(gr1,-16)
+   42| 000284 ld       EBE1FFF8   1     L8        gr31=#stack(gr1,-8)
+   42| 000288 bclr     4E800020   1     BA        lr
      |               Tag Table
      | 00028C        00000000 00002001 80030000 0000006C
      |               Instruction count           27
@@ -616,18 +622,18 @@ Source records read.........................................   27920
  FPR's set/used:   ssss ssss ssss ss--  ---- ---- ---- ----
  CCR's set/used:   ss-- -sss
      | 000000                           PDEF     start_web_server
-   30|                                  PROC      nparm,parmhandle,traditional,gr3-gr5
+   31|                                  PROC      nparm,parmhandle,traditional,gr3-gr5
     0| 0002A0 mfspr    7C0802A6   1     LFLR      gr0=lr
-   32| 0002A4 ld       E8620028   1     L8        gr3=.call_subprog(gr2,0)
+   33| 0002A4 ld       E8620028   1     L8        gr3=.call_subprog(gr2,0)
     0| 0002A8 stdu     F821FF91   1     ST8U      gr1,#stack(gr1,-112)=gr1
     0| 0002AC std      F8010080   1     ST8       #stack(gr1,128)=gr0
-   32| 0002B0 bl       4BFFFD51   1     CALL      gr3=start_web_server_from_nat,1,call_subprog",gr3,#ProcAlias",start_web_server_from_nat",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-   32| 0002B4 ori      60000000   1
-   33| 0002B8 addi     38600000   1     LI        gr3=0
-   34| 0002BC ld       E9810080   1     L8        gr12=#stack(gr1,128)
-   34| 0002C0 addi     38210070   1     AI        gr1=gr1,112
-   34| 0002C4 mtspr    7D8803A6   1     LLR       lr=gr12
-   34| 0002C8 bclr     4E800020   1     BA        lr
+   33| 0002B0 bl       4BFFFD51   1     CALL      gr3=start_web_server_from_nat,1,call_subprog",gr3,#ProcAlias",start_web_server_from_nat",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+   33| 0002B4 ori      60000000   1
+   34| 0002B8 addi     38600000   1     LI        gr3=0
+   35| 0002BC ld       E9810080   1     L8        gr12=#stack(gr1,128)
+   35| 0002C0 addi     38210070   1     AI        gr1=gr1,112
+   35| 0002C4 mtspr    7D8803A6   1     LLR       lr=gr12
+   35| 0002C8 bclr     4E800020   1     BA        lr
      |               Tag Table
      | 0002CC        00000000 00002001 80000000 0000002C
      |               Instruction count           11
@@ -636,7 +642,7 @@ Source records read.........................................   27920
  FPR's set/used:   ssss ssss ssss ss--  ---- ---- ---- ---s
  CCR's set/used:   ss-- -sss
      | 000000                           PDEF     call_subprog
-   96|                                  PROC      programm,server_deliver_filename,request_header,gr3-gr10
+   98|                                  PROC      programm,server_deliver_filename,request_header,gr3-gr10
     0| 0002E0 mfspr    7C0802A6   1     LFLR      gr0=lr
     0| 0002E4 fmr      FC000090   1     LRFL      fp0=fp0
     0| 0002E8 stfd     DBE1FFF8   1     STFL      #stack(gr1,-8)=fp31
@@ -652,450 +658,450 @@ Source records read.........................................   27920
     0| 000310 std      FB21FFB8   1     ST8       #stack(gr1,-72)=gr25
     0| 000314 std      FB01FFB0   1     ST8       #stack(gr1,-80)=gr24
     0| 000318 std      F8010010   1     ST8       #stack(gr1,16)=gr0
-  105| 00031C ld       EBC20008   1     L8        gr30=.$STATIC(gr2,0)
+  107| 00031C ld       EBC20008   1     L8        gr30=.$STATIC(gr2,0)
     0| 000320 stdu     F821FB61   1     ST8U      gr1,#stack(gr1,-1184)=gr1
-  114| 000324 addi     389E0030   1     AI        gr4=gr30,48
-  114| 000328 addi     387E0028   1     AI        gr3=gr30,40
+  116| 000324 addi     389E0030   1     AI        gr4=gr30,48
+  116| 000328 addi     387E0028   1     AI        gr3=gr30,40
     0| 00032C std      F8A104E0   1     ST8       request_header(gr1,1248)=gr5
     0| 000330 std      F8C104E8   1     ST8       request_header(gr1,1256)=gr6
     0| 000334 std      F8E104F0   1     ST8       request_header(gr1,1264)=gr7
     0| 000338 std      F90104F8   1     ST8       request_header(gr1,1272)=gr8
     0| 00033C std      F9210500   1     ST8       request_header(gr1,1280)=gr9
     0| 000340 std      F9410508   1     ST8       request_header(gr1,1288)=gr10
-  106| 000344 ld       E81E0040   1     L8        gr0=""22(gr30,64)
-  106| 000348 std      F801007C   1     ST8       req_settings(gr1,124)=gr0
-  114| 00034C bl       4BFFFCB5   1     CALL      gr3=tempnam,2,(*)Cuchar",gr3,(*)Cuchar",gr4,#ProcAlias",tempnam",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  114| 000350 ori      60000000   1
-  114| 000354 ori      607D0000   1     LR        gr29=gr3
-  115| 000358 ori      63830000   1     LR        gr3=gr28
-  115| 00035C ori      63A40000   1     LR        gr4=gr29
-  115| 000360 bl       4BFFFCA1   1     CALLN     gr3,(*)uchar=strcpy,2,gr3,gr4,(*)Cuchar,gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  115| 000364 ori      60000000   1
-  117| 000368 addi     389E000C   1     AI        gr4=gr30,12
-  117| 00036C ori      63A30000   1     LR        gr3=gr29
-  117| 000370 bl       4BFFFC91   1     CALL      gr3=fopen,2,(*)Cuchar",gr3,(*)Cuchar",gr4,#ProcAlias",fopen",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  117| 000374 ori      60000000   1
-  117| 000378 cmpdi    2C230000   1     C8        cr0=gr3,0
-  117| 00037C bc       41820604   1     BT        CL.123,cr0,0x4/eq,taken=30%(30,70)
-  122| 000380 bl       4BFFFC81   1     CALL      gr3=fclose,1,(*)aggr#1",gr3,#ProcAlias",fclose",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  122| 000384 ori      60000000   1
-  125| 000388 addi     387E0198   1     AI        gr3=gr30,408
-  125| 00038C ori      63A40000   1     LR        gr4=gr29
-  125| 000390 bl       4BFFFC71   1     CALL      gr3=printf,2,(*)Cuchar",gr3,(*)uchar",gr4,#ProcAlias",printf",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  125| 000394 ori      60000000   1
-  127| 000398 addi     387E00F8   1     AI        gr3=gr30,248
-  127| 00039C ori      63E40000   1     LR        gr4=gr31
-  127| 0003A0 bl       4BFFFC61   1     CALL      gr3=printf,2,(*)Cuchar",gr3,(*)uchar",gr4,#ProcAlias",printf",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  127| 0003A4 ori      60000000   1
-  128| 0003A8 bl       4BFFFC59   1     CALL      gr3=fork,0,#ProcAlias",fork",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  128| 0003AC ori      60000000   1
-  129| 0003B0 ori      607C0000   1     LR        gr28=gr3
-  129| 0003B4 cmpwi    2C030000   1     C4        cr0=gr3,0
+  108| 000344 ld       E81E0040   1     L8        gr0=""23(gr30,64)
+  108| 000348 std      F801007C   1     ST8       req_settings(gr1,124)=gr0
+  116| 00034C bl       4BFFFCB5   1     CALL      gr3=tempnam,2,(*)Cuchar",gr3,(*)Cuchar",gr4,#ProcAlias",tempnam",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  116| 000350 ori      60000000   1
+  116| 000354 ori      607D0000   1     LR        gr29=gr3
+  117| 000358 ori      63830000   1     LR        gr3=gr28
+  117| 00035C ori      63A40000   1     LR        gr4=gr29
+  117| 000360 bl       4BFFFCA1   1     CALLN     gr3,(*)uchar=strcpy,2,gr3,gr4,(*)Cuchar,gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  117| 000364 ori      60000000   1
+  119| 000368 addi     389E000C   1     AI        gr4=gr30,12
+  119| 00036C ori      63A30000   1     LR        gr3=gr29
+  119| 000370 bl       4BFFFC91   1     CALL      gr3=fopen,2,(*)Cuchar",gr3,(*)Cuchar",gr4,#ProcAlias",fopen",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  119| 000374 ori      60000000   1
+  119| 000378 cmpdi    2C230000   1     C8        cr0=gr3,0
+  119| 00037C bc       41820604   1     BT        CL.123,cr0,0x4/eq,taken=30%(30,70)
+  124| 000380 bl       4BFFFC81   1     CALL      gr3=fclose,1,(*)aggr#1",gr3,#ProcAlias",fclose",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  124| 000384 ori      60000000   1
+  127| 000388 addi     387E0198   1     AI        gr3=gr30,408
+  127| 00038C ori      63A40000   1     LR        gr4=gr29
+  127| 000390 bl       4BFFFC71   1     CALL      gr3=printf,2,(*)Cuchar",gr3,(*)uchar",gr4,#ProcAlias",printf",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  127| 000394 ori      60000000   1
+  129| 000398 addi     387E00F8   1     AI        gr3=gr30,248
+  129| 00039C ori      63E40000   1     LR        gr4=gr31
+  129| 0003A0 bl       4BFFFC61   1     CALL      gr3=printf,2,(*)Cuchar",gr3,(*)uchar",gr4,#ProcAlias",printf",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  129| 0003A4 ori      60000000   1
+  130| 0003A8 bl       4BFFFC59   1     CALL      gr3=fork,0,#ProcAlias",fork",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  130| 0003AC ori      60000000   1
+  131| 0003B0 ori      607C0000   1     LR        gr28=gr3
+  131| 0003B4 cmpwi    2C030000   1     C4        cr0=gr3,0
     0| 0003B8 addi     3B000000   1     LI        gr24=0
-  129| 0003BC bc       40820454   1     BF        CL.6,cr0,0x4/eq,taken=20%(20,80)
-  136| 0003C0 ori      63A30000   1     LR        gr3=gr29
-  136| 0003C4 bl       4BFFFC3D   1     CALLN     gr3=strlen,1,gr3,(*)Cuchar,gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  136| 0003C8 ori      60000000   1
-  136| 0003CC addi     38630006   1     AI        gr3=gr3,6
-  136| 0003D0 bl       4BFFFC31   1     CALL      gr3=malloc,1,gr3,#ProcAlias",malloc",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  136| 0003D4 ori      60000000   1
-  136| 0003D8 ori      607B0000   1     LR        gr27=gr3
-  137| 0003DC addi     38000014   1     LI        gr0=20
-  140| 0003E0 addi     389E0060   1     AI        gr4=gr30,96
-  140| 0003E4 ori      63A50000   1     LR        gr5=gr29
-  137| 0003E8 stw      90010070   1     ST4Z      arraylength(gr1,112)=gr0
-  140| 0003EC bl       4BFFFC15   1     CALL      gr3=sprintf,3,(*)uchar",gr3,(*)Cuchar",gr4,(*)uchar",gr5,#ProcAlias",sprintf",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  140| 0003F0 ori      60000000   1
-  141| 0003F4 addi     387E0178   1     AI        gr3=gr30,376
-  141| 0003F8 ori      63640000   1     LR        gr4=gr27
-  141| 0003FC bl       4BFFFC05   1     CALL      gr3=printf,2,(*)Cuchar",gr3,(*)uchar",gr4,#ProcAlias",printf",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  141| 000400 ori      60000000   1
-  143| 000404 addi     389E0010   1     AI        gr4=gr30,16
-  143| 000408 ori      63630000   1     LR        gr3=gr27
-  143| 00040C bl       4BFFFBF5   1     CALL      gr3=fopen,2,(*)Cuchar",gr3,(*)Cuchar",gr4,#ProcAlias",fopen",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  143| 000410 ori      60000000   1
-  143| 000414 ori      607B0000   1     LR        gr27=gr3
-  144| 000418 lwa      E863002E   1     L4A       gr3=(*)aggr#1._file(gr3,44)
-  144| 00041C addi     38800001   1     LI        gr4=1
-  144| 000420 bl       4BFFFBE1   1     CALL      gr3=dup2,2,gr3,gr4,#ProcAlias",dup2",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  144| 000424 ori      60000000   1
-  145| 000428 lwa      E87B002E   1     L4A       gr3=(*)aggr#1._file(gr27,44)
-  145| 00042C bl       4BFFFBD5   1     CALL      gr3=close,1,gr3,#ProcAlias",close",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  145| 000430 ori      60000000   1
-  147| 000434 ld       EB620030   1     L8        gr27=._iob(gr2,0)
-  147| 000438 addi     389E0110   1     AI        gr4=gr30,272
-  147| 00043C addi     387B00B0   1     AI        gr3=gr27,176
-  147| 000440 bl       4BFFFBC1   1     CALL      gr3=fprintf,2,(*)aggr#1",gr3,(*)Cuchar",gr4,#ProcAlias",fprintf",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  147| 000444 ori      60000000   1
-  148| 000448 stw      93010074   1     ST4Z      i(gr1,116)=gr24
-  148| 00044C addi     38600000   1     LI        gr3=0
-  150| 000450 ld       E8820018   1     L8        gr4=.nat_signalHandler(gr2,0)
-  150| 000454 ori      60000000   1
-  150| 000458 ori      60000000   1
-  150| 00045C ori      60210000   1
-  148|                              CL.8:
-  150| 000460 bl       4BFFFBA1   1     CALL      gr3=signal,2,gr3,(*)void()",gr4,#ProcAlias",signal",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  150| 000464 ori      60000000   1
-  150| 000468 ld       E8820018   1     L8        gr4=.nat_signalHandler(gr2,0)
-  148| 00046C lwz      80610074   1     L4Z       gr3=i(gr1,116)
-  148| 000470 addi     38030001   1     AI        gr0=gr3,1
-  148| 000474 stw      90010074   1     ST4Z      i(gr1,116)=gr0
-  148| 000478 extsw    7C0307B4   1     EXTS4     gr3=gr0
-  148| 00047C cmpwi    2C000100   1     C4        cr0=gr0,256
-  148| 000480 bc       4180FFE0   1     BT        CL.8,cr0,0x1/lt,taken=80%(80,20)
-  155| 000484 addi     38810088   1     AI        gr4=gr1,136
-  155| 000488 addi     38600005   1     LI        gr3=5
-  155| 00048C bl       4BFFFB75   1     CALL      gr3=ncxr_create_parm,2,gr3,(*)void*",gr4,#ProcAlias",(*)void",ncxr_create_parm",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  155| 000490 ori      60000000   1
-  156| 000494 ld       E8810088   1     L8        gr4=myparmhandle(gr1,136)
-  156| 000498 addi     38600000   1     LI        gr3=0
-  156| 00049C addi     38A00041   1     LI        gr5=65
-  156| 0004A0 addi     38C00014   1     LI        gr6=20
-  156| 0004A4 addi     38E00000   1     LI        gr7=0
-  156| 0004A8 addi     39000001   1     LI        gr8=1
-  156| 0004AC addi     39210070   1     AI        gr9=gr1,112
-  156| 0004B0 addi     39400000   1     LI        gr10=0
-  156| 0004B4 bl       4BFFFB4D   1     CALL      gr3=ncxr_init_parm_sa,8,gr3,(*)void",gr4-gr8,(*)int",gr9,gr10,#ProcAlias",ncxr_init_parm_sa",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  156| 0004B8 ori      60000000   1
-  157| 0004BC ld       E8810088   1     L8        gr4=myparmhandle(gr1,136)
-  157| 0004C0 addi     38600001   1     LI        gr3=1
-  157| 0004C4 addi     38A00041   1     LI        gr5=65
-  157| 0004C8 addi     38C00014   1     LI        gr6=20
-  157| 0004CC addi     38E00000   1     LI        gr7=0
-  157| 0004D0 addi     39000001   1     LI        gr8=1
-  157| 0004D4 addi     39210070   1     AI        gr9=gr1,112
-  157| 0004D8 addi     39400000   1     LI        gr10=0
-  157| 0004DC bl       4BFFFB25   1     CALL      gr3=ncxr_init_parm_sa,8,gr3,(*)void",gr4-gr8,(*)int",gr9,gr10,#ProcAlias",ncxr_init_parm_sa",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  157| 0004E0 ori      60000000   1
-  158| 0004E4 ld       E8810088   1     L8        gr4=myparmhandle(gr1,136)
-  158| 0004E8 addi     38600002   1     LI        gr3=2
-  158| 0004EC addi     38A00041   1     LI        gr5=65
-  158| 0004F0 addi     38C00005   1     LI        gr6=5
-  158| 0004F4 addi     38E00000   1     LI        gr7=0
-  158| 0004F8 addi     39000000   1     LI        gr8=0
-  158| 0004FC bl       4BFFFB05   1     CALL      gr3=ncxr_init_parm_s,6,gr3,(*)void",gr4-gr8,#ProcAlias",ncxr_init_parm_s",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  158| 000500 ori      60000000   1
-  159| 000504 ld       E8810088   1     L8        gr4=myparmhandle(gr1,136)
-  159| 000508 addi     38600003   1     LI        gr3=3
-  159| 00050C addi     38A00041   1     LI        gr5=65
-  159| 000510 addi     38C00064   1     LI        gr6=100
-  159| 000514 addi     38E00000   1     LI        gr7=0
-  159| 000518 addi     39000000   1     LI        gr8=0
-  159| 00051C bl       4BFFFAE5   1     CALL      gr3=ncxr_init_parm_s,6,gr3,(*)void",gr4-gr8,#ProcAlias",ncxr_init_parm_s",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  159| 000520 ori      60000000   1
-  160| 000524 ld       E8810088   1     L8        gr4=myparmhandle(gr1,136)
-  160| 000528 addi     38600004   1     LI        gr3=4
-  160| 00052C addi     38A00041   1     LI        gr5=65
-  160| 000530 addi     38C00000   1     LI        gr6=0
-  160| 000534 bl       4BFFFACD   1     CALL      gr3=ncxr_init_parm_d,4,gr3,(*)void",gr4-gr6,#ProcAlias",ncxr_init_parm_d",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  160| 000538 ori      60000000   1
-  163| 00053C addi     38000000   1     LI        gr0=0
+  131| 0003BC bc       40820454   1     BF        CL.6,cr0,0x4/eq,taken=20%(20,80)
+  138| 0003C0 ori      63A30000   1     LR        gr3=gr29
+  138| 0003C4 bl       4BFFFC3D   1     CALLN     gr3=strlen,1,gr3,(*)Cuchar,gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  138| 0003C8 ori      60000000   1
+  138| 0003CC addi     38630006   1     AI        gr3=gr3,6
+  138| 0003D0 bl       4BFFFC31   1     CALL      gr3=malloc,1,gr3,#ProcAlias",malloc",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  138| 0003D4 ori      60000000   1
+  138| 0003D8 ori      607B0000   1     LR        gr27=gr3
+  139| 0003DC addi     38000014   1     LI        gr0=20
+  142| 0003E0 addi     389E0060   1     AI        gr4=gr30,96
+  142| 0003E4 ori      63A50000   1     LR        gr5=gr29
+  139| 0003E8 stw      90010070   1     ST4Z      arraylength(gr1,112)=gr0
+  142| 0003EC bl       4BFFFC15   1     CALL      gr3=sprintf,3,(*)uchar",gr3,(*)Cuchar",gr4,(*)uchar",gr5,#ProcAlias",sprintf",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  142| 0003F0 ori      60000000   1
+  143| 0003F4 addi     387E0178   1     AI        gr3=gr30,376
+  143| 0003F8 ori      63640000   1     LR        gr4=gr27
+  143| 0003FC bl       4BFFFC05   1     CALL      gr3=printf,2,(*)Cuchar",gr3,(*)uchar",gr4,#ProcAlias",printf",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  143| 000400 ori      60000000   1
+  145| 000404 addi     389E0010   1     AI        gr4=gr30,16
+  145| 000408 ori      63630000   1     LR        gr3=gr27
+  145| 00040C bl       4BFFFBF5   1     CALL      gr3=fopen,2,(*)Cuchar",gr3,(*)Cuchar",gr4,#ProcAlias",fopen",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  145| 000410 ori      60000000   1
+  145| 000414 ori      607B0000   1     LR        gr27=gr3
+  146| 000418 lwa      E863002E   1     L4A       gr3=(*)aggr#1._file(gr3,44)
+  146| 00041C addi     38800001   1     LI        gr4=1
+  146| 000420 bl       4BFFFBE1   1     CALL      gr3=dup2,2,gr3,gr4,#ProcAlias",dup2",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  146| 000424 ori      60000000   1
+  147| 000428 lwa      E87B002E   1     L4A       gr3=(*)aggr#1._file(gr27,44)
+  147| 00042C bl       4BFFFBD5   1     CALL      gr3=close,1,gr3,#ProcAlias",close",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  147| 000430 ori      60000000   1
+  149| 000434 ld       EB620030   1     L8        gr27=._iob(gr2,0)
+  149| 000438 addi     389E0110   1     AI        gr4=gr30,272
+  149| 00043C addi     387B00B0   1     AI        gr3=gr27,176
+  149| 000440 bl       4BFFFBC1   1     CALL      gr3=fprintf,2,(*)aggr#1",gr3,(*)Cuchar",gr4,#ProcAlias",fprintf",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  149| 000444 ori      60000000   1
+  150| 000448 stw      93010074   1     ST4Z      i(gr1,116)=gr24
+  150| 00044C addi     38600000   1     LI        gr3=0
+  152| 000450 ld       E8820018   1     L8        gr4=.nat_signalHandler(gr2,0)
+  152| 000454 ori      60000000   1
+  152| 000458 ori      60000000   1
+  152| 00045C ori      60210000   1
+  150|                              CL.8:
+  152| 000460 bl       4BFFFBA1   1     CALL      gr3=signal,2,gr3,(*)void()",gr4,#ProcAlias",signal",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  152| 000464 ori      60000000   1
+  152| 000468 ld       E8820018   1     L8        gr4=.nat_signalHandler(gr2,0)
+  150| 00046C lwz      80610074   1     L4Z       gr3=i(gr1,116)
+  150| 000470 addi     38030001   1     AI        gr0=gr3,1
+  150| 000474 stw      90010074   1     ST4Z      i(gr1,116)=gr0
+  150| 000478 extsw    7C0307B4   1     EXTS4     gr3=gr0
+  150| 00047C cmpwi    2C000100   1     C4        cr0=gr0,256
+  150| 000480 bc       4180FFE0   1     BT        CL.8,cr0,0x1/lt,taken=80%(80,20)
+  157| 000484 addi     38810088   1     AI        gr4=gr1,136
+  157| 000488 addi     38600005   1     LI        gr3=5
+  157| 00048C bl       4BFFFB75   1     CALL      gr3=ncxr_create_parm,2,gr3,(*)void*",gr4,#ProcAlias",(*)void",ncxr_create_parm",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  157| 000490 ori      60000000   1
+  158| 000494 ld       E8810088   1     L8        gr4=myparmhandle(gr1,136)
+  158| 000498 addi     38600000   1     LI        gr3=0
+  158| 00049C addi     38A00041   1     LI        gr5=65
+  158| 0004A0 addi     38C00014   1     LI        gr6=20
+  158| 0004A4 addi     38E00000   1     LI        gr7=0
+  158| 0004A8 addi     39000001   1     LI        gr8=1
+  158| 0004AC addi     39210070   1     AI        gr9=gr1,112
+  158| 0004B0 addi     39400000   1     LI        gr10=0
+  158| 0004B4 bl       4BFFFB4D   1     CALL      gr3=ncxr_init_parm_sa,8,gr3,(*)void",gr4-gr8,(*)int",gr9,gr10,#ProcAlias",ncxr_init_parm_sa",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  158| 0004B8 ori      60000000   1
+  159| 0004BC ld       E8810088   1     L8        gr4=myparmhandle(gr1,136)
+  159| 0004C0 addi     38600001   1     LI        gr3=1
+  159| 0004C4 addi     38A00041   1     LI        gr5=65
+  159| 0004C8 addi     38C00014   1     LI        gr6=20
+  159| 0004CC addi     38E00000   1     LI        gr7=0
+  159| 0004D0 addi     39000001   1     LI        gr8=1
+  159| 0004D4 addi     39210070   1     AI        gr9=gr1,112
+  159| 0004D8 addi     39400000   1     LI        gr10=0
+  159| 0004DC bl       4BFFFB25   1     CALL      gr3=ncxr_init_parm_sa,8,gr3,(*)void",gr4-gr8,(*)int",gr9,gr10,#ProcAlias",ncxr_init_parm_sa",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  159| 0004E0 ori      60000000   1
+  160| 0004E4 ld       E8810088   1     L8        gr4=myparmhandle(gr1,136)
+  160| 0004E8 addi     38600002   1     LI        gr3=2
+  160| 0004EC addi     38A00041   1     LI        gr5=65
+  160| 0004F0 addi     38C00005   1     LI        gr6=5
+  160| 0004F4 addi     38E00000   1     LI        gr7=0
+  160| 0004F8 addi     39000000   1     LI        gr8=0
+  160| 0004FC bl       4BFFFB05   1     CALL      gr3=ncxr_init_parm_s,6,gr3,(*)void",gr4-gr8,#ProcAlias",ncxr_init_parm_s",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  160| 000500 ori      60000000   1
+  161| 000504 ld       E8810088   1     L8        gr4=myparmhandle(gr1,136)
+  161| 000508 addi     38600003   1     LI        gr3=3
+  161| 00050C addi     38A00041   1     LI        gr5=65
+  161| 000510 addi     38C00064   1     LI        gr6=100
+  161| 000514 addi     38E00000   1     LI        gr7=0
+  161| 000518 addi     39000000   1     LI        gr8=0
+  161| 00051C bl       4BFFFAE5   1     CALL      gr3=ncxr_init_parm_s,6,gr3,(*)void",gr4-gr8,#ProcAlias",ncxr_init_parm_s",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  161| 000520 ori      60000000   1
+  162| 000524 ld       E8810088   1     L8        gr4=myparmhandle(gr1,136)
+  162| 000528 addi     38600004   1     LI        gr3=4
+  162| 00052C addi     38A00041   1     LI        gr5=65
+  162| 000530 addi     38C00000   1     LI        gr6=0
+  162| 000534 bl       4BFFFACD   1     CALL      gr3=ncxr_init_parm_d,4,gr3,(*)void",gr4-gr6,#ProcAlias",ncxr_init_parm_d",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  162| 000538 ori      60000000   1
+  165| 00053C addi     38000000   1     LI        gr0=0
     0| 000540 ld       E8A20038   1     L8        gr5=.+CONSTANT_AREA(gr2,0)
     0| 000544 addis    3C802020   1     LIU       gr4=8224
-  167| 000548 lwz      80610570   1     L4Z       gr3=request_header.request_arguments(gr1,1392)
-  163| 00054C stw      93010074   1     ST4Z      i(gr1,116)=gr24
+  169| 000548 lwz      80610570   1     L4Z       gr3=request_header.request_arguments(gr1,1392)
+  165| 00054C stw      93010074   1     ST4Z      i(gr1,116)=gr24
     0| 000550 addi     3B442020   1     AI        gr26=gr4,8224
-  165| 000554 stw      934100B4   1     ST4A      <a4:d180:l4>(gr1,180)=gr26
-  169| 000558 addi     3B200000   1     LI        gr25=0
-  167| 00055C cmpw     7C001800   1     C4        cr0=gr0,gr3
-  166| 000560 stw      934100A0   1     ST4A      <a4:d160:l4>(gr1,160)=gr26
-  169| 000564 addi     386100A4   1     AI        gr3=gr1,164
-  174| 000568 addi     389E0014   1     AI        gr4=gr30,20
+  167| 000554 stw      934100B4   1     ST4A      <a4:d180:l4>(gr1,180)=gr26
+  171| 000558 addi     3B200000   1     LI        gr25=0
+  169| 00055C cmpw     7C001800   1     C4        cr0=gr0,gr3
+  168| 000560 stw      934100A0   1     ST4A      <a4:d160:l4>(gr1,160)=gr26
+  171| 000564 addi     386100A4   1     AI        gr3=gr1,164
+  176| 000568 addi     389E0014   1     AI        gr4=gr30,20
     0| 00056C lfd      CBE50000   1     LFL       fp31=+CONSTANT_AREA(gr5,0)
-  165| 000570 stfd     DBE100A4   1     STFL      <a4:d164:l8>(gr1,164)=fp31
-  165| 000574 stfd     DBE100AC   1     STFL      <a4:d172:l8>(gr1,172)=fp31
-  166| 000578 stfd     DBE10090   1     STFL      <a4:d144:l8>(gr1,144)=fp31
-  166| 00057C stfd     DBE10098   1     STFL      <a4:d152:l8>(gr1,152)=fp31
-  167| 000580 bc       408000A8   1     BF        CL.13,cr0,0x1/lt,taken=50%(0,0)
+  167| 000570 stfd     DBE100A4   1     STFL      <a4:d164:l8>(gr1,164)=fp31
+  167| 000574 stfd     DBE100AC   1     STFL      <a4:d172:l8>(gr1,172)=fp31
+  168| 000578 stfd     DBE10090   1     STFL      <a4:d144:l8>(gr1,144)=fp31
+  168| 00057C stfd     DBE10098   1     STFL      <a4:d152:l8>(gr1,152)=fp31
+  169| 000580 bc       408000A8   1     BF        CL.13,cr0,0x1/lt,taken=50%(0,0)
     0|                              CL.106:
-  169| 000584 ld       E8810578   1     L8        gr4=request_header.request_keys(gr1,1400)
-  169| 000588 ldx      7C84C82A   1     L8        gr4=(*)uchar*(gr4,gr25,0)
-  169| 00058C bl       4BFFFA75   1     CALLN     gr3,keys=strcpy,2,gr3,gr4,(*)Cuchar,gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  169| 000590 ori      60000000   1
-  170| 000594 addi     38610090   1     AI        gr3=gr1,144
-  170| 000598 ld       E8810580   1     L8        gr4=request_header.request_values(gr1,1408)
-  170| 00059C ldx      7C84C82A   1     L8        gr4=(*)uchar*(gr4,gr25,0)
-  170| 0005A0 bl       4BFFFA61   1     CALLN     gr3,values=strcpy,2,gr3,gr4,(*)Cuchar,gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  170| 0005A4 ori      60000000   1
-  175|                              CL.14:
-  177| 0005A8 addi     38600000   1     LI        gr3=0
-  177| 0005AC ld       E8810088   1     L8        gr4=myparmhandle(gr1,136)
-  177| 0005B0 addi     38A00014   1     LI        gr5=20
-  177| 0005B4 addi     38C10090   1     AI        gr6=gr1,144
-  177| 0005B8 addi     38E10074   1     AI        gr7=gr1,116
-  177| 0005BC bl       4BFFFA45   1     CALL      gr3=ncxr_put_parm_array,5,gr3,(*)void",gr4,gr5,(*)void",gr6,(*)int",gr7,#ProcAlias",ncxr_put_parm_array",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  177| 0005C0 ori      60000000   1
-  178| 0005C4 addi     38600001   1     LI        gr3=1
-  178| 0005C8 ld       E8810088   1     L8        gr4=myparmhandle(gr1,136)
-  178| 0005CC addi     38A00014   1     LI        gr5=20
-  178| 0005D0 addi     38E10074   1     AI        gr7=gr1,116
-  178| 0005D4 addi     38C100A4   1     AI        gr6=gr1,164
-  178| 0005D8 bl       4BFFFA29   1     CALL      gr3=ncxr_put_parm_array,5,gr3,(*)void",gr4,gr5,(*)void",gr6,(*)int",gr7,#ProcAlias",ncxr_put_parm_array",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  178| 0005DC ori      60000000   1
-  169| 0005E0 addi     386100A4   1     AI        gr3=gr1,164
-  163| 0005E4 lwz      80A10074   1     L4Z       gr5=i(gr1,116)
-  174| 0005E8 addi     389E0014   1     AI        gr4=gr30,20
-  163| 0005EC addi     38A50001   1     AI        gr5=gr5,1
-  163| 0005F0 stw      90A10074   1     ST4Z      i(gr1,116)=gr5
-  163| 0005F4 extsw    7CA007B4   1     EXTS4     gr0=gr5
-  169| 0005F8 rldicr   78191F24   1     SLL8      gr25=gr0,3
-  163| 0005FC cmpwi    2C050014   1     C4        cr0=gr5,20
-  163| 000600 bc       40800048   1     BF        CL.91,cr0,0x1/lt,taken=20%(20,80)
-  165| 000604 stfd     DBE100A4   1     STFL      <a4:d164:l8>(gr1,164)=fp31
-  165| 000608 stw      934100B4   1     ST4A      <a4:d180:l4>(gr1,180)=gr26
-  165| 00060C stfd     DBE100AC   1     STFL      <a4:d172:l8>(gr1,172)=fp31
-  166| 000610 stw      934100A0   1     ST4A      <a4:d160:l4>(gr1,160)=gr26
-  167| 000614 lwz      80010570   1     L4Z       gr0=request_header.request_arguments(gr1,1392)
-  166| 000618 stfd     DBE10090   1     STFL      <a4:d144:l8>(gr1,144)=fp31
-  166| 00061C stfd     DBE10098   1     STFL      <a4:d152:l8>(gr1,152)=fp31
-  167| 000620 cmpw     7C050000   1     C4        cr0=gr5,gr0
+  171| 000584 ld       E8810578   1     L8        gr4=request_header.request_keys(gr1,1400)
+  171| 000588 ldx      7C84C82A   1     L8        gr4=(*)uchar*(gr4,gr25,0)
+  171| 00058C bl       4BFFFA75   1     CALLN     gr3,keys=strcpy,2,gr3,gr4,(*)Cuchar,gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  171| 000590 ori      60000000   1
+  172| 000594 addi     38610090   1     AI        gr3=gr1,144
+  172| 000598 ld       E8810580   1     L8        gr4=request_header.request_values(gr1,1408)
+  172| 00059C ldx      7C84C82A   1     L8        gr4=(*)uchar*(gr4,gr25,0)
+  172| 0005A0 bl       4BFFFA61   1     CALLN     gr3,values=strcpy,2,gr3,gr4,(*)Cuchar,gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  172| 0005A4 ori      60000000   1
+  177|                              CL.14:
+  179| 0005A8 addi     38600000   1     LI        gr3=0
+  179| 0005AC ld       E8810088   1     L8        gr4=myparmhandle(gr1,136)
+  179| 0005B0 addi     38A00014   1     LI        gr5=20
+  179| 0005B4 addi     38C10090   1     AI        gr6=gr1,144
+  179| 0005B8 addi     38E10074   1     AI        gr7=gr1,116
+  179| 0005BC bl       4BFFFA45   1     CALL      gr3=ncxr_put_parm_array,5,gr3,(*)void",gr4,gr5,(*)void",gr6,(*)int",gr7,#ProcAlias",ncxr_put_parm_array",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  179| 0005C0 ori      60000000   1
+  180| 0005C4 addi     38600001   1     LI        gr3=1
+  180| 0005C8 ld       E8810088   1     L8        gr4=myparmhandle(gr1,136)
+  180| 0005CC addi     38A00014   1     LI        gr5=20
+  180| 0005D0 addi     38E10074   1     AI        gr7=gr1,116
+  180| 0005D4 addi     38C100A4   1     AI        gr6=gr1,164
+  180| 0005D8 bl       4BFFFA29   1     CALL      gr3=ncxr_put_parm_array,5,gr3,(*)void",gr4,gr5,(*)void",gr6,(*)int",gr7,#ProcAlias",ncxr_put_parm_array",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  180| 0005DC ori      60000000   1
+  171| 0005E0 addi     386100A4   1     AI        gr3=gr1,164
+  165| 0005E4 lwz      80A10074   1     L4Z       gr5=i(gr1,116)
+  176| 0005E8 addi     389E0014   1     AI        gr4=gr30,20
+  165| 0005EC addi     38A50001   1     AI        gr5=gr5,1
+  165| 0005F0 stw      90A10074   1     ST4Z      i(gr1,116)=gr5
+  165| 0005F4 extsw    7CA007B4   1     EXTS4     gr0=gr5
+  171| 0005F8 rldicr   78191F24   1     SLL8      gr25=gr0,3
+  165| 0005FC cmpwi    2C050014   1     C4        cr0=gr5,20
+  165| 000600 bc       40800048   1     BF        CL.91,cr0,0x1/lt,taken=20%(20,80)
+  167| 000604 stfd     DBE100A4   1     STFL      <a4:d164:l8>(gr1,164)=fp31
+  167| 000608 stw      934100B4   1     ST4A      <a4:d180:l4>(gr1,180)=gr26
+  167| 00060C stfd     DBE100AC   1     STFL      <a4:d172:l8>(gr1,172)=fp31
+  168| 000610 stw      934100A0   1     ST4A      <a4:d160:l4>(gr1,160)=gr26
+  169| 000614 lwz      80010570   1     L4Z       gr0=request_header.request_arguments(gr1,1392)
+  168| 000618 stfd     DBE10090   1     STFL      <a4:d144:l8>(gr1,144)=fp31
+  168| 00061C stfd     DBE10098   1     STFL      <a4:d152:l8>(gr1,152)=fp31
+  169| 000620 cmpw     7C050000   1     C4        cr0=gr5,gr0
     0| 000624 bc       4180FF60   1     BT        CL.106,cr0,0x1/lt,taken=50%(0,0)
-  170|                              CL.13:
-  174| 000628 addi     386100A4   1     AI        gr3=gr1,164
-  174| 00062C bl       4BFFF9D5   1     CALLN     gr3,keys=strcpy,2,gr3,gr4,""44,gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  174| 000630 ori      60000000   1
-  175| 000634 addi     389E0018   1     AI        gr4=gr30,24
-  175| 000638 addi     38610090   1     AI        gr3=gr1,144
-  175| 00063C bl       4BFFF9C5   1     CALLN     gr3,values=strcpy,2,gr3,gr4,""45,gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  175| 000640 ori      60000000   1
+  172|                              CL.13:
+  176| 000628 addi     386100A4   1     AI        gr3=gr1,164
+  176| 00062C bl       4BFFF9D5   1     CALLN     gr3,keys=strcpy,2,gr3,gr4,""45,gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  176| 000630 ori      60000000   1
+  177| 000634 addi     389E0018   1     AI        gr4=gr30,24
+  177| 000638 addi     38610090   1     AI        gr3=gr1,144
+  177| 00063C bl       4BFFF9C5   1     CALLN     gr3,values=strcpy,2,gr3,gr4,""46,gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  177| 000640 ori      60000000   1
     0| 000644 b        4BFFFF64   1     B         CL.14,-1
     0|                              CL.91:
-  181| 000648 ld       E8810088   1     L8        gr4=myparmhandle(gr1,136)
-  181| 00064C addi     38C104E8   1     LA        gr6=request_header(gr1,1256)
-  181| 000650 addi     38600002   1     LI        gr3=2
-  181| 000654 addi     38A00005   1     LI        gr5=5
-  181| 000658 bl       4BFFF9A9   1     CALL      gr3=ncxr_put_parm,4,gr3,(*)void",gr4,gr5,(*)void",gr6,#ProcAlias",ncxr_put_parm",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  181| 00065C ori      60000000   1
-  181| 000660 cmpwi    2C030000   1     C4        cr0=gr3,0
-  181| 000664 bc       4180030C   1     BT        CL.124,cr0,0x1/lt,taken=10%(10,90)
-  183|                              CL.15:
-  186| 000668 ori      63A30000   1     LR        gr3=gr29
-  186| 00066C bl       4BFFF995   1     CALLN     gr3=strlen,1,gr3,(*)Cuchar,gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  186| 000670 ori      60000000   1
-  186| 000674 extsw    7C6507B4   1     EXTS4     gr5=gr3
-  186| 000678 addi     38600003   1     LI        gr3=3
-  186| 00067C ld       E8810088   1     L8        gr4=myparmhandle(gr1,136)
-  186| 000680 ori      63A60000   1     LR        gr6=gr29
-  186| 000684 bl       4BFFF97D   1     CALL      gr3=ncxr_put_parm,4,gr3,(*)void",gr4,gr5,(*)void",gr6,#ProcAlias",ncxr_put_parm",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  186| 000688 ori      60000000   1
-  187| 00068C ld       E8810088   1     L8        gr4=myparmhandle(gr1,136)
-  187| 000690 addi     38C1007C   1     AI        gr6=gr1,124
-  187| 000694 addi     38600004   1     LI        gr3=4
-  187| 000698 addi     38A00008   1     LI        gr5=8
-  187| 00069C bl       4BFFF965   1     CALL      gr3=ncxr_put_parm,4,gr3,(*)void",gr4,gr5,(*)void",gr6,#ProcAlias",ncxr_put_parm",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  187| 0006A0 ori      60000000   1
-  190| 0006A4 ld       E8620040   1     L8        gr3=._system_configuration(gr2,0)
-  190| 0006A8 lwa      E803002E   1     L4A       gr0=<s225:d44:l4>(gr3,44)
-  190| 0006AC cmpwi    2C000080   1     C4        cr0=gr0,128
-  190| 0006B0 bc       408202A8   1     BF        CL.71,cr0,0x4/eq,taken=40%(40,60)
-  190| 0006B4 std      FB0100B8   1     ST8       <a4:d184:l8>(gr1,184,align='1000')=gr24
-  190| 0006B8 std      FB0100C0   1     ST8       <a4:d192:l8>(gr1,192,align='1000')=gr24
-  190| 0006BC addi     38010137   1     AI        gr0=gr1,311
-  190| 0006C0 rldicr   78030624   1     RN8       gr3=gr0,0,0xFFFFFFFFFFFFFF80
-  190| 0006C4 addi     38010450   1     AI        gr0=gr1,1104
-  190| 0006C8 std      FB0100C8   1     ST8       <a4:d200:l8>(gr1,200,align='1000')=gr24
-  190| 0006CC subf     7C030050   1     S         gr0=gr0,gr3
-  190| 0006D0 std      FB0100D0   1     ST8       <a4:d208:l8>(gr1,208,align='1000')=gr24
-  190| 0006D4 rldicl   7800C9C2   1     SRL8      gr0=gr0,7
-  190| 0006D8 std      FB0100D8   1     ST8       <a4:d216:l8>(gr1,216,align='1000')=gr24
-  190| 0006DC std      FB0100E0   1     ST8       <a4:d224:l8>(gr1,224,align='1000')=gr24
-  190| 0006E0 std      FB0100E8   1     ST8       <a4:d232:l8>(gr1,232,align='1000')=gr24
-  190| 0006E4 std      FB0100F0   1     ST8       <a4:d240:l8>(gr1,240,align='1000')=gr24
-  190| 0006E8 std      FB0100F8   1     ST8       <a4:d248:l8>(gr1,248,align='1000')=gr24
-  190| 0006EC std      FB010100   1     ST8       <a4:d256:l8>(gr1,256,align='1000')=gr24
-  190| 0006F0 std      FB010108   1     ST8       <a4:d264:l8>(gr1,264,align='1000')=gr24
-  190| 0006F4 std      FB010110   1     ST8       <a4:d272:l8>(gr1,272,align='1000')=gr24
-  190| 0006F8 std      FB010118   1     ST8       <a4:d280:l8>(gr1,280,align='1000')=gr24
-  190| 0006FC std      FB010120   1     ST8       <a4:d288:l8>(gr1,288,align='1000')=gr24
-  190| 000700 std      FB010128   1     ST8       <a4:d296:l8>(gr1,296,align='1000')=gr24
+  183| 000648 ld       E8810088   1     L8        gr4=myparmhandle(gr1,136)
+  183| 00064C addi     38C104E8   1     LA        gr6=request_header(gr1,1256)
+  183| 000650 addi     38600002   1     LI        gr3=2
+  183| 000654 addi     38A00005   1     LI        gr5=5
+  183| 000658 bl       4BFFF9A9   1     CALL      gr3=ncxr_put_parm,4,gr3,(*)void",gr4,gr5,(*)void",gr6,#ProcAlias",ncxr_put_parm",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  183| 00065C ori      60000000   1
+  183| 000660 cmpwi    2C030000   1     C4        cr0=gr3,0
+  183| 000664 bc       4180030C   1     BT        CL.124,cr0,0x1/lt,taken=10%(10,90)
+  185|                              CL.15:
+  188| 000668 ori      63A30000   1     LR        gr3=gr29
+  188| 00066C bl       4BFFF995   1     CALLN     gr3=strlen,1,gr3,(*)Cuchar,gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  188| 000670 ori      60000000   1
+  188| 000674 extsw    7C6507B4   1     EXTS4     gr5=gr3
+  188| 000678 addi     38600003   1     LI        gr3=3
+  188| 00067C ld       E8810088   1     L8        gr4=myparmhandle(gr1,136)
+  188| 000680 ori      63A60000   1     LR        gr6=gr29
+  188| 000684 bl       4BFFF97D   1     CALL      gr3=ncxr_put_parm,4,gr3,(*)void",gr4,gr5,(*)void",gr6,#ProcAlias",ncxr_put_parm",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  188| 000688 ori      60000000   1
+  189| 00068C ld       E8810088   1     L8        gr4=myparmhandle(gr1,136)
+  189| 000690 addi     38C1007C   1     AI        gr6=gr1,124
+  189| 000694 addi     38600004   1     LI        gr3=4
+  189| 000698 addi     38A00008   1     LI        gr5=8
+  189| 00069C bl       4BFFF965   1     CALL      gr3=ncxr_put_parm,4,gr3,(*)void",gr4,gr5,(*)void",gr6,#ProcAlias",ncxr_put_parm",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  189| 0006A0 ori      60000000   1
+  192| 0006A4 ld       E8620040   1     L8        gr3=._system_configuration(gr2,0)
+  192| 0006A8 lwa      E803002E   1     L4A       gr0=<s226:d44:l4>(gr3,44)
+  192| 0006AC cmpwi    2C000080   1     C4        cr0=gr0,128
+  192| 0006B0 bc       408202A8   1     BF        CL.71,cr0,0x4/eq,taken=40%(40,60)
+  192| 0006B4 std      FB0100B8   1     ST8       <a4:d184:l8>(gr1,184,align='1000')=gr24
+  192| 0006B8 std      FB0100C0   1     ST8       <a4:d192:l8>(gr1,192,align='1000')=gr24
+  192| 0006BC addi     38010137   1     AI        gr0=gr1,311
+  192| 0006C0 rldicr   78030624   1     RN8       gr3=gr0,0,0xFFFFFFFFFFFFFF80
+  192| 0006C4 addi     38010450   1     AI        gr0=gr1,1104
+  192| 0006C8 std      FB0100C8   1     ST8       <a4:d200:l8>(gr1,200,align='1000')=gr24
+  192| 0006CC subf     7C030050   1     S         gr0=gr0,gr3
+  192| 0006D0 std      FB0100D0   1     ST8       <a4:d208:l8>(gr1,208,align='1000')=gr24
+  192| 0006D4 rldicl   7800C9C2   1     SRL8      gr0=gr0,7
+  192| 0006D8 std      FB0100D8   1     ST8       <a4:d216:l8>(gr1,216,align='1000')=gr24
+  192| 0006DC std      FB0100E0   1     ST8       <a4:d224:l8>(gr1,224,align='1000')=gr24
+  192| 0006E0 std      FB0100E8   1     ST8       <a4:d232:l8>(gr1,232,align='1000')=gr24
+  192| 0006E4 std      FB0100F0   1     ST8       <a4:d240:l8>(gr1,240,align='1000')=gr24
+  192| 0006E8 std      FB0100F8   1     ST8       <a4:d248:l8>(gr1,248,align='1000')=gr24
+  192| 0006EC std      FB010100   1     ST8       <a4:d256:l8>(gr1,256,align='1000')=gr24
+  192| 0006F0 std      FB010108   1     ST8       <a4:d264:l8>(gr1,264,align='1000')=gr24
+  192| 0006F4 std      FB010110   1     ST8       <a4:d272:l8>(gr1,272,align='1000')=gr24
+  192| 0006F8 std      FB010118   1     ST8       <a4:d280:l8>(gr1,280,align='1000')=gr24
+  192| 0006FC std      FB010120   1     ST8       <a4:d288:l8>(gr1,288,align='1000')=gr24
+  192| 000700 std      FB010128   1     ST8       <a4:d296:l8>(gr1,296,align='1000')=gr24
     0| 000704 mtspr    7C0903A6   1     LCTR      ctr=gr0
     0| 000708 ori      60000000   1
     0| 00070C ori      60210000   1
-  190|                              CL.72:
-  190| 000710 dcbz     7C001FEC   1     DCBZ      pass(gr3,0)
-  190| 000714 addi     38630080   1     AI        gr3=gr3,128
-  190| 000718 bc       4320FFF8   1     BCT       ctr=CL.72,,0x64/eq/flt/fgt,0x0
-  190| 00071C stb      9B01044F   1     ST1Z      <a4:d1103:l1>(gr1,1103)=gr24
-  190| 000720 addi     3861044C   1     AI        gr3=gr1,1100
-  190| 000724 addi     38810448   1     AI        gr4=gr1,1096
-  190| 000728 addi     38000000   1     LI        gr0=0
-  190| 00072C rldicr   78630764   1     RN8       gr3=gr3,0,0xFFFFFFFFFFFFFFFC
-  190| 000730 rldicr   78840724   1     RN8       gr4=gr4,0,0xFFFFFFFFFFFFFFF8
-  190| 000734 sth      B001044D   1     ST2Z      <a4:d110|1:l1>#250|2:l1>#251_4(gr1,1101)=gr0
-  190| 000738 stw      93030000   1     ST4Z      pass(gr3,0)=gr24
-  190| 00073C std      FB04FF88   1     ST8       pass(gr4,-120,align='1000')=gr24
-  190| 000740 std      FB04FF90   1     ST8       pass(gr4,-112,align='1000')=gr24
-  190| 000744 std      FB04FF98   1     ST8       pass(gr4,-104,align='1000')=gr24
-  190| 000748 std      FB04FFA0   1     ST8       pass(gr4,-96,align='1000')=gr24
-  190| 00074C std      FB04FFA8   1     ST8       pass(gr4,-88,align='1000')=gr24
-  190| 000750 std      FB04FFB0   1     ST8       pass(gr4,-80,align='1000')=gr24
-  190| 000754 std      FB04FFB8   1     ST8       pass(gr4,-72,align='1000')=gr24
-  190| 000758 std      FB04FFC0   1     ST8       pass(gr4,-64,align='1000')=gr24
-  190| 00075C std      FB04FFC8   1     ST8       pass(gr4,-56,align='1000')=gr24
-  190| 000760 std      FB04FFD0   1     ST8       pass(gr4,-48,align='1000')=gr24
-  190| 000764 std      FB04FFD8   1     ST8       pass(gr4,-40,align='1000')=gr24
-  190| 000768 std      FB04FFE0   1     ST8       pass(gr4,-32,align='1000')=gr24
-  190| 00076C std      FB04FFE8   1     ST8       pass(gr4,-24,align='1000')=gr24
-  190| 000770 std      FB04FFF0   1     ST8       pass(gr4,-16,align='1000')=gr24
-  190| 000774 std      FB04FFF8   1     ST8       pass(gr4,-8,align='1000')=gr24
-  190| 000778 std      FB040000   1     ST8       pass(gr4,0,align='1000')=gr24
-  190|                              CL.73:
-  192| 00077C ld       E8810088   1     L8        gr4=myparmhandle(gr1,136)
-  192| 000780 addi     38600000   1     LI        gr3=0
-  192| 000784 addi     38A100B8   1     AI        gr5=gr1,184
-  192| 000788 bl       4BFFF879   1     CALL      gr3=ncxr_get_parm_info,3,gr3,(*)void",gr4,(*)parameter_description",gr5,#ProcAlias",ncxr_get_parm_info",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  192| 00078C ori      60000000   1
-  193| 000790 ld       E8810088   1     L8        gr4=myparmhandle(gr1,136)
-  193| 000794 addi     38A10170   1     AI        gr5=gr1,368
-  193| 000798 addi     38600001   1     LI        gr3=1
-  193| 00079C bl       4BFFF865   1     CALL      gr3=ncxr_get_parm_info,3,gr3,(*)void",gr4,(*)parameter_description",gr5,#ProcAlias",ncxr_get_parm_info",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  193| 0007A0 ori      60000000   1
-  194| 0007A4 ld       E8810088   1     L8        gr4=myparmhandle(gr1,136)
-  194| 0007A8 addi     38A10228   1     AI        gr5=gr1,552
-  194| 0007AC addi     38600002   1     LI        gr3=2
-  194| 0007B0 bl       4BFFF851   1     CALL      gr3=ncxr_get_parm_info,3,gr3,(*)void",gr4,(*)parameter_description",gr5,#ProcAlias",ncxr_get_parm_info",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  194| 0007B4 ori      60000000   1
-  195| 0007B8 ld       E8810088   1     L8        gr4=myparmhandle(gr1,136)
-  195| 0007BC addi     38A102E0   1     AI        gr5=gr1,736
-  195| 0007C0 addi     38600003   1     LI        gr3=3
-  195| 0007C4 bl       4BFFF83D   1     CALL      gr3=ncxr_get_parm_info,3,gr3,(*)void",gr4,(*)parameter_description",gr5,#ProcAlias",ncxr_get_parm_info",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  195| 0007C8 ori      60000000   1
-  196| 0007CC ld       E8810088   1     L8        gr4=myparmhandle(gr1,136)
-  196| 0007D0 addi     38A10398   1     AI        gr5=gr1,920
-  196| 0007D4 addi     38600004   1     LI        gr3=4
-  196| 0007D8 bl       4BFFF829   1     CALL      gr3=ncxr_get_parm_info,3,gr3,(*)void",gr4,(*)parameter_description",gr5,#ProcAlias",ncxr_get_parm_info",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  196| 0007DC ori      60000000   1
-  199| 0007E0 addi     389E0140   1     AI        gr4=gr30,320
-  199| 0007E4 addi     387B00B0   1     AI        gr3=gr27,176
-  199| 0007E8 bl       4BFFF819   1     CALL      gr3=fprintf,2,(*)aggr#1",gr3,(*)Cuchar",gr4,#ProcAlias",fprintf",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  199| 0007EC ori      60000000   1
-  201| 0007F0 ori      63E30000   1     LR        gr3=gr31
-  201| 0007F4 addi     38800005   1     LI        gr4=5
-  201| 0007F8 addi     38A100B8   1     AI        gr5=gr1,184
-  201| 0007FC bl       4BFFF805   1     CALL      gr3=ncxr_if4_callnat,3,(*)uchar",gr3,gr4,(*)parameter_description",gr5,#ProcAlias",ncxr_if4_callnat",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  201| 000800 ori      60000000   1
-  203| 000804 addi     38600000   1     LI        gr3=0
-  203| 000808 bl       4BFFF7F9   1     CALL      exit,1,gr3,#ProcAlias",exit",fcr",gr1,cr[01567]",gr0",gr3"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  203| 00080C ori      60000000   1
-  203|                              CL.6:
-  207| 000810 addi     3B600000   1     LI        gr27=0
-  215| 000814 addi     387E0128   1     AI        gr3=gr30,296
-  215| 000818 bl       4BFFF7E9   1     CALL      gr3=printf,1,(*)Cuchar",gr3,#ProcAlias",printf",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  215| 00081C ori      60000000   1
-  218| 000820 ori      63830000   1     LR        gr3=gr28
-  218| 000824 addi     38810078   1     AI        gr4=gr1,120
-  218| 000828 ori      60000000   1
-  218| 00082C ori      60210000   1
-  215|                              CL.16:
-  218| 000830 addi     38A00001   1     LI        gr5=1
-  218| 000834 bl       4BFFF7CD   1     CALL      gr3=waitpid,3,gr3,(*)int",gr4,gr5,#ProcAlias",waitpid",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  218| 000838 ori      60000000   1
-  230| 00083C addi     3B7B0001   1     AI        gr27=gr27,1
-  219| 000840 cmpwi    2C030000   1     C4        cr0=gr3,0
-  219| 000844 bc       418000B4   1     BT        CL.44,cr0,0x1/lt,taken=20%(20,80)
-  237| 000848 addi     38600001   1     LI        gr3=1
-  225| 00084C bc       41810080   1     BT        CL.43,cr0,0x2/gt,taken=20%(20,80)
-  230| 000850 cmpwi    2C1B0005   1     C4        cr0=gr27,5
-  230| 000854 bc       40800018   1     BF        CL.42,cr0,0x1/lt,taken=20%(20,80)
-  237| 000858 bl       4BFFF7A9   1     CALL      gr3=sleep,1,gr3,#ProcAlias",sleep",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  237| 00085C ori      60000000   1
-  218| 000860 addi     38810078   1     AI        gr4=gr1,120
-  218| 000864 ori      63830000   1     LR        gr3=gr28
-  239| 000868 b        4BFFFFC8   1     B         CL.16
+  192|                              CL.72:
+  192| 000710 dcbz     7C001FEC   1     DCBZ      pass(gr3,0)
+  192| 000714 addi     38630080   1     AI        gr3=gr3,128
+  192| 000718 bc       4320FFF8   1     BCT       ctr=CL.72,,0x64/eq/flt/fgt,0x0
+  192| 00071C stb      9B01044F   1     ST1Z      <a4:d1103:l1>(gr1,1103)=gr24
+  192| 000720 addi     3861044C   1     AI        gr3=gr1,1100
+  192| 000724 addi     38810448   1     AI        gr4=gr1,1096
+  192| 000728 addi     38000000   1     LI        gr0=0
+  192| 00072C rldicr   78630764   1     RN8       gr3=gr3,0,0xFFFFFFFFFFFFFFFC
+  192| 000730 rldicr   78840724   1     RN8       gr4=gr4,0,0xFFFFFFFFFFFFFFF8
+  192| 000734 sth      B001044D   1     ST2Z      <a4:d110|1:l1>#251|2:l1>#252_4(gr1,1101)=gr0
+  192| 000738 stw      93030000   1     ST4Z      pass(gr3,0)=gr24
+  192| 00073C std      FB04FF88   1     ST8       pass(gr4,-120,align='1000')=gr24
+  192| 000740 std      FB04FF90   1     ST8       pass(gr4,-112,align='1000')=gr24
+  192| 000744 std      FB04FF98   1     ST8       pass(gr4,-104,align='1000')=gr24
+  192| 000748 std      FB04FFA0   1     ST8       pass(gr4,-96,align='1000')=gr24
+  192| 00074C std      FB04FFA8   1     ST8       pass(gr4,-88,align='1000')=gr24
+  192| 000750 std      FB04FFB0   1     ST8       pass(gr4,-80,align='1000')=gr24
+  192| 000754 std      FB04FFB8   1     ST8       pass(gr4,-72,align='1000')=gr24
+  192| 000758 std      FB04FFC0   1     ST8       pass(gr4,-64,align='1000')=gr24
+  192| 00075C std      FB04FFC8   1     ST8       pass(gr4,-56,align='1000')=gr24
+  192| 000760 std      FB04FFD0   1     ST8       pass(gr4,-48,align='1000')=gr24
+  192| 000764 std      FB04FFD8   1     ST8       pass(gr4,-40,align='1000')=gr24
+  192| 000768 std      FB04FFE0   1     ST8       pass(gr4,-32,align='1000')=gr24
+  192| 00076C std      FB04FFE8   1     ST8       pass(gr4,-24,align='1000')=gr24
+  192| 000770 std      FB04FFF0   1     ST8       pass(gr4,-16,align='1000')=gr24
+  192| 000774 std      FB04FFF8   1     ST8       pass(gr4,-8,align='1000')=gr24
+  192| 000778 std      FB040000   1     ST8       pass(gr4,0,align='1000')=gr24
+  192|                              CL.73:
+  194| 00077C ld       E8810088   1     L8        gr4=myparmhandle(gr1,136)
+  194| 000780 addi     38600000   1     LI        gr3=0
+  194| 000784 addi     38A100B8   1     AI        gr5=gr1,184
+  194| 000788 bl       4BFFF879   1     CALL      gr3=ncxr_get_parm_info,3,gr3,(*)void",gr4,(*)parameter_description",gr5,#ProcAlias",ncxr_get_parm_info",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  194| 00078C ori      60000000   1
+  195| 000790 ld       E8810088   1     L8        gr4=myparmhandle(gr1,136)
+  195| 000794 addi     38A10170   1     AI        gr5=gr1,368
+  195| 000798 addi     38600001   1     LI        gr3=1
+  195| 00079C bl       4BFFF865   1     CALL      gr3=ncxr_get_parm_info,3,gr3,(*)void",gr4,(*)parameter_description",gr5,#ProcAlias",ncxr_get_parm_info",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  195| 0007A0 ori      60000000   1
+  196| 0007A4 ld       E8810088   1     L8        gr4=myparmhandle(gr1,136)
+  196| 0007A8 addi     38A10228   1     AI        gr5=gr1,552
+  196| 0007AC addi     38600002   1     LI        gr3=2
+  196| 0007B0 bl       4BFFF851   1     CALL      gr3=ncxr_get_parm_info,3,gr3,(*)void",gr4,(*)parameter_description",gr5,#ProcAlias",ncxr_get_parm_info",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  196| 0007B4 ori      60000000   1
+  197| 0007B8 ld       E8810088   1     L8        gr4=myparmhandle(gr1,136)
+  197| 0007BC addi     38A102E0   1     AI        gr5=gr1,736
+  197| 0007C0 addi     38600003   1     LI        gr3=3
+  197| 0007C4 bl       4BFFF83D   1     CALL      gr3=ncxr_get_parm_info,3,gr3,(*)void",gr4,(*)parameter_description",gr5,#ProcAlias",ncxr_get_parm_info",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  197| 0007C8 ori      60000000   1
+  198| 0007CC ld       E8810088   1     L8        gr4=myparmhandle(gr1,136)
+  198| 0007D0 addi     38A10398   1     AI        gr5=gr1,920
+  198| 0007D4 addi     38600004   1     LI        gr3=4
+  198| 0007D8 bl       4BFFF829   1     CALL      gr3=ncxr_get_parm_info,3,gr3,(*)void",gr4,(*)parameter_description",gr5,#ProcAlias",ncxr_get_parm_info",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  198| 0007DC ori      60000000   1
+  201| 0007E0 addi     389E0140   1     AI        gr4=gr30,320
+  201| 0007E4 addi     387B00B0   1     AI        gr3=gr27,176
+  201| 0007E8 bl       4BFFF819   1     CALL      gr3=fprintf,2,(*)aggr#1",gr3,(*)Cuchar",gr4,#ProcAlias",fprintf",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  201| 0007EC ori      60000000   1
+  203| 0007F0 ori      63E30000   1     LR        gr3=gr31
+  203| 0007F4 addi     38800005   1     LI        gr4=5
+  203| 0007F8 addi     38A100B8   1     AI        gr5=gr1,184
+  203| 0007FC bl       4BFFF805   1     CALL      gr3=ncxr_if4_callnat,3,(*)uchar",gr3,gr4,(*)parameter_description",gr5,#ProcAlias",ncxr_if4_callnat",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  203| 000800 ori      60000000   1
+  205| 000804 addi     38600000   1     LI        gr3=0
+  205| 000808 bl       4BFFF7F9   1     CALL      exit,1,gr3,#ProcAlias",exit",fcr",gr1,cr[01567]",gr0",gr3"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  205| 00080C ori      60000000   1
+  205|                              CL.6:
+  209| 000810 addi     3B600000   1     LI        gr27=0
+  217| 000814 addi     387E0128   1     AI        gr3=gr30,296
+  217| 000818 bl       4BFFF7E9   1     CALL      gr3=printf,1,(*)Cuchar",gr3,#ProcAlias",printf",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  217| 00081C ori      60000000   1
+  220| 000820 ori      63830000   1     LR        gr3=gr28
+  220| 000824 addi     38810078   1     AI        gr4=gr1,120
+  220| 000828 ori      60000000   1
+  220| 00082C ori      60210000   1
+  217|                              CL.16:
+  220| 000830 addi     38A00001   1     LI        gr5=1
+  220| 000834 bl       4BFFF7CD   1     CALL      gr3=waitpid,3,gr3,(*)int",gr4,gr5,#ProcAlias",waitpid",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  220| 000838 ori      60000000   1
+  232| 00083C addi     3B7B0001   1     AI        gr27=gr27,1
+  221| 000840 cmpwi    2C030000   1     C4        cr0=gr3,0
+  221| 000844 bc       418000B4   1     BT        CL.44,cr0,0x1/lt,taken=20%(20,80)
+  239| 000848 addi     38600001   1     LI        gr3=1
+  227| 00084C bc       41810080   1     BT        CL.43,cr0,0x2/gt,taken=20%(20,80)
+  232| 000850 cmpwi    2C1B0005   1     C4        cr0=gr27,5
+  232| 000854 bc       40800018   1     BF        CL.42,cr0,0x1/lt,taken=20%(20,80)
+  239| 000858 bl       4BFFF7A9   1     CALL      gr3=sleep,1,gr3,#ProcAlias",sleep",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  239| 00085C ori      60000000   1
+  220| 000860 addi     38810078   1     AI        gr4=gr1,120
+  220| 000864 ori      63830000   1     LR        gr3=gr28
+  241| 000868 b        4BFFFFC8   1     B         CL.16
     0|                              CL.42:
-  232| 00086C addi     387E006C   1     AI        gr3=gr30,108
-  232| 000870 bl       4BFFF791   1     CALL      gr3=printf,1,(*)Cuchar",gr3,#ProcAlias",printf",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  232| 000874 ori      60000000   1
-  234| 000878 ori      63830000   1     LR        gr3=gr28
-  234| 00087C addi     38800009   1     LI        gr4=9
-  234| 000880 bl       4BFFF781   1     CALL      gr3=kill,2,gr3,gr4,#ProcAlias",kill",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  234| 000884 ori      60000000   1
-  243| 000888 ori      63A30000   1     LR        gr3=gr29
-  243| 00088C ori      63E40000   1     LR        gr4=gr31
-  243| 000890 bl       4BFFF771   1     CALL      gr3=handle_timeout,2,(*)uchar",gr3,(*)uchar",gr4,#ProcAlias",handle_timeout",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  247| 000894 addi     38600000   1     LI        gr3=0
-  248| 000898 ld       E98104B0   1     L8        gr12=#stack(gr1,1200)
-  248| 00089C lfd      CBE10498   1     LFL       fp31=#stack(gr1,1176)
-  248| 0008A0 addi     382104A0   1     AI        gr1=gr1,1184
-  248| 0008A4 mtspr    7D8803A6   1     LLR       lr=gr12
-  248| 0008A8 ld       EB01FFB0   1     L8        gr24=#stack(gr1,-80)
+  234| 00086C addi     387E006C   1     AI        gr3=gr30,108
+  234| 000870 bl       4BFFF791   1     CALL      gr3=printf,1,(*)Cuchar",gr3,#ProcAlias",printf",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  234| 000874 ori      60000000   1
+  236| 000878 ori      63830000   1     LR        gr3=gr28
+  236| 00087C addi     38800009   1     LI        gr4=9
+  236| 000880 bl       4BFFF781   1     CALL      gr3=kill,2,gr3,gr4,#ProcAlias",kill",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  236| 000884 ori      60000000   1
+  245| 000888 ori      63A30000   1     LR        gr3=gr29
+  245| 00088C ori      63E40000   1     LR        gr4=gr31
+  245| 000890 bl       4BFFF771   1     CALL      gr3=handle_timeout,2,(*)uchar",gr3,(*)uchar",gr4,#ProcAlias",handle_timeout",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  249| 000894 addi     38600000   1     LI        gr3=0
+  250| 000898 ld       E98104B0   1     L8        gr12=#stack(gr1,1200)
+  250| 00089C lfd      CBE10498   1     LFL       fp31=#stack(gr1,1176)
+  250| 0008A0 addi     382104A0   1     AI        gr1=gr1,1184
+  250| 0008A4 mtspr    7D8803A6   1     LLR       lr=gr12
+  250| 0008A8 ld       EB01FFB0   1     L8        gr24=#stack(gr1,-80)
     0|                              CL.125:
-  248| 0008AC ld       EB21FFB8   1     L8        gr25=#stack(gr1,-72)
-  248| 0008B0 ld       EB41FFC0   1     L8        gr26=#stack(gr1,-64)
-  248| 0008B4 ld       EB61FFC8   1     L8        gr27=#stack(gr1,-56)
-  248| 0008B8 ld       EB81FFD0   1     L8        gr28=#stack(gr1,-48)
-  248| 0008BC ld       EBA1FFD8   1     L8        gr29=#stack(gr1,-40)
-  248| 0008C0 ld       EBC1FFE0   1     L8        gr30=#stack(gr1,-32)
-  248| 0008C4 ld       EBE1FFE8   1     L8        gr31=#stack(gr1,-24)
-  248| 0008C8 bclr     4E800020   1     BA        lr
+  250| 0008AC ld       EB21FFB8   1     L8        gr25=#stack(gr1,-72)
+  250| 0008B0 ld       EB41FFC0   1     L8        gr26=#stack(gr1,-64)
+  250| 0008B4 ld       EB61FFC8   1     L8        gr27=#stack(gr1,-56)
+  250| 0008B8 ld       EB81FFD0   1     L8        gr28=#stack(gr1,-48)
+  250| 0008BC ld       EBA1FFD8   1     L8        gr29=#stack(gr1,-40)
+  250| 0008C0 ld       EBC1FFE0   1     L8        gr30=#stack(gr1,-32)
+  250| 0008C4 ld       EBE1FFE8   1     L8        gr31=#stack(gr1,-24)
+  250| 0008C8 bclr     4E800020   1     BA        lr
     0|                              CL.43:
-  227| 0008CC lwa      E881007A   1     L4A       gr4=status(gr1,120)
-  227| 0008D0 addi     387E00A8   1     AI        gr3=gr30,168
-  227| 0008D4 bl       4BFFF72D   1     CALL      gr3=printf,2,(*)Cuchar",gr3,gr4,#ProcAlias",printf",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  227| 0008D8 ori      60000000   1
-  247| 0008DC addi     38600000   1     LI        gr3=0
-  248| 0008E0 ld       E98104B0   1     L8        gr12=#stack(gr1,1200)
-  248| 0008E4 lfd      CBE10498   1     LFL       fp31=#stack(gr1,1176)
-  248| 0008E8 addi     382104A0   1     AI        gr1=gr1,1184
-  248| 0008EC mtspr    7D8803A6   1     LLR       lr=gr12
-  248| 0008F0 ld       EB01FFB0   1     L8        gr24=#stack(gr1,-80)
-  228| 0008F4 b        4BFFFFB8   1     B         CL.125,-1
+  229| 0008CC lwa      E881007A   1     L4A       gr4=status(gr1,120)
+  229| 0008D0 addi     387E00A8   1     AI        gr3=gr30,168
+  229| 0008D4 bl       4BFFF72D   1     CALL      gr3=printf,2,(*)Cuchar",gr3,gr4,#ProcAlias",printf",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  229| 0008D8 ori      60000000   1
+  249| 0008DC addi     38600000   1     LI        gr3=0
+  250| 0008E0 ld       E98104B0   1     L8        gr12=#stack(gr1,1200)
+  250| 0008E4 lfd      CBE10498   1     LFL       fp31=#stack(gr1,1176)
+  250| 0008E8 addi     382104A0   1     AI        gr1=gr1,1184
+  250| 0008EC mtspr    7D8803A6   1     LLR       lr=gr12
+  250| 0008F0 ld       EB01FFB0   1     L8        gr24=#stack(gr1,-80)
+  230| 0008F4 b        4BFFFFB8   1     B         CL.125,-1
     0|                              CL.44:
-  221| 0008F8 bl       4BFFF709   1     CALL      gr3=_Errno,0,#ProcAlias",_Errno",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  221| 0008FC ori      60000000   1
-  221| 000900 lwa      EBE30002   1     L4A       gr31=(*)int(gr3,0)
-  221| 000904 bl       4BFFF6FD   1     CALL      gr3=_Errno,0,#ProcAlias",_Errno",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  221| 000908 ori      60000000   1
-  221| 00090C lwa      E8630002   1     L4A       gr3=(*)int(gr3,0)
-  221| 000910 bl       4BFFF6F1   1     CALL      gr3=strerror,1,gr3,#ProcAlias",strerror",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  221| 000914 ori      60000000   1
-  221| 000918 ori      63E40000   1     LR        gr4=gr31
-  221| 00091C ori      60650000   1     LR        gr5=gr3
-  221| 000920 addi     387E015C   1     AI        gr3=gr30,348
-  221| 000924 bl       4BFFF6DD   1     CALL      gr3=printf,3,(*)Cuchar",gr3,gr4,(*)uchar",gr5,#ProcAlias",printf",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  221| 000928 ori      60000000   1
-  222| 00092C lwa      E881007A   1     L4A       gr4=status(gr1,120)
-  222| 000930 addi     387E0094   1     AI        gr3=gr30,148
-  222| 000934 bl       4BFFF6CD   1     CALL      gr3=printf,2,(*)Cuchar",gr3,gr4,#ProcAlias",printf",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  222| 000938 ori      60000000   1
-  247| 00093C addi     38600000   1     LI        gr3=0
-  248| 000940 ld       E98104B0   1     L8        gr12=#stack(gr1,1200)
-  248| 000944 lfd      CBE10498   1     LFL       fp31=#stack(gr1,1176)
-  248| 000948 addi     382104A0   1     AI        gr1=gr1,1184
-  248| 00094C mtspr    7D8803A6   1     LLR       lr=gr12
-  248| 000950 ld       EB01FFB0   1     L8        gr24=#stack(gr1,-80)
+  223| 0008F8 bl       4BFFF709   1     CALL      gr3=_Errno,0,#ProcAlias",_Errno",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  223| 0008FC ori      60000000   1
+  223| 000900 lwa      EBE30002   1     L4A       gr31=(*)int(gr3,0)
+  223| 000904 bl       4BFFF6FD   1     CALL      gr3=_Errno,0,#ProcAlias",_Errno",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  223| 000908 ori      60000000   1
+  223| 00090C lwa      E8630002   1     L4A       gr3=(*)int(gr3,0)
+  223| 000910 bl       4BFFF6F1   1     CALL      gr3=strerror,1,gr3,#ProcAlias",strerror",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  223| 000914 ori      60000000   1
+  223| 000918 ori      63E40000   1     LR        gr4=gr31
+  223| 00091C ori      60650000   1     LR        gr5=gr3
+  223| 000920 addi     387E015C   1     AI        gr3=gr30,348
+  223| 000924 bl       4BFFF6DD   1     CALL      gr3=printf,3,(*)Cuchar",gr3,gr4,(*)uchar",gr5,#ProcAlias",printf",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  223| 000928 ori      60000000   1
+  224| 00092C lwa      E881007A   1     L4A       gr4=status(gr1,120)
+  224| 000930 addi     387E0094   1     AI        gr3=gr30,148
+  224| 000934 bl       4BFFF6CD   1     CALL      gr3=printf,2,(*)Cuchar",gr3,gr4,#ProcAlias",printf",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  224| 000938 ori      60000000   1
+  249| 00093C addi     38600000   1     LI        gr3=0
+  250| 000940 ld       E98104B0   1     L8        gr12=#stack(gr1,1200)
+  250| 000944 lfd      CBE10498   1     LFL       fp31=#stack(gr1,1176)
+  250| 000948 addi     382104A0   1     AI        gr1=gr1,1184
+  250| 00094C mtspr    7D8803A6   1     LLR       lr=gr12
+  250| 000950 ld       EB01FFB0   1     L8        gr24=#stack(gr1,-80)
     0| 000954 b        4BFFFF58   1     B         CL.125,-1
-  190|                              CL.71:
-  190| 000958 addi     38800398   1     LI        gr4=920
-  190| 00095C addi     386100B8   1     AI        gr3=gr1,184
-  190| 000960 addi     38A00000   1     LI        gr5=0
-  190| 000964 bl       4BFFF69D   1     CALLN     pass=___fill64,3,gr3,gr4,gr5,gr1,cr[01567]",gr0",gr3"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  190| 000968 ori      60000000   1
+  192|                              CL.71:
+  192| 000958 addi     38800398   1     LI        gr4=920
+  192| 00095C addi     386100B8   1     AI        gr3=gr1,184
+  192| 000960 addi     38A00000   1     LI        gr5=0
+  192| 000964 bl       4BFFF69D   1     CALLN     pass=___fill64,3,gr3,gr4,gr5,gr1,cr[01567]",gr0",gr3"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  192| 000968 ori      60000000   1
     0| 00096C b        4BFFFE10   1     B         CL.73,-1
     0|                              CL.124:
-  183| 000970 addi     38600007   1     LI        gr3=7
-  183| 000974 bl       4BFFF68D   1     CALL      exit,1,gr3,#ProcAlias",exit",fcr",gr1,cr[01567]",gr0",gr3"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  183| 000978 ori      60000000   1
+  185| 000970 addi     38600007   1     LI        gr3=7
+  185| 000974 bl       4BFFF68D   1     CALL      exit,1,gr3,#ProcAlias",exit",fcr",gr1,cr[01567]",gr0",gr3"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  185| 000978 ori      60000000   1
     0| 00097C b        4BFFFCEC   1     B         CL.15,-1
     0|                              CL.123:
-  119| 000980 bl       4BFFF681   1     CALL      gr3=_Errno,0,#ProcAlias",_Errno",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  119| 000984 ori      60000000   1
-  119| 000988 lwa      E8630002   1     L4A       gr3=(*)int(gr3,0)
-  119| 00098C bl       4BFFF675   1     CALL      gr3=strerror,1,gr3,#ProcAlias",strerror",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  119| 000990 ori      60000000   1
-  119| 000994 ori      60640000   1     LR        gr4=gr3
-  119| 000998 addi     387E0084   1     AI        gr3=gr30,132
-  119| 00099C bl       4BFFF665   1     CALL      gr3=printf,2,(*)Cuchar",gr3,(*)uchar",gr4,#ProcAlias",printf",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
-  119| 0009A0 ori      60000000   1
-  120| 0009A4 addi     3860FFFF   1     LI        gr3=-1
-  248| 0009A8 ld       E98104B0   1     L8        gr12=#stack(gr1,1200)
-  248| 0009AC addi     382104A0   1     AI        gr1=gr1,1184
-  248| 0009B0 mtspr    7D8803A6   1     LLR       lr=gr12
-  248| 0009B4 ld       EB81FFD0   1     L8        gr28=#stack(gr1,-48)
-  248| 0009B8 ld       EBA1FFD8   1     L8        gr29=#stack(gr1,-40)
-  248| 0009BC ld       EBC1FFE0   1     L8        gr30=#stack(gr1,-32)
-  248| 0009C0 ld       EBE1FFE8   1     L8        gr31=#stack(gr1,-24)
-  248| 0009C4 bclr     4E800020   1     BA        lr
+  121| 000980 bl       4BFFF681   1     CALL      gr3=_Errno,0,#ProcAlias",_Errno",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  121| 000984 ori      60000000   1
+  121| 000988 lwa      E8630002   1     L4A       gr3=(*)int(gr3,0)
+  121| 00098C bl       4BFFF675   1     CALL      gr3=strerror,1,gr3,#ProcAlias",strerror",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  121| 000990 ori      60000000   1
+  121| 000994 ori      60640000   1     LR        gr4=gr3
+  121| 000998 addi     387E0084   1     AI        gr3=gr30,132
+  121| 00099C bl       4BFFF665   1     CALL      gr3=printf,2,(*)Cuchar",gr3,(*)uchar",gr4,#ProcAlias",printf",fcr",gr1,cr[01567]",gr0",gr4"-gr12",fp0"-fp13",mq",lr",fcr",xer",fsr",ca",ctr"
+  121| 0009A0 ori      60000000   1
+  122| 0009A4 addi     3860FFFF   1     LI        gr3=-1
+  250| 0009A8 ld       E98104B0   1     L8        gr12=#stack(gr1,1200)
+  250| 0009AC addi     382104A0   1     AI        gr1=gr1,1184
+  250| 0009B0 mtspr    7D8803A6   1     LLR       lr=gr12
+  250| 0009B4 ld       EB81FFD0   1     L8        gr28=#stack(gr1,-48)
+  250| 0009B8 ld       EBA1FFD8   1     L8        gr29=#stack(gr1,-40)
+  250| 0009BC ld       EBC1FFE0   1     L8        gr30=#stack(gr1,-32)
+  250| 0009C0 ld       EBE1FFE8   1     L8        gr31=#stack(gr1,-24)
+  250| 0009C4 bclr     4E800020   1     BA        lr
      |               Tag Table
      | 0009C8        00000000 00002201 82080001 000006E8
      |               Instruction count          442

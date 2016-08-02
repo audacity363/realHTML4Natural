@@ -5,9 +5,9 @@
 #include "standard.h"
 #include "varhandle.h"
 #include "lda_parser.h"
+#include "jinja_parser.h"
 #include "utils.h"
 
-extern int parser_start(char *, struct variables*, char*, char*, int*);
 
 int generate_500errPage_parser(char *output, struct variables *anker, 
     char *error_str, int line, char *template)
@@ -24,7 +24,7 @@ int generate_500errPage_parser(char *output, struct variables *anker,
     newStringVar(anker, "error_template", template);
     newIntVar(anker, "error_line_nr", line);
 
-    parser_start(parser_template, anker, output, error_str, &line);
+    start_jinjaparser(anker, output, parser_template, error_str, &line);
     return(0);
 }
 
@@ -45,7 +45,7 @@ int generate_500errPage_lda(char *output, char *error_str, char *ldaname)
     newStringVar(anker, "error_str", error_str);
     newStringVar(anker, "lda_name", ldaname);
 
-    parser_start(lda_template, anker, output, error_str, &error_line);
+    start_jinjaparser(anker,output, lda_template, error_str, &error_line);
     return(0);
 }
 
@@ -57,7 +57,7 @@ int generate_page(struct variables *anker, char *ldaname, char *templatename,
     char *lda = malloc(strlen(webserver_settings.nat_sourcepath)
                             +strlen(webserver_settings.natlibrary)
                                     +strlen(ldaname)+10);
-    char *error_str = malloc(2048);
+    char error_str[2048];
     int error_zeile;
 
     sprintf(template, "%s/%s", webserver_settings.templatepath, templatename);
@@ -81,7 +81,7 @@ int generate_page(struct variables *anker, char *ldaname, char *templatename,
         return(-1);
     }
     printf("Start jinja Parser\n");
-    if(parser_start(template, anker, output_file, error_str, &error_zeile) < 0)
+    if(start_jinjaparser(anker, output_file, template, error_str, &error_zeile) < 0)
     {
         printf("Error in zeile %d [%s]\n", error_zeile, error_str);
         generate_500errPage_parser(output_file, anker, error_str, error_zeile, 
@@ -89,5 +89,6 @@ int generate_page(struct variables *anker, char *ldaname, char *templatename,
         return(-1);
     }
     free(template);
+    return(0);
 }
 

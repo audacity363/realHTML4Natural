@@ -14,6 +14,7 @@
 #include "varhandle.h"
 #include "header.h"
 #include "utils.h"
+#include "jinja_parser.h"
 
 #define VARLENGTH 20 
 #define ARRAYLENGTH 20
@@ -50,8 +51,9 @@ int handle_timeout(char *deliver_file, char *program)
     struct variables *anker = malloc(sizeof(struct variables));
     char *error_filename = malloc(strlen(deliver_file)+6);
     char *template = malloc(sizeof(webserver_settings.templatepath)+15);
-    char error_str[1024];
+    char error_str[2048];
     FILE *p_errorfile;
+    int error_line;
 
 
     /*Init Anker*/
@@ -77,7 +79,7 @@ int handle_timeout(char *deliver_file, char *program)
 
     newStringVar(anker, "error_str", error_str);
     newStringVar(anker, "programm", program);
-    parser_start(template, anker, deliver_file);
+    start_jinjaparser(anker, deliver_file, template, error_str, &error_line);
 }
 
 /*

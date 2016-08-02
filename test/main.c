@@ -6,9 +6,9 @@
 #include "varhandle.h"
 #include "hexdump.h"
 #include "utils.h"
+#include "jinja_parser.h"
 
 int main()
 {
     struct variables *anker = malloc(sizeof(struct variables));
-    generate_page(anker, " ", " ", " ");
 }

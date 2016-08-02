@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "include/standard.h"
+#include "standard.h"
 #include "lookup.h"
 #include "cfg.h"
 

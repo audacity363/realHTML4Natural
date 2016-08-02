@@ -1,0 +1,19 @@
+<html>
+<head>
+    <title>Hello World</title>
+    <style>
+    table {
+        margin-right: auto;
+        margin-left: auto;
+    }
+    </style>
+</head>
+<body>
+{%for entry in testarray%}
+    {%if loop.i == 3%}
+        {%break%}
+    {%end-if%}
+    <p>{{entry}}</p>
+{%end-for%}
+</body>
+</html>

@@ -13,11 +13,14 @@ int compare(struct variables *anker, char *var1, char *var2, char *symbol,
     int var_type1, var_type2;
     char *c_value1, *c_value2;
     int i_value1, i_value2;
+    int x_index1, y_index1, index_type1;
+    int x_index2, y_index2, index_type2;
 
     printf("var1: [%s]\n", var1);
     printf("var2: [%s]\n", var2);
     printf("Operator: [%s]\n", symbol);
 
+    index_type1 = getIndex(anker, var1, &x_index1, &y_index1, error_str);
     if((var_type1 = getVarType(anker, var1)) < 0)
     {
         if(var1[0] == '"')
@@ -40,11 +43,39 @@ int compare(struct variables *anker, char *var1, char *var2, char *symbol,
             return(-1);
         }
     }
-    else if(var_type1 == INTARRAY || var_type1 == STRINGARRAY || 
-            var_type1 == TWO_DSTRINGARRAY || var_type1 == TWO_DINTARRAY)
+    else if(var_type1 == INTARRAY && index_type1 == 1)
     {
-        strcpy(error_str, "Type Error: Arrays are not supported, yet");
-        return(-2);
+        if((i_value1 = getIntValuefromArray(anker, var1, x_index1)) == -1)
+        {
+            sprintf(error_str, "Unkown Variable [%s]", var1);
+            return(-2);
+        }
+        else if(i_value2 == -2)
+        {
+            strcpy(error_str, "Index Error: index out of range");
+            return(-3);
+        }
+        var_type1 = INT;
+    }
+    else if(var_type1 == TWO_DINTARRAY && index_type1 == 2)
+    {
+        if(getIntValuefrom2DArray(anker, var1, x_index1, y_index1,
+                                  &i_value1) < 0)
+        {
+            strcpy(error_str, varhandle_error_str);
+            return(-4);
+        }
+        var_type1 = INT;
+    }
+    else if(var_type1 == STRINGARRAY && index_type1 == 1)
+    {
+        c_value1 = getStringValuefromArray(anker, var1, x_index1);
+        var_type1 = STRING;
+    }
+    else if(var_type1 == TWO_DSTRINGARRAY && index_type1 == 2)
+    {
+        c_value1 = getStringValuefrom2DArray(anker, var1, x_index1, y_index1);
+        var_type1 = STRING;
     }
     else if(var_type1 == STRING)
     {
@@ -54,7 +85,13 @@ int compare(struct variables *anker, char *var1, char *var2, char *symbol,
     {
         i_value1 = getIntValue(anker, var1);
     }
+    else
+    {
+        strcpy(error_str, "Type Error: Arrays are not supported, yet");
+        return(-2);
+    }
 
+    index_type2 = getIndex(anker, var2, &x_index2, &y_index2, error_str);
     if((var_type2 = getVarType(anker, var2)) < 0)
     {
         if(var2[0] == '"')
@@ -77,12 +114,41 @@ int compare(struct variables *anker, char *var1, char *var2, char *symbol,
             return(-1);
         }
     }
-    else if(var_type2 == INTARRAY || var_type2 == STRINGARRAY || 
-            var_type2 == TWO_DSTRINGARRAY || var_type2 == TWO_DINTARRAY)
+    else if(var_type2 == INTARRAY && index_type2 == 1)
     {
-        strcpy(error_str, "Type Error: Arrays are not supported, yet");
-        return(-2);
+        if((i_value2 = getIntValuefromArray(anker, var2, x_index2)) == -1)
+        {
+            sprintf(error_str, "Unkown Variable [%s]", var2);
+            return(-2);
+        }
+        else if(i_value2 == -2)
+        {
+            strcpy(error_str, "Index Error: index out of range");
+            return(-3);
+        }
+        var_type2 = INT;
     }
+    else if(var_type2 == TWO_DINTARRAY && index_type2 == 2)
+    {
+        if(getIntValuefrom2DArray(anker, var2, x_index2, y_index2,
+                                  &i_value2) < 0)
+        {
+            strcpy(error_str, varhandle_error_str);
+            return(-4);
+        }
+        var_type2 = INT;
+    }
+    else if(var_type2 == STRINGARRAY && index_type2 == 1)
+    {
+        c_value2 = getStringValuefromArray(anker, var2, x_index2);
+        var_type2 = STRING;
+    }
+    else if(var_type2 == TWO_DSTRINGARRAY && index_type2 == 2)
+    {
+        c_value2 = getStringValuefrom2DArray(anker, var2, x_index2, y_index2);
+        var_type2 = STRING;
+    }
+
     else if(var_type2 == STRING)
     {
         c_value2 = getStringValue(anker, var2);
@@ -90,6 +156,11 @@ int compare(struct variables *anker, char *var1, char *var2, char *symbol,
     else if(var_type2 == INT)
     {
         i_value2 = getIntValue(anker, var2);
+    }
+    else
+    {
+        strcpy(error_str, "Type Error: Arrays are not supported, yet");
+        return(-2);
     }
 
     if(var_type1 != var_type2)

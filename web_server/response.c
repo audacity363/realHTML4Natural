@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "include/standard.h"
+#include "standard.h"
 
 #define SERVER_STRING "Server: nathttp/0.0.1\r\n"
 

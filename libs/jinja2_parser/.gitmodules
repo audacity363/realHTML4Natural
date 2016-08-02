@@ -1,3 +1,0 @@
-[submodule "include"]
-	path = include
-	url = ssh://tom@engemann.me:29418/nat-include.git

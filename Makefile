@@ -62,11 +62,12 @@ clean_hexdump:
 	-rm -f $(HEXD_PATH)/bin/*.o $(HEXD_PATH)/*.a
 
 jinjaparser:
-	$(CC) $(CFLAGS) -o $(JINJA_PATH)/bin/utils.o $(JINJA_PATH)/utils.c $(INCDIR)
-	$(CC) $(CFLAGS) -o $(JINJA_PATH)/bin/if.o $(JINJA_PATH)/if.c $(INCDIR)
-	$(CC) $(CFLAGS) -o $(JINJA_PATH)/bin/for.o $(JINJA_PATH)/for.c $(INCDIR)
-	$(CC) $(CFLAGS) -o $(JINJA_PATH)/bin/parser.o $(JINJA_PATH)/parser.c $(INCDIR)
-	$(CC) $(CFLAGS) -o $(JINJA_PATH)/bin/main.o $(JINJA_PATH)/main.c $(INCDIR)
+	$(CC) $(CFLAGS) -o $(JINJA_PATH)/bin/file_handling.o $(JINJA_PATH)/file_handling.c $(INCDIR)
+	$(CC) $(CFLAGS) -o $(JINJA_PATH)/bin/start_jinjaparser.o $(JINJA_PATH)/start_jinjaparser.c $(INCDIR)
+	$(CC) $(CFLAGS) -o $(JINJA_PATH)/bin/variable_handle.o $(JINJA_PATH)/variable_handle.c $(INCDIR)
+	$(CC) $(CFLAGS) -o $(JINJA_PATH)/bin/command_handling.o $(JINJA_PATH)/command_handling.c $(INCDIR)
+	$(CC) $(CFLAGS) -o $(JINJA_PATH)/bin/for_handling.o $(JINJA_PATH)/for_handling.c $(INCDIR)
+	$(CC) $(CFLAGS) -o $(JINJA_PATH)/bin/if_handling.o $(JINJA_PATH)/if_handling.c $(INCDIR)
 	ar $(ARFLAGS) $(JINJA_PATH)/libjinjaparser.a $(JINJA_PATH)/bin/*.o
 
 clean_jinjaparser:
@@ -135,6 +136,10 @@ test_webserver:
 glob_test:
 	$(CC) -g -o $(HOMEDIR)/test/main $(HOMEDIR)/test/main.c $(INCDIR) $(LIBS)
 
+lib:
+	$(MAKE) -f Makedyn clean
+	$(MAKE) -f Makedyn lib
+
 
 clean:
 	$(MAKE) clean_cfgreader
@@ -157,3 +162,6 @@ all:
 	$(MAKE) varhandle
 	$(MAKE) var2name
 	$(MAKE) webserver
+
+all_test:
+	$(CC) -g -o ./test/main ./test/main.c $(INCDIR) jinja2.so
