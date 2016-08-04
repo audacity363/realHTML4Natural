@@ -7,7 +7,7 @@
 
 char varhandle_error_str[2048];
 
-void printArrayfromPtr(struct variables *ptr, FILE *output)
+void printArrayfromPtrtoFile(struct variables *ptr, FILE *output)
 {
     int x;
 
@@ -22,6 +22,23 @@ void printArrayfromPtr(struct variables *ptr, FILE *output)
             fprintf(output, ",");
     }
     fprintf(output, "]");
+}
+
+void printArrayfromPtr(struct variables *ptr)
+{
+    int x;
+
+    printf("[");
+    for(x=0; x < ptr->length; x++)
+    {
+        if(ptr->type == STRINGARRAY)
+            printf("\"%s\"", ((char**)ptr->data)[x]);
+        else
+            printf("%d", ((int*)ptr->data)[x]);
+        if(x+1 < ptr->length)
+            printf(",");
+    }
+    printf("]");
 }
 
 void printArray(struct variables *anker, char *name, bool showname, 
@@ -496,7 +513,7 @@ int print2DArraytoFile(struct variables *anker, char *name, FILE *p_output)
             }
         }
         fprintf(p_output, "]");
-        if(x+1 < ptro->x_length)
+        if(x+1 < ptr->x_length)
             fprintf(p_output, ",");
         fprintf(p_output, "\n");
 
@@ -508,8 +525,6 @@ int print2DArraytoFile(struct variables *anker, char *name, FILE *p_output)
 void printVarstoFile(struct variables *anker, FILE *p_output)
 {
     struct variables *ptr;
-
-    printf("--------------------------------------------------------------\n");
 
     ptr = anker;
     while(ptr != NULL)
@@ -537,6 +552,5 @@ void printVarstoFile(struct variables *anker, FILE *p_output)
         }
         ptr = ptr->next;
     }
-    printf("--------------------------------------------------------------\n");
     return;
 }

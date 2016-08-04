@@ -6,6 +6,8 @@
 #include "standard.h"
 #include "varhandle.h"
 #include "utils.h"
+#include "jinja_parser.h"
+#include "command_handling.h"
 
 /*Sucht nacht einem Befehl.
  * Return:
@@ -17,44 +19,66 @@
  *
  * kein bekannter = -1
  */
-int searchCommand(char *line)
+int searchCommand(char *line, macros *anker)
 {
     char *found_cmd;
+    struct macro_definition *hptr;
 
     if((found_cmd = strstr(line, "end-for")) != NULL)
     {
-        return(2);
+        return(ENDFOR_CMD);
     }
     else if((found_cmd = strstr(line, "for")) != NULL)
     {
-        return(1);
+        return(FOR_CMD);
     }
     else if((found_cmd = strstr(line, "end-if")) != NULL)
     {
-        return(4);
+        return(ENDIF_CMD);
     }
     else if((found_cmd = strstr(line, "if")) != NULL)
     {
-        return(3);
+        return(IF_CMD);
     }
     else if((found_cmd = strstr(line, "printVars")) != NULL)
     {
-        return(5);
+        return(PRINTVARS_CMD);
     }
     else if((found_cmd = strstr(line, "else")) != NULL)
     {
-        return(6);
+        return(ELSE_CMD);
     }
     else if((found_cmd = strstr(line, "continue")) != NULL)
     {
-        return(7);
+        return(CONTINUE_CMD);
     }
     else if((found_cmd = strstr(line, "break")) != NULL)
     {
-        return(8);
+        return(BREAK_CMD);
+    }
+    else if((found_cmd = strstr(line, "import")) != NULL)
+    {
+        return(IMPORT_CMD);
+    }
+    else if((found_cmd = strstr(line, "end-macro")) != NULL)
+    {
+        return(ENDMACRO_CMD);
+    }
+    else if((found_cmd = strstr(line, "macro")) != NULL)
+    {
+        return(NEWMACRO_CMD);
     }
     else
     {
+        hptr = anker->anker;
+        while(hptr != NULL)
+        {
+            if(strstr(line, hptr->name) != NULL)
+            {
+                return(MACRO_CMD);
+            }
+            hptr = hptr->next;
+        }
         return(-1);
     }
 
@@ -70,4 +94,10 @@ int start_if(struct variables *anker, char *cmd_buff, FILE *p_output,
             char *error_str)
 {
     return(if_handle(anker, cmd_buff, p_output, error_str));
+}
+
+int start_import(struct variables *anker, char *line, FILE *p_output,
+                 char *error_str)
+{
+    return(import_handle(anker, line, p_output, error_str));
 }

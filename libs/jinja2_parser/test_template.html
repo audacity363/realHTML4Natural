@@ -9,11 +9,12 @@
     </style>
 </head>
 <body>
-{%for entry in testarray%}
-    {%if loop.i == 3%}
-        {%break%}
-    {%end-if%}
-    <p>{{entry}}</p>
-{%end-for%}
+{%macro "test"%}
+HEllo World
+balblabla
+wkleöjrhnflkeöwjrfbnelrkgjgb
+{%end-macro%}
+
+{% test %}
 </body>
 </html>

@@ -43,6 +43,8 @@ all:
 	$(CC) -g -c -o ./bin/command_handling.o command_handling.c $(INCDIR)
 	$(CC) -g -c -o ./bin/for_handling.o for_handling.c $(INCDIR)
 	$(CC) -g -c -o ./bin/if_handling.o if_handling.c $(INCDIR)
+	$(CC) -g -c -o ./bin/import_handling.o import_handling.c $(INCDIR)
+	$(CC) -g -c -o ./bin/macro_handling.o macro_handling.c $(INCDIR)
 	$(CC) -g -o ./main main.c $(INCDIR) ./bin/*.o $(LIBS)
 
 clean:

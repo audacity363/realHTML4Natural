@@ -526,8 +526,6 @@ void printVarstoFile(struct variables *anker, FILE *p_output)
 {
     struct variables *ptr;
 
-    printf("--------------------------------------------------------------\n");
-
     ptr = anker;
     while(ptr != NULL)
     {
@@ -554,6 +552,5 @@ void printVarstoFile(struct variables *anker, FILE *p_output)
         }
         ptr = ptr->next;
     }
-    printf("--------------------------------------------------------------\n");
     return;
 }

@@ -6,14 +6,15 @@
 #include "varhandle.h"
 #include "file_handling.h"
 #include "jinja_parser.h"
+#include "command_handling.h"
 
-int parse_line(struct variables *anker, char *line, FILE *p_output,
+int parse_line(struct variables *anker, macros *macro_anker, char *line, FILE *p_output,
                char **cmd_buff, int *just_save, int *in_for, int *in_if,
                char *error_str)
 {
     char *pos_open_var, *pos_close_var;
     char *pos_open_cmd, *pos_close_cmd;
-    int cmd_type, if_ret;
+    int cmd_type, if_ret, cmd = 0;
 
     if((pos_open_var = strstr(line, "{{")) != NULL && *just_save == 0)
     {
@@ -46,13 +47,18 @@ int parse_line(struct variables *anker, char *line, FILE *p_output,
         
         pos_close_cmd[0] = '\0';
         memmove(line, pos_open_cmd+2, strlen(pos_open_cmd));
-        switch(searchCommand(line))
+        switch(searchCommand(line, macro_anker))
         {
             case -1:
                 strcpy(error_str, "Name Error: Unkown Function");
                 return(-4);
             //Forschleife:
-            case 1:
+            case FOR_CMD:
+                if(*just_save == 2)
+                {
+                    cmd = 1;
+                    goto save_macro;
+                }
                 *in_for = *in_for + 1;
                 if(*just_save != 0)
                 {
@@ -74,7 +80,12 @@ int parse_line(struct variables *anker, char *line, FILE *p_output,
                 strcat(*cmd_buff, "\n");
                 return(0);
             //Forschleife ist geschlossen worden 
-            case 2:
+            case ENDFOR_CMD:
+                if(*just_save == 2)
+                {
+                    cmd = 1;
+                    goto save_macro;
+                }
                 if(*in_for-1 != 0)
                 {
                     *in_for = *in_for -1; 
@@ -104,7 +115,12 @@ int parse_line(struct variables *anker, char *line, FILE *p_output,
                 *just_save = 0;
                 return(0);
             //If abfrage
-            case 3:
+            case IF_CMD:
+                if(*just_save == 2)
+                {
+                    cmd = 1;
+                    goto save_macro;
+                }
                 *in_if = *in_if + 1;
                 if(*just_save != 0)
                 {
@@ -125,7 +141,12 @@ int parse_line(struct variables *anker, char *line, FILE *p_output,
                 strcat(*cmd_buff, "\n");
                 return(0);
             //Close if
-            case 4:
+            case ENDIF_CMD:
+                if(*just_save == 2)
+                {
+                    cmd = 1;
+                    goto save_macro;
+                }
                 if(*in_if-1 != 0)
                 {
                     *in_if = *in_if -1;
@@ -157,15 +178,46 @@ int parse_line(struct variables *anker, char *line, FILE *p_output,
                 *just_save = 0;
                 return(if_ret);
             //Found printVars()
-            case 5:
+            case PRINTVARS_CMD:
+                if(*just_save == 2)
+                {
+                    cmd = 1;
+                    goto save_macro;
+                }
+                if(*just_save == 2)
+                    goto save_macro;
                 printVarstoFile(anker, p_output);
                 return(0);
+            case IMPORT_CMD:
+                if(*just_save == 2)
+                {
+                    cmd = 1;
+                    goto save_macro;
+                }
+                return(start_import(anker, line, p_output, error_str));
+            case NEWMACRO_CMD:
+                if(getMacroName(macro_anker, line) < 0)
+                    return(-2);
+                *just_save = 2;
+                macro_anker->macro_buff = malloc(1);
+                return(0);
+            case ENDMACRO_CMD:
+                *just_save = 0;
+                saveMacro(macro_anker);
+                return(0);
+            case MACRO_CMD:
+                if(printMacro(macro_anker, line, p_output, 
+                   error_str) < 0)
+                    return(-3);
+                return(0);
             //Else
-            case 6:
+            case ELSE_CMD:
             //continue
-            case 7:
+            case CONTINUE_CMD:
             //break
-            case 8:
+            case BREAK_CMD:
+                if(*just_save == 2)
+                    goto save_macro;
                 *cmd_buff = realloc(*cmd_buff, strlen(*cmd_buff)+strlen(line)+6);
                 strcat(*cmd_buff, "{%");
                 strcat(*cmd_buff, line);
@@ -178,8 +230,29 @@ int parse_line(struct variables *anker, char *line, FILE *p_output,
     }
     else if(*just_save > 0)
     {
-        *cmd_buff = realloc(*cmd_buff, strlen(*cmd_buff)+strlen(line)+1);
-        strcat(*cmd_buff, line);
+        if(*just_save == 1)
+        {
+            *cmd_buff = realloc(*cmd_buff, strlen(*cmd_buff)+strlen(line)+1);
+            strcat(*cmd_buff, line);
+        }
+        else if(*just_save == 2)
+        {
+save_macro:
+            if(cmd == 1)
+            {
+                macro_anker->macro_buff = realloc(macro_anker->macro_buff, strlen(macro_anker->macro_buff)+strlen(line)+6);
+                strcat(macro_anker->macro_buff, "{%");
+                strcat(macro_anker->macro_buff, line);
+                strcat(macro_anker->macro_buff, "%}");
+            }
+            else
+            {
+                macro_anker->macro_buff = realloc(macro_anker->macro_buff, strlen(macro_anker->macro_buff)+strlen(line)+1);
+                strcat(macro_anker->macro_buff, line);
+            }
+
+        }
+
     }
     else
     {
@@ -206,6 +279,12 @@ int start_jinjaparser(struct variables *anker, char *outputfile,
     FILE *p_template, *p_output;
     char *line, *cmd_buff = NULL;
     int parser_status = 0, in_for = 0, in_if = 0, l_line_nr = 0;
+
+    macros macros_anker;
+
+    macros_anker.anker = malloc(sizeof(struct macro_definition));
+    macros_anker.anker->next = NULL;
+    strcpy(macros_anker.anker->name, "macroanker");
 
     if((p_template = openTemplateFile(templatefile, error_str)) == NULL)
     {
@@ -234,7 +313,7 @@ int start_jinjaparser(struct variables *anker, char *outputfile,
         }
 
         l_line_nr++;
-        if(parse_line(anker, line, p_output, &cmd_buff, &parser_status, 
+        if(parse_line(anker, &macros_anker, line, p_output, &cmd_buff, &parser_status, 
                       &in_for, &in_if, error_str) < 0)
         {
             close_jinjaparser(p_output, p_template);

@@ -475,8 +475,9 @@ int for_handle(struct variables *anker, char *cmd_buff, FILE *p_output,
                 free(line);
                 break;
             }
+            bzero(line, strlen(line));
 
-            free(line);
+            //free(line);
         }
     }
 
