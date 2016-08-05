@@ -161,8 +161,8 @@ int editIntVar(struct variables *anker, char *name, int value)
        //Wrong Var Type
        return(-2);
 
-    free(ptr->data);
-    ptr->data = malloc(sizeof(int));
+    /*free(ptr->data);
+    ptr->data = malloc(sizeof(int));*/
     *(int*)ptr->data = value;
     return(0);
 }
