@@ -68,6 +68,8 @@ jinjaparser:
 	$(CC) $(CFLAGS) -o $(JINJA_PATH)/bin/command_handling.o $(JINJA_PATH)/command_handling.c $(INCDIR)
 	$(CC) $(CFLAGS) -o $(JINJA_PATH)/bin/for_handling.o $(JINJA_PATH)/for_handling.c $(INCDIR)
 	$(CC) $(CFLAGS) -o $(JINJA_PATH)/bin/if_handling.o $(JINJA_PATH)/if_handling.c $(INCDIR)
+	$(CC) $(CFLAGS) -o $(JINJA_PATH)/bin/import_handling.o $(JINJA_PATH)/import_handling.c $(INCDIR)
+	$(CC) $(CFLAGS) -o $(JINJA_PATH)/bin/macro_handling.o $(JINJA_PATH)/macro_handling.c $(INCDIR)
 	ar $(ARFLAGS) $(JINJA_PATH)/libjinjaparser.a $(JINJA_PATH)/bin/*.o
 
 clean_jinjaparser:

@@ -85,19 +85,19 @@ int searchCommand(char *line, macros *anker)
 }
 
 int start_for(struct variables *anker, char *cmd_buff, FILE *p_output,
-               char *error_str)
+               macros *macro_anker, char *error_str)
 {    
-    return(for_handle(anker, cmd_buff, p_output, error_str));
+    return(for_handle(anker, cmd_buff, p_output, macro_anker, error_str));
 }
 
 int start_if(struct variables *anker, char *cmd_buff, FILE *p_output,
-            char *error_str)
+            macros *macro_anker, char *error_str)
 {
-    return(if_handle(anker, cmd_buff, p_output, error_str));
+    return(if_handle(anker, cmd_buff, p_output, macro_anker, error_str));
 }
 
 int start_import(struct variables *anker, char *line, FILE *p_output,
-                 char *error_str)
+                 macros *macro_anker, char *error_str)
 {
-    return(import_handle(anker, line, p_output, error_str));
+    return(import_handle(anker, line, p_output, macro_anker, error_str));
 }

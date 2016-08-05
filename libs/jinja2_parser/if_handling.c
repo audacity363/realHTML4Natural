@@ -6,6 +6,7 @@
 #include "standard.h"
 #include "varhandle.h"
 #include "utils.h"
+#include "jinja_parser.h"
 
 int compare(struct variables *anker, char *var1, char *var2, char *symbol, 
             int index, char *error_str)
@@ -250,7 +251,7 @@ int compare(struct variables *anker, char *var1, char *var2, char *symbol,
 }
 
 int if_handle(struct variables *anker, char *cmd_buff, FILE *p_output,
-              char *error_str)
+              macros *macro_anker, char *error_str)
 {
     char *if_block, *tmp_buff, *if_cmd, *if_cmd_detail, *line, *l_cmd_buff = NULL;
 
@@ -400,7 +401,7 @@ int if_handle(struct variables *anker, char *cmd_buff, FILE *p_output,
             return(2);
         }
 
-        if(parse_line(anker, line, p_output, &l_cmd_buff,
+        if(parse_line(anker, macro_anker, line, p_output, &l_cmd_buff,
                    &parser_status, &l_in_for, &l_in_if, error_str) < 0)
         {
             free(line);

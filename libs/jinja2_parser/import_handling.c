@@ -10,7 +10,7 @@
 #include "jinja_parser.h"
 
 int import_handle(struct variables *anker, char *line, FILE *p_output, 
-                  char *error_str)
+                  macros *macro_anker, char *error_str)
 {
     char *begin, *end, *template, *complete_path;
     char *import_line, *cmd_buff = NULL;
@@ -66,7 +66,7 @@ int import_handle(struct variables *anker, char *line, FILE *p_output,
         }
 
         l_line_nr++;
-        if(parse_line(anker, import_line, p_output, &cmd_buff, &parser_status, 
+        if(parse_line(anker, macro_anker, import_line, p_output, &cmd_buff, &parser_status, 
                       &in_for, &in_if, error_str) < 0)
         {
             fclose(import_file);

@@ -105,7 +105,8 @@ int parse_line(struct variables *anker, macros *macro_anker, char *line, FILE *p
                     return(0);
                 }
                 *in_for = *in_for - 1;
-                if(start_for(anker, *cmd_buff, p_output, error_str) < 0)
+                if(start_for(anker, *cmd_buff, p_output, macro_anker,
+                             error_str) < 0)
                 {
                     free(*cmd_buff);
                     return(-1);
@@ -168,7 +169,7 @@ int parse_line(struct variables *anker, macros *macro_anker, char *line, FILE *p
 
                 }
                 *in_if = *in_if -1;
-                if((if_ret = start_if(anker, *cmd_buff, p_output, error_str)) < 0)
+                if((if_ret = start_if(anker, *cmd_buff, p_output, macro_anker, error_str)) < 0)
                 {
                     free(*cmd_buff);
                     return(-1);
@@ -194,7 +195,7 @@ int parse_line(struct variables *anker, macros *macro_anker, char *line, FILE *p
                     cmd = 1;
                     goto save_macro;
                 }
-                return(start_import(anker, line, p_output, error_str));
+                return(start_import(anker, line, p_output, macro_anker, error_str));
             case NEWMACRO_CMD:
                 if(getMacroName(macro_anker, line) < 0)
                     return(-2);

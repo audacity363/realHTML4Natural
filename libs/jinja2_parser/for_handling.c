@@ -6,6 +6,7 @@
 #include "standard.h"
 #include "varhandle.h"
 #include "utils.h"
+#include "jinja_parser.h"
 
 int for_getArrayLength(struct variables *anker, char *name, int var_type,
                    int index_type, int x_index, int y_index, char *error_str)
@@ -298,7 +299,7 @@ int fillTmpVar(struct variables *anker, char *tmp_name, char *variable,
 }
 
 int for_handle(struct variables *anker, char *cmd_buff, FILE *p_output,
-               char *error_str)
+               macros *macro_anker, char *error_str)
 {
     char *for_block, *tmp_buff, *for_cmd, *for_cmd_detail;
     char *l_cmd_buff = NULL;
@@ -459,7 +460,7 @@ int for_handle(struct variables *anker, char *cmd_buff, FILE *p_output,
                 }
             }
 
-            if((parser_ret = parse_line(anker, line, p_output, &l_cmd_buff,
+            if((parser_ret = parse_line(anker, macro_anker, line, p_output, &l_cmd_buff,
                        &parser_status, &l_in_for, &l_in_if, error_str)) < 0)
             {
                 free(line);

@@ -12,3 +12,7 @@ typedef struct {
 
 int start_jinjaparser(struct variables *anker, char *outputfile,
                       char *templatefile, char *error_str, int *error_zeile);
+
+int parse_line(struct variables *anker, macros *macro_anker, char *line, FILE *p_output,
+               char **cmd_buff, int *just_save, int *in_for, int *in_if,
+               char *error_str);

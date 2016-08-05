@@ -14,7 +14,7 @@ void fillTestvalues(struct variables *anker)
 
     newIntVar(anker, "ISADMIN", 1);
 
-    newIntArray(anker, "ADMIN", 0);
+    newIntArray(anker, "ADMIN", 1);
     for(i=1; i < 20; i++)
     {
         appendIntArray(anker, "ADMIN", i);
@@ -76,7 +76,8 @@ int main()
 
     printVars(anker);
     
-    char template[] = "./test_template.html";
+    //char template[] = "./test_template.html";
+    char template[] = "./tshus.html";
     char outputfile[] = "./output.html";
     char error_str[2048];
 

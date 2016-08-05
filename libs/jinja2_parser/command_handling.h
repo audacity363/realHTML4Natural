@@ -13,8 +13,8 @@
 
 int searchCommand(char *line, macros *anker);
 int start_for(struct variables *anker, char *cmd_buff, FILE *p_output,
-               char *error_str);
+               macros *macros_anker, char *error_str);
 int start_if(struct variables *anker, char *cmd_buff, FILE *p_output,
-               char *error_str);
+               macros *macros_anker, char *error_str);
 int start_import(struct variables *anker, char *line, FILE *p_output,
-                 char *error_str);
+                 macros *macros_anker, char *error_str);

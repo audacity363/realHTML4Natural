@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "header.h"
 #include "server.h"
 
-int dummyhandle(char *prog)
+int dummyhandle(char *prog, char *ip, httpheader test)
 {
     return(0);
 }

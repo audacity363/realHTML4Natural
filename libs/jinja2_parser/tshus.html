@@ -15,9 +15,10 @@
             <td>Name</td>
             <td>link</td>
             <td>Admin?</td>
-            {%if ISADMIN == 1%}
+        {%if ISADMIN == 1%}
             <td></td>
-            {%end-if%}
+        {%end-if%}
+
         </thead>
         <tbody>
         {%for user in username%}
@@ -28,13 +29,13 @@
                 <td>{{loop.i}}</td>
                 <td>{{user}}</td>
                 <td><a href="{{links[loop.i]}}">klick</a></td>
-                {%if ADMIN[loop.i] == 1 %}
-                    <td><span>Yes</span></td>
+                {%if ADMIN[loop.i] == 1%}
+                    <td><span>YES</span></td>
                 {%else%}
-                    <td><span>Yes</span></td>
+                    <td><span>NO</span></td>
                 {%end-if%}
                 {%if ISADMIN == 1%}
-                    <td><button class="btn btn-danger">User löschen</button></td>
+                    <td><button class="btn btn-danger">User loeschen</button></td>
                 {%end-if%}
             </tr>
         {%end-for%}
