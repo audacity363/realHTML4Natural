@@ -1,3 +1,7 @@
+/**
+ * @file file_handling.h
+ */
+
 #define LINELENGTH 1024
 
 FILE *openOutputFile(char *filename, char *error_str);

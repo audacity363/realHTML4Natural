@@ -1,6 +1,6 @@
 .PHONY: var2names web_server
-HOMEDIR = /u/it/a140734/C/realHtml4Natural/
-#HOMEDIR = /home/tom//Documents/realHtml4Natural/
+#HOMEDIR = /u/it/a140734/C/realHtml4Natural/
+HOMEDIR = /home/tom//Documents/realHtml4Natural/
 
 STANDARD_PATH    	=   $(HOMEDIR)/include
 
@@ -38,9 +38,9 @@ LIBS    = -L$(CFG_PATH) -lcfg \
           -L$(VAR_PATH) -lvarhandle \
           -L$(UTILS_PATH) -lutils \
 
-CC = xlc
-#CC = gcc
-CFLAGS = -c -g
+#CC = xlc
+CC = gcc
+CFLAGS = -c -g 
 
 ARFLAGS = -vcru
 
@@ -99,11 +99,11 @@ clean_utils:
 	-rm -f $(UTILS_PATH)/bin/*.o $(UTILS_PATH)/*.a
 	
 varhandle:
-	$(CC) $(CFLAGS) $(VAR_PATH)/integer.c -o $(VAR_PATH)/bin/integer.o
-	$(CC) $(CFLAGS) $(VAR_PATH)/string.c -o $(VAR_PATH)/bin/string.o
-	$(CC) $(CFLAGS) $(VAR_PATH)/management.c -o $(VAR_PATH)/./bin/management.o
-	$(CC) $(CFLAGS) $(VAR_PATH)/print.c -o $(VAR_PATH)/bin/print.o
-	ar $(ARFLAGS) $(VAR_PATH)/libvarhandle.a $(VAR_PATH)/bin/*.o
+	$(CC) $(CFLAGS) $(VAR_PATH)/integer.c -o $(VAR_PATH)/bin/integer.o $(INCDIR)
+	$(CC) $(CFLAGS) $(VAR_PATH)/string.c -o $(VAR_PATH)/bin/string.o $(INCDIR)
+	$(CC) $(CFLAGS) $(VAR_PATH)/management.c -o $(VAR_PATH)/./bin/management.o $(INCDIR)
+	$(CC) $(CFLAGS) $(VAR_PATH)/print.c -o $(VAR_PATH)/bin/print.o $(INCDIR)
+	ar $(ARFLAGS) $(VAR_PATH)/libvarhandle.a $(VAR_PATH)/bin/*.o 
 
 clean_varhandle:
 	-rm -f $(VAR_PATH)/bin/*.o $(VAR_PATH)/*.a
@@ -137,6 +137,9 @@ test_webserver:
 
 glob_test:
 	$(CC) -g -o $(HOMEDIR)/test/main $(HOMEDIR)/test/main.c $(INCDIR) $(LIBS)
+
+doc:
+	doxygen ./doxygen/testconfig
 
 lib:
 	$(MAKE) -f Makedyn clean

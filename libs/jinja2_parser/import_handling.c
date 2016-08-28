@@ -8,7 +8,22 @@
 #include "utils.h"
 #include "file_handling.h"
 #include "jinja_parser.h"
+/**
+ * @file import_handling.c
+ * @brief Importiert eine Datei und parst diese
+ */
 
+/**
+ * @brief Parst den import Befehl, sucht diese Datei und parst diese
+ *
+ * @param anker Anker Punkt fuer Variablen
+ * @param Buffer welcher den Import Befehl beinhaltet
+ * @param p_output File pointer auf das Output file
+ * @param macro_anker Anker Punkt fuer Macro Definitionen
+ * @param error_str Buffer in den Error Nachrichten geschrieben werden
+ *
+ * @return Error: < 0; Parser-Error: return Code von @ref parse_line; Erfolg: 0
+ */
 int import_handle(struct variables *anker, char *line, FILE *p_output, 
                   macros *macro_anker, char *error_str)
 {

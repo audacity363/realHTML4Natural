@@ -8,6 +8,25 @@
 #include "utils.h"
 #include "jinja_parser.h"
 
+/**
+ * @file if_handling.c
+ * @brief Bearbeitet einen IF-Block
+ */
+
+
+/**
+ * @brief vergleicht die beiden Variablen
+ *
+ * @param anker Anker Punkt fuer Variablen
+ * @param var1 name der ersten Variable
+ * @param var2 name der zweiten Variable
+ * @param symbol Vergleichsymbol
+ * @param index Wird nicht verwendet und ich habe keine Ahnung mehr warum es
+ *        dort steht
+ * @param error_str Buffer in den Error Nachrichten geschrieben werden
+ *
+ * @return Error: < 0; True: 1; False: 0
+ */
 int compare(struct variables *anker, char *var1, char *var2, char *symbol, 
             int index, char *error_str)
 {
@@ -16,10 +35,6 @@ int compare(struct variables *anker, char *var1, char *var2, char *symbol,
     int i_value1, i_value2;
     int x_index1, y_index1, index_type1;
     int x_index2, y_index2, index_type2;
-
-    printf("var1: [%s]\n", var1);
-    printf("var2: [%s]\n", var2);
-    printf("Operator: [%s]\n", symbol);
 
     index_type1 = getIndex(anker, var1, &x_index1, &y_index1, error_str);
     if((var_type1 = getVarType(anker, var1)) < 0)
@@ -172,7 +187,6 @@ int compare(struct variables *anker, char *var1, char *var2, char *symbol,
 
     if(var_type1 == STRING)
     {
-        printf("compare [%s] and [%s]\n", c_value1, c_value2);
         if(strcmp(symbol, "==") == 0)
         {
             if(strcmp(c_value1, c_value2) == 0)
@@ -197,7 +211,6 @@ int compare(struct variables *anker, char *var1, char *var2, char *symbol,
     }
     else if(var_type1 == INT)
     {
-        printf("compare [%d] and [%d]\n", i_value1, i_value2);
         if(strcmp(symbol, "<") == 0)
         {
             if(i_value1 < i_value2)
@@ -250,6 +263,20 @@ int compare(struct variables *anker, char *var1, char *var2, char *symbol,
     }
 }
 
+/**
+ * @brief zerlegt den IF-Block, parst die erste Zeile, erstellt dann daraus 
+ *        eine IF-Abfrage und geht durch jede Zeile im Block durch und ruft 
+ *        @ref parse_line auf
+ *
+ * @param anker Anker Punkt fuer Variablen
+ * @param cmd_buff Buffer in dem der IF-Block gespeichert ist
+ * @param p_output Filehandle auf das Output File
+ * @param macro_anker Anker Punkt fuer Macro Definitionen
+ * @param error_str Buffer in den Error Nachrichten geschrieben werden
+ *
+ * @return Header-Error: < 0; Parser-Error: Return Code von @ref parse_line;
+ *         Erfolg: 0
+ */
 int if_handle(struct variables *anker, char *cmd_buff, FILE *p_output,
               macros *macro_anker, char *error_str)
 {
@@ -354,7 +381,7 @@ int if_handle(struct variables *anker, char *cmd_buff, FILE *p_output,
             }
             if(strstr(((char**)if_block)[i], "else") != NULL && found_ifs == 0)
             {
-                else_offset = i;
+                else_offset = i+1;
                 found_else = 1;
                 break;
             }

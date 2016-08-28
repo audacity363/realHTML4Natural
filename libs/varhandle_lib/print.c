@@ -152,15 +152,15 @@ char *generateStringValuefromArray(struct variables *anker, char *name)
         {
             sprintf(buf, "\"%s\"", ((char**)hptr->data)[i]);
             returnstr = realloc(returnstr,
-                        strlen(returnstr)+strlen(buf));
+                        strlen(returnstr)+strlen(buf)+1);
             strcat(returnstr, buf);
             if(i+1 < hptr->length)
             {
-                returnstr = realloc(returnstr, strlen(returnstr)+1);
+                returnstr = realloc(returnstr, strlen(returnstr)+2);
                 strcat(returnstr, ",");
             }
         }
-        returnstr = realloc(returnstr, strlen(returnstr)+1);
+        returnstr = realloc(returnstr, strlen(returnstr)+2);
         strcat(returnstr, "]");
     }
     else if(hptr->type == INTARRAY)
@@ -172,15 +172,15 @@ char *generateStringValuefromArray(struct variables *anker, char *name)
         {
             sprintf(buf, "%d", ((int*)hptr->data)[i]);
             returnstr = realloc(returnstr,
-                        strlen(returnstr)+strlen(buf));
+                        strlen(returnstr)+strlen(buf)+1);
             strcat(returnstr, buf);
             if(i+1 < hptr->length)
             {
-                returnstr = realloc(returnstr, strlen(returnstr)+1);
+                returnstr = realloc(returnstr, strlen(returnstr)+2);
                 strcat(returnstr, ",");
             }
         }
-        returnstr = realloc(returnstr, strlen(returnstr)+1);
+        returnstr = realloc(returnstr, strlen(returnstr)+2);
         strcat(returnstr, "]");
     }
     else if(hptr->type == TWO_DSTRINGARRAY)
@@ -196,23 +196,23 @@ char *generateStringValuefromArray(struct variables *anker, char *name)
             {
                 sprintf(buf, "\"%s\"", ((char**)hptr->data)[hptr->x_length*i+x]);
                 returnstr = realloc(returnstr,
-                            strlen(returnstr)+strlen(buf));
+                            strlen(returnstr)+strlen(buf)+1);
                 strcat(returnstr, buf);
                 if(x+1 < hptr->y_length)
                 {
-                    returnstr = realloc(returnstr, strlen(returnstr)+1);
+                    returnstr = realloc(returnstr, strlen(returnstr)+2);
                     strcat(returnstr, ",");
                 }
             }
-            returnstr = realloc(returnstr, strlen(returnstr)+1);
+            returnstr = realloc(returnstr, strlen(returnstr)+2);
             strcat(returnstr, "]");
             if(i+1 < hptr->x_length)
             {
-                returnstr = realloc(returnstr, strlen(returnstr)+1);
+                returnstr = realloc(returnstr, strlen(returnstr)+2);
                 strcat(returnstr, ",");
             }
         }
-        returnstr = realloc(returnstr, strlen(returnstr)+1);
+        returnstr = realloc(returnstr, strlen(returnstr)+2);
         strcat(returnstr, "]");
     }
     else if(hptr->type == TWO_DINTARRAY)
@@ -228,15 +228,15 @@ char *generateStringValuefromArray(struct variables *anker, char *name)
             {
                 sprintf(buf, "%d", ((int*)hptr->data)[hptr->x_length*i+x]);
                 returnstr = realloc(returnstr,
-                            strlen(returnstr)+strlen(buf));
+                            strlen(returnstr)+strlen(buf)+1);
                 strcat(returnstr, buf);
                 if(x+1 < hptr->y_length)
                 {
-                    returnstr = realloc(returnstr, strlen(returnstr)+1);
+                    returnstr = realloc(returnstr, strlen(returnstr)+2);
                     strcat(returnstr, ",");
                 }
             }
-            returnstr = realloc(returnstr, strlen(returnstr)+1);
+            returnstr = realloc(returnstr, strlen(returnstr)+2);
             strcat(returnstr, "]");
             if(i+1 < hptr->x_length)
             {
@@ -244,7 +244,7 @@ char *generateStringValuefromArray(struct variables *anker, char *name)
                 strcat(returnstr, ",");
             }
         }
-        returnstr = realloc(returnstr, strlen(returnstr)+1);
+        returnstr = realloc(returnstr, strlen(returnstr)+2);
         strcat(returnstr, "]");
     }
     return(returnstr);

@@ -1,3 +1,7 @@
+/**
+ * @file varhandle.h
+ */
+
 #define INT 1
 #define STRING 2
 #define STRINGARRAY 3
@@ -7,10 +11,12 @@
 
 #define ARGS 1
 
+#define NAME_LENGTH 200
+
 typedef int bool;
 
 struct variables{
-    char name[200];
+    char name[NAME_LENGTH];
     int length;
     int full_length;
     int x_length;

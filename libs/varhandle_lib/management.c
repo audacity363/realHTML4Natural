@@ -26,6 +26,46 @@ struct variables *searchVar(struct variables *anker, char *name)
 
 }
 
+int copyVar(struct variables *first, struct variables *second, char *name, 
+            char *error_str)
+{
+    struct variables *hptr1, *hptr2, *new_var;
+
+    if((hptr1 = searchVar(first, name)) == NULL)
+    {
+        sprintf(error_str, "Unkown Variable: %s", name);
+        return(-1);
+    }
+
+    hptr2 = second;
+
+    while(hptr2->next != NULL)
+    {
+        hptr2 = hptr2->next;
+    }
+
+    new_var = malloc(sizeof(struct variables));
+    switch(hptr1->type)
+    {
+        case INT:
+            new_var->data = malloc(sizeof(int));
+            break;
+        case INTARRAY:
+            new_var->data = malloc(sizeof(int)*(hptr1->length));
+            break;    
+        case TWO_DINTARRAY:
+            new_var->data = malloc((hptr1->x_length*hptr1->y_length)*sizeof(int));
+            break;
+        case STRING:
+            new_var->data = malloc(sizeof(char)*strlen(hptr1->data));
+            break;
+    }
+    memcpy(new_var, hptr2, sizeof(struct variables));
+    hptr2->next = new_var;
+
+    return(0);
+}
+
 int getArrayLength(struct variables *anker, char *name, int *x, int *y)
 {
     struct variables *ptr;
@@ -33,12 +73,12 @@ int getArrayLength(struct variables *anker, char *name, int *x, int *y)
     ptr = anker;
     while(ptr != NULL)
     {
-        if(cmp(ptr->name, name) && 
+        if(strcmp(ptr->name, name) == 0 && 
           (ptr->type == STRINGARRAY || ptr->type == INTARRAY))
         {
             return(ptr->length);
         }
-        else if(cmp(ptr->name, name) &&
+        else if(strcmp(ptr->name, name) == 0 &&
                (ptr->type == TWO_DSTRINGARRAY || ptr->type == TWO_DINTARRAY))
         {
             if(x == NULL || y == NULL)

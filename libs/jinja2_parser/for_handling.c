@@ -8,6 +8,24 @@
 #include "utils.h"
 #include "jinja_parser.h"
 
+/**
+ * @file for_handling.c
+ * @brief Bearbeitet einen For-Block
+ */
+
+/**
+ * @brief Ließt die Array Laenge aus und gibt die gebrauchte zurueck
+ *
+ * @param anker Anker Punkt fuer Variablen
+ * @param name Name der Variable
+ * @param var_type Typ der variable
+ * @param index_type Index Typ; Ob es 0, 1 oder 2 Index ist
+ * @param x_index Ermittelte X-Index
+ * @param y_index Ermittelte Y-Index
+ * @param error_str Buffer in den Error Nachrichten geschrieben werden
+ *
+ * @return Erfolg: Variablen Length; Error: -100
+ */
 int for_getArrayLength(struct variables *anker, char *name, int var_type,
                    int index_type, int x_index, int y_index, char *error_str)
 {
@@ -97,6 +115,20 @@ int for_getArrayLength(struct variables *anker, char *name, int var_type,
     return(-100);
 }
 
+/**
+ * @brief erstellt eine temporaere Variable welche im For-Block benutzt werden 
+ *        kann
+ *
+ * @param anker Anker Punkt fuer Variablen
+ * @param tmp_name Name der neuen Variable
+ * @param variable Name der Variable, durch welche durchiteriert werden soll
+ * @param var_type Typ der neuen Variable
+ * @param index_type Falls die alte Variable ein Array ist wird hier angegbene
+ *        welcher Index Typ benutzt werden soll
+ * @param x_index Vorher emittelte X-Index
+ * @param y_index Vorher emittelte Y-Index
+ * @param error_str Buffer in den Error Nachrichten geschrieben werden
+ */
 int createTmpVar(struct variables *anker, char *tmp_name, char *variable,
                 int var_type, int index_type, int x_index, int y_index,
                 char *error_str)
@@ -166,6 +198,21 @@ int createTmpVar(struct variables *anker, char *tmp_name, char *variable,
     }
     return(0);
 }
+
+/**
+ * @brief Fuellt die zuvor, in @ref createTmpVar erstellte, temporaere Variable
+ *        welche im For-Block benutzt werden 
+ *
+ * @param anker Anker Punkt fuer Variablen
+ * @param tmp_name Name der neuen Variable
+ * @param variable Name der Variable, durch welche durchiteriert werden soll
+ * @param var_type Typ der neuen Variable
+ * @param index_type Falls die alte Variable ein Array ist wird hier angegbene
+ *        welcher Index Typ benutzt werden soll
+ * @param x_index Vorher emittelte X-Index
+ * @param y_index Vorher emittelte Y-Index
+ * @param error_str Buffer in den Error Nachrichten geschrieben werden
+ */
 
 int fillTmpVar(struct variables *anker, char *tmp_name, char *variable,
                 int var_type, int index_type, int x_index, int y_index,
@@ -298,6 +345,20 @@ int fillTmpVar(struct variables *anker, char *tmp_name, char *variable,
     return(0);
 }
 
+/**
+ * @brief zerlegt den For-Block, parst die erste Zeile, erstellt dann daraus 
+ *        eine For-Schleife und geht durch jede Zeile im Block durch und ruft 
+ *        @ref parse_line auf
+ *
+ * @param anker Anker Punkt fuer Variablen
+ * @param cmd_buff Buffer in dem der For-Block gespeichert ist
+ * @param p_output Filehandle auf das Output File
+ * @param macro_anker Anker Punkt fuer Macro Definitionen
+ * @param error_str Buffer in den Error Nachrichten geschrieben werden
+ *
+ * @return Header-Error: < 0; Parser-Error: Return Code von @ref parse_line;
+ *         Erfolg: 0
+ */
 int for_handle(struct variables *anker, char *cmd_buff, FILE *p_output,
                macros *macro_anker, char *error_str)
 {

@@ -8,6 +8,23 @@
 #include "file_handling.h"
 #include "utils.h"
 
+/**
+ * @file variable_handle.c
+ * @brief Parst den Variablen Befehl und gibt diese aus
+ */
+
+/**
+ * @brief Parst den Index aus dem Variablen Namen
+ *
+ * @param anker Anker Punkt fuer Variablen
+ * @param variable Buffer welcher die Variable beinhaltet
+ * @param x Buffer in dender X Index geschrieben wird
+ * @param y Buffer in dender y Index geschrieben wird
+ * @param error_str Buffer in den Error Nachrichten geschrieben werden
+ *
+ * @return 0: kein Index gefunden; 1: X Index gefunden;
+ *         2: X und Y Index gefunden; <0: Error
+ */
 int getIndex(struct variables *anker, char *variable, int *x, int *y,
              char *error_str)
 {
@@ -107,6 +124,16 @@ int getIndex(struct variables *anker, char *variable, int *x, int *y,
     return(2);
 }
 
+/**
+ * @brief Parst einen Funktionsnamen aus dem Variablennamen
+ *
+ * @param anker Anker Punkt fuer Variablen
+ * @param variable Buffer welcher die Variable beinhaltet
+ * @param function_buffer Buffer in welchen der Funktionsname geschrieben wird
+ * @param error_str Buffer in den Error Nachrichten geschrieben werden
+ *
+ * @return 0: Keine Funktion gefunden; 1: Funktion gefunden
+ */
 int getFunction(struct variables *anker, char *variable, char *function_buffer,
                 char* error_str)
 {
@@ -123,6 +150,18 @@ int getFunction(struct variables *anker, char *variable, char *function_buffer,
     return(1);
 }
 
+/**
+ * @brief Gibt eine Int Variable aus
+ *
+ * @param anker Anker Punkt fuer Variablen
+ * @param p_output File pointer auf das Output file
+ * @param variable Buffer welcher die Variable beinhaltet
+ * @param has_function Ist eine Funktion uebergeben (1 || 0)
+ * @param functionbuffer Buffer welche die Funktion enthaehlt
+ * @param error_str Buffer in den Error Nachrichten geschrieben werden
+ * 
+ * @return Erfolg: 0; Error < 0
+ */
 int handleIntVar(struct variables *anker, FILE *p_output, char *variable,
                  int has_function, char *functionbuffer, char *error_str)
 {
@@ -143,6 +182,20 @@ int handleIntVar(struct variables *anker, FILE *p_output, char *variable,
     return(0);
 }
 
+/**
+ * @brief Gibt ein 1D Int Array aus.
+ *
+ * @param anker Anker Punkt fuer Variablen
+ * @param p_output File pointer auf das Output file
+ * @param variable Buffer welcher die Variable beinhaltet
+ * @param index_type Wurde ein Index mit uebergeben
+ * @param x_index Gefundene X Index
+ * @param has_function Ist eine Funktion uebergeben (1 || 0)
+ * @param functionbuffer Buffer welche die Funktion enthaehlt
+ * @param error_str Buffer in den Error Nachrichten geschrieben werden
+ * 
+ * @return Erfolg: 0; Error < 0
+ */
 int handleInt1DArray(struct variables *anker, FILE *p_output, char *variable,
                      int index_type, int x_index, int has_function,
                      char *functionbuffer, char *error_str)
@@ -186,6 +239,21 @@ int handleInt1DArray(struct variables *anker, FILE *p_output, char *variable,
     return(0);
 }
 
+/**
+ * @brief Gibt ein 2D Int Array aus
+ *
+ * @param anker Anker Punkt fuer Variablen
+ * @param p_output File pointer auf das Output file
+ * @param variable Buffer welcher die Variable beinhaltet
+ * @param index_type Wurde ein Index mit uebergeben? 
+ * @param x_index Gefundene X Index
+ * @param y_index Gefundene Y Index
+ * @param has_function Ist eine Funktion uebergeben (1 || 0)
+ * @param functionbuffer Buffer welche die Funktion enthaehlt
+ * @param error_str Buffer in den Error Nachrichten geschrieben werden
+ * 
+ * @return Erfolg: 0; Error < 0
+ */
 int handleInt2DArray(struct variables *anker, FILE *p_output, char *variable,
                      int index_type, int x_index, int y_index,
                      int has_function, char *functionbuffer, char *error_str)
@@ -241,6 +309,20 @@ int handleInt2DArray(struct variables *anker, FILE *p_output, char *variable,
     return(0);
 }
 
+/**
+ * @brief Gibt eine String Variable aus
+ *
+ * @param anker Anker Punkt fuer Variablen
+ * @param p_output File pointer auf das Output file
+ * @param variable Buffer welcher die Variable beinhaltet
+ * @param index_type Wurde ein Index mit uebergeben
+ * @param x_index Gefundene X Index
+ * @param has_function Ist eine Funktion uebergeben (1 || 0)
+ * @param functionbuffer Buffer welche die Funktion enthaehlt
+ * @param error_str Buffer in den Error Nachrichten geschrieben werden
+ * 
+ * @return Erfolg: 0; Error < 0
+ */
 int handleStringVar(struct variables *anker, FILE *p_output, char *variable,
                     int index_type, int x_index, int has_function,
                     char *functionbuffer, char *error_str)
@@ -275,6 +357,21 @@ int handleStringVar(struct variables *anker, FILE *p_output, char *variable,
     return(0);
 }
 
+/**
+ * @brief Gibt ein 1D String Array aus
+ *
+ * @param anker Anker Punkt fuer Variablen
+ * @param p_output File pointer auf das Output file
+ * @param variable Buffer welcher die Variable beinhaltet
+ * @param index_type Wurde ein Index mit uebergeben
+ * @param x_index Gefundene X Index
+ * @param y_index Gefundene Y Index
+ * @param has_function Ist eine Funktion uebergeben (1 || 0)
+ * @param functionbuffer Buffer welche die Funktion enthaehlt
+ * @param error_str Buffer in den Error Nachrichten geschrieben werden
+ * 
+ * @return Erfolg: 0; Error < 0
+ */
 int handleString1DArray(struct variables *anker, FILE *p_output, char *variable,
                         int index_type, int x_index, int y_index, int has_function,
                         char *functionbuffer, char *error_str)
@@ -324,6 +421,21 @@ int handleString1DArray(struct variables *anker, FILE *p_output, char *variable,
     return(0);
 }
 
+/**
+ * @brief Gibt ein 2D String Array aus
+ *
+ * @param anker Anker Punkt fuer Variablen
+ * @param p_output File pointer auf das Output file
+ * @param variable Buffer welcher die Variable beinhaltet
+ * @param index_type Wurde ein Index mit uebergeben
+ * @param x_index Gefundene X Index
+ * @param y_index Gefundene Y Index
+ * @param has_function Ist eine Funktion uebergeben (1 || 0)
+ * @param functionbuffer Buffer welche die Funktion enthaehlt
+ * @param error_str Buffer in den Error Nachrichten geschrieben werden
+ * 
+ * @return Erfolg: 0; Error < 0
+ */
 int handleString2DArray(struct variables *anker, FILE *p_output, char *variable,
                         int index_type, int x_index, int y_index, int has_function,
                         char *functionbuffer, char *error_str)
@@ -368,12 +480,26 @@ int handleString2DArray(struct variables *anker, FILE *p_output, char *variable,
     return(0);
 }
 
+/**
+ * @brief Parst ein Variablensttring mit Index und Funktion und ruft 
+ *        demendsprechend den Handler auf
+ *
+ * @param anker Anker Punkt fuer Variablen
+ * @param variable Buffer welcher die Variable beinhaltet
+ * @param p_output File pointer auf das Output file
+ * @param error_str Buffer in den Error Nachrichten geschrieben werden
+ * 
+ * @return Erfolg: 0; Error < 0
+ */
 int handle_variable(struct variables *anker, char *variable, FILE *p_output,
                     char *error_str)
 {
     int var_type, index_type, x_index, y_index;
     char function_buffer[100];
     int has_function = 0;
+
+    variable = StripTrailingSpaces(variable);
+    TrimSpaces(variable);
 
     if(strcmp(variable, "loop.i") != 0 && strstr(variable, "loop.i") == NULL)
     {

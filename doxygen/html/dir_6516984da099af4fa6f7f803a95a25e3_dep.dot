@@ -1,0 +1,13 @@
+digraph "libs/Sockets" {
+  compound=true
+  node [ fontsize="10", fontname="Helvetica"];
+  edge [ labelfontsize="10", labelfontname="Helvetica"];
+  subgraph clusterdir_6719ab1f1f7655efc2fa43f7eb574fd1 {
+    graph [ bgcolor="#ddddee", pencolor="black", label="libs" fontname="Helvetica", fontsize="10", URL="dir_6719ab1f1f7655efc2fa43f7eb574fd1.html"]
+  subgraph clusterdir_6516984da099af4fa6f7f803a95a25e3 {
+    graph [ bgcolor="#eeeeff", pencolor="black", label="" URL="dir_6516984da099af4fa6f7f803a95a25e3.html"];
+    dir_6516984da099af4fa6f7f803a95a25e3 [shape=plaintext label="Sockets"];
+    dir_5e3d5cd7e3cb6529f8417eb3fb380b4f [shape=box label="test" color="black" fillcolor="white" style="filled" URL="dir_5e3d5cd7e3cb6529f8417eb3fb380b4f.html"];
+  }
+  }
+}

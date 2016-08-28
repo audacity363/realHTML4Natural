@@ -1,0 +1,8 @@
+digraph "test" {
+  compound=true
+  node [ fontsize="10", fontname="Helvetica"];
+  edge [ labelfontsize="10", labelfontname="Helvetica"];
+  dir_13e138d54eb8818da29c3992edef070a [shape=box, label="test", style="filled", fillcolor="#eeeeff", pencolor="black", URL="dir_13e138d54eb8818da29c3992edef070a.html"];
+  dir_6719ab1f1f7655efc2fa43f7eb574fd1 [shape=box label="libs" fillcolor="white" style="filled" color="red" URL="dir_6719ab1f1f7655efc2fa43f7eb574fd1.html"];
+  dir_13e138d54eb8818da29c3992edef070a->dir_6719ab1f1f7655efc2fa43f7eb574fd1 [headlabel="3", labeldistance=1.5 headhref="dir_000014_000001.html"];
+}

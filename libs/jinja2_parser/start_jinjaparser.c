@@ -8,6 +8,39 @@
 #include "jinja_parser.h"
 #include "command_handling.h"
 
+/**
+ * @file start_jinjaparser.c
+ * @author Tom Engemann
+ * @date 26.08.2016
+ * @brief Startpunkt fuer den Parser
+ */
+
+
+/**
+ * @brief parst jeweils eine ganze Zeile
+ *
+ * @usage Wenn eine Zeile geparst werden soll, kann diese Funktion aufgerufen
+ *        werden. Sie wird auch recusive benutzt
+ *
+ * Wird von folgenden Funktionen benutzt:
+ *
+ * - @ref start_jinjaparser 
+ * - @ref printMacro
+ * - @ref if_handle
+ * - @ref import_handle
+ *
+ * @param anker Anker Punkt fuer Variablen
+ * @param macro_anker Anker Punkt fuer Macro Definitionen
+ * @param line Die zu parsende Zeile
+ * @param p_output File pointer auf das Output file
+ * @param cmd_buff BUffer um mehrzeilige Befehle zu speichern
+ * @param just_save Inikator dafuer ob geparst oder gespeichert werden soll
+ * @param in_for Inikator dafuer ob man sich in einem FOR block befindet
+ * @param in_if Inikator dafuer ob man sich in einem IF block befindet
+ * @param error_str Buffer in den Error Nachrichten geschrieben werden
+ *
+ * @return 0 wenn alles OK war; < 0 wenn es einen Fehler gab
+ */
 int parse_line(struct variables *anker, macros *macro_anker, char *line, FILE *p_output,
                char **cmd_buff, int *just_save, int *in_for, int *in_if,
                char *error_str)
@@ -46,6 +79,7 @@ int parse_line(struct variables *anker, macros *macro_anker, char *line, FILE *p
         }
         
         pos_close_cmd[0] = '\0';
+        fprintf(p_output, "%.*s", pos_open_cmd-line, line);
         memmove(line, pos_open_cmd+2, strlen(pos_open_cmd));
         switch(searchCommand(line, macro_anker))
         {
@@ -189,6 +223,18 @@ int parse_line(struct variables *anker, macros *macro_anker, char *line, FILE *p
                     goto save_macro;
                 printVarstoFile(anker, p_output);
                 return(0);
+            case TYPEOF_CMD:
+                if(*just_save == 2)
+                {
+                    cmd = 1;
+                    goto save_macro;
+                }
+                if(*just_save == 2)
+                    goto save_macro;
+
+                typeof_cmd(anker, macro_anker, line, p_output, error_str);
+                fprintf(p_output, "%s", pos_close_cmd+2);
+                return(0);
             case IMPORT_CMD:
                 if(*just_save == 2)
                 {
@@ -200,7 +246,8 @@ int parse_line(struct variables *anker, macros *macro_anker, char *line, FILE *p
                 if(getMacroName(macro_anker, line) < 0)
                     return(-2);
                 *just_save = 2;
-                macro_anker->macro_buff = malloc(1);
+                macro_anker->macro_buff = malloc(sizeof(char));
+                bzero(macro_anker->macro_buff, 1);
                 return(0);
             case ENDMACRO_CMD:
                 *just_save = 0;
@@ -208,7 +255,7 @@ int parse_line(struct variables *anker, macros *macro_anker, char *line, FILE *p
                 return(0);
             case MACRO_CMD:
                 if(printMacro(macro_anker, line, p_output, 
-                   error_str) < 0)
+                   anker, error_str) < 0)
                     return(-3);
                 return(0);
             //Else
@@ -263,7 +310,15 @@ save_macro:
     return(0);
 }
 
-int close_jinjaparser(FILE *p_output, FILE *p_template)
+/**
+ * @brief Schließt alle offene Filehandler
+ *
+ * @param p_output Filehandler fuer das Outputfile (write)
+ * @param p_template Filehandler fuer das Templatefile (read)
+ *
+ * @return Nothing
+ */
+void close_jinjaparser(FILE *p_output, FILE *p_template)
 {
     char error_str[2048];
 
@@ -274,6 +329,17 @@ int close_jinjaparser(FILE *p_output, FILE *p_template)
         closeTemplateFile(p_template, error_str);
 }
 
+/**
+ * @brief Eintiegspunkt des kompletten jinja parsers
+ *
+ * @param anker Anker Punkt fuer Variablen
+ * @param outputfile kompletter Pfad zum outputfile
+ * @param templatefile kompletter Pfad zum outputfile
+ * @param error_str Buffer in den Error Nachrichten geschrieben werden
+ * @param line_nr Buffer in den die Fehler Zeilennummer geschrieben wird
+ *
+ * @return 0 wenn alles OK war; < 0 wenn es einen Fehler gab
+ */
 int start_jinjaparser(struct variables *anker, char *outputfile,
                       char *templatefile, char *error_str, int *line_nr)
 {
@@ -285,6 +351,7 @@ int start_jinjaparser(struct variables *anker, char *outputfile,
 
     macros_anker.anker = malloc(sizeof(struct macro_definition));
     macros_anker.anker->next = NULL;
+    macros_anker.macro_buff = NULL;
     strcpy(macros_anker.anker->name, "macroanker");
 
     if((p_template = openTemplateFile(templatefile, error_str)) == NULL)

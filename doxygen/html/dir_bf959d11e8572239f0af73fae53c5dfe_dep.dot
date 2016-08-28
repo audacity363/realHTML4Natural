@@ -1,0 +1,9 @@
+digraph "libs/nat-lda-parser/compiled_lda" {
+  compound=true
+  node [ fontsize="10", fontname="Helvetica"];
+  edge [ labelfontsize="10", labelfontname="Helvetica"];
+  subgraph clusterdir_20790db619c66ff3d728ed3ba61023f3 {
+    graph [ bgcolor="#ddddee", pencolor="black", label="nat-lda-parser" fontname="Helvetica", fontsize="10", URL="dir_20790db619c66ff3d728ed3ba61023f3.html"]
+  dir_bf959d11e8572239f0af73fae53c5dfe [shape=box, label="compiled_lda", style="filled", fillcolor="#eeeeff", pencolor="black", URL="dir_bf959d11e8572239f0af73fae53c5dfe.html"];
+  }
+}

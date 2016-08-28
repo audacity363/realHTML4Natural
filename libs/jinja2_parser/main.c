@@ -12,6 +12,8 @@ void fillTestvalues(struct variables *anker)
     char tmpbuff[100];
     int i,x;
 
+    struct variables test1;
+
     newIntVar(anker, "ISADMIN", 1);
 
     newIntArray(anker, "ADMIN", 1);
@@ -29,6 +31,7 @@ void fillTestvalues(struct variables *anker)
         }
     }
 
+
     new2DStringArray(anker, "s2dtestarray", 5, 6);
     for(i=0; i < 5; i++)
     {
@@ -39,8 +42,7 @@ void fillTestvalues(struct variables *anker)
         }
     }
 
-
-    newStringVar(anker, "test", "Hello World");
+    newStringVar(anker, "test1", "Hello World");
 
     newStringArray(anker, "username", "value 0");
     for(i=1; i < 10; i++)
@@ -72,7 +74,8 @@ int main()
 
     logHexDump(" ", 2, stdout);
 
-    strcpy(webserver_settings.templatepath, "/u/it/a140734/C/realHtml4Natural/libs/jinja2_parser/");
+    //strcpy(webserver_settings.templatepath, "/u/it/a140734/C/realHtml4Natural/libs/jinja2_parser/");
+    strcpy(webserver_settings.templatepath, "/home/tom/Documents/realHtml4Natural/libs/jinja2_parser/");
 
     printVars(anker);
     
@@ -81,8 +84,11 @@ int main()
     char outputfile[] = "./output.html";
     char error_str[2048];
 
+
+
     if(start_jinjaparser(anker, outputfile, template, error_str, &line_nr) < 0)
     {
+        printf("Linenr: [%d]\n", line_nr);
         printf("%s\n", error_str);
         exit(0);
     }

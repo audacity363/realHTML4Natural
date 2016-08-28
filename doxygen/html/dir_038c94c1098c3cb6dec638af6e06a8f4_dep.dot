@@ -1,0 +1,8 @@
+digraph "TestProgs" {
+  compound=true
+  node [ fontsize="10", fontname="Helvetica"];
+  edge [ labelfontsize="10", labelfontname="Helvetica"];
+  dir_038c94c1098c3cb6dec638af6e06a8f4 [shape=box, label="TestProgs", style="filled", fillcolor="#eeeeff", pencolor="black", URL="dir_038c94c1098c3cb6dec638af6e06a8f4.html"];
+  dir_6719ab1f1f7655efc2fa43f7eb574fd1 [shape=box label="libs" fillcolor="white" style="filled" color="red" URL="dir_6719ab1f1f7655efc2fa43f7eb574fd1.html"];
+  dir_038c94c1098c3cb6dec638af6e06a8f4->dir_6719ab1f1f7655efc2fa43f7eb574fd1 [headlabel="1", labeldistance=1.5 headhref="dir_000015_000001.html"];
+}
