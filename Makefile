@@ -139,7 +139,7 @@ glob_test:
 	$(CC) -g -o $(HOMEDIR)/test/main $(HOMEDIR)/test/main.c $(INCDIR) $(LIBS)
 
 doc:
-	doxygen ./doxygen/testconfig
+	doxygen ./doxygen/doxygenconfig
 
 lib:
 	$(MAKE) -f Makedyn clean
