@@ -1,4 +1,4 @@
-#HOMEDIR = /u/it/a140734/C/realHtml4Natural/
+##HOMEDIR = /u/it/a140734/C/realHtml4Natural_copy/
 HOMEDIR = /home/tom//Documents/realHtml4Natural/
 
 STANDARD_PATH    	=   $(HOMEDIR)/include

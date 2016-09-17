@@ -79,7 +79,8 @@ int getArrayLength(struct variables *anker, char *name, int *x, int *y)
             return(ptr->length);
         }
         else if(strcmp(ptr->name, name) == 0 &&
-               (ptr->type == TWO_DSTRINGARRAY || ptr->type == TWO_DINTARRAY))
+               (ptr->type == TWO_DSTRINGARRAY || ptr->type == TWO_DINTARRAY ||
+                ptr->type == U_STRINGARRAY || ptr->type == U_TWO_DSTRINGARRAY))
         {
             if(x == NULL || y == NULL)
             {
@@ -92,6 +93,19 @@ int getArrayLength(struct variables *anker, char *name, int *x, int *y)
         ptr = ptr->next;
     }
     return(-1);
+}
+
+int getVarLength(struct variables *anker, char *name)
+{
+    struct variables *ptr;
+
+    if((ptr = searchVar(anker, name)) == NULL)
+    {
+        sprintf(varhandle_error_str, "Unkown Variable [%d]", name);
+        return(-1);
+    }
+
+    return(ptr->length);
 }
 
 int deleteVar(struct variables *anker, char *name)
@@ -128,7 +142,7 @@ struct variables* createTmpArrayOut2DArray(struct variables *anker, char *name,
                                            int x)
 {
     struct variables *ptr, *hptr;
-    int y;
+    int y, offset;
 
     ptr = malloc(sizeof(struct variables));
 
@@ -161,6 +175,27 @@ struct variables* createTmpArrayOut2DArray(struct variables *anker, char *name,
             strcpy(((char**)ptr->data)[y],
                     ((char**)hptr->data)[hptr->x_length*x+y]);
         }
+    }
+    else if(hptr->type == U_TWO_DSTRINGARRAY)
+    {
+        ptr->length = hptr->length;
+        ptr->x_length = hptr->x_length;
+        ptr->type = U_STRINGARRAY;
+
+        ptr->data = malloc((ptr->x_length+4*sizeof(wchar_t))*ptr->x_length);
+
+        for(y=0; y < hptr->y_length; y++)
+        {
+
+
+offset = ((hptr->y_length*(hptr->length*sizeof(wchar_t)))*(x))+((hptr->length*sizeof(wchar_t))*y);
+            printf("value: [%S]\n", hptr->data+offset);
+            printf("offset: [%d]\n", offset);
+            wcscpy((wchar_t*)(ptr->data+((ptr->length)*sizeof(wchar_t)*y)), (wchar_t*)(hptr->data+offset));
+        }
+
+
+
     }
     else if(hptr->type == TWO_DINTARRAY)
     {

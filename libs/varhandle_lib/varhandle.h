@@ -2,12 +2,20 @@
  * @file varhandle.h
  */
 
-#define INT 1
 #define STRING 2
 #define STRINGARRAY 3
 #define TWO_DSTRINGARRAY 5
+#define THREE_DSTRINGARRAY 5
+
+#define INT 1
 #define INTARRAY 4
 #define TWO_DINTARRAY 6
+#define THREE_DINTARRAY 6
+
+#define U_STRING 7
+#define U_STRINGARRAY 8
+#define U_TWO_DSTRINGARRAY 9
+#define U_THREE_DSTRINGARRAY 10
 
 #define ARGS 1
 
@@ -21,6 +29,7 @@ struct variables{
     int full_length;
     int x_length;
     int y_length;
+    int z_length;
     int type;
     int array;
     void *data;
@@ -72,7 +81,7 @@ int editIntVarArray(struct variables *anker, char *name, int value, int x);
 int editIntVar2DArray(struct variables *anker, char *name, int value, int x,
                       int y);
 
-char *generateStringValuefromArray(struct variables *ankerchar, char *name);
+wchar_t *generateStringValuefromArray(struct variables *ankerchar, char *name);
 void printArrayfromPtrtoFile(struct variables *ptr, FILE *output);
 void printArrayfromPtr(struct variables *ptr);
 struct variables* createTmpArrayOut2DArray(struct variables *anker, char *name,
@@ -82,3 +91,28 @@ void printArray(struct variables *anker, char *name, bool showname,
                     char *returnstring);
 void printVars(struct variables *anker);
 void printVar(struct variables *anker, char *name);
+
+int getVarLength(struct variables *anker, char *name);
+
+
+//File: unicode.c Alles was mit unicode zu tun hat
+int newUStringVar(struct variables *anker, char *name, wchar_t *value, int length);
+int editUStringVar(struct variables *anker, char *name, wchar_t *value);
+wchar_t* getUStringVal(struct variables *anker, char *name);
+
+int newUStringArray(struct variables *anker, char *name, int var_length,
+                    int array_length);
+int editUStringArray(struct variables *anker, char *name, wchar_t *value, int x);
+wchar_t *getUStringArrayVal(struct variables *anker, char *name, int x);
+
+int newU2DStringArray(struct variables *anker, char *name, int var_length,
+                    int x_length, int y_length);
+int editU2DStringArray(struct variables *anker, char *name, wchar_t *value,
+                       int x, int y);
+wchar_t *getUString2DArrayVal(struct variables *anker, char *name, int x, int y);
+
+int newU3DStringArray(struct variables *anker, char *name, int var_length,
+                      int x_length, int y_length, int z_length);
+int editU3DStringArray(struct variables *anker, char *name, wchar_t *value, int x,
+                      int y, int z);
+wchar_t *getUString3DArrayVal(struct variables *anker, char *name, int x, int y, int z);

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <wchar.h>
 
 #include "standard.h"
 #include "varhandle.h"
@@ -30,6 +31,7 @@ int for_getArrayLength(struct variables *anker, char *name, int var_type,
                    int index_type, int x_index, int y_index, char *error_str)
 {
     char *c_value;
+    wchar_t *wc_value;
     int *i_value, length;
     int l_y_index, l_x_index;
     
@@ -80,6 +82,67 @@ int for_getArrayLength(struct variables *anker, char *name, int var_type,
         {
             c_value = getStringValuefrom2DArray(anker, name, x_index, y_index);
             return(strlen(c_value));
+        }
+    }
+    else if(var_type == U_STRING)
+    {
+        if((wc_value = getUStringVal(anker, name)) ==NULL)
+        {
+            strcpy(error_str, varhandle_error_str);
+            return(-3);
+        }
+        return(wcslen(wc_value));
+    }
+    else if(var_type == U_STRINGARRAY)
+    {
+        if(index_type == 0)
+        {
+            if((length = getArrayLength(anker, name, &l_x_index, &l_y_index)) < 0)
+            {
+                sprintf(error_str, "Unkown_variable [%s]", name);
+                return(-3);
+            }
+            return(l_x_index);
+        }
+        else if(index_type == 1)
+        {
+            if((wc_value = getUStringArrayVal(anker, name, x_index)) == NULL)
+            {
+                strcpy(error_str, varhandle_error_str);
+                return(-3);
+            }
+            return(wcslen(wc_value));
+        }
+    }
+    else if(var_type == U_TWO_DSTRINGARRAY)
+    {
+        if(index_type == 0)
+        {
+            if((length = getArrayLength(anker, name, &l_x_index, &l_y_index)) < 0)
+            {
+                sprintf(error_str, "Unkown_variable [%s]", name);
+                return(-3);
+            }
+            return(l_x_index);
+        }
+        else if(index_type == 1)
+        {
+            if((length = getArrayLength(anker, name, &l_x_index, &l_y_index)) < 0)
+            {
+                sprintf(error_str, "Unkown_variable [%s]", name);
+                return(-3);
+            }
+            return(l_y_index);
+
+        }
+        else if(index_type == 2)
+        {
+            if((wc_value = getUStringArrayVal(anker, name, x_index)) == NULL)
+            {
+                strcpy(error_str, varhandle_error_str);
+                return(-3);
+            }
+            return(wcslen(wc_value));
         }
     }
     else if(var_type == INTARRAY)
@@ -135,7 +198,7 @@ int createTmpVar(struct variables *anker, char *tmp_name, char *variable,
 {
     char *c_value, tmp_str[2];
     int i_value;
-    int i, x, y, length;
+    int i, x, y, length, var_length;
 
 
     tmp_str[1] = '\0';
@@ -170,6 +233,50 @@ int createTmpVar(struct variables *anker, char *tmp_name, char *variable,
         else if(index_type == 2)
         {
             newStringVar(anker, tmp_name, " ");
+        }
+    }
+    else if(var_type == U_STRING)
+    {
+        if((length = getVarLength(anker, variable)) < 0)
+        {
+            strcpy(error_str, varhandle_error_str);
+            return(-2);
+        }
+        newUStringVar(anker, tmp_name, L" ", length);
+    }
+    else if(var_type == U_STRINGARRAY)
+    {
+        if((length = getVarLength(anker, variable)) < 0)
+        {
+            strcpy(error_str, varhandle_error_str);
+            return(-2);
+        }
+        newUStringVar(anker, tmp_name, L" ", length);
+    }
+    else if(var_type == U_TWO_DSTRINGARRAY)
+    {
+        if((var_length = getVarLength(anker, variable)) < 0)
+        {
+            strcpy(error_str, varhandle_error_str);
+            return(-2);
+        }
+
+        if(index_type == 0)
+        {
+            if((length = getArrayLength(anker, variable, &x, &y)) < 0)
+            {
+                sprintf(error_str, "Unkown Variable [%s]", variable);
+                return(-1);
+            }
+            newUStringArray(anker, tmp_name, var_length, x);
+        }
+        else if(index_type == 1)
+        {
+            newUStringVar(anker, tmp_name, L" ", var_length);
+        }
+        else if(index_type == 2)
+        {
+            newUStringVar(anker, tmp_name, L" ", var_length);
         }
     }
     else if(var_type == INTARRAY)
@@ -219,6 +326,7 @@ int fillTmpVar(struct variables *anker, char *tmp_name, char *variable,
                 int for_index, char *error_str)
 {
     char *c_value, *tmp_str = NULL;
+    wchar_t *wc_value;
     int i_value, x, y, length, i, rc;
 
     if(var_type == STRING)
@@ -280,6 +388,60 @@ int fillTmpVar(struct variables *anker, char *tmp_name, char *variable,
             tmp_str[1] = '\0';
             tmp_str[0] = c_value[for_index];
             editStringVar(anker, tmp_name, tmp_str);
+        }
+    }
+    else if(var_type == U_STRING)
+    {
+        //die vier Byte herausfilter die vom for_index gewuenscht wurden
+    }
+    else if(var_type == U_STRINGARRAY)
+    {
+        if(index_type == 0)
+        {
+            if((wc_value = getUStringArrayVal(anker, variable, for_index)) == NULL)
+            {
+                strcpy(error_str, varhandle_error_str);
+                return(-2);
+            }
+            editUStringVar(anker, tmp_name, wc_value);
+        }
+        else if(index_type == 1)
+        {
+            //die vier Byte herausfilter die vom for_index gewuenscht wurden
+        }
+    }
+    else if(var_type == U_TWO_DSTRINGARRAY)
+    {
+        if(index_type == 0)
+        {
+            if((length = getArrayLength(anker, variable, &x, &y)) < 0)
+            {
+                sprintf(error_str, "Unkown Variable [%s]", variable);
+                return(-1);
+            }
+            for(i=0; i < y; i++)
+            {
+                if((wc_value = getUString2DArrayVal(anker, variable, for_index, i)) == NULL)
+                {
+                    strcpy(error_str, varhandle_error_str);
+                    return(-2);
+                }
+                editUStringVar(anker, tmp_name, wc_value);
+            }
+        }
+        else if(index_type == 1)
+        {
+            if((wc_value = getUString2DArrayVal(anker, variable, x_index, for_index)) == NULL)
+            {
+                strcpy(error_str, varhandle_error_str);
+                return(-2);
+            }
+            editUStringVar(anker, tmp_name, wc_value);
+
+        }
+        else if(index_type == 2)
+        {
+            //die vier Byte herausfilter die vom for_index gewuenscht wurden
         }
     }
     else if(var_type == INTARRAY)

@@ -78,6 +78,18 @@ int str_isdigit(char *str)
     return(0);
 }
 
+int strn_isdigit(char *str, int length)
+{
+    int i;
+
+    for(i=0; i < length; i++)
+    {
+        if(isdigit(str[i]) == 0)
+            return(-1);
+    }
+    return(0);
+}
+
 void char_strcat(char *str, char character)
 {
     char tmp_str[2];

@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <wchar.h>
+#include <locale.h>
 
 #include "standard.h"
 #include "varhandle.h"
@@ -14,19 +16,30 @@ void fillTestvalues(struct variables *anker)
 
     struct variables test1;
 
+    wchar_t wctest[10];
+
+    swprintf(wctest, 10, L"lölölö");
+    newUStringVar(anker, "utest", wctest, 10);
+
     newIntVar(anker, "ISADMIN", 1);
 
     newIntArray(anker, "ADMIN", 1);
+    newUStringArray(anker, "uarray", 10, 20);
     for(i=1; i < 20; i++)
     {
         appendIntArray(anker, "ADMIN", i);
+        swprintf(wctest, 10, L"lölö %d", i);
+        editUStringArray(anker, "uarray", wctest, i);
     }
 
     new2DIntArray(anker, "i2dtestarray", 5, 5);
+    newU2DStringArray(anker, "u2dtest", 10, 5, 5);
     for(i=0; i < 5; i++)
     {
         for(x=0; x < 5; x++)
         {
+            swprintf(wctest, 10, L"öö %d %d", i, x);
+            editU2DStringArray(anker, "u2dtest", wctest, i, x);
             editIntVar2DArray(anker, "i2dtestarray", i+x, i, x);
         }
     }
@@ -69,18 +82,21 @@ int main()
     struct variables *anker = malloc(sizeof(struct variables));
     int line_nr; 
 
+    setlocale(LC_ALL, "");
+
     anker->next = NULL;
     fillTestvalues(anker);
 
     logHexDump(" ", 2, stdout);
 
-    //strcpy(webserver_settings.templatepath, "/u/it/a140734/C/realHtml4Natural/libs/jinja2_parser/");
+    //strcpy(webserver_settings.templatepath, "/u/it/a140734/C/realHtml4Natural_copy/libs/jinja2_parser/");
     strcpy(webserver_settings.templatepath, "/home/tom/Documents/realHtml4Natural/libs/jinja2_parser/");
 
     printVars(anker);
     
     //char template[] = "./test_template.html";
     char template[] = "./tshus.html";
+    //char template[] = "./utesttm.html";
     char outputfile[] = "./output.html";
     char error_str[2048];
 

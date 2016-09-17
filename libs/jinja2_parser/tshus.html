@@ -23,10 +23,7 @@
         {%end-if%}
         </thead>
         <tbody>
-        {%for user in username%}
-        {% if user == " "%}
-        {%break%}
-        {%end-if%}
+        {%for user in uarray %}
             <tr>
                 <td>{{loop.i}}</td>
                 <td>{{user}}</td>
@@ -46,7 +43,7 @@
     {% test5(username, ADMIN) %}
 </body>
 <script>
-var testvar = {{ ADMIN }};
+var testvar = {{ uarray }};
 console.log(testvar);
 </script>
 </html>

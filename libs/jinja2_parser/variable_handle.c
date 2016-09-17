@@ -201,7 +201,7 @@ int handleInt1DArray(struct variables *anker, FILE *p_output, char *variable,
                      char *functionbuffer, char *error_str)
 {
     int value;
-    char *str_array;
+    wchar_t *str_array;
     if(index_type == 0 && has_function == 0)
     {
         //Komplettes Array ausgeben
@@ -210,7 +210,7 @@ int handleInt1DArray(struct variables *anker, FILE *p_output, char *variable,
             strcpy(error_str, varhandle_error_str);
             return(-1);
         }
-        fprintf(p_output, "%s", str_array);
+        fprintf(p_output, "%S", str_array);
     }
     else if(index_type == 0 && has_function == 1)
     {
@@ -259,7 +259,7 @@ int handleInt2DArray(struct variables *anker, FILE *p_output, char *variable,
                      int has_function, char *functionbuffer, char *error_str)
 {
     int value, rc;
-    char *str_array;
+    wchar_t *str_array;
     struct variables *tmp_array;
 
     if(index_type == 0 && has_function == 0)
@@ -270,7 +270,7 @@ int handleInt2DArray(struct variables *anker, FILE *p_output, char *variable,
             strcpy(error_str, "Unkown var");
             return(-1);
         }
-        fprintf(p_output, "%s", str_array);
+        fprintf(p_output, "%S", str_array);
     }
     else if(index_type == 0 && has_function == 1)
     {
@@ -376,7 +376,8 @@ int handleString1DArray(struct variables *anker, FILE *p_output, char *variable,
                         int index_type, int x_index, int y_index, int has_function,
                         char *functionbuffer, char *error_str)
 {
-    char *value, *str_array;
+    char *value;
+    wchar_t *str_array;
 
     if(index_type == 0 && has_function == 0)
     {
@@ -386,7 +387,7 @@ int handleString1DArray(struct variables *anker, FILE *p_output, char *variable,
             strcpy(error_str, varhandle_error_str);
             return(-1);
         }
-        fprintf(p_output, "%s", str_array);
+        fprintf(p_output, "%S", str_array);
     }
     else if(index_type == 0 && has_function == 1)
     {
@@ -440,7 +441,8 @@ int handleString2DArray(struct variables *anker, FILE *p_output, char *variable,
                         int index_type, int x_index, int y_index, int has_function,
                         char *functionbuffer, char *error_str)
 {
-    char *value, *str_array;
+    char *value;
+    wchar_t *str_array;
     struct variables *tmp_array;
 
     if(index_type == 0 && has_function == 0)
@@ -451,7 +453,7 @@ int handleString2DArray(struct variables *anker, FILE *p_output, char *variable,
             strcpy(error_str, varhandle_error_str);
             return(-1);
         }
-        fprintf(p_output, "%s", str_array);
+        fprintf(p_output, "%S", str_array);
     }
     else if(index_type == 0 && has_function == 1)
     {
@@ -471,6 +473,179 @@ int handleString2DArray(struct variables *anker, FILE *p_output, char *variable,
     {
         //Nur bestimmtest Feld ausgeben
         value = getStringValuefrom2DArray(anker, variable, x_index, y_index);
+        fprintf(p_output, "%s", value);
+    }
+    else if(index_type == 2 && has_function == 1)
+    {
+        //Funktion nur auf bestimtest Feld anwenden
+    }
+    return(0);
+}
+
+/**
+ * @brief Gibt eine String Variable aus
+ *
+ * @param anker Anker Punkt fuer Variablen
+ * @param p_output File pointer auf das Output file
+ * @param variable Buffer welcher die Variable beinhaltet
+ * @param index_type Wurde ein Index mit uebergeben
+ * @param x_index Gefundene X Index
+ * @param has_function Ist eine Funktion uebergeben (1 || 0)
+ * @param functionbuffer Buffer welche die Funktion enthaehlt
+ * @param error_str Buffer in den Error Nachrichten geschrieben werden
+ * 
+ * @return Erfolg: 0; Error < 0
+ */
+int handleUStringVar(struct variables *anker, FILE *p_output, char *variable,
+                    int index_type, int x_index, int has_function,
+                    char *functionbuffer, char *error_str)
+{
+    wchar_t *value;
+
+    if(index_type == 0 && has_function == 0)
+    {
+        //Kompletten String ausgeben
+        value = getUStringVal(anker, variable);
+        fprintf(p_output, "%S", value);
+    }
+    else if(index_type == 0 && has_function == 1)
+    {
+        //Funktion auf komplettenm String anwenden
+    }
+    else if(index_type == 1 && has_function == 0)
+    {
+        //Bestimmten Char aus String ausgeben
+        value = getUStringVal(anker, variable);
+        if(x_index > wcslen(value)-1)
+        {
+            strcpy(error_str, "Index Error: Index out of range\n");
+            return(-1);
+        }
+        fprintf(p_output, "%c", value[x_index]);
+    }
+    else if(index_type == 1 && has_function == 1)
+    {
+        //Funktion auf bestimmten Char anwenden
+    }
+    return(0);
+}
+
+
+/**
+ * @brief Gibt ein 1D String Array aus
+ *
+ * @param anker Anker Punkt fuer Variablen
+ * @param p_output File pointer auf das Output file
+ * @param variable Buffer welcher die Variable beinhaltet
+ * @param index_type Wurde ein Index mit uebergeben
+ * @param x_index Gefundene X Index
+ * @param y_index Gefundene Y Index
+ * @param has_function Ist eine Funktion uebergeben (1 || 0)
+ * @param functionbuffer Buffer welche die Funktion enthaehlt
+ * @param error_str Buffer in den Error Nachrichten geschrieben werden
+ * 
+ * @return Erfolg: 0; Error < 0
+ */
+int handleUString1DArray(struct variables *anker, FILE *p_output, char *variable,
+                        int index_type, int x_index, int y_index, int has_function,
+                        char *functionbuffer, char *error_str)
+{
+    wchar_t *value, *str_array;
+
+    if(index_type == 0 && has_function == 0)
+    {
+        //Komplettes Array ausgeben
+        if((str_array = generateStringValuefromArray(anker, variable)) == NULL)
+        {
+            strcpy(error_str, varhandle_error_str);
+            return(-1);
+        }
+        fprintf(p_output, "%S", str_array);
+    }
+    else if(index_type == 0 && has_function == 1)
+    {
+        //Funktion aufs ganze Array anwenden
+    }
+    else if(index_type == 1 && has_function == 0)
+    {
+        //Einzelnes Feld ausgeben
+        value = getUStringArrayVal(anker, variable, x_index);
+        fprintf(p_output, "%S", value);
+    }
+    else if(index_type == 1 && has_function == 1)
+    {
+        //Funktion nur auf ein Feld ausfuehren
+    }
+    else if(index_type == 2 && has_function == 0)
+    {
+        //bestimmtes Char aus dem String ausgeben
+        value = getUStringArrayVal(anker, variable, x_index);
+        if(y_index > strlen(value)-1)
+        {
+            strcpy(error_str, "Index Error: Index out od range\n");
+            return(-2);
+        }
+        fprintf(p_output, "%c", value[y_index]);
+    }
+    else if(index_type == 2 && has_function == 1)
+    {
+        //Funktion nur auf ein bestimmtes Char ausfuehren
+    }
+
+    return(0);
+}
+
+/**
+ * @brief Gibt ein 2D String Array aus
+ *
+ * @param anker Anker Punkt fuer Variablen
+ * @param p_output File pointer auf das Output file
+ * @param variable Buffer welcher die Variable beinhaltet
+ * @param index_type Wurde ein Index mit uebergeben
+ * @param x_index Gefundene X Index
+ * @param y_index Gefundene Y Index
+ * @param has_function Ist eine Funktion uebergeben (1 || 0)
+ * @param functionbuffer Buffer welche die Funktion enthaehlt
+ * @param error_str Buffer in den Error Nachrichten geschrieben werden
+ * 
+ * @return Erfolg: 0; Error < 0
+ */
+int handleUString2DArray(struct variables *anker, FILE *p_output, char *variable,
+                        int index_type, int x_index, int y_index, int has_function,
+                        char *functionbuffer, char *error_str)
+{
+    wchar_t *value;
+    wchar_t *str_array;
+    struct variables *tmp_array;
+
+    if(index_type == 0 && has_function == 0)
+    {
+        //Komplettes Array ausgeben
+        if((str_array = generateStringValuefromArray(anker, variable)) == NULL)
+        {
+            strcpy(error_str, varhandle_error_str);
+            return(-1);
+        }
+        fprintf(p_output, "%S", str_array);
+    }
+    else if(index_type == 0 && has_function == 1)
+    {
+        //Funktion auf kompletets Array anwenden
+    }
+    else if(index_type == 1 && has_function == 0)
+    {
+        //Nur Index als Array ausgeben
+        tmp_array = createTmpArrayOut2DArray(anker, variable, x_index);
+        printArrayfromPtrtoFile(tmp_array, p_output);
+    }
+    else if(index_type == 1 && has_function == 1)
+    {
+        //Funktion nur auf bestimmtes Index Array anwenden
+    }
+    else if(index_type == 2 && has_function == 0)
+    {
+        //Nur bestimmtest Feld ausgeben
+        value = getUString2DArrayVal(anker, variable, x_index, y_index);
         fprintf(p_output, "%s", value);
     }
     else if(index_type == 2 && has_function == 1)
@@ -603,4 +778,39 @@ int handle_variable(struct variables *anker, char *variable, FILE *p_output,
         return(0);
     }
 
+    if(var_type == U_STRING)
+    {
+        if(handleUStringVar(anker, p_output, variable,
+                    index_type, x_index, has_function,
+                    function_buffer, error_str) < 0)
+        {
+            return(-12);
+        }
+        return(0);
+
+    }
+
+    if(var_type == U_STRINGARRAY)
+    {
+        if(handleUString1DArray(anker, p_output, variable,
+                               index_type, x_index, y_index, has_function,
+                               function_buffer, error_str) < 0)
+        {
+            return(-10);
+        }
+        return(0);
+
+    }
+
+    if(var_type == U_TWO_DSTRINGARRAY)
+    {
+        if(handleUString2DArray(anker, p_output, variable,
+                               index_type, x_index, y_index, has_function,
+                               function_buffer, error_str) < 0)
+        {
+            return(-11);
+        }
+        return(0);
+
+    }
 }
