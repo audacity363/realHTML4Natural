@@ -67,17 +67,17 @@ path_struct getConfig(char *requestpath, char *filepath, char **error_str)
         settings.found_debug = 1;
     }
 
-    //CloseCfg();
+    CloseCfg();
     return(settings);
 }
 
-path_struct getpathsettings(char *requestpath, char *config_file)
+path_struct getpathsettings(char *requestpath, FILE *logfile)
 {
     char *error_str = (char*)malloc(1024);
-    path_struct settings = getConfig(requestpath, config_file, &error_str);
+    path_struct settings = getConfig(requestpath, "/u/it/a140734/C/realHtml4Natural/web_server/test.cfg", &error_str);
     if(settings.found == 0)
     {
-        fprintf(stderr, "Error: [%s]\n", error_str);
+        fprintf(logfile, "Error: [%s]\n", error_str);
     }
     return(settings);
 }

@@ -34,4 +34,4 @@ typedef struct {
     bool found_library;
 } found_struct;
 
-path_struct getpathsettings(char*, char*);
+path_struct getpathsettings(char*, FILE*);

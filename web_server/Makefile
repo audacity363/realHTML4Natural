@@ -1,41 +1,47 @@
-HOMEDIR = /u/it/a140734/C/sharedlib_jinja2
+CC=gcc
+CFLAGS=-O3 -Wunused-result
+HTTPOBJ = ./bin/httppil.o ./bin/http.o ./bin/httpxml.o ./bin/httphandler.o \
+			./bin/httppost.o ./bin/httpauth.o ./bin/lookup.o ./bin/natural.o
+HEADERS = httpint.h httpapi.h httpxml.h
+
+TARGET = miniweb
+HTTPOBJ += ./bin/miniweb.o
+
+DEFINES=
+
+OS="Linux"
+
+DEFINES+= -DHTTP_DEBUG
+LDFLAGS += -g
+
+
+HOMEDIR = /home/tom//Documents/realHtml4Natural/
 
 STANDARD_PATH    	=   $(HOMEDIR)/include
+CFG_PATH     		= 	$(HOMEDIR)/libs/CfgReader/
 
-HEXD_PATH   = $(HOMEDIR)/libs/hexdump/
-CFG_PATH    = $(HOMEDIR)/libs/CfgReader/
-SOC_PATH    = $(HOMEDIR)/libs/Sockets/
-WEB_PATH    = $(HOMEDIR)/web_server/
-JINJA_PATH  = $(HOMEDIR)/libs/jinja2_parser/
-VAR_PATH    = $(HOMEDIR)/libs/varhandle_lib/
-LDA_PATH    = $(HOMEDIR)/libs/nat-lda-parser/compiled_lda/
-NATVAR_PATH = $(HOMEDIR)/var2names/
-UTILS_PATH  = $(HOMEDIR)/libs/utils/
+INCDIR = -I$(STANDARD_PATH) \
+		 -I$(CFG_PATH)
 
-INCDIR   =  -I$(STANDARD_PATH)  \
-            -I$(HEXD_PATH)      \
-            -I$(CFG_PATH)       \
-            -I$(SOC_PATH)       \
-            -I$(WEB_PATH)       \
-            -I$(JINJA_PATH)     \
-            -I$(VAR_PATH)       \
-            -I$(LDA_PATH)       \
-            -I$(NATVAR_PATH)    \
-            -I$(UTILS_PATH)
 
-CC = xlc
+LIBS = -L$(CFG_PATH) -lcfg
 
-all:
-	$(CC) -c -o ./bin/lookup.o lookup.c $(INCDIR)
-	$(CC) -c -o ./bin/filehandling.o filehandling.c  $(INCDIR)
-	$(CC) -c -o ./bin/response.o response.c  $(INCDIR)
-	$(CC) -c -o ./bin/header.o header.c  $(INCDIR)
-	$(CC) -c -o ./bin/start.o main.c  $(INCDIR)
-	ar -cru libwebserver.a ./bin/*.o
+%.o: ../%.c $(HEADERS)
+	$(CC) $(DEFINES) -g -c -o $@ $(CFLAGS) $(INCDIR) $(filter %.c, $^) 
 
-testprog:
-	xlc -o ./test/main ./test/main.c $(LIBS) -I./ -L./ -lwebserver
+all: $(HTTPOBJ)
+	@echo Building for $(OS)
+	$(CC) $(LDFLAGS) $(HTTPOBJ) $(LIBS) -o $(TARGET)
+
+min: $(HTTPOBJ) httpmin.o
+	@echo Building for $(OS)
+	$(CC) $(LDFLAGS) $(HTTPOBJ) httpmin.o -o httpd $(LIBS)
+
+install: all
+	@rm -f /usr/bin/$(TARGET)
+	@cp $(TARGET) /usr/bin
 
 clean:
-	-rm ./bin/*.o
-	-rm *.a
+	@rm -f $(TARGET) $(TARGET).exe
+	@rm -f ./bin/*.o
+	@rm -rf Debug Release

@@ -209,7 +209,6 @@ static	char	error[100];
 		{
 			sprintf(error, "Eintrag [%s] im Konfigurations-File nicht gefunden", p_token);
 			*p_error = error;
-			fclose (p_config_file);
 			return(NULL);
 		}
 		/* Zeilen-Ende \n durch String-Ende \0 ersetzen				*/
