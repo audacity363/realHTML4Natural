@@ -88,9 +88,9 @@ int compare(struct variables *anker, char *var1, char *var2, char *symbol,
     }
     else if(var_type1 == INTARRAY && index_type1 == 1)
     {
-        if((i_value1 = getIntValuefromArray(anker, var1, x_index1)) == -1)
+        if(getIntValuefromArray(anker, var1, x_index1, &i_value1) < 0)
         {
-            sprintf(error_str, "Unkown Variable [%s]", var1);
+            strcpy(error_str, varhandle_error_str);
             return(-2);
         }
         else if(i_value2 == -2)
@@ -126,7 +126,11 @@ int compare(struct variables *anker, char *var1, char *var2, char *symbol,
     }
     else if(var_type1 == INT)
     {
-        i_value1 = getIntValue(anker, var1);
+        if(getIntValue(anker, var1, &i_value1) < 0)
+        {
+            strcpy(error_str, varhandle_error_str);
+            return(-5);
+        }
     }
     else if(var_type1 == U_STRING)
     {
@@ -178,9 +182,9 @@ int compare(struct variables *anker, char *var1, char *var2, char *symbol,
     }
     else if(var_type2 == INTARRAY && index_type2 == 1)
     {
-        if((i_value2 = getIntValuefromArray(anker, var2, x_index2)) == -1)
+        if(getIntValuefromArray(anker, var2, x_index2, &i_value2) < 0)
         {
-            sprintf(error_str, "Unkown Variable [%s]", var2);
+            strcpy(error_str, varhandle_error_str);
             return(-2);
         }
         else if(i_value2 == -2)
@@ -217,7 +221,11 @@ int compare(struct variables *anker, char *var1, char *var2, char *symbol,
     }
     else if(var_type2 == INT)
     {
-        i_value2 = getIntValue(anker, var2);
+        if(getIntValue(anker, var2, &i_value2) < 0)
+        {
+            strcpy(error_str, varhandle_error_str);
+            return(-5);
+        }
     }
     else if(var_type2 == U_STRING)
     {

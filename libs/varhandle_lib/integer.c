@@ -6,7 +6,7 @@
 #include "varhandle.h"
 #include "management.h"
 
-void newIntVar(struct variables *anker, char *name, int value)
+int newIntVar(struct variables *anker, char *name, int value)
 {
     struct variables *ptr, *hptr;
 
@@ -14,28 +14,51 @@ void newIntVar(struct variables *anker, char *name, int value)
     while(ptr->next != NULL)
         ptr = ptr->next;
 
-    hptr = malloc(sizeof(struct variables));
+    if((hptr = malloc(sizeof(struct variables))) == NULL)
+    {
+        strcpy(varhandle_error_str, "MemoryError: Can not allocate Memory for variable Entry (newIntVar)");
+        return(-1);
+    }
+
     strcpy(hptr->name, name);
 
-    hptr->data = malloc(sizeof(int));
+    if((hptr->data = malloc(sizeof(int))) == NULL)
+    {
+        strcpy(varhandle_error_str, "MemoryError: Can not allocate Memory for variable (newIntVar)");
+        return(-2);
+    }
     *(int*)hptr->data = value;
     hptr->type = INT;
+
+    hptr->length = sizeof(int);
+    hptr->x_length = 0;
+    hptr->y_length = 0;
+
     hptr->next = NULL;
 
     ptr->next = hptr;
-    return;
+    return(0);
 }
 
-int getIntValue(struct variables *anker, char *name)
+int getIntValue(struct variables *anker, char *name, int *value)
 {
     struct variables *ptr;
 
     if((ptr = searchVar(anker, name)) == NULL)
     { 
+        sprintf(varhandle_error_str, "Unkown Variable [%s]", name);
+        value = NULL;
         return(-1);
     }
 
-    return(*(int*)ptr->data);
+   if(ptr->type != INT)
+   {
+        sprintf(varhandle_error_str, "TypeError: variable [%s] is not an integer", name);
+       return(-2);
+   }
+
+    *value = *(int*)ptr->data;
+    return(0);
 }
 
 int editIntVar(struct variables *anker, char *name, int value)
@@ -44,15 +67,16 @@ int editIntVar(struct variables *anker, char *name, int value)
 
     if((ptr = searchVar(anker, name)) == NULL)
     {
+        sprintf(varhandle_error_str, "Unkown Variable [%s]", name);
         return(-1);
     }
 
    if(ptr->type != INT)
-       //Wrong Var Type
+   {
+        sprintf(varhandle_error_str, "TypeError: variable [%s] is not an integer", name);
        return(-2);
+   }
 
-    /*free(ptr->data);
-    ptr->data = malloc(sizeof(int));*/
     *(int*)ptr->data = value;
     return(0);
 }
@@ -61,7 +85,7 @@ int editIntVar(struct variables *anker, char *name, int value)
 
 //---------------------------------------------------------------------------
 
-void newIntArray(struct variables *anker, char *name, int initvalue)
+int newIntArray(struct variables *anker, char *name, int x_length)
 {
     struct variables *ptr, *hptr;
 
@@ -69,83 +93,89 @@ void newIntArray(struct variables *anker, char *name, int initvalue)
     while(ptr->next != NULL)
         ptr = ptr->next;
 
-    hptr = malloc(sizeof(struct variables));
-    if(hptr == NULL)
+    if((hptr = malloc(sizeof(struct variables))) == NULL)
     {
-        printf("Can not allocate Memory (newIntArray)\n");
-        return;
+        strcpy(varhandle_error_str, "MemoryError: Can not allocate Memory for variable Entry (newIntArray)");
+        return(-1);
     }
+
     hptr->type = INTARRAY;
-    hptr->length = 1;
+
+    hptr->length = sizeof(int);
+    hptr->x_length = x_length;
+    hptr->y_length = 0;
+
     strcpy(hptr->name, name);
 
-    hptr->data = malloc(sizeof(int)*hptr->length);
-    *(int*)(hptr->data+(sizeof(int)*(hptr->length-1))) = initvalue;
+    if((hptr->data = malloc(sizeof(int)*x_length)) == NULL)
+    {
+        strcpy(varhandle_error_str, "MemoryError: Can not allocate Memory for variable (newIntArray)");
+        return(-2);
+    }
 
     hptr->next = NULL;
 
     ptr->next = hptr;
-    return;
+    return(0);
 }
 
-void appendIntArray(struct variables *anker, char *name, int value)
-{
-    struct variables *ptr;
-    int length;
-
-    if((ptr = searchVar(anker, name)) == NULL)
-    {
-        return;
-    }
-
-    ptr->length++;
-    length = ptr->length;
-
-    ptr->data = realloc(ptr->data, sizeof(int)*length);
-    *(int*)(ptr->data+(sizeof(int)*(length-1))) = value;
-
-    return;
-}
-
-int getIntValuefromArray(struct variables *anker, char *name, int index)
+int getIntValuefromArray(struct variables *anker, char *name, int x_index, int *value)
 {
     struct variables *ptr;
     ptr = anker;
 
     if((ptr = searchVar(anker, name)) == NULL)
     {
+        sprintf(varhandle_error_str, "Unkown Variable [%s]", name);
         return(-1);
     }
 
-    if(index >= ptr->length)
+    if(ptr->type != INTARRAY)
     {
+        sprintf(varhandle_error_str, "TypeError: variable [%s] is not an integer array", name);
         return(-2);
     }
 
-    return(((int*)ptr->data)[index]);
+    if(x_index >= ptr->x_length)
+    {
+        sprintf(varhandle_error_str, "IndexError: Index out of range");
+        return(-3);
+    }
+
+    *value =((int*)(ptr->data))[x_index];
+
+    return(0);
 }
 
-int editIntVarArray(struct variables *anker, char *name, int value, int x)
+int editIntVarArray(struct variables *anker, char *name, int value, int x_index)
 {
     struct variables *ptr;
 
     if((ptr = searchVar(anker, name)) == NULL)
     {
+        sprintf(varhandle_error_str, "Unkown Variable [%s]", name);
         return(-1);
     }
 
-    if(x >= ptr->length)
+    if(ptr->type != INTARRAY)
     {
+        sprintf(varhandle_error_str, "TypeError: variable [%s] is not an integer array", name);
         return(-2);
     }
 
-    ((int*)ptr->data)[x] = value;
+    if(x_index >= ptr->x_length)
+    {
+        sprintf(varhandle_error_str, "IndexError: Index out of range");
+        return(-2);
+    }
+
+    ((int*)ptr->data)[x_index] = value;
     return(0);
 }
 
 //---------------------------------------------------------------------------
 
-void new2DIntArray(struct variables *anker, char *name, int x_length,
+int new2DIntArray(struct variables *anker, char *name, int x_length,
                    int y_length)
 {
     struct variables *ptr, *hptr;
@@ -154,19 +184,30 @@ void new2DIntArray(struct variables *anker, char *name, int x_length,
     while(ptr->next != NULL)
         ptr = ptr->next;
 
-    hptr = malloc(sizeof(struct variables));
+    if((hptr = malloc(sizeof(struct variables))) == NULL)
+    {
+        strcpy(varhandle_error_str, "MemoryError: Can not allocate Memory for variable Entry (new2DIntArray)");
+        return(-1);
+    }
 
     strcpy(hptr->name, name);
 
     hptr->type = TWO_DINTARRAY;
+
+    hptr->length = sizeof(int);
     hptr->x_length = x_length;
     hptr->y_length = y_length;
 
-    hptr->data = malloc((x_length*y_length)*sizeof(int));
+    if((hptr->data = malloc((x_length*y_length)*sizeof(int))) == NULL)
+    {
+        strcpy(varhandle_error_str, "MemoryError: Can not allocate Memory for variable (new2DIntArray)");
+        return(-2);
+    }
 
     hptr->next = NULL;
 
     ptr->next = hptr;
+    return(0);
 }
 
 int getIntValuefrom2DArray(struct variables *anker, char *name, int x, 
@@ -198,14 +239,21 @@ int editIntVar2DArray(struct variables *anker, char *name, int value, int x,
 
     if((ptr = searchVar(anker, name)) == NULL)
     {
+        sprintf(varhandle_error_str, "Unkown Variable [%s]", name);
         return(-1);
     }
 
     if(ptr->type != TWO_DINTARRAY)
-        return(-1);
+    {
+        sprintf(varhandle_error_str, "TypeError: Varaible [%s] is not a two dimension integer array", name);
+        return(-2);
+    }
 
     if(x >= ptr->x_length || y >= ptr->y_length)
-        return(-1);
+    {
+        strcpy(varhandle_error_str, "Index Error: index out of range");
+        return(-3);
+    }
 
     ((int*)ptr->data)[ptr->x_length*x+y] = value;
     return(0);

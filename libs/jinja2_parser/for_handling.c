@@ -292,10 +292,10 @@ int createTmpVar(struct variables *anker, char *tmp_name, char *variable,
                 sprintf(error_str, "Unkown Variable [%s]", variable);
                 return(-2);
             }
-            newIntArray(anker, tmp_name, 0);
+            newIntArray(anker, tmp_name, y);
             for(i=1; i < y; i++)
             {
-                appendIntArray(anker, tmp_name, 0);
+                editIntVarArray(anker, tmp_name, 0, y);
             }
         }
         else if(index_type == 1)
@@ -443,9 +443,9 @@ int fillTmpVar(struct variables *anker, char *tmp_name, char *variable,
     }
     else if(var_type == INTARRAY)
     {
-        if((i_value = getIntValuefromArray(anker, variable, for_index)) == -1)
+        if(getIntValuefromArray(anker, variable, for_index, &i_value) < 0)
         {
-            sprintf(error_str, "Unkown Variable [%s]", variable);
+            strcpy(error_str, varhandle_error_str);
             return(-2);
         }
         else if(i_value == -2)

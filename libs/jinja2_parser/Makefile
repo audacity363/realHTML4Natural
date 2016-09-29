@@ -1,5 +1,5 @@
-##HOMEDIR = /u/it/a140734/C/realHtml4Natural/
-HOMEDIR = /home/tom//Documents/realHtml4Natural/
+HOMEDIR = /u/it/a140734/C/realHtml4Natural/
+##HOMEDIR = /home/tom//Documents/realHtml4Natural/
 
 STANDARD_PATH    	=   $(HOMEDIR)/include
 
@@ -33,8 +33,8 @@ LIBS    = -L$(CFG_PATH) -lcfg \
           -L$(VAR_PATH) -lvarhandle \
           -L$(UTILS_PATH) -lutils \
 
-#CC = xlc
-CC = gcc
+CC = xlc
+#CC = gcc
 
 all:
 	$(CC) -g -c -o ./bin/file_handling.o file_handling.c $(INCDIR)

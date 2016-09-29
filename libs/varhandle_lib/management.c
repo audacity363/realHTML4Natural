@@ -69,30 +69,17 @@ int copyVar(struct variables *first, struct variables *second, char *name,
 int getArrayLength(struct variables *anker, char *name, int *x, int *y)
 {
     struct variables *ptr;
-   
-    ptr = anker;
-    while(ptr != NULL)
+
+    if((ptr = searchVar(anker, name)) == NULL)
     {
-        if(strcmp(ptr->name, name) == 0 && 
-          (ptr->type == STRINGARRAY || ptr->type == INTARRAY))
-        {
-            return(ptr->length);
-        }
-        else if(strcmp(ptr->name, name) == 0 &&
-               (ptr->type == TWO_DSTRINGARRAY || ptr->type == TWO_DINTARRAY ||
-                ptr->type == U_STRINGARRAY || ptr->type == U_TWO_DSTRINGARRAY))
-        {
-            if(x == NULL || y == NULL)
-            {
-                return(-2);
-            }
-            *x = ptr->x_length;
-            *y = ptr->y_length;
-            return(0);
-        }
-        ptr = ptr->next;
+        sprintf(varhandle_error_str, "Unkown Variable [%s]", name);
+        return(-1);
     }
-    return(-1);
+
+    *x = ptr->x_length;
+    *y = ptr->y_length;
+   
+    return(0);
 }
 
 int getVarLength(struct variables *anker, char *name)
@@ -143,8 +130,6 @@ struct variables* createTmpArrayOut2DArray(struct variables *anker, char *name,
 {
     struct variables *ptr, *hptr;
     int y, offset;
-
-    ptr = malloc(sizeof(struct variables));
 
     hptr = anker;
     while(hptr != NULL)

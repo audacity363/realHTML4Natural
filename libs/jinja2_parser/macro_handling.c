@@ -365,7 +365,11 @@ int printMacro(macros *macro_anker, char *line, FILE *p_output,
         }
         else if(var_type == INTARRAY && index_type == 1)
         {
-            i_buff = getIntValuefromArray(var_anker, arguments[i], x_index);
+            if(getIntValuefromArray(var_anker, arguments[i], x_index, &i_buff) < 0)
+            {
+                strcpy(error_str, varhandle_error_str);
+                return(-6);
+            }
             newIntVar(new_var_anker, hptr->aguments_name[i], i_buff);
         }
         else if(var_type == TWO_DINTARRAY && index_type == 1)
@@ -377,13 +381,13 @@ int printMacro(macros *macro_anker, char *line, FILE *p_output,
             }
 
             getIntValuefrom2DArray(var_anker, arguments[i], x_index, 0, &i_buff);
-            newIntArray(new_var_anker, hptr->aguments_name[i], i_buff);
+            newIntArray(new_var_anker, hptr->aguments_name[i], x_length);
 
-            for(x=1; x < x_length; x++)
+            for(x=0; x < x_length; x++)
             {
                 getIntValuefrom2DArray(var_anker, arguments[i],
                                                 x_index, x, &i_buff);
-                appendIntArray(new_var_anker, hptr->aguments_name[i], i_buff);
+                editIntVarArray(var_anker, arguments[i], i_buff, x);
             }
         }
         else if(var_type == TWO_DINTARRAY && index_type == 2)
@@ -435,27 +439,37 @@ int printMacro(macros *macro_anker, char *line, FILE *p_output,
         }
         else if(var_type == INT)
         {
-            i_buff = getIntValue(var_anker, arguments[i]);
+            if(getIntValue(var_anker, arguments[i], &i_buff) < 0)
+            {
+                strcpy(error_str, varhandle_error_str);
+            }
             newIntArray(new_var_anker, hptr->aguments_name[i], i_buff);
         }
         else if(var_type == INTARRAY)
         {
-            if((x_length = getArrayLength(var_anker, arguments[i], 0, 0)) <0)
+            if(getArrayLength(var_anker, arguments[i], &x_length, &y_length) <0)
             {
                 strcpy(error_str, "Type Error: Unkown Error");
                 return(-6);
             }
-            i_buff = getIntValuefromArray(var_anker, arguments[i], 0);
-            newIntArray(new_var_anker, hptr->aguments_name[i], i_buff);
-            for(x=1; x < x_length; x++)
+            if(getIntValuefromArray(var_anker, arguments[i], 0, &i_buff) < 0)
             {
-                i_buff = getIntValuefromArray(var_anker, arguments[i], x);
-                appendIntArray(new_var_anker, hptr->aguments_name[i], i_buff);
+                strcpy(error_str, varhandle_error_str);
+                return(-7);
+            }
+            newIntArray(new_var_anker, hptr->aguments_name[i], x_length);
+            for(x=0; x < x_length; x++)
+            {
+                if(getIntValuefromArray(var_anker, arguments[i], x, &i_buff) < 0)
+                {
+                    strcpy(error_str, varhandle_error_str);
+                }
+                editIntVarArray(new_var_anker, hptr->aguments_name[i], x, i_buff);
             }
         }
         else if(var_type == STRINGARRAY)
         {
-            if((x_length = getArrayLength(var_anker, arguments[i], 0, 0)) < 0)
+            if(getArrayLength(var_anker, arguments[i], &x_length, &y_length) < 0)
             {
                 strcpy(error_str, "Type Error: Unkown Error");
                 return(-7);

@@ -156,7 +156,7 @@ int start_import(struct variables *anker, char *line, FILE *p_output,
  *
  * @return Den exitstatus von import_handle
  */
-int typeof_cmd(struct varhandle *anker, macros *macro_anker, char *line, 
+int typeof_cmd(struct variables *anker, macros *macro_anker, char *line, 
                FILE *p_output, char *error_str)
 {
 

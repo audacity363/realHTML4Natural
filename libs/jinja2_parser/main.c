@@ -23,11 +23,11 @@ void fillTestvalues(struct variables *anker)
 
     newIntVar(anker, "ISADMIN", 1);
 
-    newIntArray(anker, "ADMIN", 1);
+    newIntArray(anker, "ADMIN", 20);
     newUStringArray(anker, "uarray", 10, 20);
-    for(i=1; i < 20; i++)
+    for(i=0; i < 20; i++)
     {
-        appendIntArray(anker, "ADMIN", i);
+        editIntVarArray(anker, "ADMIN", i, i);
         swprintf(wctest, 10, L"lölö %d", i);
         editUStringArray(anker, "uarray", wctest, i);
     }
@@ -91,15 +91,17 @@ int main()
 
     logHexDump(" ", 2, stdout);
 
-    //strcpy(webserver_settings.templatepath, "/u/it/a140734/C/realHtml4Natural/libs/jinja2_parser/");
-    strcpy(webserver_settings.templatepath, "/home/tom/Documents/realHtml4Natural/libs/jinja2_parser/");
+    strcpy(webserver_settings.templatepath, "/u/it/a140734/C/realHtml4Natural/libs/jinja2_parser/");
+    //strcpy(webserver_settings.templatepath, "/home/tom/Documents/realHtml4Natural/libs/jinja2_parser/");
 
     printVars(anker);
     
     //char template[] = "./test_template.html";
-    char template[] = "/home/tom/Documents/realHtml4Natural/libs/jinja2_parser/tshus.html";
+    //char template[] = "/home/tom/Documents/realHtml4Natural/libs/jinja2_parser/tshus.html";
+    char template[] = "/u/it/a140734/C/realHtml4Natural/libs/jinja2_parser/tshus.html";
     //char template[] = "./utesttm.html";
-    char outputfile[] = "/home/tom/Documents/realHtml4Natural/libs/jinja2_parser/output.html";
+    //char outputfile[] = "/home/tom/Documents/realHtml4Natural/libs/jinja2_parser/output.html";
+    char outputfile[] = "/u/it/a140734/C/realHtml4Natural/libs/jinja2_parser/output.html";
     char error_str[2048];
 
 

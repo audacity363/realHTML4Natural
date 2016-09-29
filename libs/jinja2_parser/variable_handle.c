@@ -56,9 +56,9 @@ int getIndex(struct variables *anker, char *variable, int *x, int *y,
 
     if(strcmp(index_buff, "loop.i") == 0)
     {
-        if((*x = getIntValue(anker, "loop.i")) < 0)
+        if(getIntValue(anker, "loop.i", x) < 0)
         {
-            strcpy(error_str, "Unkown Variable [loop.i]");
+            strcpy(error_str, varhandle_error_str);
             free(index_buff);
             return(-3);
         }
@@ -103,9 +103,9 @@ int getIndex(struct variables *anker, char *variable, int *x, int *y,
 
     if(strcmp(index_buff, "loop.i") == 0)
     {
-        if((*y = getIntValue(anker, "loop.i")) < 0)
+        if(getIntValue(anker, "loop.i", y) < 0)
         {
-            strcpy(error_str, "Unkown Variable [loop.i]");
+            strcpy(error_str, varhandle_error_str);
             free(index_buff);
             return(-7);
         }
@@ -172,9 +172,9 @@ int handleIntVar(struct variables *anker, FILE *p_output, char *variable,
     }
     else if(has_function == 0)
     {
-        if((value = getIntValue(anker, variable)) < 0)
+        if(getIntValue(anker, variable, &value) < 0)
         {
-            sprintf(error_str, "Unkown Variable: [%s]", variable);
+            strcpy(error_str, varhandle_error_str);
             return(-1);
         }
         fprintf(p_output, "%d", value);
@@ -219,9 +219,9 @@ int handleInt1DArray(struct variables *anker, FILE *p_output, char *variable,
     else if(index_type == 1 && has_function == 0)
     {
         //Index aus Array ausgeben
-        if((value = getIntValuefromArray(anker, variable, x_index)) == -1)
+        if(getIntValuefromArray(anker, variable, x_index, &value) < 1)
         {
-            sprintf(error_str, "Unkown Variable: [%s]", variable);
+            strcpy(error_str, varhandle_error_str);
             return(-1);
         }
         else if(value == -2)
@@ -581,9 +581,9 @@ int handleUString1DArray(struct variables *anker, FILE *p_output, char *variable
     {
         //bestimmtes Char aus dem String ausgeben
         value = getUStringArrayVal(anker, variable, x_index);
-        if(y_index > strlen(value)-1)
+        if(y_index > (wcslen(value)-1))
         {
-            strcpy(error_str, "Index Error: Index out od range\n");
+            strcpy(error_str, "Index Error: Index out of range\n");
             return(-2);
         }
         fprintf(p_output, "%c", value[y_index]);
