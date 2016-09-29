@@ -45,9 +45,9 @@ int for_getArrayLength(struct variables *anker, char *name, int var_type,
     {
         if(index_type == 0)
         {
-            if((length = getArrayLength(anker, name, NULL, NULL)) < 0)
+            if(getArrayLength(anker, name, &length, &l_x_index) < 0)
             {
-                sprintf(error_str, "Unkown_variable [%s]", name);
+                strcpy(error_str, varhandle_error_str);
                 return(-1);
             }
             return(length);
@@ -62,18 +62,18 @@ int for_getArrayLength(struct variables *anker, char *name, int var_type,
     {
         if(index_type == 0)
         {
-            if((length = getArrayLength(anker, name, &l_x_index, &l_y_index)) < 0)
+            if(getArrayLength(anker, name, &l_x_index, &l_y_index) < 0)
             {
-                sprintf(error_str, "Unkown_variable [%s]", name);
+                strcpy(error_str, varhandle_error_str);
                 return(-2);
             }
             return(l_x_index);
         }
         else if(index_type == 1)
         {
-            if((length = getArrayLength(anker, name, &l_x_index, &l_y_index)) < 0)
+            if(getArrayLength(anker, name, &l_x_index, &l_y_index) < 0)
             {
-                sprintf(error_str, "Unkown_variable [%s]", name);
+                strcpy(error_str, varhandle_error_str);
                 return(-3);
             }
             return(l_y_index);
@@ -97,9 +97,9 @@ int for_getArrayLength(struct variables *anker, char *name, int var_type,
     {
         if(index_type == 0)
         {
-            if((length = getArrayLength(anker, name, &l_x_index, &l_y_index)) < 0)
+            if(getArrayLength(anker, name, &l_x_index, &l_y_index) < 0)
             {
-                sprintf(error_str, "Unkown_variable [%s]", name);
+                strcpy(error_str, varhandle_error_str);
                 return(-3);
             }
             return(l_x_index);
@@ -118,18 +118,18 @@ int for_getArrayLength(struct variables *anker, char *name, int var_type,
     {
         if(index_type == 0)
         {
-            if((length = getArrayLength(anker, name, &l_x_index, &l_y_index)) < 0)
+            if(getArrayLength(anker, name, &l_x_index, &l_y_index) < 0)
             {
-                sprintf(error_str, "Unkown_variable [%s]", name);
+                strcpy(error_str, varhandle_error_str);
                 return(-3);
             }
             return(l_x_index);
         }
         else if(index_type == 1)
         {
-            if((length = getArrayLength(anker, name, &l_x_index, &l_y_index)) < 0)
+            if(getArrayLength(anker, name, &l_x_index, &l_y_index) < 0)
             {
-                sprintf(error_str, "Unkown_variable [%s]", name);
+                strcpy(error_str, varhandle_error_str);
                 return(-3);
             }
             return(l_y_index);
@@ -147,9 +147,9 @@ int for_getArrayLength(struct variables *anker, char *name, int var_type,
     }
     else if(var_type == INTARRAY)
     {
-        if((length = getArrayLength(anker, name, NULL, NULL)) < 0)
+        if(getArrayLength(anker, name, NULL, NULL) < 0)
         {
-            sprintf(error_str, "Unkown_variable [%s]", name);
+            strcpy(error_str, varhandle_error_str);
             return(-4);
         }
         return(length);
@@ -158,18 +158,18 @@ int for_getArrayLength(struct variables *anker, char *name, int var_type,
     {
         if(index_type == 0)
         {
-            if((length = getArrayLength(anker, name, &l_x_index, &l_y_index)) < 0)
+            if(getArrayLength(anker, name, &l_x_index, &l_y_index) < 0)
             {
-                sprintf(error_str, "Unkown_variable [%s]", name);
+                strcpy(error_str, varhandle_error_str);
                 return(-3);
             }
             return(l_x_index);
         }
         else if(index_type == 1)
         {
-            if((length = getArrayLength(anker, name, &l_x_index, &l_y_index)) < 0)
+            if(getArrayLength(anker, name, &l_x_index, &l_y_index) < 0)
             {
-                sprintf(error_str, "Unkown_variable [%s]", name);
+                strcpy(error_str, varhandle_error_str);
                 return(-3);
             }
             return(l_y_index);
@@ -215,9 +215,9 @@ int createTmpVar(struct variables *anker, char *tmp_name, char *variable,
     {
         if(index_type == 0)
         {
-            if((length = getArrayLength(anker, variable, &x, &y)) < 0)
+            if(getArrayLength(anker, variable, &x, &y) < 0)
             {
-                sprintf(error_str, "Unkown Variable [%s]", variable);
+                strcpy(error_str, varhandle_error_str);
                 return(-1);
             }
             newStringArray(anker, tmp_name, " ");
@@ -263,9 +263,9 @@ int createTmpVar(struct variables *anker, char *tmp_name, char *variable,
 
         if(index_type == 0)
         {
-            if((length = getArrayLength(anker, variable, &x, &y)) < 0)
+            if(getArrayLength(anker, variable, &x, &y) < 0)
             {
-                sprintf(error_str, "Unkown Variable [%s]", variable);
+                strcpy(error_str, varhandle_error_str);
                 return(-1);
             }
             newUStringArray(anker, tmp_name, var_length, x);
@@ -287,9 +287,9 @@ int createTmpVar(struct variables *anker, char *tmp_name, char *variable,
     {
         if(index_type == 0)
         {
-            if((length = getArrayLength(anker, variable, &x, &y)) < 0)
+            if(getArrayLength(anker, variable, &x, &y) < 0)
             {
-                sprintf(error_str, "Unkown Variable [%s]", variable);
+                strcpy(error_str, varhandle_error_str);
                 return(-2);
             }
             newIntArray(anker, tmp_name, y);
@@ -359,9 +359,9 @@ int fillTmpVar(struct variables *anker, char *tmp_name, char *variable,
     {
         if(index_type == 0)
         {
-            if((length = getArrayLength(anker, variable, &x, &y)) < 0)
+            if(getArrayLength(anker, variable, &x, &y) < 0)
             {
-                sprintf(error_str, "Unkown Variable [%s]", variable);
+                strcpy(error_str, varhandle_error_str);
                 return(-1);
             }
 
@@ -411,9 +411,9 @@ int fillTmpVar(struct variables *anker, char *tmp_name, char *variable,
     {
         if(index_type == 0)
         {
-            if((length = getArrayLength(anker, variable, &x, &y)) < 0)
+            if(getArrayLength(anker, variable, &x, &y) < 0)
             {
-                sprintf(error_str, "Unkown Variable [%s]", variable);
+                strcpy(error_str, varhandle_error_str);
                 return(-1);
             }
             for(i=0; i < y; i++)
@@ -459,9 +459,9 @@ int fillTmpVar(struct variables *anker, char *tmp_name, char *variable,
     {
         if(index_type == 0)
         {
-            if((length = getArrayLength(anker, variable, &x, &y)) < 0)
+            if(getArrayLength(anker, variable, &x, &y) < 0)
             {
-                sprintf(error_str, "Unkown Variable [%s]", variable);
+                strcpy(error_str, varhandle_error_str);
                 return(-4);
             }
             for(i=0; i < x; i++)
