@@ -19,8 +19,8 @@
 ** START OF CODE TO BE CHANGED BY THE USER
 */
 
-extern long print_all_vars();
-extern long start_web_server();
+extern long user_exit();
+extern long flipBuffer();
 
 
 /*
@@ -34,8 +34,8 @@ extern long start_web_server();
 
 TAB_STRUCT n_call_table[] = {
 
-  { "STATWEB", start_web_server },
-  { "GENPAGE", print_all_vars}
+  { "GENPAGE", user_exit},
+  { "FLIPBUF", flipBuffer}
 
 };
 

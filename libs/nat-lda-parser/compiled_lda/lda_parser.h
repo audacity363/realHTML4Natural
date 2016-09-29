@@ -12,6 +12,7 @@
 #define SAG_INTEGER_CHAR 'I'
 #define SAG_NUMERIK_CHAR 'N'
 #define SAG_CONTROL_CHAR 'C'
+#define SAG_LOGIC_CHAR   'L'
 #define SAG_DYNAMIC "DYNAMIC"
 
 #define SAG_COMMENT          1

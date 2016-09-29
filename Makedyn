@@ -41,7 +41,7 @@ MAKEFILE    =   Makefile
 #
 # Set own userexit files
 #
-USEROBJS = send_values_to_page.o start_server.o
+USEROBJS = send_values_to_page.o flipBuffer.o
 
 #
 USERLIB  = jinja2.so
@@ -142,7 +142,6 @@ $(USERLIB) : $(NATOBJ) $(USEROBJS)
             -L$(CFG_PATH) -lcfg \
             -L$(HEXD_PATH) -lhexdump \
             -L$(SOC_PATH) -lsockets \
-            -L$(WEB_PATH) -lwebserver \
             -L$(JINJA_PATH) -ljinjaparser \
             -L$(VAR_PATH) -lvarhandle \
             -L$(LDA_PATH) -lldaparser \

@@ -15,7 +15,7 @@
         </thead>
         <tbody>
         {%for user in username%}
-        {% if user == " "%}
+        {% if loop.i == 13 %}
         {%break%}
         {%end-if%}
             <tr>

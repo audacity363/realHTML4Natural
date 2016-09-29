@@ -19,6 +19,9 @@ char *StripTrailingSpaces(char *str)
 {
     char *end;
 
+    printf("Strip Spaces:\n");
+    printf("Working with [%s]\n", str);
+
     end = str + strlen(str) - 1;
     while(end > str && isspace(*end)) end--;
 

@@ -1,54 +1,21 @@
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <dlfcn.h>
 #include <string.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/un.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <signal.h>
+#include <wchar.h>
+#include <locale.h>
 
 #include "natuser.h"
+#include "natni.h"
 #include "standard.h"
 #include "varhandle.h"
-#include "hexdump.h"
 #include "utils.h"
+#include "hexdump.h"
+#include "var2name.h"
 
-#define UNIT_SEPERATOR 0x1F
+#define GET_INTERFACE_FUNC "nni_get_interface"
 
-void signalHandler(int signal);
 int exec_stat = 0;
-
-struct variables *gotoendofAnker(struct variables *anker)
-{
-    struct variables *ptr;
-
-    ptr = anker;
-    exec_stat = 500;
-    while(ptr->next != NULL)
-    {
-        ptr = ptr->next;
-    }
-    exec_stat = 600;
-
-    return ptr;
-}
-
-int calculateBufferSize(struct variables *anker)
-{
-    int size = 0;
-
-    struct variables *hptr = anker->next;
-    while(hptr != NULL)
-    {
-        size += 48+hptr->full_length;
-        hptr = hptr->next;
-    }
-    size += 12;
-
-    return(size);
-}
 
 int shiftInt(int input, int length)
 {
@@ -62,209 +29,782 @@ int shiftInt(int input, int length)
             result = input >> 16;
             break;
         case 4:
+
             result = input;
             break;
     }
     return(result);
 }
 
-int getVar(void *parmhandle, int index, struct variables *nat_vars, int *complete_size)
+int convert2Bto4BString(char *inbuffer, wchar_t *outbuffer, int length)
 {
-    struct parameter_description var_info;
-    exec_stat = 200;
-    int ret;
-	int dynamic_flag, protected_flag, x_array_flag,
-        dimensions, x_length, y_length,
-        var_type;
+    int i, offset;
 
-    int *indexes;
-    int i, x, offset, i_tmpdata;
-    char *data, *tmpdata, namebuff[20];
+    void *v_in, *v_out, *v_tmp;
 
-    if((ret = ncxr_get_parm_info(index, parmhandle, &var_info)) < 0)
+    v_in = (void*)inbuffer;
+    v_out = (void*)outbuffer;
+
+    for(i=0; i < length; i++)
     {
-        switch(ret)
-        {
-            case -1:
-                return(16);
-            case -2:
-                return(17);
-            case -7:
-                return(18);
-        }
+        offset = (sizeof(wchar_t)*i)+2;
+
+        v_tmp = v_out+offset;
+
+        memcpy(v_tmp, v_in+(i*2), 2);
     }
 
-    exec_stat = 300;
-	dynamic_flag = var_info.flags & IF4_FLG_DYNVAR;
-	protected_flag = var_info.flags & IF4_FLG_PROTECTED;
-    x_array_flag = var_info.flags & IF4_FLG_XARRAY;
+    return(0);
+}
+
+int convert1Bto4BString(char *inbuffer, wchar_t *outbuffer, int length)
+{
+    int i, offset;
+
+    void *v_in, *v_out, *v_tmp;
+
+    v_in = (void*)inbuffer;
+    v_out = (void*)outbuffer;
+
+    for(i=0; i < length; i++)
+    {
+        offset = (sizeof(wchar_t)*i)+3;
+
+        v_tmp = v_out+offset;
+
+        memcpy(v_tmp, v_in+i, 1);
+    }
+
+    return(0);
+}
+
+int checkLogicVar(void *buff)
+{
+    if(memcmp(buff, 0x00, 1) == 0)
+    {
+        return(0);
+    }
+    return(1);
+}
+
+int OpenLib(void **shLib, char *name)
+{
+    char *error;
+
+    *shLib = dlopen(name, RTLD_NOW);
+    if(!*shLib)
+    {
+        error = dlerror();
+        printf("Error while loading Module [%s]: [%s]\n", name, error);
+        return(-1);
+    }
+    return(0);
+}
+
+void CloseLib(void **shLib)
+{
+    dlclose(*shLib);
+}
+
+/**
+ * Return: 200: Nicht nur Zahlen im Buffer
+ *         201: Memory Allocation schlug fehl
+ *         299: Unbekannte Dimension
+ *         000: OK
+ *
+ *
+ *
+ */
+int handleNumericVar(pnni_611_functions sh_funcs, void *parmhandle, int index,
+                     struct parameter_description var_info,
+                     struct variables *nat_vars)
+{
+    char *c_tmp_buff, tmp_var_name[100];
+
+    wchar_t *wc_tmp_buff;
+
+    int i, x, y, z,
+        nat_index[3] = {0, 0, 0};
+
+    sprintf(tmp_var_name, "tmp%d", index);
+
+    
+
+    if((c_tmp_buff = (char*)malloc(var_info.length)) == NULL)
+    {
+        return(301);
+    }
+
+    if((wc_tmp_buff = (wchar_t*)malloc(var_info.length*sizeof(wchar_t)+4)) == NULL)
+    {
+        return(302);
+    }
+
+    bzero(wc_tmp_buff, (var_info.length*sizeof(wchar_t))+4);
+
+    if(var_info.dimensions == 0)
+    {
+
+        sh_funcs->pf_nni_get_parm(sh_funcs, index, parmhandle, var_info.length_all, c_tmp_buff);
+        //logHexDump(c_tmp_buff, var_info.length_all, stdout);
+
+        newStringVar(nat_vars, tmp_var_name, c_tmp_buff);
+    }
+    else if(var_info.dimensions == 1)
+    {
+
+        bzero(wc_tmp_buff, (var_info.length*sizeof(wchar_t))+4);
+
+        newUStringArray(nat_vars, tmp_var_name, var_info.length, var_info.occurrences[0]);
+
+        for(nat_index[0]=0; nat_index[0] < var_info.occurrences[0];
+            nat_index[0]++) 
+        {
+            sh_funcs->pf_nni_get_parm_array(sh_funcs, index, parmhandle,
+                    var_info.length*sizeof(wchar_t), (void*)c_tmp_buff, nat_index);
+
+            convert1Bto4BString(c_tmp_buff, wc_tmp_buff, var_info.length);
+            editUStringArray(nat_vars, tmp_var_name, wc_tmp_buff, nat_index[0]);
+
+            bzero(c_tmp_buff, var_info.length);
+            bzero(wc_tmp_buff, (var_info.length*sizeof(wchar_t))+4);
+        }
+    }
+    else if(var_info.dimensions == 2)
+    {
+
+        newU2DStringArray(nat_vars, tmp_var_name, var_info.length,
+                          var_info.occurrences[0], var_info.occurrences[1]);
+
+        for(nat_index[0]=0; nat_index[0] < var_info.occurrences[0];
+            nat_index[0]++) 
+        {
+            for(nat_index[1]=0; nat_index[1] < var_info.occurrences[1];
+                nat_index[1]++) 
+            {
+                sh_funcs->pf_nni_get_parm_array(sh_funcs, index, parmhandle,
+                        var_info.length*sizeof(wchar_t), (void*)c_tmp_buff, nat_index);
+
+                convert1Bto4BString(c_tmp_buff, wc_tmp_buff, var_info.length);
+                //editUString2DArray(nat_vars, tmp_var_name, wc_tmp_buff, nat_index[0], nat_index[1]);
+
+                bzero(c_tmp_buff, var_info.length);
+                bzero(wc_tmp_buff, (var_info.length*sizeof(wchar_t))+4);
+            }
+        }
+    }
+    else if(var_info.dimensions == 3)
+    {
+    
+        for(nat_index[0]=0; nat_index[0] < var_info.occurrences[0];
+            nat_index[0]++) 
+        {
+            for(nat_index[1]=0; nat_index[1] < var_info.occurrences[1];
+                nat_index[1]++) 
+            {
+                for(nat_index[2]=0; nat_index[2] < var_info.occurrences[2];
+                    nat_index[2]++) 
+                {
+
+                    sh_funcs->pf_nni_get_parm_array(sh_funcs, index, parmhandle,
+                            var_info.length*sizeof(wchar_t), (void*)c_tmp_buff, nat_index);
+
+                    convert1Bto4BString(c_tmp_buff, wc_tmp_buff, var_info.length);
+
+                    bzero(c_tmp_buff, var_info.length);
+                    bzero(wc_tmp_buff, (var_info.length*sizeof(wchar_t))+4);
+                }
+            }
+        }
+    }
+    else
+    {
+        return(399);
+    }
+
+    free(c_tmp_buff);
+    free(wc_tmp_buff);
+
+    return(0);
+
+}
+
+/**
+ * Return: 301: Memory Allocation schlug fehl
+ *         399: Unbekannte Dimension
+ *         000: OK
+ */
+int handleUnicodeVar(pnni_611_functions sh_funcs, void *parmhandle, int index,
+                     struct parameter_description var_info,
+                     struct variables *nat_vars)
+{
+    char *c_tmp_buff;
+
+    wchar_t *wc_tmp_buff;
+
+    int i, x, y, z,
+        nat_index[3] = {0, 0, 0};
+
+    if((c_tmp_buff = (char*)malloc(var_info.length*2)) == NULL)
+    {
+        return(399);
+    }
+
+    if((wc_tmp_buff = (wchar_t*)malloc((var_info.length*sizeof(wchar_t))+4)) ==NULL)
+    {
+        free(c_tmp_buff);
+        return(399);
+    }
+
+    bzero(wc_tmp_buff, (var_info.length*sizeof(wchar_t))+4);
+
+    if(var_info.dimensions == 0)
+    {
+
+        sh_funcs->pf_nni_get_parm(sh_funcs, index, parmhandle, var_info.length_all, c_tmp_buff);
+
+        convert2Bto4BString(c_tmp_buff, wc_tmp_buff, var_info.length);
+
+    }
+    else if(var_info.dimensions == 1)
+    {
+
+        bzero(wc_tmp_buff, (var_info.length*sizeof(wchar_t))+4);
+
+        for(nat_index[0]=0; nat_index[0] < var_info.occurrences[0];
+            nat_index[0]++) 
+        {
+            sh_funcs->pf_nni_get_parm_array(sh_funcs, index, parmhandle,
+                    var_info.length*sizeof(wchar_t), (void*)c_tmp_buff, nat_index);
+
+            convert2Bto4BString(c_tmp_buff, wc_tmp_buff, var_info.length);
+
+            bzero(wc_tmp_buff, (var_info.length*sizeof(wchar_t))+4);
+        }
+    }
+    else if(var_info.dimensions == 2)
+    {
+        bzero(wc_tmp_buff, (var_info.length*sizeof(wchar_t))+4);
+
+        for(nat_index[0]=0; nat_index[0] < var_info.occurrences[0];
+            nat_index[0]++) 
+        {
+            for(nat_index[1]=0; nat_index[1] < var_info.occurrences[1];
+                nat_index[1]++) 
+            {
+                sh_funcs->pf_nni_get_parm_array(sh_funcs, index, parmhandle,
+                        var_info.length*sizeof(wchar_t), (void*)c_tmp_buff, nat_index);
+
+                convert2Bto4BString(c_tmp_buff, wc_tmp_buff, var_info.length);
+
+                bzero(wc_tmp_buff, (var_info.length*sizeof(wchar_t))+4);
+            }
+        }
+    }
+    else if(var_info.dimensions == 3)
+    {
+    
+        for(nat_index[0]=0; nat_index[0] < var_info.occurrences[0];
+            nat_index[0]++) 
+        {
+            for(nat_index[1]=0; nat_index[1] < var_info.occurrences[1];
+                nat_index[1]++) 
+            {
+                for(nat_index[2]=0; nat_index[2] < var_info.occurrences[2];
+                    nat_index[2]++) 
+                {
+
+                    sh_funcs->pf_nni_get_parm_array(sh_funcs, index, parmhandle,
+                            var_info.length*sizeof(wchar_t), (void*)c_tmp_buff, nat_index);
+
+                    convert2Bto4BString(c_tmp_buff, wc_tmp_buff, var_info.length);
+
+                    bzero(wc_tmp_buff, (var_info.length*sizeof(wchar_t))+4);
+                }
+            }
+        }
+    }
+    else
+    {
+        return(399);
+    }
+
+    free(c_tmp_buff);
+    free(wc_tmp_buff);
+
+    return(0);
+}
+
+int handleAlphaNumericVar(pnni_611_functions sh_funcs, void *parmhandle, int index,
+                     struct parameter_description var_info,
+                     struct variables *nat_vars)
+{
+    char *c_tmp_buff, tmp_var_name[100];
+
+    wchar_t *wc_tmp_buff;
+
+    int i, x, y, z,
+        nat_index[3] = {0, 0, 0};
+    int rc;
+
+    sprintf(tmp_var_name, "tmp%d", index);
+
+    if((c_tmp_buff = (char*)malloc(var_info.length)) == NULL)
+    {
+        return(401);
+    }
+
+    if((wc_tmp_buff = (wchar_t*)malloc(var_info.length*sizeof(wchar_t)+4)) == NULL)
+    {
+        return(302);
+    }
+
+    bzero(wc_tmp_buff, (var_info.length*sizeof(wchar_t))+4);
+
+    if(var_info.dimensions == 0)
+    {
+        rc = sh_funcs->pf_nni_get_parm(sh_funcs, index, parmhandle, var_info.length, c_tmp_buff);
+        switch(rc)
+        {
+            case NNI_RC_OK:
+                printf("NNI_RC_OK\n");
+                break;
+            case NNI_RC_NOT_INIT:
+                printf("NNI_RC_NOT_INIT\n");
+                break;
+            case NNI_RC_PARM_ERROR:
+                printf("NNI_RC_PARM_ERROR\n");
+                break;
+            case NNI_RC_ILL_PNUM:
+                printf("NNI_RC_ILL_PNUM\n");
+                break;
+            case NNI_RC_DATA_TRUNC:
+                printf("NNI_RC_DATA_TRUNC\n");
+                break;
+        }
+        if(rc > 0)
+            printf("only [%d] Bytes were read\n", rc);
+
+        logHexDump(c_tmp_buff, var_info.length, stdout);
+        convert1Bto4BString(c_tmp_buff, wc_tmp_buff, var_info.length);
+        printf("Add new U Var\n");
+        logHexDump(wc_tmp_buff, var_info.length*sizeof(wchar_t)+4, stdout);
+        if(newUStringVar(nat_vars, tmp_var_name, wc_tmp_buff, var_info.length) < 0)
+        {
+            printf("Error in Varhandle: [%s]\n", varhandle_error_str);
+        }
+    }
+    else if(var_info.dimensions == 1)
+    {
+
+        bzero(wc_tmp_buff, (var_info.length*sizeof(wchar_t))+4);
+        newUStringArray(nat_vars, tmp_var_name, var_info.length+1, var_info.occurrences[0]);
+
+        for(nat_index[0]=0; nat_index[0] < var_info.occurrences[0];
+            nat_index[0]++) 
+        {
+            sh_funcs->pf_nni_get_parm_array(sh_funcs, index, parmhandle,
+                    var_info.length*sizeof(wchar_t), (void*)c_tmp_buff, nat_index);
+
+            convert1Bto4BString(c_tmp_buff, wc_tmp_buff, var_info.length);
+            editUStringArray(nat_vars, tmp_var_name, wc_tmp_buff, nat_index[0]);
+
+            bzero(c_tmp_buff, var_info.length);
+            bzero(wc_tmp_buff, (var_info.length*sizeof(wchar_t))+4);
+        }
+    }
+    else if(var_info.dimensions == 2)
+    {
+        bzero(wc_tmp_buff, (var_info.length*sizeof(wchar_t))+4);
+
+        //newUString2DArray(nat_vars, tmp_var_name, var_info.length,
+        //                  var_info.occurrences[0], var_info.occurrences[1]);
+
+        for(nat_index[0]=0; nat_index[0] < var_info.occurrences[0];
+            nat_index[0]++) 
+        {
+            for(nat_index[1]=0; nat_index[1] < var_info.occurrences[1];
+                nat_index[1]++) 
+            {
+                sh_funcs->pf_nni_get_parm_array(sh_funcs, index, parmhandle,
+                        var_info.length*sizeof(wchar_t), (void*)c_tmp_buff, nat_index);
+
+                convert1Bto4BString(c_tmp_buff, wc_tmp_buff, var_info.length);
+                //editUString2DArray(nat_vars, tmp_var_name, wc_tmp_buff, nat_index[0], nat_index[1]);
+
+                bzero(c_tmp_buff, var_info.length);
+                bzero(wc_tmp_buff, (var_info.length*sizeof(wchar_t))+4);
+            }
+        }
+    }
+    else if(var_info.dimensions == 3)
+    {
+    
+        for(nat_index[0]=0; nat_index[0] < var_info.occurrences[0];
+            nat_index[0]++) 
+        {
+            for(nat_index[1]=0; nat_index[1] < var_info.occurrences[1];
+                nat_index[1]++) 
+            {
+                for(nat_index[2]=0; nat_index[2] < var_info.occurrences[2];
+                    nat_index[2]++) 
+                {
+
+                    sh_funcs->pf_nni_get_parm_array(sh_funcs, index, parmhandle,
+                            var_info.length*sizeof(wchar_t), (void*)c_tmp_buff, nat_index);
+
+                    convert1Bto4BString(c_tmp_buff, wc_tmp_buff, var_info.length);
+
+                    bzero(c_tmp_buff, var_info.length);
+                    bzero(wc_tmp_buff, (var_info.length*sizeof(wchar_t))+4);
+                }
+            }
+        }
+    }
+    else
+    {
+        return(499);
+    }
+
+    free(c_tmp_buff);
+    free(wc_tmp_buff);
+
+    return(0);
+}
+
+int handleIntegerVar(pnni_611_functions sh_funcs, void *parmhandle, int index,
+                     struct parameter_description var_info,
+                     struct variables *nat_vars)
+{
+    int *p_i_tmp_buff,
+        i_tmp_buff;
+
+    int i, x, y, z,
+        nat_index[3] = {0, 0, 0};
+
+    char tmp_var_name[100];
+
+    sprintf(tmp_var_name, "tmp%d", index);
+
+    if((p_i_tmp_buff = (int*)malloc(var_info.length)) == NULL)
+    {
+        return(501);
+    }
+
+    if(var_info.dimensions == 0)
+    {
+        sh_funcs->pf_nni_get_parm(sh_funcs, index, parmhandle, var_info.length, p_i_tmp_buff);
+        i_tmp_buff = shiftInt(*p_i_tmp_buff, var_info.length);
+        newIntVar(nat_vars, tmp_var_name, i_tmp_buff);
+    }
+    else if(var_info.dimensions == 1)
+    {
+
+        newIntArray(nat_vars, tmp_var_name, 0);
+        for(nat_index[0]=0; nat_index[0] < var_info.occurrences[0];
+            nat_index[0]++) 
+        {
+            sh_funcs->pf_nni_get_parm_array(sh_funcs, index, parmhandle,
+                    var_info.length, (void*)p_i_tmp_buff, nat_index);
+            i_tmp_buff = shiftInt(*p_i_tmp_buff, var_info.length);
+            appendIntArray(nat_vars, tmp_var_name, i_tmp_buff);
+        }
+    }
+    else if(var_info.dimensions == 2)
+    {
+        for(nat_index[0]=0; nat_index[0] < var_info.occurrences[0];
+            nat_index[0]++) 
+        {
+            for(nat_index[1]=0; nat_index[1] < var_info.occurrences[1];
+                nat_index[1]++) 
+            {
+                sh_funcs->pf_nni_get_parm_array(sh_funcs, index, parmhandle,
+                        var_info.length, (void*)p_i_tmp_buff, nat_index);
+                i_tmp_buff = shiftInt(*p_i_tmp_buff, var_info.length);
+            }
+        }
+    }
+    else if(var_info.dimensions == 3)
+    {
+    
+        for(nat_index[0]=0; nat_index[0] < var_info.occurrences[0];
+            nat_index[0]++) 
+        {
+            for(nat_index[1]=0; nat_index[1] < var_info.occurrences[1];
+                nat_index[1]++) 
+            {
+                for(nat_index[2]=0; nat_index[2] < var_info.occurrences[2];
+                    nat_index[2]++) 
+                {
+
+                    sh_funcs->pf_nni_get_parm_array(sh_funcs, index, parmhandle,
+                            var_info.length, (void*)p_i_tmp_buff, nat_index);
+                    i_tmp_buff = shiftInt(*p_i_tmp_buff, var_info.length);
+                }
+            }
+        }
+    }
+    else
+    {
+        return(599);
+    }
+
+    free(p_i_tmp_buff);
+    return(0);
+}
+
+int handleControlVar(pnni_611_functions sh_funcs, void *parmhandle, int index,
+                     struct parameter_description var_info,
+                     struct variables *nat_vars)
+
+{
+    return(0);
+}
+
+int handleLogicVar(pnni_611_functions sh_funcs, void *parmhandle, int index,
+                   struct parameter_description var_info,
+                   struct variables *nat_vars)
+
+{
+    void *v_tmp_buff;
+    int i_tmp_buff;
+
+    int i, x, y, z,
+        nat_index[3] = {0, 0, 0};
+
+    char tmp_var_name[100];
+
+    sprintf(tmp_var_name, "tmp%d", index);
+
+    if((v_tmp_buff = malloc(var_info.length)) == NULL)
+    {
+        return(601);
+    }
+
+    if(var_info.dimensions == 0)
+    {
+        sh_funcs->pf_nni_get_parm(sh_funcs, index, parmhandle, var_info.length, v_tmp_buff);
+        i_tmp_buff = checkLogicVar(v_tmp_buff);
+        newIntVar(nat_vars, tmp_var_name, i_tmp_buff);
+    }
+    else if(var_info.dimensions == 1)
+    {
+
+
+        for(nat_index[0]=0; nat_index[0] < var_info.occurrences[0];
+            nat_index[0]++) 
+        {
+            sh_funcs->pf_nni_get_parm_array(sh_funcs, index, parmhandle,
+                    var_info.length, v_tmp_buff, nat_index);
+            i_tmp_buff = checkLogicVar(v_tmp_buff);
+        }
+    }
+    else if(var_info.dimensions == 2)
+    {
+        for(nat_index[0]=0; nat_index[0] < var_info.occurrences[0];
+            nat_index[0]++) 
+        {
+            for(nat_index[1]=0; nat_index[1] < var_info.occurrences[1];
+                nat_index[1]++) 
+            {
+                sh_funcs->pf_nni_get_parm_array(sh_funcs, index, parmhandle,
+                        var_info.length, v_tmp_buff, nat_index);
+                i_tmp_buff = checkLogicVar(v_tmp_buff);
+            }
+        }
+    }
+    else if(var_info.dimensions == 3)
+    {
+    
+        for(nat_index[0]=0; nat_index[0] < var_info.occurrences[0];
+            nat_index[0]++) 
+        {
+            for(nat_index[1]=0; nat_index[1] < var_info.occurrences[1];
+                nat_index[1]++) 
+            {
+                for(nat_index[2]=0; nat_index[2] < var_info.occurrences[2];
+                    nat_index[2]++) 
+                {
+
+                    sh_funcs->pf_nni_get_parm_array(sh_funcs, index, parmhandle,
+                            var_info.length, v_tmp_buff, nat_index);
+                    i_tmp_buff = checkLogicVar(v_tmp_buff);
+                }
+            }
+        }
+    }
+    else
+    {
+        return(699);
+    }
+
+    free(v_tmp_buff);
+
+    return(0);
+}
+
+int handleBinaryVar(struct parameter_description var_info, void *buffer,
+                    struct variables *nat_vars)
+{
+    return(0);
+}
+
+
+int readVar(void *parmhandle, pnni_611_functions sh_funcs, int index,
+            struct variables *nat_vars, FILE *logfile)
+{
+    struct parameter_description var_info;
+
+    void *buffer;
+
+    int i, x, y, z, x_length, y_length, rc,
+        dynamic_flag;
+
+    if(sh_funcs->pf_nni_get_parm_info(sh_funcs, index, parmhandle, &var_info) != NNI_RC_OK)
+    {
+        return(100);
+    }
 
     printf("Format:     [%c]\n", var_info.format);
     printf("Length:     [%d]\n", var_info.length);
     printf("Length All: [%d]\n", var_info.length_all);
     printf("Dimensions: [%d]\n", var_info.dimensions);
-
-    data = malloc(var_info.length_all);
-
-    if(ncxr_get_parm(index, parmhandle, var_info.length_all, data) < 0)
+    if(var_info.dimensions > 0)
     {
-        printf("Error while read variable value\n");
-        return(20);
-    }
-
-    if((var_info.format == 'A' || var_info.format == 'N') && var_info.dimensions == 0)
-    {
-        exec_stat = 450;
-        sprintf(namebuff, "var%d", index);
-        data = StripTrailingSpaces(data);
-        newStringVar(nat_vars, namebuff, data);
-    }
-    else if((var_info.format == 'A' || var_info.format == 'N') && var_info.dimensions == 1)
-    {
-        exec_stat = 500;
-        tmpdata = malloc(var_info.length+1);
-
-        memcpy(tmpdata, data, var_info.length);
-        tmpdata[var_info.length+1] = '\0';
-        tmpdata = StripTrailingSpaces(tmpdata);
-
-        sprintf(namebuff, "var%d", index);
-
-        newStringArray(nat_vars, namebuff, tmpdata);
-        for(i=1; i < var_info.occurrences[0]; i++)
+        for(i=0; i != var_info.dimensions; i++)
         {
-            bzero(tmpdata, var_info.length+1);
-            memcpy(tmpdata, data+(i*var_info.length), var_info.length);
-            tmpdata[var_info.length+1] = '\0';
-            HexDump(tmpdata, var_info.length);
-            tmpdata = StripTrailingSpaces(tmpdata);
-            appendStringArray(nat_vars, namebuff, tmpdata);
+            fprintf(logfile, "\tOcc: [%d]\n", var_info.occurrences[i]);
         }
+
     }
-    else if((var_info.format == 'A' || var_info.format == 'N') && var_info.dimensions == 2)
+
+    dynamic_flag = var_info.flags & IF4_FLG_DYNVAR;
+    fprintf(logfile, "Dynamic: [%d]\n", dynamic_flag);
+
+    if(var_info.dimensions > 0 && dynamic_flag)
     {
-        exec_stat = 600;
-        tmpdata = malloc(var_info.length);
-        //logHexDump(data, var_info.length_all, stdout);
-        
-        sprintf(namebuff, "var%d", index);
-
-        memcpy(tmpdata, data, var_info.length);
-        tmpdata = StripTrailingSpaces(tmpdata);
-
-        new2DStringArray(nat_vars, namebuff, var_info.occurrences[0], var_info.occurrences[1]);
-        for(i=0; i < var_info.occurrences[0]; i++)
-        {
-            for(x=0; x < var_info.occurrences[1]; x++)
-            {
-                offset = ((var_info.occurrences[1]*var_info.length)*i)+(var_info.length*x);
-                printf("Offset [%d]Bytes\n", offset);
-                memcpy(tmpdata, data+offset, var_info.length);
-                tmpdata = StripTrailingSpaces(tmpdata);
-                editStringVar2DArray(nat_vars, namebuff, tmpdata, i, x);
-            }
-        }
+        fprintf(logfile, "Error: Length == 0\n");
+        return(101);
     }
-    else if(var_info.format == 'I' && var_info.dimensions == 0)
+
+    if((buffer = (void*)malloc(var_info.length_all)) == NULL)
     {
-        sprintf(namebuff, "var%d", index);
-        memcpy(&i_tmpdata, data, var_info.length);
-        i_tmpdata = shiftInt(i_tmpdata, var_info.length);
-        newIntVar(nat_vars, namebuff, i_tmpdata);
+        return(102);
     }
-    else if(var_info.format == 'I' && var_info.dimensions == 1)
+
+    if(sh_funcs->pf_nni_get_parm(sh_funcs, index, parmhandle, var_info.length_all,
+      buffer) != NNI_RC_OK)
     {
-        sprintf(namebuff, "var%d", index);
-
-        memcpy(&i_tmpdata, data, var_info.length);
-        i_tmpdata = shiftInt(i_tmpdata, var_info.length);
-        newIntArray(nat_vars, namebuff, i_tmpdata);
-
-        for(i=1; i < var_info.occurrences[0]; i++)
-        {
-            memcpy(&i_tmpdata, data+(i*var_info.length), var_info.length);
-            i_tmpdata = shiftInt(i_tmpdata, var_info.length);
-            appendIntArray(nat_vars, namebuff, i_tmpdata);
-        }
+        return(103);
     }
-    else if(var_info.format == 'I' && var_info.dimensions == 2)
+
+
+    switch(var_info.format)
     {
-        sprintf(namebuff, "var%d", index);
-        new2DIntArray(nat_vars, namebuff, var_info.occurrences[0], var_info.occurrences[1]);
-
-        for(i=0; i < var_info.occurrences[0]; i++)
-        {
-            for(x=0; x < var_info.occurrences[1]; x++)
-            {
-                offset = ((var_info.occurrences[1]*var_info.length)*i)+(var_info.length*x);
-                memcpy(&i_tmpdata, data+offset, var_info.length);
-                i_tmpdata = shiftInt(i_tmpdata, var_info.length);
-                editIntVar2DArray(nat_vars, namebuff, i_tmpdata, i, x);
-            }
-        }
+        case 'N':
+            if((rc = handleNumericVar(sh_funcs, parmhandle, index, var_info, nat_vars))>0)
+                return(rc);
+            break;
+        case 'A':
+            if((rc = handleAlphaNumericVar(sh_funcs, parmhandle, index, var_info, nat_vars))>0)
+                return(rc);
+            break;
+        case 'U':
+            if((rc = handleUnicodeVar(sh_funcs, parmhandle, index, var_info, nat_vars))>0)
+                return(rc);
+            break;
+        case 'I':
+            if((rc = handleIntegerVar(sh_funcs, parmhandle, index, var_info, nat_vars))>0)
+                return(rc);
+            break;
+        case 'C':
+            if((rc = handleControlVar(sh_funcs, parmhandle, index, var_info, nat_vars))>0)
+                return(rc);
+            break;
+        case 'L':
+            if((rc = handleLogicVar(sh_funcs, parmhandle, index, var_info, nat_vars))>0)
+                return(rc);
+            break;
+        case 'B':
+            if((rc = handleBinaryVar(var_info, buffer, nat_vars))>0)
+                return(rc);
+            break;
+        default:
+            fprintf(logfile, "Error: Unkown Variable\n");
     }
 
+    free(buffer);
 
-    *complete_size += var_info.length_all;
-
-	printf("\n");
-
+    fprintf(logfile, "\n\n");
     return(0);
 }
 
-long print_all_vars(WORD nparm, void *parmhandle, void *traditional)
+long user_exit(WORD nparm, void *parmhandle, void *traditional)
 {
-    int i, ret;
-    void *value;
+    void *shlib = NULL;
+
+    int i, rc;
+
+    char *error;
+    void *buffer;
+    wchar_t *var_value,
+            *tmp_value;
+
+    char ldaname[22], templatename[22], deliver_filename[100],
+         *settingsstr;
+
 
     FILE *logfile;
-    int old_stdout;
 
-    char ldaname[22];
-    char templatename[22];
-    char deliver_filename[100];
-    char *settingsstr;
+    struct variables nat_vars;
 
-    int complete_size = 0;
     struct parameter_description lda, template, settings, deliver_file;
 
-    logfile = fopen("/tmp/gen_page.log", "w");
+    PF_NNI_GET_INTERFACE pf_nni_get_interface = NULL;
+    pnni_611_functions s_funcs;
 
-    old_stdout = dup(1);
-    dup2(fileno(logfile), 1);
-    close(fileno(logfile));
+    setlocale(LC_ALL, "");
 
-    signal(SIGILL, signalHandler);
-    signal(SIGSEGV, signalHandler);
+    nat_vars.next = NULL;
 
-    exec_stat = 1;
-
-    struct variables *nat_vars = malloc(sizeof(struct variables));
-    strcpy(nat_vars->name, "anker");
-    nat_vars->next = NULL;
-
-    complete_size = sizeof(struct variables);
-
-    if(traditional != NULL)
-        return((long)14);
-
-    exec_stat = 2;
-
-    printf("NPARM: [%hu]\n", nparm);
-    exec_stat = 3;
-
-    /*Read LDA Name Information*/
-    switch(ncxr_get_parm_info(0, parmhandle, &lda))
+    if((logfile = fopen("/tmp/a140734_logfile.log", "w")) == NULL)
     {
-        case -1:
-            printf("Error while reading lda infos\n");
-            return((long)1);
-        case -2:
-            printf("Error while reading lda infos\n");
-            return((long)2);
-        case -7:
-            printf("Error while reading lda infos\n");
-            return((long)3);
+        return(1);
+    }
+
+    if(OpenLib(&shlib, "libnatural.so") < 0)
+    {
+        fprintf(logfile, "Error loading so\n");
+        fclose(logfile);
+        return(2);
+    }
+
+    pf_nni_get_interface = (PF_NNI_GET_INTERFACE)dlsym(shlib,
+        GET_INTERFACE_FUNC);
+
+    if(!pf_nni_get_interface)
+    {
+        error = dlerror();
+        fprintf(logfile, "Error while loading Function [%s]: [%s]\n", GET_INTERFACE_FUNC, error);
+        CloseLib(&shlib);
+        fclose(logfile);
+        return(3);
+    }
+
+
+    if(((pf_nni_get_interface)(NNI_VERSION_CURR, (void**)&s_funcs)) != NNI_RC_OK)
+    {
+        fprintf(logfile, "...Error while gettings Function Table\n");
+        CloseLib(&shlib);
+        fclose(logfile);
+        return(4);
+    }
+
+
+    /*Start LDA*/
+    if(s_funcs->pf_nni_get_parm_info(s_funcs, 0, parmhandle, &lda) != NNI_RC_OK)
+    {
+        return(100);
     }
 
     if(lda.format != 'A' || lda.length_all != 20 || lda.dimensions != 0)
@@ -272,33 +812,14 @@ long print_all_vars(WORD nparm, void *parmhandle, void *traditional)
         printf("LDA Formatierung stimmt nicht\n");
         return((long)4);
     }
+    s_funcs->pf_nni_get_parm(s_funcs, 0, parmhandle, 20, ldaname);
+    ldaname[21] = '\0';
+    /*End LDA*/
 
-
-    switch(ncxr_get_parm(0, parmhandle, 20, ldaname))
+    /*Start template*/
+    if(s_funcs->pf_nni_get_parm_info(s_funcs, 1, parmhandle, &template) != NNI_RC_OK)
     {
-        case -1:
-            printf("Error while reading ldaname\n");
-            return((long)4);
-        case -2:
-            printf("Error while reading ldaname\n");
-            return((long)5);
-        case -3:
-            printf("Error while reading ldaname\n");
-            return((long)6);
-    }
-
-    /*Read Template Name Information*/
-    switch(ncxr_get_parm_info(1, parmhandle, &template))
-    {
-        case -1:
-            printf("Error while reading template infos\n");
-            return((long)7);
-        case -2:
-            printf("Error while reading template infos\n");
-            return((long)8);
-        case -7:
-            printf("Error while reading template infos\n");
-            return((long)9);
+        return(100);
     }
 
     if(template.format != 'A' || template.length_all != 20 || template.dimensions != 0)
@@ -306,123 +827,71 @@ long print_all_vars(WORD nparm, void *parmhandle, void *traditional)
         printf("Template Formatierung stimmt nicht\n");
         return((long)10);
     }
+    s_funcs->pf_nni_get_parm(s_funcs, 1, parmhandle, 20, templatename);
+    /*End Template*/
 
-    switch(ncxr_get_parm(1, parmhandle, 20, templatename))
+    /*Start deliver File*/
+    if(s_funcs->pf_nni_get_parm_info(s_funcs, 2, parmhandle, &deliver_file) != NNI_RC_OK)
     {
-        case -1:
-            return((long)11);
-        case -2:
-            return((long)12);
-        case -3:
-            return((long)13);
-    }
-
-    /*Read deliver File name*/
-    switch(ncxr_get_parm_info(2, parmhandle, &deliver_file))
-    {
-        case -1:
-            return((long)14);
-        case -2:
-            return((long)15);
-        case -7:
-            return((long)16);
+        return(100);
     }
 
     if(deliver_file.format != 'A' || deliver_file.length_all != 100 || deliver_file.dimensions != 0)
     {
         return((long)17);
     }
+    s_funcs->pf_nni_get_parm(s_funcs, 2, parmhandle, 100, deliver_filename);
+    /*End deliver File*/
 
-    switch(ncxr_get_parm(2, parmhandle, 100, deliver_filename))
+    /*Start Settingsstr*/
+    if(s_funcs->pf_nni_get_parm_info(s_funcs, 3, parmhandle, &settings) != NNI_RC_OK)
     {
-        case -1:
-            return((long)18);
-        case -2:
-            return((long)19);
-        case -3:
-            return((long)20);
-    }
-    /*Read settings str*/
-    switch(ncxr_get_parm_info(3, parmhandle, &settings))
-    {
-        case -1:
-            return((long)14);
-        case -2:
-            return((long)15);
-        case -7:
-            return((long)16);
-    }
-
-    if(settings.format != 'A' || settings.dimensions != 0)
-    {
-        return((long)17);
+        return(100);
     }
 
     settingsstr = malloc(settings.length_all);
 
-    switch(ncxr_get_parm(3, parmhandle, settings.length_all, settingsstr))
-    {
-        case -1:
-            return((long)18);
-        case -2:
-            return((long)19);
-        case -3:
-            return((long)20);
-    }
+    s_funcs->pf_nni_get_parm(s_funcs, 3, parmhandle, settings.length_all, settingsstr);
+    /*End Settingsstr*/
+    printf("Parms: [%d]\n", nparm);
 
-    printf("LDA: [%s]\n", ldaname);
-    printf("Template: [%s]\n", StripTrailingSpaces(templatename));
-    printf("DeliverFile: [%s]\n", deliver_filename);
-    printf("Settingstr: [%s]\n", settingsstr);
+    printf("LDA:      [%s]\n", ldaname);
+    printf("Template: [%s]\n", templatename);
+    printf("Filename: [%s]\n", settingsstr);
 
     for(i=4; i < nparm; i++)
     {
-        printf("I: [%d]\n", i);
-        exec_stat = 4 + i;
-        complete_size += sizeof(struct variables);
-        exec_stat = 500 + i;
-        if((ret = getVar(parmhandle, i, nat_vars, &complete_size)) > 0)
+        if((rc = readVar(parmhandle, s_funcs, i, &nat_vars, logfile))>0)
         {
-            printf("Error at i=[%d]\n", i);
-            return((long)ret);
+            CloseLib(&shlib);
+            fclose(logfile);
+            return((long)rc);
         }
     }
+    
 
-    printf("\n\n\n\n");
-    //printFullAnker(nat_vars, stdout);
-    printf("Complete size: [%d]\n", complete_size);
+    printVars(&nat_vars);
 
-    //SendVarsToSocket(fp, nat_vars, complete_size);
-    printf("Call generate_page\n");
-    generate_page(nat_vars, ldaname, templatename, deliver_filename);
-    printf("generate_page finished\n");
+    char error_str[1024];
+    strcpy(webserver_settings.templatepath, "/u/it/a140734/C/realHtml4Natural/web_server/templates/");
+    strcpy(webserver_settings.nat_sourcepath, "/VAW/natural/logi/fuser63/");
+    strcpy(webserver_settings.natlibrary, "TGAP0734");
 
-    dup2(old_stdout, 1);
-    close(old_stdout);
+    generate_page(&nat_vars, ldaname, templatename, deliver_filename);
 
-    return((long)0);
 
-}
-
-void signalHandler(int signal)
-{
-    FILE *error_file;
-
-    error_file = fopen("/tmp/engemann_nat_error", "w");
-    if(signal == SIGILL)
+    /*if(var2name(&nat_vars, "/VAW/natural/logi/fuser63/TGAP0734/SRC/LSHUS.NSL", error_str) < 0)
     {
-        fprintf(error_file, "SIGILL\n");
-        fprintf(error_file, "execstat : [%d]\n", exec_stat);
-    }
-    else if(signal == SIGSEGV)
-    {
-        fprintf(error_file, "SIGSEGV\n");
-        fprintf(error_file, "execstat : [%d]\n", exec_stat);
+        printf("Error: [%s]\n", error_str);
     }
     else
     {
-        fprintf(error_file, "Unkown");
-    }
-    fclose(error_file);
-    return;
+        printVars(&nat_vars);
+    }*/
+    CloseLib(&shlib);
+    fclose(logfile);
+
+
+    return((long)0);
+
 }

@@ -139,6 +139,7 @@ typedef struct _tagSubstParam {
 #define FLAG_DATA_STREAM	0x100000
 #define FLAG_CUSTOM_HEADER	0x200000
 #define FLAG_MULTIPART		0x400000
+#define FLAG_URLENCODED     0x800000
 
 #define FLAG_RECEIVING		0x80000000
 #define FLAG_SENDING		0x40000000
@@ -154,6 +155,11 @@ typedef union {
 } IPADDR;
 
 typedef struct {
+    struct {
+        char pchParamName[100];
+        char pchParamValue[2024];
+      } stParams[MAXPOSTPARAMS];
+    int pchParamNumber;
 	int iHttpVer;
 	size_t startByte;
 	char *pucPath;

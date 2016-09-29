@@ -13,7 +13,7 @@ int newUStringVar(struct variables *anker, char *name, wchar_t *value, int lengt
 
     if(wcslen(value) == 0)
     {
-        strcpy(varhandle_error_str, "Invalid Variable Length");
+        sprintf(varhandle_error_str, "Invalid Variable Length [%d]", wcslen(value));
         return(-1);
     }
 

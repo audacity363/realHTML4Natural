@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <locale.h>
 
 #include "standard.h"
 #include "varhandle.h"
@@ -42,7 +43,7 @@
  * @return 0 wenn alles OK war; < 0 wenn es einen Fehler gab
  */
 int parse_line(struct variables *anker, macros *macro_anker, char *line, FILE *p_output,
-               char **cmd_buff, int *just_save, int *in_for, int *in_if,
+               char *cmd_buff, int *just_save, int *in_for, int *in_if,
                char *error_str)
 {
     char *pos_open_var, *pos_close_var;
@@ -80,7 +81,7 @@ int parse_line(struct variables *anker, macros *macro_anker, char *line, FILE *p
         
         pos_close_cmd[0] = '\0';
         fprintf(p_output, "%.*s", pos_open_cmd-line, line);
-        memmove(line, pos_open_cmd+2, strlen(pos_open_cmd));
+        memmove(line, pos_open_cmd+2, strlen(pos_open_cmd)+1);
         switch(searchCommand(line, macro_anker))
         {
             case -1:
@@ -96,22 +97,16 @@ int parse_line(struct variables *anker, macros *macro_anker, char *line, FILE *p
                 *in_for = *in_for + 1;
                 if(*just_save != 0)
                 {
-                    *cmd_buff = realloc(*cmd_buff, strlen(*cmd_buff)+strlen(line)+6);
-                    strcat(*cmd_buff, "{%");
-                    strcat(*cmd_buff, line);
-                    strcat(*cmd_buff, "%}\n");
+                    strcat(cmd_buff, "{%");
+                    strcat(cmd_buff, line);
+                    strcat(cmd_buff, "%}\n");
                     return(0);
                 }
+                bzero(cmd_buff, 2024*100);
 
-                if(*cmd_buff != NULL);
-                {
-                    free(*cmd_buff);
-                    *cmd_buff = NULL;
-                }
                 *just_save = 1;
-                *cmd_buff = malloc(strlen(line)+2);
-                strcpy(*cmd_buff, line);
-                strcat(*cmd_buff, "\n");
+                strcpy(cmd_buff, line);
+                strcat(cmd_buff, "\n");
                 return(0);
             //Forschleife ist geschlossen worden 
             case ENDFOR_CMD:
@@ -123,30 +118,25 @@ int parse_line(struct variables *anker, macros *macro_anker, char *line, FILE *p
                 if(*in_for-1 != 0)
                 {
                     *in_for = *in_for -1; 
-                    *cmd_buff = realloc(*cmd_buff, strlen(*cmd_buff)+strlen(line)+6);
-                    strcat(*cmd_buff, "{%");
-                    strcat(*cmd_buff, line);
-                    strcat(*cmd_buff, "%}\n");
+                    strcat(cmd_buff, "{%");
+                    strcat(cmd_buff, line);
+                    strcat(cmd_buff, "%}\n");
                     return(0);
                 }
                 if(*in_if != 0)
                 {
                     *in_for = *in_for -1; 
-                    *cmd_buff = realloc(*cmd_buff, strlen(*cmd_buff)+strlen(line)+6);
-                    strcat(*cmd_buff, "{%");
-                    strcat(*cmd_buff, line);
-                    strcat(*cmd_buff, "%}\n");
+                    strcat(cmd_buff, "{%");
+                    strcat(cmd_buff, line);
+                    strcat(cmd_buff, "%}\n");
                     return(0);
                 }
                 *in_for = *in_for - 1;
-                if(start_for(anker, *cmd_buff, p_output, macro_anker,
+                if(start_for(anker, cmd_buff, p_output, macro_anker,
                              error_str) < 0)
                 {
-                    free(*cmd_buff);
                     return(-1);
                 }
-                free(*cmd_buff);
-                *cmd_buff = NULL;
                 *just_save = 0;
                 return(0);
             //If abfrage
@@ -159,21 +149,15 @@ int parse_line(struct variables *anker, macros *macro_anker, char *line, FILE *p
                 *in_if = *in_if + 1;
                 if(*just_save != 0)
                 {
-                    *cmd_buff = realloc(*cmd_buff, strlen(*cmd_buff)+strlen(line)+6);
-                    strcat(*cmd_buff, "{%");
-                    strcat(*cmd_buff, line);
-                    strcat(*cmd_buff, "%}\n");
+                    strcat(cmd_buff, "{%");
+                    strcat(cmd_buff, line);
+                    strcat(cmd_buff, "%}\n");
                     return(0);
                 }
                 *just_save = 1;
-                if(*cmd_buff != NULL);
-                {
-                    free(*cmd_buff);
-                    *cmd_buff = NULL;
-                }
-                *cmd_buff = malloc(strlen(line)+1);
-                strcpy(*cmd_buff, line);
-                strcat(*cmd_buff, "\n");
+                bzero(cmd_buff, 2024*100);
+                strcpy(cmd_buff, line);
+                strcat(cmd_buff, "\n");
                 return(0);
             //Close if
             case ENDIF_CMD:
@@ -185,31 +169,26 @@ int parse_line(struct variables *anker, macros *macro_anker, char *line, FILE *p
                 if(*in_if-1 != 0)
                 {
                     *in_if = *in_if -1;
-                    *cmd_buff = realloc(*cmd_buff, strlen(*cmd_buff)+strlen(line)+6);
-                    strcat(*cmd_buff, "{%");
-                    strcat(*cmd_buff, line);
-                    strcat(*cmd_buff, "%}\n");
+                    strcat(cmd_buff, "{%");
+                    strcat(cmd_buff, line);
+                    strcat(cmd_buff, "%}\n");
                     return(0);
 
                 }
                 if(*in_for != 0)
                 {
                     *in_if = *in_if -1;
-                    *cmd_buff = realloc(*cmd_buff, strlen(*cmd_buff)+strlen(line)+6);
-                    strcat(*cmd_buff, "{%");
-                    strcat(*cmd_buff, line);
-                    strcat(*cmd_buff, "%}\n");
+                    strcat(cmd_buff, "{%");
+                    strcat(cmd_buff, line);
+                    strcat(cmd_buff, "%}\n");
                     return(0);
 
                 }
                 *in_if = *in_if -1;
-                if((if_ret = start_if(anker, *cmd_buff, p_output, macro_anker, error_str)) < 0)
+                if((if_ret = start_if(anker, cmd_buff, p_output, macro_anker, error_str)) < 0)
                 {
-                    free(*cmd_buff);
                     return(-1);
                 }
-                free(*cmd_buff);
-                *cmd_buff = NULL;
                 *just_save = 0;
                 return(if_ret);
             //Found printVars()
@@ -246,8 +225,8 @@ int parse_line(struct variables *anker, macros *macro_anker, char *line, FILE *p
                 if(getMacroName(macro_anker, line) < 0)
                     return(-2);
                 *just_save = 2;
-                macro_anker->macro_buff = malloc(sizeof(char));
-                bzero(macro_anker->macro_buff, 1);
+                //macro_anker->macro_buff = malloc(sizeof(char));
+                bzero(macro_anker->macro_buff, sizeof(macro_anker->macro_buff));
                 return(0);
             case ENDMACRO_CMD:
                 *just_save = 0;
@@ -266,10 +245,9 @@ int parse_line(struct variables *anker, macros *macro_anker, char *line, FILE *p
             case BREAK_CMD:
                 if(*just_save == 2)
                     goto save_macro;
-                *cmd_buff = realloc(*cmd_buff, strlen(*cmd_buff)+strlen(line)+6);
-                strcat(*cmd_buff, "{%");
-                strcat(*cmd_buff, line);
-                strcat(*cmd_buff, "%}\n");
+                strcat(cmd_buff, "{%");
+                strcat(cmd_buff, line);
+                strcat(cmd_buff, "%}\n");
                 return(0);
             default:
                 strcpy(error_str, "Internal Error: searchCommand() return something unkown");
@@ -280,22 +258,21 @@ int parse_line(struct variables *anker, macros *macro_anker, char *line, FILE *p
     {
         if(*just_save == 1)
         {
-            *cmd_buff = realloc(*cmd_buff, strlen(*cmd_buff)+strlen(line)+1);
-            strcat(*cmd_buff, line);
+            strcat(cmd_buff, line);
         }
         else if(*just_save == 2)
         {
 save_macro:
             if(cmd == 1)
             {
-                macro_anker->macro_buff = realloc(macro_anker->macro_buff, strlen(macro_anker->macro_buff)+strlen(line)+6);
+                //macro_anker->macro_buff = realloc(macro_anker->macro_buff, strlen(macro_anker->macro_buff)+strlen(line)+6);
                 strcat(macro_anker->macro_buff, "{%");
                 strcat(macro_anker->macro_buff, line);
                 strcat(macro_anker->macro_buff, "%}");
             }
             else
             {
-                macro_anker->macro_buff = realloc(macro_anker->macro_buff, strlen(macro_anker->macro_buff)+strlen(line)+1);
+                //macro_anker->macro_buff = realloc(macro_anker->macro_buff, strlen(macro_anker->macro_buff)+strlen(line)+1);
                 strcat(macro_anker->macro_buff, line);
             }
 
@@ -344,14 +321,16 @@ int start_jinjaparser(struct variables *anker, char *outputfile,
                       char *templatefile, char *error_str, int *line_nr)
 {
     FILE *p_template, *p_output;
-    char *line, *cmd_buff = NULL;
+    char *line, cmd_buff[2024*100];
     int parser_status = 0, in_for = 0, in_if = 0, l_line_nr = 0;
+
+    setlocale(LC_ALL, "");
 
     macros macros_anker;
 
     macros_anker.anker = malloc(sizeof(struct macro_definition));
     macros_anker.anker->next = NULL;
-    macros_anker.macro_buff = NULL;
+    //macros_anker.macro_buff = NULL;
     strcpy(macros_anker.anker->name, "macroanker");
 
     if((p_template = openTemplateFile(templatefile, error_str)) == NULL)
@@ -381,7 +360,7 @@ int start_jinjaparser(struct variables *anker, char *outputfile,
         }
 
         l_line_nr++;
-        if(parse_line(anker, &macros_anker, line, p_output, &cmd_buff, &parser_status, 
+        if(parse_line(anker, &macros_anker, line, p_output, cmd_buff, &parser_status, 
                       &in_for, &in_if, error_str) < 0)
         {
             close_jinjaparser(p_output, p_template);

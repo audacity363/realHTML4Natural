@@ -60,7 +60,9 @@ int generate_page(struct variables *anker, char *ldaname, char *templatename,
     char error_str[2048];
     int error_zeile;
 
-    sprintf(template, "%s/%s", webserver_settings.templatepath, templatename);
+    printf("ldaname : [%s]\n", ldaname);
+
+    sprintf(template, "%s/%s", webserver_settings.templatepath, StripTrailingSpaces(templatename));
     sprintf(lda, "%s/%s/SRC/%s.NSL", webserver_settings.nat_sourcepath,
                             webserver_settings.natlibrary, StripTrailingSpaces(ldaname));
 

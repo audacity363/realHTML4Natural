@@ -102,6 +102,10 @@ void natone_parser(struct varnames *anker, struct status_p *status, char *line)
             printf("Integer\n");
             vartype = INTEGER;
             break;
+        case SAG_LOGIC_CHAR:
+            printf("Logical (Integer)\n");
+            vartype = INTEGER;
+            break;
         case SAG_NUMERIK_CHAR:
             printf("Numeric\n");
             vartype = NUMERIC;

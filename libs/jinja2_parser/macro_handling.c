@@ -31,7 +31,7 @@ int getMacroName(macros *macro_anker, char *line, char *error_str)
     char *begin_args, *end_args;
     char *equals_ptr, default_val[2048];
     char *args_split;
-    char *import_line, *cmd_buff = NULL;
+    char *import_line, *cmd_buff;
     char *saveptr;
 
     int found_args = 0;
@@ -187,8 +187,9 @@ int saveMacro(macros *macros_anker)
 
     if(override == 1)
     {
-        free(hptr->value);
-        hptr->value = malloc(strlen(macros_anker->macro_buff)+1);
+        bzero(hptr->value, sizeof(hptr->value));
+        //free(hptr->value);
+        //hptr->value = malloc(strlen(macros_anker->macro_buff)+1);
 
         hptr->aguments = macros_anker->aguments;
 
@@ -206,7 +207,7 @@ int saveMacro(macros *macros_anker)
     {
         new_value = malloc(sizeof(struct macro_definition));
         strcpy(new_value->name, macros_anker->cur_name);
-        new_value->value = malloc(strlen(macros_anker->macro_buff)+1);
+        //new_value->value = malloc(strlen(macros_anker->macro_buff)+1);
         strcpy(new_value->value, macros_anker->macro_buff);
 
         new_value->aguments = macros_anker->aguments;
@@ -221,9 +222,10 @@ int saveMacro(macros *macros_anker)
         hptr->next = new_value;
     }
 
-    free(macros_anker->macro_buff);
-    macros_anker->macro_buff = NULL;
-    bzero(macros_anker->cur_name, 1024);
+    //free(macros_anker->macro_buff);
+    bzero(macros_anker->macro_buff, sizeof(macros_anker->macro_buff));
+    //macros_anker->macro_buff = NULL;
+    bzero(macros_anker->cur_name, sizeof(macros_anker->cur_name));
     return(0);
 }
 
@@ -515,14 +517,14 @@ int printMacro(macros *macro_anker, char *line, FILE *p_output,
 
     //newStringVar(new_var_anker, "testvar", "Hello Wold");
 
-    char *cmd_buff;
+    char cmd_buff[100*2024];
     int just_save, in_for, in_if;
 
     bodybuff = strtok_r(hptr->value, "\n", &bodysave);
     while(bodybuff != NULL)
     {
         if((parser_rc = parse_line(new_var_anker, macro_anker, bodybuff,
-                                   p_output, &cmd_buff, &just_save, &in_for,
+                                   p_output, cmd_buff, &just_save, &in_for,
                                    &in_if, error_str)) < 0)
         {
             return(parser_rc);

@@ -1,6 +1,6 @@
 .PHONY: var2names web_server
-#HOMEDIR = /u/it/a140734/C/realHtml4Natural_copy/
-HOMEDIR = /home/tom//Documents/realHtml4Natural/
+HOMEDIR = /u/it/a140734/C/realHtml4Natural/
+#HOMEDIR = /home/tom//Documents/realHtml4Natural/
 
 STANDARD_PATH    	=   $(HOMEDIR)/include
 
@@ -38,8 +38,8 @@ LIBS    = -L$(CFG_PATH) -lcfg \
           -L$(VAR_PATH) -lvarhandle \
           -L$(UTILS_PATH) -lutils \
 
-#CC = xlc
-CC = gcc
+CC = xlc
+#CC = gcc
 CFLAGS = -c -g 
 
 ARFLAGS = -vcru
@@ -103,6 +103,7 @@ varhandle:
 	$(CC) $(CFLAGS) $(VAR_PATH)/string.c -o $(VAR_PATH)/bin/string.o $(INCDIR)
 	$(CC) $(CFLAGS) $(VAR_PATH)/management.c -o $(VAR_PATH)/./bin/management.o $(INCDIR)
 	$(CC) $(CFLAGS) $(VAR_PATH)/print.c -o $(VAR_PATH)/bin/print.o $(INCDIR)
+	$(CC) $(CFLAGS) $(VAR_PATH)/unicode.c -o $(VAR_PATH)/bin/unicode.o $(INCDIR)
 	ar $(ARFLAGS) $(VAR_PATH)/libvarhandle.a $(VAR_PATH)/bin/*.o 
 
 clean_varhandle:
@@ -155,7 +156,7 @@ clean:
 	$(MAKE) clean_utils
 	$(MAKE) clean_varhandle
 	$(MAKE) clean_var2name
-	$(MAKE) clean_webserver
+	#$(MAKE) clean_webserver
 
 all:
 	$(MAKE) cfgreader
@@ -166,7 +167,7 @@ all:
 	$(MAKE) utils
 	$(MAKE) varhandle
 	$(MAKE) var2name
-	$(MAKE) webserver
+	#$(MAKE) webserver
 
 all_test:
 	$(CC) -g -o ./test/main ./test/main.c $(INCDIR) jinja2.so

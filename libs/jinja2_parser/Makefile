@@ -1,4 +1,4 @@
-##HOMEDIR = /u/it/a140734/C/realHtml4Natural_copy/
+##HOMEDIR = /u/it/a140734/C/realHtml4Natural/
 HOMEDIR = /home/tom//Documents/realHtml4Natural/
 
 STANDARD_PATH    	=   $(HOMEDIR)/include
@@ -28,7 +28,6 @@ INCDIR   =  -I$(STANDARD_PATH)  \
 LIBS    = -L$(CFG_PATH) -lcfg \
           -L$(HEXD_PATH) -lhexdump \
           -L$(SOC_PATH) -lsockets \
-          -L$(WEB_PATH) -lwebserver \
           -L$(NATVAR_PATH) -lvar2name \
           -L$(LDA_PATH) -lldaparser \
           -L$(VAR_PATH) -lvarhandle \

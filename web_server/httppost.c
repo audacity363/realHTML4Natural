@@ -121,6 +121,101 @@ void _mwNotifyPostVars(HttpParam *hp, HttpSocket* phsSocket, PostParam *pp)
   }
 }
 
+void urldecode2(char *dst, const char *src)
+{
+    char a, b;
+    while (*src) 
+    {
+        if ((*src == '%') &&
+        ((a = src[1]) && (b = src[2])) &&
+        (isxdigit(a) && isxdigit(b))) 
+        {
+            if (a >= 'a')
+            a -= 'a'-'A';
+            if (a >= 'A')
+            a -= ('A' - 10);
+            else
+            a -= '0';
+            if (b >= 'a')
+            b -= 'a'-'A';
+            if (b >= 'A')
+            b -= ('A' - 10);
+            else
+            b -= '0';
+            *dst++ = 16*a+b;
+            src+=3;
+        } 
+        else if (*src == '+') 
+        {
+            *dst++ = ' ';
+            src++;
+        }
+        else 
+        {
+            *dst++ = *src++;
+        }
+    }
+    *dst++ = '\0';
+}
+
+int test(char *buffer, HttpSocket *phsSocket)
+{
+    char *ptr = buffer+strlen(buffer);
+    char *hptr, *kptr, *vptr, *sptr1, *sptr2;
+    HttpRequest *phr = &phsSocket->request;
+
+    int i=0;
+
+    for(i=0; i < 20; i++)
+    {
+        memset(phr->stParams[i].pchParamName, 0x20, sizeof(phr->stParams[i-1].pchParamName));
+        memset(phr->stParams[i].pchParamValue, 0x20, sizeof(phr->stParams[i-1].pchParamValue));
+        phr->stParams[i].pchParamName[99] = '\0';
+        phr->stParams[i].pchParamValue[2023] = '\0';
+
+    }
+
+    i=1;
+
+    while(ptr && ptr[0] != '\n') ptr--;
+
+    ptr++;
+
+    printf("-----------------------\n");
+    hptr = strtok_r(ptr, "&", &sptr1);
+    while(hptr != NULL)
+    {
+        printf("[%s]\n", hptr);
+        
+        kptr = strtok_r(hptr, "=", &sptr2);
+        vptr = strtok_r(NULL, "=", &sptr2);
+        //printf("\t[%s]=[%s]\n", kptr, vptr);
+
+        //memset(phr->stParams[i-1].pchParamName, 0x20, sizeof(phr->stParams[i-1].pchParamName));
+        memset(phr->stParams[i-1].pchParamValue, '\0', sizeof(phr->stParams[i-1].pchParamValue));
+        //phr->stParams[i-1].pchParamValue[2023] = '\0';
+
+        strcpy(phr->stParams[i-1].pchParamName, kptr);
+        //urldecode2(vptr, vptr);
+        urldecode2(phr->stParams[i-1].pchParamValue, vptr);
+        //strncpy(phr->stParams[i-1].pchParamValue, vptr, strlen(vptr));
+
+        hptr = strtok_r(NULL, "&", &sptr1);
+        i++;
+    }
+    i--;
+
+    phr->pchParamNumber = i;
+
+    printf("i=[%d]\n", i);
+
+    for(i=0; i < phr->pchParamNumber; i++)
+        printf("\t[%s]=[%s]\n",phr->stParams[i].pchParamName, phr->stParams[i].pchParamValue);
+
+    printf("\n-----------------------\n");
+
+}
+
 ////////////////////////////////////////////////////////////////////////////
 // _mwProcessMultipartPost
 // Process a multipart POST request
@@ -160,6 +255,12 @@ int _mwProcessMultipartPost(HttpParam *httpParam, HttpSocket* phsSocket, BOOL fN
   
   
   //ASSERT(pxMP->writeLocation <= HTTPMAXRECVBUFFER);
+ 
+  if(ISFLAGSET(phsSocket, FLAG_URLENCODED))
+  {
+    test(phsSocket->buffer, phsSocket);
+    return 1;
+  }
   
   // Search new data for boundary indicator
   pchBoundarySearch = _mwFindMultipartBoundary(phsSocket->buffer, 

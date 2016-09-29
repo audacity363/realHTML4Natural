@@ -325,13 +325,12 @@ int fillTmpVar(struct variables *anker, char *tmp_name, char *variable,
                 int var_type, int index_type, int x_index, int y_index,
                 int for_index, char *error_str)
 {
-    char *c_value, *tmp_str = NULL;
+    char *c_value, tmp_str[10];
     wchar_t *wc_value;
     int i_value, x, y, length, i, rc;
 
     if(var_type == STRING)
     {
-        tmp_str = malloc(2);
         tmp_str[1] = '\0';
 
         c_value = getStringValue(anker, variable);
@@ -348,7 +347,6 @@ int fillTmpVar(struct variables *anker, char *tmp_name, char *variable,
         }
         else if(index_type == 1)
         {
-            tmp_str = malloc(2);
             tmp_str[1] = '\0';
 
             c_value = getStringValuefromArray(anker, variable, x_index);
@@ -384,7 +382,6 @@ int fillTmpVar(struct variables *anker, char *tmp_name, char *variable,
         {
             c_value = getStringValuefrom2DArray(anker, variable, x_index,
                                                 y_index);
-            tmp_str = malloc(2);
             tmp_str[1] = '\0';
             tmp_str[0] = c_value[for_index];
             editStringVar(anker, tmp_name, tmp_str);
@@ -500,10 +497,6 @@ int fillTmpVar(struct variables *anker, char *tmp_name, char *variable,
         }
     }
 
-    if(tmp_str != NULL)
-    {
-        free(tmp_str);
-    }
     return(0);
 }
 
@@ -524,9 +517,11 @@ int fillTmpVar(struct variables *anker, char *tmp_name, char *variable,
 int for_handle(struct variables *anker, char *cmd_buff, FILE *p_output,
                macros *macro_anker, char *error_str)
 {
-    char *for_block, *tmp_buff, *for_cmd, *for_cmd_detail;
-    char *l_cmd_buff = NULL;
-    char *line;
+    char for_block[200][2024], *tmp_buff, *for_cmd, for_cmd_detail[10][1024];
+    //char *for_block, *for_cmd_detail;
+    char l_cmd_buff[100*2024];
+    //char *line;
+    char line[2024];
 
     int block_length = 0, i, x, for_index, arg_length, var_type;
     int index_type, x_index, y_index;
@@ -536,9 +531,7 @@ int for_handle(struct variables *anker, char *cmd_buff, FILE *p_output,
 
     tmp_buff = strtok(cmd_buff, "\n");
 
-    for_block = malloc(sizeof(char*));
-    ((char**)for_block)[0] = malloc(strlen(tmp_buff));
-    strcpy(((char**)for_block)[0], tmp_buff);
+    strcpy(for_block[0], tmp_buff);
     block_length++;
 
 
@@ -550,14 +543,12 @@ int for_handle(struct variables *anker, char *cmd_buff, FILE *p_output,
         }
         block_length++;
 
-        for_block = realloc(for_block, sizeof(char*)*block_length);
-        ((char**)for_block)[block_length-1] = malloc(strlen(tmp_buff)+1);
-        strcpy(((char**)for_block)[block_length-1], tmp_buff);
+        strcpy(for_block[block_length-1], tmp_buff);
     }
 
 
     //For Befehl vorne und hinten von Leerzeichen befreien
-    for_cmd = ((char**)for_block)[0];
+    for_cmd = for_block[0];
     TrimSpaces(for_cmd);
     for_cmd = StripTrailingSpaces(for_cmd);
 
@@ -568,9 +559,7 @@ int for_handle(struct variables *anker, char *cmd_buff, FILE *p_output,
         return(-1);
     }
 
-    for_cmd_detail = malloc(sizeof(char*));
-    ((char**)for_cmd_detail)[0] = malloc(strlen(tmp_buff));
-    strcpy(((char**)for_cmd_detail)[0], tmp_buff);
+    strcpy(for_cmd_detail[0], tmp_buff);
     
     for(i=1; i < 4;i++)
     {
@@ -579,23 +568,17 @@ int for_handle(struct variables *anker, char *cmd_buff, FILE *p_output,
             strcpy(error_str, "Syntax Error: Missing Token");
             return(-1);
         }
-        if((for_cmd_detail = realloc(for_cmd_detail, sizeof(char*)*(i+1))) == NULL)
-        {
-            strcpy(error_str, strerror(errno));
-            return(-2);
-        }
-        ((char**)for_cmd_detail)[i] = malloc(strlen(tmp_buff)+1);
-        memcpy(((char**)for_cmd_detail)[i], tmp_buff, strlen(tmp_buff)+1);
+        strcpy(for_cmd_detail[i], tmp_buff);
     }
 
-    if(strcmp(((char**)for_cmd_detail)[2], "in") == 0)
+    if(strcmp(for_cmd_detail[2], "in") == 0)
     {
-        if((index_type = getIndex(anker, ((char**)for_cmd_detail)[3],
+        if((index_type = getIndex(anker, for_cmd_detail[3],
                                   &x_index, &y_index, error_str)) < 0)
         {
             return(-3);
         }
-        if((var_type = getVarType(anker, ((char**)for_cmd_detail)[3])) < 0)
+        if((var_type = getVarType(anker, for_cmd_detail[3])) < 0)
         {
             strcpy(error_str, varhandle_error_str);
             return(-4);
@@ -628,7 +611,7 @@ int for_handle(struct variables *anker, char *cmd_buff, FILE *p_output,
 
     }
 
-    if((arg_length = for_getArrayLength(anker, ((char**)for_cmd_detail)[3],
+    if((arg_length = for_getArrayLength(anker, for_cmd_detail[3],
             var_type, index_type, x_index, y_index, error_str)) < 0)
     {
         return(-9);
@@ -641,13 +624,13 @@ int for_handle(struct variables *anker, char *cmd_buff, FILE *p_output,
         newIntVar(anker, "loop.i", 0);
     }
 
-    createTmpVar(anker, ((char**)for_cmd_detail)[1], ((char**)for_cmd_detail)[3],
+    createTmpVar(anker, for_cmd_detail[1], for_cmd_detail[3],
                 var_type, index_type, x_index, y_index,
                 error_str);
 
     for(i=0; i < arg_length; i++)
     {
-        fillTmpVar(anker, ((char**)for_cmd_detail)[1], ((char**)for_cmd_detail)[3],
+        fillTmpVar(anker, for_cmd_detail[1], for_cmd_detail[3],
                 var_type, index_type, x_index, y_index,
                 i, error_str);
 
@@ -656,8 +639,7 @@ int for_handle(struct variables *anker, char *cmd_buff, FILE *p_output,
         for(x=1; x < block_length; x++)
         {
             editIntVar(anker, "loop.i", i);
-            line = malloc(strlen(((char**)for_block)[x])+2);
-            strcpy(line, ((char**)for_block)[x]);
+            strcpy(line, for_block[x]);
             strcat(line, "\n");
 
             if(strstr(line, "if") != NULL && strstr(line, "end-if") == NULL)
@@ -673,37 +655,29 @@ int for_handle(struct variables *anker, char *cmd_buff, FILE *p_output,
             {
                 if(strstr(line, "break") != NULL)
                 {
-                    free(line);;
                     return(0);
                 }
                 else if(strstr(line, "continue") != NULL)
                 {
-                    free(line);
                     break;
                 }
             }
 
-            if((parser_ret = parse_line(anker, macro_anker, line, p_output, &l_cmd_buff,
+            if((parser_ret = parse_line(anker, macro_anker, line, p_output, l_cmd_buff,
                        &parser_status, &l_in_for, &l_in_if, error_str)) < 0)
             {
-                free(line);
                 return(-10);
             }
             else if(parser_ret == 1)
             {
-                free(line);
                 return(0);
             }
             else if(parser_ret == 1)
             {
-                free(line);
                 break;
             }
-            bzero(line, strlen(line));
-
-            //free(line);
+            bzero(line, sizeof(line));
         }
     }
-
     return(0);
 }

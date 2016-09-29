@@ -5,7 +5,6 @@
 #define MAXATTRLENGTH 500
 #define MAXSTRINGLENGTH 500
 
-#define DEBUG 
  
  //Kurzform fuer strcmp
 #define cmp(X,Y) (strcmp(X,Y)==0)

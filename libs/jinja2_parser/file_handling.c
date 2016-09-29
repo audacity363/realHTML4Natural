@@ -40,6 +40,10 @@ FILE *openOutputFile(char *filename, char *error_str)
  */
 int closeOutputFile(FILE *p_output, char *error_str)
 {
+    if(p_output == NULL)
+    {
+        return(0);
+    }
     if(fflush(p_output) != 0)
     {
         sprintf(error_str, "Error while flushing outputfile: [%s]",
@@ -47,12 +51,17 @@ int closeOutputFile(FILE *p_output, char *error_str)
         return(-1);
     }
 
-    if(fclose(p_output) != 0)
+    if(p_output == NULL)
+    {
+        return(0);
+    }
+
+/*    if(fclose(p_output) != 0)
     {
         sprintf(error_str, "Error while closing outputfile: [%s]",
             strerror(errno));
         return(-2);
-    }
+    }*/
     return(0);
 }
 
@@ -108,11 +117,15 @@ char *getLinefromTemplate(FILE *p_template, char *error_str)
  */
 int  closeTemplateFile(FILE *p_template, char *error_str)
 {
-    if(fclose(p_template) != 0)
+    if(p_template == NULL)
+    {
+        return(0);
+    }
+    /*if(fclose(p_template) != 0)
     {
         sprintf(error_str, "Error while closing template: [%s]",
             strerror(errno));
         return(-1);
-    }
+    }*/
     return(0);
 }

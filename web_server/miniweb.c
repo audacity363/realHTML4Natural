@@ -175,33 +175,30 @@ int main(int argc,char* argv[])
 	fprintf(stderr,"MiniWeb (built on %s)\n(C)2005-2013 Written by Stanley Huang <stanleyhuangyc@gmail.com>\n\n", __DATE__);
 
 
-    char config_path[] = "/home/tom/Documents/realHtml4Natural/web_server/test.cfg";
-#ifdef WIN32
-	SetConsoleCtrlHandler( (PHANDLER_ROUTINE) MiniWebQuit, TRUE );
-#else
+    //char config_path[] = "/home/tom/Documents/realHtml4Natural/web_server/test.cfg";
+    char config_path[] = "/u/it/a140734/C/realHtml4Natural/web_server/test.cfg";
+
+    char htdocs_path[] = "/u/it/a140734/C/realHtml4Natural/web_server/htdocs/";
+
 	signal(SIGINT, (void *) MiniWebQuit);
 	signal(SIGTERM, (void *) MiniWebQuit);
 	signal(SIGPIPE, SIG_IGN);
-#endif
 
 	//fill in default settings
 	mwInitParam(&httpParam);
 	httpParam.maxClients=32;
 	httpParam.httpPort = 80;
-	GetFullPath(httpParam.pchWebPath, argv[0], "htdocs");
-#ifndef DISABLE_BASIC_WWWAUTH
+	//GetFullPath(httpParam.pchWebPath, argv[0], "htdocs");
 	httpParam.pxAuthHandler = authHandlerList;
-#endif
 	httpParam.pxUrlHandler=urlHandlerList;
 	httpParam.flags=FLAG_DIR_LISTING;
 	httpParam.tmSocketExpireTime = 15;
 	httpParam.pfnPost = DefaultWebPostCallback;
     httpParam.config_path = config_path;
-#ifdef MEDIA_SERVER
-	httpParam.pfnFileUpload = TranscodeUploadCallback;
-#else
 	httpParam.pfnFileUpload = DefaultWebFileUploadCallback;
-#endif
+
+    strcpy(httpParam.pchWebPath, htdocs_path);
+
 
 	//parsing command line arguments
 	{

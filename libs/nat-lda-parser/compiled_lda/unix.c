@@ -103,6 +103,7 @@ void unix_parser(struct varnames *anker, struct status_p *status, char *line)
         case SAG_NUMERIK_CHAR:
             vartype = NUMERIC;
             break;
+        case SAG_LOGIC_CHAR:
         case SAG_INTEGER_CHAR:
             vartype = NUMERIC;
             break;

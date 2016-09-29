@@ -1100,23 +1100,6 @@ int _mwProcessReadSocket(HttpParam* hp, HttpSocket* phsSocket)
 		} else if (!memcmp(phsSocket->buffer, "POST", 4)) {
 			SETFLAG(phsSocket,FLAG_REQUEST_POST);
 			path = phsSocket->pucData + 6;
-#ifdef ENABLE_RTSP
-		} else if (!memcmp(phsSocket->buffer, "OPTIONS", 7)) {
-			SETFLAG(phsSocket,FLAG_REQUEST_OPTIONS);
-			path = phsSocket->pucData + 8;
-		} else if (!memcmp(phsSocket->buffer, "DESCRIBE", 8)) {
-			SETFLAG(phsSocket,FLAG_REQUEST_DESCRIBE);
-			path = phsSocket->pucData + 9;
-		} else if (!memcmp(phsSocket->buffer, "SETUP", 5)) {
-			SETFLAG(phsSocket,FLAG_REQUEST_SETUP);
-			path = phsSocket->pucData + 6;
-		} else if (!memcmp(phsSocket->buffer, "PLAY", 4)) {
-			SETFLAG(phsSocket,FLAG_REQUEST_PLAY);
-			path = phsSocket->pucData + 5;
-		} else if (!memcmp(phsSocket->buffer, "TEARDOWN", 8)) {
-			SETFLAG(phsSocket,FLAG_REQUEST_TEARDOWN);
-			path = phsSocket->pucData + 9;
-#endif
 		} else {
 			SYSLOG(LOG_INFO,"[%d] Unsupported method\n",phsSocket->socket);
 			phsSocket->request.pucPath = 0;
@@ -1648,7 +1631,7 @@ int _mwStartSendFile2(HttpParam* hp, HttpSocket* phsSocket, const char* rootPath
 		return -1;
 	}
 
-	//SYSLOG(LOG_INFO,"File/requested size: %d/%d\n",st.st_size,phsSocket->response.contentLength);
+	SYSLOG(LOG_INFO,"File/requested size: %d/%d\n",st.st_size,phsSocket->response.contentLength);
 
 	// build http header
 	phsSocket->dataLength=_mwBuildHttpHeader(
@@ -1696,12 +1679,15 @@ int _mwStartSendFile(HttpParam* hp, HttpSocket* phsSocket)
     if(settings.found == 1)
     {
         callNaturalProgram(hp, phsSocket, settings);
+	    ret = _mwStartSendFile2(hp, phsSocket, "/tmp/", "outputtest.html");
+    }
+    else
+    {
+        printf("pchWebPath:      [%s]\n", hp->pchWebPath);
+        printf("request.pucPath: [%s]\n", phsSocket->request.pucPath);
+	    ret = _mwStartSendFile2(hp, phsSocket, hp->pchWebPath, phsSocket->request.pucPath);
     }
 
-
-	ret = _mwStartSendFile2(hp, phsSocket, hp->pchWebPath, phsSocket->request.pucPath);
-
-    
 
 	if (ret != 0) {
 		SYSLOG(LOG_INFO,"[%d] Http file not found\n",phsSocket->socket);
@@ -2077,25 +2063,40 @@ int mwGetContentType(const char *pchExtname)
 	if (pchExtname[1]=='\0') {
 		return HTTPFILETYPE_OCTET;
 	} else if (pchExtname[2]=='\0') {
+        if(strcmp(pchExtname, "js") == 0)
+            return HTTPFILETYPE_JS;
+
 		memcpy(&dwExt, pchExtname, 2);
 		switch (GETDWORD(pchExtname) & 0xffdfdf) {
-		case FILEEXT_JS: return HTTPFILETYPE_JS;
 		case FILEEXT_TS: return HTTPFILETYPE_TS;
 		}
 	} else if (pchExtname[3]=='\0' || pchExtname[3]=='?') {
 		//identify 3-char file extensions
+        if(strncmp(pchExtname, "htm", 3) == 0)
+            return HTTPFILETYPE_HTML;
+        else if(strncmp(pchExtname, "xml", 3) == 0)
+            return HTTPFILETYPE_XML;
+        else if(strncmp(pchExtname, "xsl", 3) == 0)
+            return HTTPFILETYPE_XML;
+        else if(strncmp(pchExtname, "txt", 3) == 0)
+            return HTTPFILETYPE_TEXT;
+        else if(strncmp(pchExtname, "xul", 3) == 0)
+            return HTTPFILETYPE_XUL;
+        else if(strncmp(pchExtname, "gif", 3) == 0)
+            return HTTPFILETYPE_GIF;
+        else if(strncmp(pchExtname, "png", 3) == 0)
+            return HTTPFILETYPE_PNG;
+        else if(strncmp(pchExtname, "jpg", 3) == 0)
+            return HTTPFILETYPE_JPEG;
+        else if(strncmp(pchExtname, "css", 3) == 0)
+            return HTTPFILETYPE_CSS;
+        else if(strncmp(pchExtname, "swf", 3) == 0)
+            return HTTPFILETYPE_SWF;
+
+        printf("FILEEXT_HTM: [%lu]\n", FILEEXT_HTM);
 		memcpy(&dwExt, pchExtname, sizeof(dwExt));
+        printf("Search: [%lu]\n", dwExt & 0xffdfdfdf);
 		switch (dwExt & 0xffdfdfdf) {
-		case FILEEXT_HTM:	return HTTPFILETYPE_HTML;
-		case FILEEXT_XML:	return HTTPFILETYPE_XML;
-		case FILEEXT_XSL:	return HTTPFILETYPE_XML;
-		case FILEEXT_TEXT:	return HTTPFILETYPE_TEXT;
-		case FILEEXT_XUL:	return HTTPFILETYPE_XUL;
-		case FILEEXT_CSS:	return HTTPFILETYPE_CSS;
-		case FILEEXT_PNG:	return HTTPFILETYPE_PNG;
-		case FILEEXT_JPG:	return HTTPFILETYPE_JPEG;
-		case FILEEXT_GIF:	return HTTPFILETYPE_GIF;
-		case FILEEXT_SWF:	return HTTPFILETYPE_SWF;
 		case FILEEXT_MPA:	return HTTPFILETYPE_MPA;
 		case FILEEXT_MPG:	return HTTPFILETYPE_MPEG;
 		case FILEEXT_AVI:	return HTTPFILETYPE_AVI;
@@ -2108,10 +2109,12 @@ int mwGetContentType(const char *pchExtname)
 		case FILEEXT_SDP:	return HTTPFILETYPE_SDP;
 		}
 	} else if (pchExtname[4]=='\0' || pchExtname[4]=='?') {
+        if(strncmp(pchExtname, "html", 4) == 0)
+            return HTTPFILETYPE_HTML;
+
 		memcpy(&dwExt, pchExtname, sizeof(dwExt));
 		//logic-and with 0xdfdfdfdf gets the uppercase of 4 chars
 		switch (dwExt & 0xdfdfdfdf) {
-		case FILEEXT_HTML:	return HTTPFILETYPE_HTML;
 		case FILEEXT_MPEG:	return HTTPFILETYPE_MPEG;
 		case FILEEXT_M3U8:	return HTTPFILETYPE_M3U8;
 		}
@@ -2175,7 +2178,17 @@ int _mwParseHttpHeader(HttpSocket* phsSocket)
 				p += _mwGrabToken(p ,'\r', buf + 2, sizeof(buf) - 2);
 				phsSocket->pxMP = calloc(1, sizeof(HttpMultipart));
 				strcpy(phsSocket->pxMP->pchBoundaryValue, buf);
-			} else {
+			} 
+			else if (_mwStrHeadMatch(&p, "application/x-www-form-urlencoded")) {
+                SETFLAG(phsSocket, FLAG_MULTIPART);
+                SETFLAG(phsSocket, FLAG_URLENCODED);
+				buf[0] = '-';
+				buf[1] = '-';
+				p += _mwGrabToken(p ,'\r', buf + 2, sizeof(buf) - 2);
+				phsSocket->pxMP = calloc(1, sizeof(HttpMultipart));
+				strcpy(phsSocket->pxMP->pchBoundaryValue, buf);
+            }
+            else {
 				for (; *p != '\r'; p++) {
 					if (_mwStrHeadMatch(&p, "; filename=")) {
 						p += _mwGrabToken(p ,'\r', buf, sizeof(buf));
@@ -2216,6 +2229,7 @@ int _mwParseHttpHeader(HttpSocket* phsSocket)
 			DBG("[%d] Forwarded-For: %d.%d.%d.%d\n", phsSocket->socket, phsSocket->ipAddr.caddr[3], phsSocket->ipAddr.caddr[2], phsSocket->ipAddr.caddr[1], phsSocket->ipAddr.caddr[0]);
 		}
 	}
+    printf("joojojojo\n");
 	return 0;					//end of header
 }
 //////////////////////////// END OF FILE ///////////////////////////////////

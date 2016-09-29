@@ -506,6 +506,7 @@ int handleUStringVar(struct variables *anker, FILE *p_output, char *variable,
     {
         //Kompletten String ausgeben
         value = getUStringVal(anker, variable);
+        printf("%ls", value);
         fprintf(p_output, "%S", value);
     }
     else if(index_type == 0 && has_function == 1)

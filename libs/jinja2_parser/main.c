@@ -39,8 +39,10 @@ void fillTestvalues(struct variables *anker)
         for(x=0; x < 5; x++)
         {
             swprintf(wctest, 10, L"öö %d %d", i, x);
+            logHexDump(wctest, sizeof(wctest), stdout);
             editU2DStringArray(anker, "u2dtest", wctest, i, x);
             editIntVar2DArray(anker, "i2dtestarray", i+x, i, x);
+            bzero(wctest, sizeof(wctest));
         }
     }
 
@@ -89,15 +91,15 @@ int main()
 
     logHexDump(" ", 2, stdout);
 
-    //strcpy(webserver_settings.templatepath, "/u/it/a140734/C/realHtml4Natural_copy/libs/jinja2_parser/");
+    //strcpy(webserver_settings.templatepath, "/u/it/a140734/C/realHtml4Natural/libs/jinja2_parser/");
     strcpy(webserver_settings.templatepath, "/home/tom/Documents/realHtml4Natural/libs/jinja2_parser/");
 
     printVars(anker);
     
     //char template[] = "./test_template.html";
-    char template[] = "./tshus.html";
+    char template[] = "/home/tom/Documents/realHtml4Natural/libs/jinja2_parser/tshus.html";
     //char template[] = "./utesttm.html";
-    char outputfile[] = "./output.html";
+    char outputfile[] = "/home/tom/Documents/realHtml4Natural/libs/jinja2_parser/output.html";
     char error_str[2048];
 
 

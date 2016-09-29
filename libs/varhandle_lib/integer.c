@@ -6,58 +6,6 @@
 #include "varhandle.h"
 #include "management.h"
 
-int getIntValue(struct variables *anker, char *name)
-{
-    struct variables *ptr;
-
-    if((ptr = searchVar(anker, name)) == NULL)
-    { 
-        return(-1);
-    }
-
-    return(*(int*)ptr->data);
-}
-
-int getIntValuefromArray(struct variables *anker, char *name, int index)
-{
-    struct variables *ptr;
-    ptr = anker;
-
-    if((ptr = searchVar(anker, name)) == NULL)
-    {
-        return(-1);
-    }
-
-    if(index >= ptr->length)
-    {
-        return(-2);
-    }
-
-    return(((int*)ptr->data)[index]);
-}
-
-int getIntValuefrom2DArray(struct variables *anker, char *name, int x, 
-                                int y, int *value)
-{
-    struct variables *ptr;
-
-    if((ptr = searchVar(anker, name)) == NULL)
-    {
-        sprintf(varhandle_error_str, "Unkown Variable [%s]", name);
-        return(-1);
-    }
-
-    if(x >= ptr->x_length || y >= ptr->y_length)
-    {
-        strcpy(varhandle_error_str, "Index Error: index out of range");
-        return(-2);
-    }
-
-    *value = ((int*)ptr->data)[ptr->x_length*x+y];
-
-    return(0);
-}
-
 void newIntVar(struct variables *anker, char *name, int value)
 {
     struct variables *ptr, *hptr;
@@ -77,6 +25,41 @@ void newIntVar(struct variables *anker, char *name, int value)
     ptr->next = hptr;
     return;
 }
+
+int getIntValue(struct variables *anker, char *name)
+{
+    struct variables *ptr;
+
+    if((ptr = searchVar(anker, name)) == NULL)
+    { 
+        return(-1);
+    }
+
+    return(*(int*)ptr->data);
+}
+
+int editIntVar(struct variables *anker, char *name, int value)
+{
+    struct variables *ptr;
+
+    if((ptr = searchVar(anker, name)) == NULL)
+    {
+        return(-1);
+    }
+
+   if(ptr->type != INT)
+       //Wrong Var Type
+       return(-2);
+
+    /*free(ptr->data);
+    ptr->data = malloc(sizeof(int));*/
+    *(int*)ptr->data = value;
+    return(0);
+}
+
+
+
+//---------------------------------------------------------------------------
 
 void newIntArray(struct variables *anker, char *name, int initvalue)
 {
@@ -105,6 +88,63 @@ void newIntArray(struct variables *anker, char *name, int initvalue)
     return;
 }
 
+void appendIntArray(struct variables *anker, char *name, int value)
+{
+    struct variables *ptr;
+    int length;
+
+    if((ptr = searchVar(anker, name)) == NULL)
+    {
+        return;
+    }
+
+    ptr->length++;
+    length = ptr->length;
+
+    ptr->data = realloc(ptr->data, sizeof(int)*length);
+    *(int*)(ptr->data+(sizeof(int)*(length-1))) = value;
+
+    return;
+}
+
+int getIntValuefromArray(struct variables *anker, char *name, int index)
+{
+    struct variables *ptr;
+    ptr = anker;
+
+    if((ptr = searchVar(anker, name)) == NULL)
+    {
+        return(-1);
+    }
+
+    if(index >= ptr->length)
+    {
+        return(-2);
+    }
+
+    return(((int*)ptr->data)[index]);
+}
+
+int editIntVarArray(struct variables *anker, char *name, int value, int x)
+{
+    struct variables *ptr;
+
+    if((ptr = searchVar(anker, name)) == NULL)
+    {
+        return(-1);
+    }
+
+    if(x >= ptr->length)
+    {
+        return(-2);
+    }
+
+    ((int*)ptr->data)[x] = value;
+    return(0);
+}
+
+//---------------------------------------------------------------------------
+
 void new2DIntArray(struct variables *anker, char *name, int x_length,
                    int y_length)
 {
@@ -129,62 +169,27 @@ void new2DIntArray(struct variables *anker, char *name, int x_length,
     ptr->next = hptr;
 }
 
-void appendIntArray(struct variables *anker, char *name, int value)
-{
-    struct variables *ptr;
-    int length;
-
-    if((ptr = searchVar(anker, name)) == NULL)
-    {
-        return;
-    }
-
-    ptr->length++;
-    length = ptr->length;
-
-    ptr->data = realloc(ptr->data, sizeof(int)*length);
-    *(int*)(ptr->data+(sizeof(int)*(length-1))) = value;
-
-    return;
-}
-
-int editIntVar(struct variables *anker, char *name, int value)
+int getIntValuefrom2DArray(struct variables *anker, char *name, int x, 
+                                int y, int *value)
 {
     struct variables *ptr;
 
     if((ptr = searchVar(anker, name)) == NULL)
     {
+        sprintf(varhandle_error_str, "Unkown Variable [%s]", name);
         return(-1);
     }
 
-   if(ptr->type != INT)
-       //Wrong Var Type
-       return(-2);
-
-    /*free(ptr->data);
-    ptr->data = malloc(sizeof(int));*/
-    *(int*)ptr->data = value;
-    return(0);
-}
-
-int editIntVarArray(struct variables *anker, char *name, int value, int x)
-{
-    struct variables *ptr;
-
-    if((ptr = searchVar(anker, name)) == NULL)
+    if(x >= ptr->x_length || y >= ptr->y_length)
     {
-        return(-1);
-    }
-
-    if(x >= ptr->length)
-    {
+        strcpy(varhandle_error_str, "Index Error: index out of range");
         return(-2);
     }
 
-    ((int*)ptr->data)[x] = value;
+    *value = ((int*)ptr->data)[ptr->x_length*x+y];
+
     return(0);
 }
-
 
 int editIntVar2DArray(struct variables *anker, char *name, int value, int x,
                       int y)
@@ -205,3 +210,5 @@ int editIntVar2DArray(struct variables *anker, char *name, int value, int x,
     ((int*)ptr->data)[ptr->x_length*x+y] = value;
     return(0);
 }
+
+//---------------------------------------------------------------------------
