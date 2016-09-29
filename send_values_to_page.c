@@ -500,14 +500,14 @@ int handleIntegerVar(pnni_611_functions sh_funcs, void *parmhandle, int index,
     else if(var_info.dimensions == 1)
     {
 
-        newIntArray(nat_vars, tmp_var_name, 0);
+        newIntArray(nat_vars, tmp_var_name, var_info.occurrences[0]);
         for(nat_index[0]=0; nat_index[0] < var_info.occurrences[0];
             nat_index[0]++) 
         {
             sh_funcs->pf_nni_get_parm_array(sh_funcs, index, parmhandle,
                     var_info.length, (void*)p_i_tmp_buff, nat_index);
             i_tmp_buff = shiftInt(*p_i_tmp_buff, var_info.length);
-            appendIntArray(nat_vars, tmp_var_name, i_tmp_buff);
+            editIntVarArray(nat_vars, tmp_var_name, i_tmp_buff, nat_index[0]);
         }
     }
     else if(var_info.dimensions == 2)
