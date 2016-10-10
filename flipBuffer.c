@@ -16,8 +16,9 @@ long flipBuffer(WORD nparm, void *parmhandle, void *traditional)
 
     char *error;
     char buffer_one[29], buffer_two[29];
+    int length;
 
-    struct parameter_description pd_buffer_one, pd_buffer_two;
+    struct parameter_description pd_buffer_one, pd_buffer_two, pd_length;
 
     PF_NNI_GET_INTERFACE pf_nni_get_interface = NULL;
     pnni_611_functions s_funcs;
@@ -48,8 +49,15 @@ long flipBuffer(WORD nparm, void *parmhandle, void *traditional)
 
     s_funcs->pf_nni_get_parm_info(s_funcs, 0, parmhandle, &pd_buffer_one);
     s_funcs->pf_nni_get_parm_info(s_funcs, 1, parmhandle, &pd_buffer_two);
+    s_funcs->pf_nni_get_parm_info(s_funcs, 2, parmhandle, &pd_length);
 
     s_funcs->pf_nni_get_parm(s_funcs, 0, parmhandle, pd_buffer_one.length_all, buffer_one);
+    s_funcs->pf_nni_get_parm(s_funcs, 2, parmhandle, pd_length.length_all, &length);
+
+    printf("\nLength: [%d]\n", length);
+    if(length > sizeof(buffer_two))
+        return(100);
+
 
     i=0;
     while((buffer_one[i] != '0' && buffer_one[i] != 0 && buffer_one[i] != ' ') && i < pd_buffer_two.length_all) i++;
@@ -60,7 +68,7 @@ long flipBuffer(WORD nparm, void *parmhandle, void *traditional)
     logHexDump(buffer_two, sizeof(buffer_two), stdout);
 
 
-    memcpy(buffer_two+((pd_buffer_two.length_all-i)), buffer_one, i);
+    memcpy(buffer_two+((pd_buffer_two.length_all-length)), buffer_one, length);
 
     logHexDump(buffer_two, sizeof(buffer_two), stdout);
     printf("------------------------------------------------------------------------\n");

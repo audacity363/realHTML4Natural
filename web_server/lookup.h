@@ -6,6 +6,7 @@
 #define LIBRARY "library"
 #define DEBUG "debug"
 #define TEXT "#text"
+#define PATH_PARM "path"
 
 //Notetypes
 #define OPEN 1
@@ -24,6 +25,7 @@ typedef struct {
     bool found_alias;
     bool found_returncode;
     bool found_library;
+    bool error;
 } path_struct;
 
 typedef struct {
@@ -34,4 +36,4 @@ typedef struct {
     bool found_library;
 } found_struct;
 
-path_struct getpathsettings(char*, char*);
+path_struct getpathsettings(char*, char*, char*);

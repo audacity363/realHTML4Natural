@@ -9,6 +9,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <fcntl.h>
+#include <errno.h>
+#include <mxml.h>
+
 #include "httppil.h"
 #include "httpapi.h"
 #include "revision.h"
@@ -170,15 +173,119 @@ void GetFullPath(char* buffer, char* argv0, char* path)
 	}
 }
 
+int loadConfig(char *path, char *environment)
+{
+
+    FILE *config_fp;
+    char *c_port, *c_debug;
+
+    mxml_node_t *tree, *env, *htdocs, *templates, *debug, *routes, *port, *tmp_node;
+
+    printf("Loading config for [%s]\n", environment);
+
+    if((config_fp = fopen(path, "r")) == NULL)
+    {
+        fprintf(stderr, "Error loading Config: [%s]\n", strerror(errno));
+        return(-1);
+    }
+
+    if((tree = mxmlLoadFile(NULL, config_fp, MXML_NO_CALLBACK)) == NULL)
+    {
+        fprintf(stderr, "Error loading Config: [Can not get XML Tree]\n");
+        fclose(config_fp);
+        return(-2);
+    }
+
+    if((env = mxmlFindElement(tree, tree, "environment", "type", environment, MXML_DESCEND_FIRST)) == NULL)
+    {
+        fprintf(stderr, "Error loading Conf: [Could not find environment [%s]]\n", environment);
+        return(-3);
+    }
+
+    if((htdocs = mxmlFindElement(env, tree, "htdocs", NULL, NULL, MXML_DESCEND_FIRST)) == NULL)
+    {
+        fprintf(stderr, "Error while loading Config: [\"htdocs\" entry not found]\n");
+        fclose(config_fp);
+        return(-3);
+    }
+    
+    httpParam.pchWebPath = (char*)mxmlGetText(htdocs, NULL);
+
+    if((routes = mxmlFindElement(env, tree, "routes", NULL, NULL, MXML_DESCEND_FIRST)) == NULL)
+    {
+        fprintf(stderr, "Error while loading Config: [\"routes\" entry not found]\n");
+        fclose(config_fp);
+        return(-4);
+    }
+    
+    httpParam.config_path = (char*)mxmlGetText(routes, NULL);
+
+    if((templates = mxmlFindElement(env, tree, "templates", NULL, NULL, MXML_DESCEND_FIRST)) == NULL)
+    {
+        fprintf(stderr, "Error while loading Config: [\"templates\" entry not found]\n");
+        fclose(config_fp);
+        return(-5);
+    }
+
+    httpParam.template_path = (char*)mxmlGetText(templates, NULL);
+
+    if((tmp_node = mxmlFindElement(env, tree, "natsourcepath", NULL, NULL, MXML_DESCEND_FIRST)) == NULL)
+    {
+        fprintf(stderr, "Error while loading Config: [\"natsourcepath\" entry not found]\n");
+        fclose(config_fp);
+        return(-6);
+    }
+
+    httpParam.natsource_path = (char*)mxmlGetText(tmp_node, NULL);
+
+    if((port = mxmlFindElement(env, tree, "port", NULL, NULL, MXML_DESCEND_FIRST)) != NULL)
+    {
+        printf("Found Port\n");
+        c_port = (char*)mxmlGetText(port, NULL);
+        printf("Port: [%s]\n", c_port);
+        httpParam.httpPort = atoi(c_port);
+
+    }
+
+
+    if((debug = mxmlFindElement(env, tree, "debug", NULL, NULL, MXML_DESCEND_FIRST)) != NULL)
+    {
+        if((c_debug = (char*)mxmlGetText(debug, NULL)) == NULL)
+        {
+            fprintf(stderr, "Error while loading Config: Debug Tag is empty\n");
+            fclose(config_fp);
+            return(-6);
+        }
+
+        if(strcmp(c_debug, "true") == 0)
+            httpParam.debug = 1;
+        else if(strcmp(c_debug, "false") == 0)
+            httpParam.debug = 0;
+        else
+        {
+            fprintf(stderr, "Error while loding Config: DEBUG: Unkown value [%s]\n", c_debug);
+            fclose(config_fp);
+            return(-7);
+        }
+    }
+    
+    fclose(config_fp);
+    printf("Successfully loaded configuration for environment [%s]\n", environment);
+    return(0);
+}
+
 int main(int argc,char* argv[])
 {
 	fprintf(stderr,"MiniWeb (built on %s)\n(C)2005-2013 Written by Stanley Huang <stanleyhuangyc@gmail.com>\n\n", __DATE__);
 
+    char *configfile_path, *environment = NULL;
 
-    //char config_path[] = "/home/tom/Documents/realHtml4Natural/web_server/test.cfg";
-    char config_path[] = "/u/it/a140734/C/realHtml4Natural/web_server/test.cfg";
+    if((configfile_path = getenv("WEBCONFIG")) == NULL)
+    {
+        fprintf(stderr, "WEBCONFIG not set\n");
+        exit(0);
+    }
 
-    char htdocs_path[] = "/u/it/a140734/C/realHtml4Natural/web_server/htdocs/";
 
 	signal(SIGINT, (void *) MiniWebQuit);
 	signal(SIGTERM, (void *) MiniWebQuit);
@@ -194,17 +301,22 @@ int main(int argc,char* argv[])
 	httpParam.flags=FLAG_DIR_LISTING;
 	httpParam.tmSocketExpireTime = 15;
 	httpParam.pfnPost = DefaultWebPostCallback;
-    httpParam.config_path = config_path;
 	httpParam.pfnFileUpload = DefaultWebFileUploadCallback;
-
-    strcpy(httpParam.pchWebPath, htdocs_path);
-
 
 	//parsing command line arguments
 	{
 		int i;
 		for (i=1;i<argc;i++) {
-			if (argv[i][0]=='-') {
+            if(argv[i][0]=='-' && argv[i][1]=='-')
+            {
+                if(strcmp(argv[i]+2, "environment") == 0)
+                {
+                    if(++i<argc) environment = argv[i]; 
+
+                }
+            }
+			else if (argv[i][0]=='-') 
+            {
 				switch (argv[i][1]) {
 				case 'h':
 					fprintf(stderr,"Usage: miniweb	-h	: display this help screen\n"
@@ -216,7 +328,8 @@ int main(int argc,char* argv[])
 						       "		-M	: specifiy max clients per IP\n"
 							   "		-s	: specifiy download speed limit in KB/s [default: none]\n"
 							   "		-n	: disallow multi-part download [default: allow]\n"
-						       "		-d	: disallow directory listing [default ON]\n\n");
+						       "   	 	-d	: disallow directory listing [default ON]\n\n"
+                               "        --environment: environment to load [default: none]\n\n");
 					fflush(stderr);
                                         exit(1);
 
@@ -246,8 +359,22 @@ int main(int argc,char* argv[])
 					break;
 				}
 			}
+
 		}
 	}
+
+    if(environment == NULL)
+    {
+        fprintf(stderr, "Error: parameter --environment is not set\n");
+        exit(1);
+    }
+
+
+    if(loadConfig(configfile_path, environment) < 0)
+    {
+        exit(1);
+    }
+
 	{
 		int i;
 		int error = 0;

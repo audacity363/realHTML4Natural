@@ -158,6 +158,7 @@ typedef struct {
     struct {
         char pchParamName[100];
         char pchParamValue[2024];
+        int  valueLength;
       } stParams[MAXPOSTPARAMS];
     int pchParamNumber;
 	int iHttpVer;
@@ -303,7 +304,6 @@ typedef struct _httpParam {
 	SOCKET listenSocket;
 	int httpPort;
 	int socketRcvBufSize;	/* socket receive buffer size in KB */
-	char pchWebPath[128];
 	UrlHandler *pxUrlHandler;		/* pointer to URL handler array */
 	AuthHandler *pxAuthHandler;     /* pointer to authorization handler array */
 #ifndef DISABLE_VIRTUAL_PATH
@@ -325,6 +325,10 @@ typedef struct _httpParam {
 	u_long hlBindIP;
 	void* szctx;
     char *config_path;
+	char *pchWebPath;
+    char *template_path;
+    char *natsource_path;
+    int debug;
 } HttpParam;
 
 typedef struct {

@@ -50,26 +50,22 @@ int generate_500errPage_lda(char *output, char *error_str, char *ldaname)
 }
 
 int generate_page(struct variables *anker, char *ldaname, char *templatename,
-                  char *output_file)
+                  char *output_file, char *natsource_path, char *template_path, char *natlib)
 {
-    char *template = malloc(sizeof(webserver_settings.templatepath)
+    char *template = malloc(strlen(template_path)
                             +strlen(templatename)+1);
-    char *lda = malloc(strlen(webserver_settings.nat_sourcepath)
-                            +strlen(webserver_settings.natlibrary)
-                                    +strlen(ldaname)+10);
+    char *lda = malloc(strlen(natsource_path)
+                            +strlen(natlib)+strlen(ldaname)+10);
     char error_str[2048];
     int error_zeile;
 
     printf("ldaname : [%s]\n", ldaname);
 
-    sprintf(template, "%s/%s", webserver_settings.templatepath, StripTrailingSpaces(templatename));
-    sprintf(lda, "%s/%s/SRC/%s.NSL", webserver_settings.nat_sourcepath,
-                            webserver_settings.natlibrary, StripTrailingSpaces(ldaname));
+    sprintf(template, "%s/%s", template_path, StripTrailingSpaces(templatename));
+    sprintf(lda, "%s/%s/SRC/%s.NSL", natsource_path, natlib, StripTrailingSpaces(ldaname));
 
-#ifdef DEBUG
     printf("Working with Template: [%s]\n", template);
     printf("Working with LDA     : [%s]\n", lda);
-#endif
 
     /*
      * TODO: Get ReturnValues from these functions ans redner custom 

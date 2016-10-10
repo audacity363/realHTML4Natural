@@ -17,6 +17,12 @@
 
 int exec_stat = 0;
 
+struct settings_struct_l {
+    char keys[100][100];
+    char values[100][1024];
+    int count;
+};
+
 int shiftInt(int input, int length)
 {
     int result;
@@ -35,6 +41,28 @@ int shiftInt(int input, int length)
     }
     return(result);
 }
+
+int strip4ByteSpaces(wchar_t *str, int size)
+{
+    int i = size-4;
+    void *v_str = (void*)str;
+    char memmap_space[4] = {0x00, 0x00, 0x00, 0x20};
+    char memmap_null[4] = {0x00, 0x00, 0x00, 0x00};
+
+    while(memcmp(v_str+i, memmap_space, 4) == 0 || memcmp(v_str+i, memmap_null, 4) == 0)
+    {
+        memset(v_str+i, 0x00, 4);
+        i=i-4;
+        if(i <= 0)
+           break;
+    }
+
+    if(wcslen(str) == 0)
+    {
+        memcpy(v_str, memmap_space, 4);
+    }
+}
+
 
 int convert2Bto4BString(char *inbuffer, wchar_t *outbuffer, int length)
 {
@@ -148,6 +176,8 @@ int handleNumericVar(pnni_611_functions sh_funcs, void *parmhandle, int index,
         sh_funcs->pf_nni_get_parm(sh_funcs, index, parmhandle, var_info.length_all, c_tmp_buff);
         //logHexDump(c_tmp_buff, var_info.length_all, stdout);
 
+        
+        convert1Bto4BString(c_tmp_buff, wc_tmp_buff, var_info.length);
         newStringVar(nat_vars, tmp_var_name, c_tmp_buff);
     }
     else if(var_info.dimensions == 1)
@@ -407,6 +437,8 @@ int handleAlphaNumericVar(pnni_611_functions sh_funcs, void *parmhandle, int ind
                     var_info.length*sizeof(wchar_t), (void*)c_tmp_buff, nat_index);
 
             convert1Bto4BString(c_tmp_buff, wc_tmp_buff, var_info.length);
+            strip4ByteSpaces(wc_tmp_buff, var_info.length*sizeof(wchar_t));
+
             editUStringArray(nat_vars, tmp_var_name, wc_tmp_buff, nat_index[0]);
 
             bzero(c_tmp_buff, var_info.length);
@@ -739,6 +771,8 @@ int readVar(void *parmhandle, pnni_611_functions sh_funcs, int index,
     return(0);
 }
 
+//char *serahc
+
 long user_exit(WORD nparm, void *parmhandle, void *traditional)
 {
     void *shlib = NULL;
@@ -752,6 +786,14 @@ long user_exit(WORD nparm, void *parmhandle, void *traditional)
 
     char ldaname[22], templatename[22], deliver_filename[100],
          *settingsstr;
+
+    char *split_ptr, *equals_split, *s_ptr1, *s_ptr2, 
+         *template_path, *natsource_path, *natlib;
+
+    struct settings_struct_l settings_struct;
+
+    char settings_keys[100][100], settings_value[100][1024];
+    int settings_count;
 
 
     FILE *logfile;
@@ -857,7 +899,30 @@ long user_exit(WORD nparm, void *parmhandle, void *traditional)
 
     printf("LDA:      [%s]\n", ldaname);
     printf("Template: [%s]\n", templatename);
-    printf("Filename: [%s]\n", settingsstr);
+    printf("settings: [%s]\n", settingsstr);
+
+    i=0;
+
+    split_ptr = strtok_r(settingsstr, ";", &s_ptr1);
+    while(split_ptr != NULL)
+    {
+        printf("Settings [%d]: [%s]\n", i, split_ptr);
+        equals_split = strtok_r(split_ptr, "=", &s_ptr2);
+        //strcpy(settings_keys[i], equals_split);
+        strcpy(settings_struct.keys[i], equals_split);
+        equals_split = strtok_r(NULL, "=", &s_ptr2);
+        strcpy(settings_struct.values[i], equals_split);
+        i++;
+        split_ptr = strtok_r(NULL, ";", &s_ptr1);
+    }
+    //i--;
+    settings_struct.count = i;
+
+    for(;i != -1; i--)
+    {
+        printf("Key: [%s]=[%s]\n", settings_struct.keys[i], settings_struct.values[i]);
+    }
+
 
     for(i=4; i < nparm; i++)
     {
@@ -872,12 +937,32 @@ long user_exit(WORD nparm, void *parmhandle, void *traditional)
 
     printVars(&nat_vars);
 
+    for(i=0; i < settings_struct.count; i++)
+    {
+        if(strcmp("lib", settings_struct.keys[i]) == 0)
+            natlib = settings_struct.values[i];
+        else if(strcmp("templates", settings_struct.keys[i]) == 0)
+            template_path = settings_struct.values[i];
+        else if(strcmp("natsrc", settings_struct.keys[i]) == 0)
+            natsource_path = settings_struct.values[i];
+    }
+
+    printf("Natlib: [%s]\n", natlib);
+    printf("template_path; [%s]\n", template_path);
+    printf("natsource_path: [%s]\n", natsource_path);
+
+    if(!natlib || !template_path || !natsource_path)
+    {
+        fprintf(stderr, "natlib, template_path or natsource_path ist not set\n");
+        return(100);
+    }
+
     char error_str[1024];
     strcpy(webserver_settings.templatepath, "/u/it/a140734/C/realHtml4Natural/web_server/templates/");
     strcpy(webserver_settings.nat_sourcepath, "/VAW/natural/logi/fuser63/");
     strcpy(webserver_settings.natlibrary, "TGAP0734");
 
-    generate_page(&nat_vars, ldaname, templatename, deliver_filename);
+    generate_page(&nat_vars, ldaname, templatename, deliver_filename, natsource_path, template_path, natlib);
 
 
     /*if(var2name(&nat_vars, "/VAW/natural/logi/fuser63/TGAP0734/SRC/LSHUS.NSL", error_str) < 0)

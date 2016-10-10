@@ -1650,6 +1650,60 @@ int _mwStartSendFile2(HttpParam* hp, HttpSocket* phsSocket, const char* rootPath
 	return 0;
 } // end of _mwStartSendFile2
 
+
+int parseGetParms(HttpSocket *phsSocket)
+{
+    char *get_parm,
+         *hptr,
+         *sptr1,
+         *sptr2,
+         *kptr,
+         *vptr;
+    HttpRequest *phr = &phsSocket->request;
+
+    if((get_parm = strchr(phsSocket->request.pucPath, '?')) == NULL)
+        return(0);
+
+    get_parm[0] = '\0';
+    get_parm++;
+
+    int i = 1;
+
+    hptr = strtok_r(get_parm, "&", &sptr1);
+
+    while(hptr != NULL)
+    {
+        printf("[%s]\n", hptr);
+        
+        kptr = strtok_r(hptr, "=", &sptr2);
+        vptr = strtok_r(NULL, "=", &sptr2);
+        //printf("\t[%s]=[%s]\n", kptr, vptr);
+
+        //memset(phr->stParams[i-1].pchParamName, 0x20, sizeof(phr->stParams[i-1].pchParamName));
+        memset(phr->stParams[i-1].pchParamValue, '\0', sizeof(phr->stParams[i-1].pchParamValue));
+        //phr->stParams[i-1].pchParamValue[2023] = '\0';
+
+        strcpy(phr->stParams[i-1].pchParamName, kptr);
+
+        //urldecode2(vptr, vptr);
+        phr->stParams[i-1].valueLength = strlen(vptr);
+        urldecode2(phr->stParams[i-1].pchParamValue, vptr);
+        //strncpy(phr->stParams[i-1].pchParamValue, vptr, strlen(vptr));
+
+        hptr = strtok_r(NULL, "&", &sptr1);
+        i++;
+    }
+    i--;
+
+    phr->pchParamNumber = i;
+
+    printf("i=[%d]\n", i);
+
+    for(i=0; i < phr->pchParamNumber; i++)
+        printf("\t[%s]=[%s]\n",phr->stParams[i].pchParamName, phr->stParams[i].pchParamValue);
+
+}
+
 ////////////////////////////////////////////////////////////////////////////
 // _mwStartSendFile
 // Setup for sending of a file
@@ -1657,7 +1711,11 @@ int _mwStartSendFile2(HttpParam* hp, HttpSocket* phsSocket, const char* rootPath
 int _mwStartSendFile(HttpParam* hp, HttpSocket* phsSocket)
 {
 	int ret = -1;
+    char *tmp_deliver_file, *file_basename, deliver_file[50];
+
     path_struct settings;
+
+    FILE *f_deliver_file;
 
 
 #ifndef DISABLE_VIRTUAL_PATH
@@ -1667,19 +1725,35 @@ int _mwStartSendFile(HttpParam* hp, HttpSocket* phsSocket)
 		int prefixLen = (int)strlen(pvph->pchUrlPrefix);
 		if (prefixLen == 0) continue;
 		if (strncmp(pvph->pchUrlPrefix, phsSocket->request.pucPath, prefixLen) == 0) {
-			ret = _mwStartSendFile2(hp, phsSocket, pvph->pchLocalRealPath, phsSocket->request.pucPath + prefixLen);
+			ret = _mwStartSendFile2(hp, phsSocket, pvph->pchLocalRealPath,
+                                phsSocket->request.pucPath + prefixLen);
 			if (ret == 0) return 0;
 			break;
 		}
 	}
 #endif
 
+    parseGetParms(phsSocket);
     settings = checkifNaturalPath(hp, phsSocket->request.pucPath);
-
-    if(settings.found == 1)
+    if(settings.error == true)
     {
-        callNaturalProgram(hp, phsSocket, settings);
-	    ret = _mwStartSendFile2(hp, phsSocket, "/tmp/", "outputtest.html");
+		_mwSendErrorPage(phsSocket->socket, HTTP500_HEADER, HTTP500_BODY);
+        ret = 0;
+    }
+    else if(settings.found == true)
+    {
+        tmp_deliver_file = tempnam("/tmp", "rh4N");
+        strcpy(deliver_file, tmp_deliver_file);
+        strcat(deliver_file, ".html");
+        if((f_deliver_file = fopen(deliver_file, "w")) == NULL)
+        {
+            printf("Error: [%s]\n", strerror(errno));
+            return(-1);
+        }
+        fclose(f_deliver_file);
+        file_basename = basename(deliver_file);
+        callNaturalProgram(hp, phsSocket, settings, deliver_file);
+	    ret = _mwStartSendFile2(hp, phsSocket, "/tmp/", file_basename);
     }
     else
     {
@@ -2229,7 +2303,6 @@ int _mwParseHttpHeader(HttpSocket* phsSocket)
 			DBG("[%d] Forwarded-For: %d.%d.%d.%d\n", phsSocket->socket, phsSocket->ipAddr.caddr[3], phsSocket->ipAddr.caddr[2], phsSocket->ipAddr.caddr[1], phsSocket->ipAddr.caddr[0]);
 		}
 	}
-    printf("joojojojo\n");
 	return 0;					//end of header
 }
 //////////////////////////// END OF FILE ///////////////////////////////////

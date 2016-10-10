@@ -170,6 +170,7 @@ int test(char *buffer, HttpSocket *phsSocket)
     {
         memset(phr->stParams[i].pchParamName, 0x20, sizeof(phr->stParams[i-1].pchParamName));
         memset(phr->stParams[i].pchParamValue, 0x20, sizeof(phr->stParams[i-1].pchParamValue));
+        phr->stParams[i-1].valueLength = 0;
         phr->stParams[i].pchParamName[99] = '\0';
         phr->stParams[i].pchParamValue[2023] = '\0';
 
@@ -196,7 +197,9 @@ int test(char *buffer, HttpSocket *phsSocket)
         //phr->stParams[i-1].pchParamValue[2023] = '\0';
 
         strcpy(phr->stParams[i-1].pchParamName, kptr);
+
         //urldecode2(vptr, vptr);
+        phr->stParams[i-1].valueLength = strlen(vptr);
         urldecode2(phr->stParams[i-1].pchParamValue, vptr);
         //strncpy(phr->stParams[i-1].pchParamValue, vptr, strlen(vptr));
 

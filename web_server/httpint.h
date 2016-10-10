@@ -38,8 +38,10 @@
 #define HTTP200_HDR_EST_SIZE ((sizeof(HTTP200_HEADER)+256)&(-4))
 #define HTTP403_HEADER "HTTP/1.1 403 Forbidden\r\nServer: %s\r\nContent-length: %d\r\nContent-Type: text/html\r\n\r\n"
 #define HTTP404_HEADER "HTTP/1.1 404 Not Found\r\nServer: %s\r\nContent-length: %d\r\nContent-Type: text/html\r\n\r\n"
+#define HTTP500_HEADER "HTTP/1.1 505 Internal Server Error\r\nServer: %s\r\nContent-length: %d\r\nContent-Type: text/html\r\n\r\n"
 #define HTTP403_BODY "<html><head><title>403 Forbidden</title></head><body><h1>Forbidden</h1></body></html>"
 #define HTTP404_BODY "<html><head><title>404 Not Found</title></head><body><h1>Not Found</h1><p>The requested URL has no content.</p></body></html>"
+#define HTTP500_BODY "<html><head><title>505 Internal Server Error</title></head><body><h1>Error</h1><p>An internal Error accoured</p></body></html>"
 #define HTTPBODY_REDIRECT "<html><head><meta http-equiv=\"refresh\" content=\"0; URL=%s\"></head><body></body></html>"
 #define HTTP301_HEADER "HTTP/1.1 301 Moved Permanently\r\nServer: %s\r\nLocation: %s\r\n\r\n"
 #define HTTP401_HEADER "HTTP/1.1 401 Authorization Required\r\nWWW-Authenticate: Basic realm=\"%s\"\r\nContent-Length: %d\r\nContent-Type: text/html\r\n\r\n"

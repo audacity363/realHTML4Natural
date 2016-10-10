@@ -13,30 +13,31 @@ VAR_PATH    = $(HOMEDIR)/libs/varhandle_lib/
 LDA_PATH    = $(HOMEDIR)/libs/nat-lda-parser/compiled_lda/
 NATVAR_PATH = $(HOMEDIR)/var2names/
 UTILS_PATH  = $(HOMEDIR)/libs/utils/
+XML_PATH    = $(HOMEDIR)/libs/mxml/
 
 NAMES_PATH = $(HOMEDIR)/var2names
-WEB_PATH   = $(HOMEDIR)/web_server
+WEB_PATH   = $(HOMEDIR)/web_server/
 
 INCDIR   =  -I$(STANDARD_PATH)  \
             -I$(HEXD_PATH)      \
             -I$(CFG_PATH)       \
             -I$(SOC_PATH)       \
-            -I$(WEB_PATH)       \
             -I$(JINJA_PATH)     \
             -I$(VAR_PATH)       \
             -I$(LDA_PATH)       \
             -I$(NATVAR_PATH)    \
-            -I$(UTILS_PATH)
+            -I$(UTILS_PATH)     \
+			-I$(XML_PATH)
 
 LIBS    = -L$(CFG_PATH) -lcfg \
           -L$(HEXD_PATH) -lhexdump \
           -L$(SOC_PATH) -lsockets \
-          -L$(WEB_PATH) -lwebserver \
           -L$(NATVAR_PATH) -lvar2name \
           -L$(LDA_PATH) -lldaparser \
           -L$(JINJA_PATH) -ljinjaparser \
           -L$(VAR_PATH) -lvarhandle \
           -L$(UTILS_PATH) -lutils \
+		  -L$(XML_PATH) -lmxml
 
 CC = xlc
 #CC = gcc
@@ -122,15 +123,17 @@ test_var2name:
 		$(INCDIR) $(LIBS)
 
 webserver:
-	$(CC) $(CFLAGS) -o $(WEB_PATH)/bin/lookup.o $(WEB_PATH)/lookup.c $(INCDIR)
-	$(CC) $(CFLAGS) -o $(WEB_PATH)/bin/filehandling.o $(WEB_PATH)/filehandling.c  $(INCDIR)
-	$(CC) $(CFLAGS) -o $(WEB_PATH)/bin/response.o $(WEB_PATH)/response.c  $(INCDIR)
-	$(CC) $(CFLAGS) -o $(WEB_PATH)/bin/header.o $(WEB_PATH)/header.c  $(INCDIR)
-	$(CC) $(CFLAGS) -o $(WEB_PATH)/bin/start.o $(WEB_PATH)/main.c  $(INCDIR)
-	ar $(ARFLAGS) $(WEB_PATH)/libwebserver.a $(WEB_PATH)/bin/*.o
+	cd $(WEB_PATH) && make
+
 
 clean_webserver:
-	-rm -f $(WEB_PATH)/bin/*.o $(WEB_PATH)/*.a
+	cd $(WEB_PATH) && make clean
+
+xml:
+	cd $(XML_PATH) && $(MAKE)
+
+clean_xml:
+	cd $(XML_PATH) && $(MAKE) clean
 
 test_webserver:
 	$(CC) -o $(WEB_PATH)/test/main $(WEB_PATH)/test/main.c \
@@ -138,6 +141,7 @@ test_webserver:
 
 glob_test:
 	$(CC) -g -o $(HOMEDIR)/test/main $(HOMEDIR)/test/main.c $(INCDIR) $(LIBS)
+
 
 doc:
 	doxygen ./doxygen/doxygenconfig
@@ -156,7 +160,8 @@ clean:
 	$(MAKE) clean_utils
 	$(MAKE) clean_varhandle
 	$(MAKE) clean_var2name
-	#$(MAKE) clean_webserver
+	$(MAKE) clean_xml
+	$(MAKE) clean_webserver
 
 all:
 	$(MAKE) cfgreader
@@ -167,7 +172,8 @@ all:
 	$(MAKE) utils
 	$(MAKE) varhandle
 	$(MAKE) var2name
-	#$(MAKE) webserver
+	$(MAKE) xml
+	$(MAKE) webserver
 
 all_test:
 	$(CC) -g -o ./test/main ./test/main.c $(INCDIR) jinja2.so
