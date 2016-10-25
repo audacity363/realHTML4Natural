@@ -1,9 +1,0 @@
-digraph "libs/hexdump/test" {
-  compound=true
-  node [ fontsize="10", fontname="Helvetica"];
-  edge [ labelfontsize="10", labelfontname="Helvetica"];
-  subgraph clusterdir_3133c3053a555820e615f8c301681037 {
-    graph [ bgcolor="#ddddee", pencolor="black", label="hexdump" fontname="Helvetica", fontsize="10", URL="dir_3133c3053a555820e615f8c301681037.html"]
-  dir_58bb9bb43860e1697722343a9b355391 [shape=box, label="test", style="filled", fillcolor="#eeeeff", pencolor="black", URL="dir_58bb9bb43860e1697722343a9b355391.html"];
-  }
-}
