@@ -134,7 +134,7 @@ void printArray(struct variables *anker, char *name, bool showname,
                 sprintf(returnstring, "[");
             }
 
-            for(i=0; i < ptr->length; i++)
+            for(i=0; i < ptr->x_length; i++)
             {
                 if(returnstring == NULL)
                     printf("\"%S\"", getUStringArrayVal(anker, name, i));
@@ -143,7 +143,7 @@ void printArray(struct variables *anker, char *name, bool showname,
                     sprintf(buf, "\"%s\"", ((char**)ptr->data)[i]);
                     strcat(returnstring, buf);
                 }
-                if(i+1 < ptr->length)
+                if(i+1 < ptr->x_length)
                 {
                     if(returnstring == NULL)
                         printf(",");
@@ -591,10 +591,10 @@ void printArraytoFile(struct variables *anker, char *name, FILE *p_output)
             fprintf(p_output, "Name: [%s] = ", name);
             fprintf(p_output, "[");
 
-            for(i=0; i < ptr->length; i++)
+            for(i=0; i < ptr->x_length; i++)
             {
                 fprintf(p_output, "\"%S\"", getUStringArrayVal(anker, name, i));
-                if(i+1 < ptr->length)
+                if(i+1 < ptr->x_length)
                 {
                     fprintf(p_output, ",");
                 }
