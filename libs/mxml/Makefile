@@ -21,21 +21,20 @@
 AR		=	/usr/bin/ar
 ARFLAGS		=	crvs
 ARCHFLAGS	=	
-#CC		=	cc -qlanglvl=extc89
-CC		=	xlc -qlanglvl=extc89
-CFLAGS		=	$(OPTIM) $(ARCHFLAGS)   -D_THREAD_SAFE -D_REENTRANT
-CP		=	/usr/bin/cp
-DSO		=	:
-DSOFLAGS	=	
-LDFLAGS		=	$(OPTIM) $(ARCHFLAGS) 
-INSTALL		=	/u/it/a140734/C/mxml-2.10/install-sh -c
-LIBMXML		=	libmxml.a
+CC		=	gcc
+CFLAGS		=	$(OPTIM) $(ARCHFLAGS) -Wall   -D_THREAD_SAFE -D_REENTRANT
+CP		=	/bin/cp
+DSO		=	$(CC)
+DSOFLAGS	=	 -Wl,-soname,libmxml.so.1,-rpath,$(libdir) -shared $(OPTIM)
+LDFLAGS		=	$(OPTIM) $(ARCHFLAGS)  -Wl,-rpath,$(libdir)
+INSTALL		=	/usr/bin/install -c
+LIBMXML		=	libmxml.so.1.5
 LIBS		=	 -lpthreads
-LN		=	/usr/bin/ln -s
-MKDIR		=	/usr/bin/mkdir
-OPTIM		=	-O
+LN		=	/bin/ln -s
+MKDIR		=	/bin/mkdir
+OPTIM		=	-fPIC -Os -g
 RANLIB		=	ranlib
-RM		=	/usr/bin/rm -f
+RM		=	/bin/rm -f
 SHELL		=	/bin/sh
 
 

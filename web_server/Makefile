@@ -1,5 +1,5 @@
-#CC=gcc
-CC=xlc
+CC=gcc
+#CC=xlc
 
 CFLAGS=-O3 -Wunused-result
 
@@ -17,8 +17,8 @@ DEFINES+= -DAIX
 LDFLAGS = -lm -L${SAG}/common/lib -brtl -Wl,-bbigtoc,-blibpath:/usr/lib/threads:/opt/softwareag/common/lib:/opt/softwareag/nat/v63140/lib:$(NATDIR)/$(NATVERS)/lib:/usr/lib:/lib -bE:$(NATDIR)/$(NATVERS)/bin/build/samples.exp -lpthreads -lc -lC -ldl -g
 
 
-#HOMEDIR = /home/tom//Documents/realHtml4Natural/
-HOMEDIR = /u/it/a140734/C/realHtml4Natural/
+HOMEDIR = /home/tom//Documents/realHTML4Natural/
+#HOMEDIR = /u/it/a140734/C/realHtml4Natural/
 
 STANDARD_PATH    	=   $(HOMEDIR)/include
 CFG_PATH     		= 	$(HOMEDIR)/libs/CfgReader/
@@ -55,8 +55,8 @@ all:
 	$(CC) $(DEFINES) -g -c -o ./bin/httppost.o httppost.c $(INCDIR)
 	$(CC) $(DEFINES) -g -c -o ./bin/httpauth.o httpauth.c $(INCDIR)
 	$(CC) $(DEFINES) -g -c -o ./bin/lookup.o lookup.c $(INCDIR)
-	$(CC) $(DEFINES) -g -c -o ./bin/natural.o natural.c $(INCDIR)
-	#$(CC) $(DEFINES) -g -c -o ./bin/gnu_natural.o gnu_natural.c $(INCDIR)
+	#$(CC) $(DEFINES) -g -c -o ./bin/natural.o natural.c $(INCDIR)
+	$(CC) $(DEFINES) -g -c -o ./bin/gnu_natural.o gnu_natural.c $(INCDIR)
 	$(CC) $(DEFINES) -g -c -o ./bin/miniweb.o miniweb.c $(INCDIR)
 	$(CC) $(LDFLAGS) -o ./miniweb ./bin/*.o $(LIBS)
 	#$(CC) -o ./miniweb ./bin/*.o $(LIBS)

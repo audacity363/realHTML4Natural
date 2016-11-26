@@ -37,7 +37,7 @@
  * Inline function support...
  */
 
-#define inline __inline__
+#define inline
 
 
 /*
