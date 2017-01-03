@@ -1,18 +1,20 @@
-OBJ = ncuxinit.o flipBuffer.o send_values_to_page.o
+OBJ = ncuxinit.o flipBuffer.o gen_page.o
 
 INCLUDE = -I./src/ \
-		  -I../include/
+		  -I../include/ \
+		  -I../libs/varhandle_lib/src/
 
 LIBS = 
 
 lib: $(OBJ)
+	gcc -shared -o librealHTML4Natural.so ./bin/*.o
 	@echo "Done..."
 	
 %.o: ./src/%.c
 	gcc -g -fpic -c $< $(INCLUDE) -o ./bin/$@
 
 clean:
-	rm -rf libldaparser.a
+	rm -rf ./librealHTML4Natural.so
 	rm -rf ./bin/*.o
 
 test:
