@@ -3,7 +3,6 @@
 #include <string.h>
 #include <errno.h>
 
-#include "standard.h"
 #include "lda_parser.h"
 
 #define SAG_NATONE "/*"

@@ -1,0 +1,14 @@
+0001**DF          0   A20   1REALHTML_LDANAME
+0002**DF          0   A20   1REALHTML_TEMPLATE
+0003**DS          0         1page
+0004**DS I1       0         2GRPARRAY                        (1:20)
+0005**DK          0   N12,3 3ARRAYFIELD1
+0006**DK          0   A10   3ARRAYFIELD2
+0007**DS          0         2GRPTEST
+0008**DF B        0   A     3BLA2
+0009**DE                     DY
+0010**DS I2       0         2GRPARRAY2                       (20,20)
+0011**DK I3       0   A20   3TMP1                            (1:40)
+0012**DK          0   A20   2tmp
+0013**DS I3       0         2GRPARRAY3                       (1:20,1:20,1:20)
+0014**DK          0   A20   3BLA3

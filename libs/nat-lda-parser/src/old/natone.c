@@ -3,21 +3,17 @@
 #include <string.h>
 #include <errno.h>
 
-#include "standard.h"
 #include "lda_parser.h"
 
-#define SAG_COMMENT_STR          "**C  "
-#define SAG_DEFINE_STR           "**DF "
-#define SAG_DEFINE_CONST_STR     "**DFC"
-#define SAG_GROUP_MEMBER_STR     "**DK "
-#define SAG_GROUP_HEAD_STR       "**DS "
-#define SAG_REDEFINE_STR         "**DR"
-#define SAG_REDEFINED_VALUES_STR "**DFR"
-#define SAG_INIT_STR             "**I"
-#define SAG_PRE_INIT_STR         "**HF1"
-#define SAG_DYNAMIC_DF_STR       "**DE"
+#define SAG_COMMENT_STR            "/*C  "
+#define SAG_DEFINE_STR             "/*DF "
+#define SAG_DEFINE_CONST_STR       "/*DFC"
+#define SAG_GROUP_MEMBER_STR       "/*DK "
+#define SAG_GROUP_HEAD_STR         "/*DS "
+#define SAG_REDEFINE_STR           "/*DRR"
+#define SAG_REDEFINED_VALUES_STR   "/*DKR"
 
-int getdefinetype_unix(char *line)
+int getdefinetype(char *line)
 {
     if(strncmp(line, SAG_COMMENT_STR, sizeof(SAG_COMMENT_STR)-1) == 0)
         return(SAG_COMMENT);
@@ -33,20 +29,14 @@ int getdefinetype_unix(char *line)
         return(SAG_REDEFINE);
     else if(strncmp(line, SAG_REDEFINED_VALUES_STR, sizeof(SAG_REDEFINED_VALUES_STR)-1) == 0)
         return(SAG_REDEFINED_VALUES);
-    else if(strncmp(line, SAG_INIT_STR, sizeof(SAG_INIT_STR)-1) == 0)
-        return(SAG_INIT);
-    else if(strncmp(line, SAG_PRE_INIT_STR, sizeof(SAG_PRE_INIT_STR)-1) == 0)
-        return(SAG_PRE_INIT);
-    else if(strncmp(line, SAG_DYNAMIC_DF_STR, sizeof(SAG_DYNAMIC_DF_STR)-1) == 0)
-        return(SAG_DYNAMIC_DF);
     else
         return(-1);
 }
 
-void unix_parser(struct varnames *anker, struct status_p *status, char *line)
+void natone_parser(struct varnames *anker, struct status_p *status, char *line)
 {
-    
-    char var_length[4];
+
+    char var_length[11];
     char *comma_pos;
     int i_var_length, level, is_array, vartype;
     int i_var_length_comma = -1;
@@ -68,55 +58,69 @@ void unix_parser(struct varnames *anker, struct status_p *status, char *line)
 
     line = line+4;
 
-    switch(getdefinetype_unix(line))
+    printf("[%s]\n", line);
+
+    switch(getdefinetype(line))
     {
         case SAG_COMMENT:
-            return;
-        case SAG_DYNAMIC_DF:
-        case SAG_INIT:
-        case SAG_PRE_INIT:
+//            printf("Comment\n");
             return;
         case SAG_DEFINE:
+            printf("normal define\n");
             break;
         case SAG_DEFINE_CONST:
+            printf("const define\n");
             break;
         case SAG_GROUP_MEMBER:
+            printf("Group Member\n");
             break;
         case SAG_GROUP_HEAD:
+            printf("Group leader\n");
             vartype = GROUP_LEADER;
             break;
         case SAG_REDEFINE:
+            printf("Redefine\n");
             vartype = REDEFINE;
             break;
         case SAG_REDEFINED_VALUES:
+            printf("Rederfined values\n");
             break;
         default:
+//            printf("Unkown Define Type\n");
             return;
     }
-    line = line + 18;
+    line = line + 24;
 
     switch(line[0])
     {
         case SAG_ALPHA_CHAR:
+            printf("Alphanumeric\n");
             vartype = ALPHA;
             break;
-        case SAG_NUMERIK_CHAR:
-            vartype = NUMERIC;
+        case SAG_INTEGER_CHAR:
+            printf("Integer\n");
+            vartype = INTEGER;
             break;
         case SAG_LOGIC_CHAR:
-        case SAG_INTEGER_CHAR:
+            printf("Logical (Integer)\n");
+            vartype = INTEGER;
+            break;
+        case SAG_NUMERIK_CHAR:
+            printf("Numeric\n");
             vartype = NUMERIC;
             break;
         case SAG_CONTROL_CHAR:
+            printf("Control\n");
             break;
         default:
             if(vartype == -1)
              {
+                printf("Unkown Type\n");
                 return;
              }
     }
 
-    var_length[3] = '\0';
+    var_length[10] = '\0';
 
     memcpy(var_length, line+1, sizeof(var_length));
     striptrailspace(var_length);
@@ -129,21 +133,27 @@ void unix_parser(struct varnames *anker, struct status_p *status, char *line)
 
         i_var_length = atoi(var_length);
         i_var_length_comma = atoi(comma_pos+1);
+        printf("[%d] [%d]\n", i_var_length, i_var_length_comma);
+    }
+    else if(strncmp(var_length, SAG_DYNAMIC, sizeof(SAG_DYNAMIC)-1) == 0)
+    {
+        printf("Length: DYNAMIC\n");
+        i_var_length = DYNAMIC;
     }
     else
     {
 
         i_var_length = atoi(var_length);
-        if(i_var_length == 0 && vartype == ALPHA)
-            i_var_length = DYNAMIC;
+        printf("Length: %d\n", i_var_length);
     }
 
-    line = line +6;
+    line = line +13;
     var_level[1] = '\0';
     var_level[0] = line[0];
 
     level = atoi(var_level);
 
+    printf("Level: [%d]\n", level);
 
     line = line +1;
 
@@ -156,6 +166,7 @@ void unix_parser(struct varnames *anker, struct status_p *status, char *line)
 
     var_name[i] = '\0';
 
+
     if(strcmp(var_name, "PAGE") == 0 || strcmp(var_name, "page") == 0)
         status->foundpage_grp = true;
 
@@ -163,8 +174,7 @@ void unix_parser(struct varnames *anker, struct status_p *status, char *line)
     if(strlen(line) == 0)
     {
         //Kein Array
-        if(status->foundpage_grp == false)
-            return;
+        printf("\n\n");
         goto save;
     }
 
@@ -184,6 +194,7 @@ void unix_parser(struct varnames *anker, struct status_p *status, char *line)
     tmp_ptr = strtok(array_save[0], ":");
     tmp_ptr = strtok(NULL, ":");
     x_array = atoi(tmp_ptr);
+    printf("X Length: [%d]\n", x_array);
     is_array = ARRAY_1D;
 
     if(array_save[1] != NULL)
@@ -191,16 +202,15 @@ void unix_parser(struct varnames *anker, struct status_p *status, char *line)
         tmp_ptr = strtok(array_save[1], ":");
         tmp_ptr = strtok(NULL, ":");
         y_array = atoi(tmp_ptr);
+        printf("Y Length: [%d]\n", y_array);
         is_array = ARRAY_2D;
     }
 
-    if(status->foundpage_grp == false)
-        return;
 
 save:
-    /*if(status->foundpage_grp == false)
+    if(status->foundpage_grp == false)
         return;
-    */
+    
     hptr = malloc(sizeof(struct varnames));
     if(hptr == NULL)
     {

@@ -27,6 +27,11 @@
 #define SAG_DYNAMIC_DF       10
 
 
+typedef int bool;
+#define true 1
+#define false 0
+
+
 struct varnames {
     char name[200];
     int level;
