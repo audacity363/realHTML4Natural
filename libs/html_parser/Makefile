@@ -1,29 +1,24 @@
-CC = gcc
-INCLUDES = -I../varhandle_lib/
-//CARGS = -Wall -g
-CARGS = -g
+OBJ = command_parsing.o \
+	  exec_if.o \
+	  exec_macro.o \
+	  for.o \
+	  if.o \
+	  json.o \
+	  macro.o \
+	  token_handling.o \
+	  variablen_parsing.o
 
-all:
-#	make vars_lib
-	$(CC) -c $(CARGS) token_handling.c -o token_handling.o $(INCLUDES)
-	$(CC) -c $(CARGS) command_parsing.c -o command_parsing.o $(INCLUDES)
-	$(CC) -c $(CARGS) variablen_parsing.c -o variablen_parsing.o $(INCLUDES)
-	$(CC) -c $(CARGS) if.c -o if.o $(INCLUDES)
-	$(CC) -c $(CARGS) exec_if.c -o exec_if.o $(INCLUDES)
-	$(CC) -c $(CARGS) for.c -o for.o $(INCLUDES)
-	$(CC) -c $(CARGS) json.c -o json.o $(INCLUDES)
-	$(CC) -c $(CARGS) macro.c -o macro.o $(INCLUDES)
-	$(CC) -c $(CARGS) exec_macro.c -o exec_macro.o $(INCLUDES)
-	$(CC) -g main.c -o main ./*.o $(INCLUDES) -L./vars -lvars
+INCLUDE = -I./src/ \
+		  -I../varhandle_lib/src/
 
-vars_lib:
-	cd ./vars/ && make
+LIBS = -L../varhandle_lib/ -lvars
 
-#list all TODO tags in comments
-todo:
-	grep -rn --exclude="*.swp" TODO: ./ | grep -v Makefile
+lib: $(OBJ)
+	gcc -o ./main $(INCLUDE) test/main.c ./bin/*.o $(LIBS)
+	
+%.o: ./src/%.c
+	gcc -g -c $< $(INCLUDE) -o ./bin/$@
 
 clean:
-	@rm -f ./*.o
-	@rm -f main
-
+	rm -rf libvars.a
+	rm -rf ./bin/*.o

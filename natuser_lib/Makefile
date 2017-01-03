@@ -1,14 +1,15 @@
-OBJ = unix.o start.o
+OBJ = ncuxinit.o flipBuffer.o send_values_to_page.o
 
-INCLUDE = -I../varhandle_lib/src/
+INCLUDE = -I./src/ \
+		  -I../include/
 
-LIBS = -L../varhandle_lib/ -lvars
+LIBS = 
 
 lib: $(OBJ)
-	ar -vcru libldaparser.a ./bin/*.o
+	@echo "Done..."
 	
 %.o: ./src/%.c
-	gcc -g -c $< $(INCLUDE) -o ./bin/$@
+	gcc -g -fpic -c $< $(INCLUDE) -o ./bin/$@
 
 clean:
 	rm -rf libldaparser.a

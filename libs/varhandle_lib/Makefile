@@ -1,16 +1,18 @@
-CC = gcc
-all:
-	$(CC) -g -c utils.c -o utils.o
-	$(CC) -g -c integer.c -o integer.o
-	$(CC) -g -c string.c -o string.o
-	$(CC) -g -c bool.c -o bool.o
-	$(CC) -g -c float.c -o float.o
-	$(CC) -g -c print.c -o print.o
-	ar -vcru libvars.a ./*.o
+OBJ = bool.o \
+	  float.o \
+	  integer.o \
+	  print.o \
+	  string.o \
+	  utils.o \
+
+INCLUDE = -I./src/
+
+lib: $(OBJ)
+	ar -vcru libvars.a ./bin/*.o
+	
+%.o: ./src/%.c
+	gcc -g -c $< $(INCLUDE) -o ./bin/$@
 
 clean:
-	@rm -f ./*.o
-	@rm -f ./*.a
-
-test:
-	gcc -g ./test_src/main.c -o ./main -I./ -L./ -lvars
+	rm -rf libvars.a
+	rm -rf ./bin/*.o
