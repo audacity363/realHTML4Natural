@@ -1,10 +1,10 @@
 CC = gcc
-INCLUDES = -I./vars/
+INCLUDES = -I../varhandle_lib/
 //CARGS = -Wall -g
 CARGS = -g
 
 all:
-	make vars_lib
+#	make vars_lib
 	$(CC) -c $(CARGS) token_handling.c -o token_handling.o $(INCLUDES)
 	$(CC) -c $(CARGS) command_parsing.c -o command_parsing.o $(INCLUDES)
 	$(CC) -c $(CARGS) variablen_parsing.c -o variablen_parsing.o $(INCLUDES)

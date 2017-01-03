@@ -1,715 +1,544 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <wchar.h>
 
-#include "standard.h"
-#include "varhandle.h"
+#include "vars.h"
+#include "print.h"
 
-char varhandle_error_str[2048];
+bool last_entry = false;
 
-void printArrayfromPtrtoFile(struct variables *ptr, FILE *output)
+void printAllVarsToFile_in(vars_t *anker, FILE *fp, int offset, bool);
+void printInteger(vars_t *var, FILE *fp, bool);
+void print1DInteger(vars_t *var, FILE *fp, bool);
+void print2DInteger(vars_t *var, FILE *fp, bool);
+void print3DInteger(vars_t *var, FILE *fp, bool);
+void printsingleBoolean(bool val, FILE *fp, bool);
+void printBoolean(vars_t *var, FILE *fp, bool);
+void print1DBoolean(vars_t *var, FILE *fp, bool);
+void print2DBoolean(vars_t *var, FILE *fp, bool);
+void print3DBoolean(vars_t *var, FILE *fp, bool);
+void print1DFloat(vars_t *var, FILE *fp, bool);
+void print2DFloat(vars_t *var, FILE *fp, bool);
+void print3DFloat(vars_t *var, FILE *fp, bool);
+void printFloat(vars_t *var, FILE *fp, bool);
+void printString(vars_t *var, FILE *fp, bool);
+void print1DString(vars_t *var, FILE *fp, bool);
+void print2DString(vars_t *var, FILE *fp, bool);
+void print3DString(vars_t *var, FILE *fp, bool);
+void printGroup(vars_t *var, FILE *fp, bool);
+
+#define SIZEOF_PRINT_FUNCS 17
+
+int print_function_dic_i[SIZEOF_PRINT_FUNCS] = {
+        INTEGER,
+        GROUP,
+        ONEDINTEGER,
+        TWODINTEGER,
+        THREEDINTEGER,
+        STRING,
+        BOOL,
+        ONEDBOOL,
+        TWODBOOL,
+        THREEDBOOL,
+        FLOAT,
+        ONEDFLOAT,
+        TWODFLOAT,
+        THREEDFLOAT,
+        ONEDSTRING,
+        TWODSTRING,
+        THREEDSTRING
+    };
+
+void (*print_function_dic_v[SIZEOF_PRINT_FUNCS])(vars_t*, FILE*, bool) = {
+        printInteger,
+        printGroup,
+        print1DInteger,
+        print2DInteger,
+        print3DInteger,
+        printString,
+        printBoolean,
+        print1DBoolean,
+        print2DBoolean,
+        print3DBoolean,
+        printFloat,
+        print1DFloat,
+        print2DFloat,
+        print3DFloat,
+        print1DString,
+        print2DString,
+        print3DString
+    };
+
+void printAllVars(vars_t *anker)
 {
-    int x;
+    printAllVarsToFile(anker, stdout);
+}
 
-    fprintf(output, "[");
-    if(ptr->type == U_STRINGARRAY)
+void printAllVarsToFile(vars_t *anker, FILE *fp)
+{
+    printAllVarsToFile_in(anker, fp, 0, false);
+}
+
+void printAllVarsJSON(vars_t *anker)
+{
+    printAllVarsToFileJSON(anker, stdout);
+}
+
+void printAllVarsToFileJSON(vars_t *anker, FILE *fp)
+{
+    fprintf(fp, "{\n");
+    printAllVarsToFile_in(anker, fp, 0, true);
+    fprintf(fp, "}\n");
+}
+
+int printVarsToFileJSON(vars_t *anker, char **var_names, int length, FILE *fp)
+{
+    int i = 0, x = 0;
+    vars_t *target = NULL;
+    void (*print_func)(vars_t*, FILE*, bool) = NULL;
+
+    fprintf(fp, "{");
+    for(; x < length; x++)
     {
-        for(x=0; x < ptr->x_length; x++)
+        if(!(target = isDefined(anker, var_names[x])))
+            return(VAR_NOT_DEFINED);
+        for(i=0; i < SIZEOF_PRINT_FUNCS; i++)
         {
-            fprintf(output, "\"%S\"", (wchar_t*)(ptr->data+((ptr->length)*sizeof(wchar_t)*x)));
-            if(x+1 < ptr->x_length)
-                fprintf(output, ",");
-
+            if(print_function_dic_i[i] == target->type)
+            {
+                print_func = print_function_dic_v[i];
+                print_func(target, fp, true);
+            }
         }
+        if(x+1 < length)
+            fprintf(fp, ",");
     }
+    fprintf(fp, "}\n");
+    return(0);
+}
+
+void printAllVarsToFile_in(vars_t *anker, FILE *fp, int offset, bool json)
+{
+    int i = 0, x = 0;
+    vars_t *hptr = NULL;
+
+    if(anker->name == NULL)
+        hptr = anker->next;
     else
+        hptr = anker;
+
+    void (*print_func)(vars_t*, FILE*, bool) = NULL;
+
+    while(hptr)
     {
-        for(x=0; x < ptr->length; x++)
+
+        for(i=0; i < SIZEOF_PRINT_FUNCS; i++)
         {
-            if(ptr->type == STRINGARRAY)
-                fprintf(output, "\"%s\"", ((char**)ptr->data)[x]);
-            else
-                fprintf(output, "%d", ((int*)ptr->data)[x]);
-            if(x+1 < ptr->length)
-                fprintf(output, ",");
+            if(print_function_dic_i[i] == hptr->type)
+            {
+                for(x=0; x < offset; x++)
+                    printf("\t");
+                print_func = print_function_dic_v[i];
+                print_func(hptr, fp, json);
+            }
         }
-    }
-    fprintf(output, "]");
-}
+        //Don't know why the NULL macro does not work here???
+        if(hptr->next != 0x00 && json)
+            fprintf(fp, ",");
+        else if(!json)
+            fprintf(fp, "\n");
 
-void printArrayfromPtr(struct variables *ptr)
-{
-    int x;
-
-    printf("[");
-
-    if(ptr->type == U_STRINGARRAY)
-    {
-        for(x=0; x < ptr->x_length; x++)
-        {
-            printf("\"%S\"", (wchar_t*)(ptr->data+((ptr->length)*sizeof(wchar_t)*x)));
-            if(x+1 < ptr->x_length)
-                printf(",");
-        }
-    }
-    else
-    {
-        for(x=0; x < ptr->length; x++)
-        {
-            if(ptr->type == STRINGARRAY)
-                printf("\"%s\"", ((char**)ptr->data)[x]);
-            else if(ptr->type == INTARRAY)
-                printf("%d", ((int*)ptr->data)[x]);
-            if(x+1 < ptr->length)
-                printf(",");
-        }
-    }
-    printf("]");
-}
-
-//TODO: returnstring auf wchar_t umstellen
-void printArray(struct variables *anker, char *name, bool showname, 
-                    char *returnstring)
-{
-    struct variables *ptr;
-    int i, tmp;
-    char buf[1000];
-
-    ptr = anker;
-
-    while(ptr != NULL)
-    {
-        if(cmp(ptr->name, name) && ptr->type == STRINGARRAY)
-        {
-            if(showname == true)
-                printf("Name: [%s] = ", name);
-
-            if(returnstring == NULL)
-                printf("[");
-            else
-            {
-                sprintf(returnstring, "[");
-            }
-
-            for(i=0; i < ptr->length; i++)
-            {
-                if(returnstring == NULL)
-                    printf("\"%s\"", ((char**)ptr->data)[i]);
-                else
-                {
-                    sprintf(buf, "\"%s\"", ((char**)ptr->data)[i]);
-                    strcat(returnstring, buf);
-                }
-                if(i+1 < ptr->length)
-                {
-                    if(returnstring == NULL)
-                        printf(",");
-                    else
-                    {
-                        strcat(returnstring, ",");
-                    }
-                }
-            }
-
-            if(returnstring == NULL)
-                printf("]");
-            else
-            {
-                strcat(returnstring, "]");
-            }
-            if(showname == true)
-                printf("\n");
-
-        }
-        else if(cmp(ptr->name, name) && ptr->type == U_STRINGARRAY)
-        {
-            if(showname == true)
-                printf("Name: [%s] = ", name);
-
-            if(returnstring == NULL)
-                printf("[");
-            else
-            {
-                sprintf(returnstring, "[");
-            }
-
-            for(i=0; i < ptr->x_length; i++)
-            {
-                if(returnstring == NULL)
-                    printf("\"%S\"", getUStringArrayVal(anker, name, i));
-                else
-                {
-                    sprintf(buf, "\"%s\"", ((char**)ptr->data)[i]);
-                    strcat(returnstring, buf);
-                }
-                if(i+1 < ptr->x_length)
-                {
-                    if(returnstring == NULL)
-                        printf(",");
-                    else
-                    {
-                        strcat(returnstring, ",");
-                    }
-                }
-            }
-
-            if(returnstring == NULL)
-                printf("]");
-            else
-            {
-                strcat(returnstring, "]");
-            }
-            if(showname == true)
-                printf("\n");
-
-        }
-        else if(cmp(ptr->name, name) && ptr->type == INTARRAY)
-        {
-            if(showname == true)
-                printf("Name: [%s] = ", name);
-
-            printf("[");
-            for(i=0; i < ptr->length; i++)
-            {
-                memcpy(&tmp, ptr->data+(sizeof(int)*i), sizeof(int));
-                /*printf("%.4d", *(int*)ptr->data+(sizeof(int)*i));*/
-                printf("%d", tmp);
-                if(i+1 < ptr->length)
-                {
-                    printf(",");
-                }
-            }
-            printf("]");
-            if(showname == true)
-                printf("\n");
-
-        }
-        ptr = ptr->next;
-    }
-}
-
-
-wchar_t *generateStringValuefromArray(struct variables *anker, char *name)
-{
-
-    struct variables *hptr;
-    wchar_t *returnstr;
-    wchar_t buf[1024];
-    int i, x;
-
-    hptr = anker;
-
-    while(hptr != NULL || strcmp(hptr->name, name) != 0)
-    {
-        if(strcmp(hptr->name, name) == 0)
-            break;
         hptr = hptr->next;
     }
-
-    if(hptr == NULL)
-    {
-        sprintf(varhandle_error_str, "Unkown Variable [%s]", name);
-        return(NULL);
-    }
-   
-    if(hptr->type == STRINGARRAY)
-    {
-        returnstr = malloc(2*sizeof(wchar_t));
-        swprintf(returnstr, 2, L"[");
-
-        for(i=0; i < hptr->length; i++)
-        {
-            swprintf(buf, sizeof(buf), L"\"%s\"", ((char**)hptr->data)[i]);
-            returnstr = realloc(returnstr,
-                        (wcslen(returnstr)+wcslen(buf)+1)*sizeof(wchar_t));
-            wcscat(returnstr, buf);
-            if(i+1 < hptr->length)
-            {
-                returnstr = realloc(returnstr, (wcslen(returnstr)+2)*sizeof(wchar_t));
-                wcscat(returnstr, L",");
-            }
-        }
-        returnstr = realloc(returnstr, (wcslen(returnstr)+2)*sizeof(wchar_t));
-        wcscat(returnstr, L"]");
-    }
-    else if(hptr->type == U_STRINGARRAY)
-    {
-        returnstr = malloc((hptr->length*hptr->x_length+hptr->x_length*3+2)*sizeof(wchar_t));
-        swprintf(returnstr, 2, L"[");
-        for(i=0; i < hptr->x_length; i++)
-        {
-            swprintf(buf, sizeof(buf), L"\"%S\"", getUStringArrayVal(anker, name, i));
-            wcscat(returnstr, buf);
-            if(i+1 < hptr->x_length)
-            {
-                wcscat(returnstr, L",");
-            }
-        }
-        wcscat(returnstr, L"]");
-    }
-    else if(hptr->type == INTARRAY)
-    {
-        returnstr = malloc(2*sizeof(wchar_t));
-        swprintf(returnstr, 2, L"[");
-
-        for(i=0; i < hptr->length; i++)
-        {
-            swprintf(buf, sizeof(buf), L"%d", ((int*)hptr->data)[i]);
-            returnstr = realloc(returnstr,
-                        (wcslen(returnstr)+wcslen(buf)+1)*sizeof(wchar_t));
-            wcscat(returnstr, buf);
-            if(i+1 < hptr->length)
-            {
-                returnstr = realloc(returnstr, (wcslen(returnstr)+2)*sizeof(wchar_t));
-                wcscat(returnstr, L",");
-            }
-        }
-        returnstr = realloc(returnstr, (wcslen(returnstr)+2)*sizeof(wchar_t));
-        wcscat(returnstr, L"]");
-    }
-    else if(hptr->type == TWO_DSTRINGARRAY)
-    {
-        returnstr = malloc(3*sizeof(wchar_t));
-        swprintf(returnstr, 2, L"[");
-
-        for(i=0; i < hptr->x_length; i++)
-        {
-            wcscat(returnstr, L"[");
-
-            for(x=0; x < hptr->y_length; x++)
-            {
-                swprintf(buf, sizeof(buf), L"\"%s\"", ((char**)hptr->data)[hptr->x_length*i+x]);
-                returnstr = realloc(returnstr,
-                            (wcslen(returnstr)+wcslen(buf)+1)*sizeof(wchar_t));
-                wcscat(returnstr, buf);
-                if(x+1 < hptr->y_length)
-                {
-                    returnstr = realloc(returnstr, (wcslen(returnstr)+2)*sizeof(wchar_t));
-                    wcscat(returnstr, L",");
-                }
-            }
-            returnstr = realloc(returnstr, (wcslen(returnstr)+2)*sizeof(wchar_t));
-            wcscat(returnstr, L"]");
-            if(i+1 < hptr->x_length)
-            {
-                returnstr = realloc(returnstr, (wcslen(returnstr)+2)*sizeof(wchar_t));
-                wcscat(returnstr, L",");
-            }
-        }
-        returnstr = realloc(returnstr, (wcslen(returnstr)+2)*sizeof(wchar_t));
-        wcscat(returnstr, L"]");
-    }
-    else if(hptr->type == U_TWO_DSTRINGARRAY)
-    {
-        returnstr = malloc(((hptr->length*hptr->x_length+hptr->x_length*3+2)*hptr->y_length+hptr->y_length*3+2)*sizeof(wchar_t));
-        swprintf(returnstr, 2, L"[");
-        for(i=0; i < hptr->x_length; i++)
-        {
-            wcscat(returnstr, L"[");
-            for(x = 0; x < hptr->y_length; x++)
-            {
-
-                swprintf(buf, sizeof(buf), L"\"%S\"", getUString2DArrayVal(anker, name, i, x));
-                wcscat(returnstr, buf);
-                if(x+1 < hptr->y_length)
-                {
-                    wcscat(returnstr, L",");
-                }   
-            }
-            wcscat(returnstr, L"]");
-            if(i+1 < hptr->x_length)
-            {
-                wcscat(returnstr, L",");
-            }
-        }
-        wcscat(returnstr, L"]");
-    }
-    else if(hptr->type == TWO_DINTARRAY)
-    {
-        returnstr = malloc(3*sizeof(wchar_t));
-        swprintf(returnstr, 2, L"[");
-
-        for(i=0; i < hptr->x_length; i++)
-        {
-            wcscat(returnstr, L"[");
-
-            for(x=0; x < hptr->y_length; x++)
-            {
-                swprintf(buf, sizeof(buf), L"%d", ((int*)hptr->data)[hptr->x_length*i+x]);
-                returnstr = realloc(returnstr,
-                            (wcslen(returnstr)+wcslen(buf)+1)*sizeof(wchar_t));
-                wcscat(returnstr, buf);
-                if(x+1 < hptr->y_length)
-                {
-                    returnstr = realloc(returnstr, (wcslen(returnstr)+2)*sizeof(wchar_t));
-                    wcscat(returnstr, L",");
-                }
-            }
-            returnstr = realloc(returnstr, (wcslen(returnstr)+2)*sizeof(wchar_t));
-            wcscat(returnstr, L"]");
-            if(i+1 < hptr->x_length)
-            {
-                returnstr = realloc(returnstr, (wcslen(returnstr)+2)*sizeof(wchar_t));
-                wcscat(returnstr, L",");
-            }
-        }
-        returnstr = realloc(returnstr, (wcslen(returnstr)+2)*sizeof(wchar_t));
-        wcscat(returnstr, L"]");
-    }
-    return(returnstr);
 }
 
 
-struct variables* getVarPointer(struct variables *anker, char* name)
+void printInteger(vars_t *var, FILE *fp, bool json)
 {
-    struct variables *ptr;
-
-    ptr = anker;
-    while(ptr != NULL)
-    {
-        if(cmp(ptr->name, name))
-            return(ptr);
-        ptr = ptr->next;
-    }
-    return(NULL);
-}
-
-int print2DArray(struct variables *anker, char *name, bool rt,
-                    char *returnstring)
-{
-    int x, y;
-    struct variables *ptr;
-    char buf[1000];
-
-    if((ptr = getVarPointer(anker, name)) == NULL)
-    {
-        fprintf(stderr, "Var not found\n");
-        sprintf(varhandle_error_str, "Unkown variable [%s]", name);
-        return(-1);
-    }
-
-    if(rt == true)
-        printf("Name: [%s] = ", ptr->name);
-
-    printf("%s[%s", rt==true?"\n":"", rt==true?"\n":"");
-    for(x=0; x < ptr->x_length; x++)
-    {  
-        if(returnstring == NULL)
-            printf("%s[", rt==true?"\t":"");
-        else
-            sprintf("%s[", rt==true?"\t":"");
-
-        for(y=0; y < ptr->y_length; y++)
-        {
-            if(ptr->type == TWO_DSTRINGARRAY)
-            {
-                if(returnstring == NULL)
-                    printf("\"%s\"", ((char**)ptr->data)[ptr->x_length*x+y]);
-                else
-                {
-                    sprintf(buf, "\"%s\"",
-                        ((char**)ptr->data)[ptr->x_length*x+y]);
-                    strcat(returnstring, buf);
-                }
-            }
-            else if(ptr->type == U_TWO_DSTRINGARRAY)
-            {
-                if(returnstring == NULL)
-                    printf("\"%S\"", getUString2DArrayVal(anker, name, x, y));
-                else
-                {
-                    sprintf(buf, "\"%s\"",
-                        ((char**)ptr->data)[ptr->x_length*x+y]);
-                    strcat(returnstring, buf);
-                }
-            }
-            else if(ptr->type == TWO_DINTARRAY)
-            {
-
-                if(returnstring == NULL)
-                    printf("%d", ((int*)ptr->data)[ptr->x_length*x+y]);
-                 else
-                 {
-                    sprintf(buf, "%d", ((int*)ptr->data)[ptr->x_length*x+y]);
-                    strcat(returnstring, buf);
-                 }
-            }
-
-            if(y+1 < ptr->y_length)
-            {
-                if(returnstring == NULL)
-                    printf(", ");
-                else
-                    strcat(returnstring, ", ");
-            }
-        }
-        if(returnstring == NULL)
-            printf("],%s", rt==true?"\n":"");
-        else
-            strcat(returnstring, "],");
-    }
-    if(returnstring == NULL)
-        printf("]%s",rt==true?"\n":"");
+    if(json)
+        fprintf(fp, "\"%s\": %d", var->name, *((int*)var->data));
     else
-        strcat(returnstring, "]");
+        fprintf(fp, "[%s] = [%d]", var->name, *((int*)var->data));
+}
+
+void print1DInteger(vars_t *var, FILE *fp, bool json)
+{
+    int i = 0;
+
+    if(json)
+        fprintf(fp, "\"%s\": [", var->name);
+    else
+        fprintf(fp, "[%s] = [", var->name);
+    for(i=0; i < var->x_length; i++)
+    {
+        fprintf(fp, "%d", ((int*)var->data)[i]);
+        if(i+1 < var->x_length)
+        {
+            fprintf(fp, ", ");
+        }
+    }
+    fprintf(fp, "]");
+}
+
+void print2DInteger(vars_t *var, FILE *fp, bool json)
+{
+    int x = 0, y = 0;
+
+    if(json)
+        fprintf(fp, "\"%s\": [", var->name);
+    else
+        fprintf(fp, "[%s] = [", var->name);
+    for(x=0; x < var->x_length; x++)
+    {
+        fprintf(fp, "[");
+        for(y=0; y < var->y_length; y++)
+        {
+            fprintf(fp, "%d", ((int*)var->data)[(x*var->y_length)+y]);
+            if(y+1 < var->y_length)
+                fprintf(fp, ", ");
+        }
+        fprintf(fp, "]");
+
+        if(x+1 < var->x_length)
+            fprintf(fp, ", ");
+    }
+    fprintf(fp, "]");
+}
+
+void print3DInteger(vars_t *var, FILE *fp, bool json)
+{
+    size_t x = 0, y = 0, z = 0, offset = 0;
+
+    if(json)
+        fprintf(fp, "\"%s\": [", var->name);
+    else
+        fprintf(fp, "[%s] = [", var->name);
+
+    for(x=0; x < var->x_length; x++)
+    {
+        fprintf(fp, "[");
+        for(y=0; y < var->y_length; y++)
+        {
+            fprintf(fp, "[");
+            for(z=0; z < var->z_length; z++)
+            {
+                offset = (z*var->x_length * var->y_length);
+                offset += (y*var->x_length) + x;
+                fprintf(fp, "%d", ((int*)var->data)[offset]);
+                if(z+1 < var->z_length)
+                    fprintf(fp, ", ");
+            }
+            fprintf(fp, "]");
+            if(y+1 < var->y_length)
+                fprintf(fp, ", ");
+        }
+
+        fprintf(fp, "]");
+
+        if(x+1 < var->x_length)
+            fprintf(fp, ", ");
+    }
+    fprintf(fp, "]");
+}
+
+void printsingleBoolean(bool val, FILE *fp, bool json)
+{
+    if(val == 1)
+        fprintf(fp, "true");
+    else
+        fprintf(fp, "false");
+}
+
+void printBoolean(vars_t *var, FILE *fp, bool json)
+{
+    if(json)
+        fprintf(fp, "\"%s\": [", var->name);
+    else
+        fprintf(fp, "[%s] = [", var->name);
+
+    printsingleBoolean(*((bool*)var->data), fp, json);
+    fprintf(fp, "]");
+}
+
+void print1DBoolean(vars_t *var, FILE *fp, bool json)
+{
+    int x = 0;
+
+    if(json)
+        fprintf(fp, "\"%s\": [", var->name);
+    else
+        fprintf(fp, "[%s] = [", var->name);
+
+    for(x=0; x < var->x_length; x++)
+    {
+        printsingleBoolean(((bool*)var->data)[x], fp, json);
+        if(x+1 < var->x_length)
+            fprintf(fp, ", ");
+    }
+    fprintf(fp, "]");
+}
+
+void print2DBoolean(vars_t *var, FILE *fp, bool json)
+{
+    size_t x = 0, y = 0, offset = 0;
+
+    if(json)
+        fprintf(fp, "\"%s\": [", var->name);
+    else
+        fprintf(fp, "[%s] = [", var->name);
+
+    for(x=0; x < var->x_length; x++)
+    {
+        fprintf(fp, "[");
+        for(y=0; y < var->y_length; y++)
+        {
+            offset = (x*var->y_length)+y;
+            printsingleBoolean(((bool*)var->data)[offset], fp, json);
+            if(y+1 < var->y_length)
+                fprintf(fp, ", ");
+        }
+        fprintf(fp, "]");
+        if(x+1 < var->x_length)
+            fprintf(fp, ", ");
+    }
+    fprintf(fp, "]");
+}
+
+void print3DBoolean(vars_t *var, FILE *fp, bool json)
+{
+    size_t x = 0, y = 0, z = 0, offset = 0;
+
+    if(json)
+        fprintf(fp, "\"%s\": [", var->name);
+    else
+        fprintf(fp, "[%s] = [", var->name);
+
+    for(x=0; x < var->x_length; x++)
+    {
+        fprintf(fp, "[");
+        for(y=0; y < var->y_length; y++)
+        {
+            fprintf(fp, "[");
+            for(z=0; z < var->z_length; z++)
+            {
+                offset = (z*var->x_length * var->y_length);
+                offset += (y*var->x_length) + x;
+                printsingleBoolean(((bool*)var->data)[offset], fp, json);
+                if(z+1 < var->z_length)
+                   fprintf(fp, ", ");
+            }
+            fprintf(fp, "]");
+
+            if(y+1 < var->y_length)
+            fprintf(fp, ", ");
+        }
+        fprintf(fp, "]");
+        if(x+1 < var->x_length)
+            fprintf(fp, ", ");
+    }
+    fprintf(fp, "]");
+}
+
+void printFloat(vars_t *var, FILE *fp, bool json)
+{
+    if(json)
+        fprintf(fp, "\"%s\": %f", var->name, *((double*)var->data));
+    else
+        fprintf(fp, "[%s] = [%f]", var->name, *((double*)var->data));
+}
+
+void print1DFloat(vars_t *var, FILE *fp, bool json)
+{
+    int i = 0;
+
+    if(json)
+        fprintf(fp, "\"%s\": [", var->name);
+    else
+        fprintf(fp, "[%s] = [", var->name);
+
+    for(i=0; i < var->x_length; i++)
+    {
+        fprintf(fp, "%f", ((double*)var->data)[i]);
+        if(i+1 < var->x_length)
+        {
+            fprintf(fp, ", ");
+        }
+    }
+    fprintf(fp, "]");
+}
+
+void print2DFloat(vars_t *var, FILE *fp, bool json)
+{
+    int x = 0, y = 0;
+
+    if(json)
+        fprintf(fp, "\"%s\": [", var->name);
+    else
+        fprintf(fp, "[%s] = [", var->name);
+
+    for(x=0; x < var->x_length; x++)
+    {
+        fprintf(fp, "[");
+        for(y=0; y < var->y_length; y++)
+        {
+            fprintf(fp, "%f", ((double*)var->data)[(x*var->y_length)+y]);
+            if(y+1 < var->y_length)
+                fprintf(fp, ", ");
+        }
+        fprintf(fp, "]");
+
+        if(x+1 < var->x_length)
+            fprintf(fp, ", ");
+    }
+    fprintf(fp, "]");
+}
+
+void print3DFloat(vars_t *var, FILE *fp, bool json)
+{
+    size_t x = 0, y = 0, z = 0, offset = 0;
+
+    if(json)
+        fprintf(fp, "\"%s\": [", var->name);
+    else
+        fprintf(fp, "[%s] = [", var->name);
+
+    for(x=0; x < var->x_length; x++)
+    {
+        fprintf(fp, "[");
+        for(y=0; y < var->y_length; y++)
+        {
+            fprintf(fp, "[");
+            for(z=0; z < var->z_length; z++)
+            {
+                offset = (z*var->x_length * var->y_length);
+                offset += (y*var->x_length) + x;
+                fprintf(fp, "%f", ((double*)var->data)[offset]);
+                if(z+1 < var->z_length)
+                    fprintf(fp, ", ");
+            }
+            fprintf(fp, "]");
+            if(y+1 < var->y_length)
+                fprintf(fp, ", ");
+        }
+
+        fprintf(fp, "]");
+
+        if(x+1 < var->x_length)
+            fprintf(fp, ", ");
+    }
+    fprintf(fp, "]");
 }
 
 
-int getVarType(struct variables *anker, char *name)
-{
-    struct variables *ptr;
 
-    if((ptr = searchVar(anker, name)) == NULL)
-    {
-        sprintf(varhandle_error_str, "Unknown Variable: [%s]", name);
-        return(-1);
-    }
-    return(ptr->type);
+void printString(vars_t *var, FILE *fp, bool json)
+{
+    if(json)
+        fprintf(fp, "\"%s\": \"%S\"", var->name, (wchar_t*)var->data);
+    else
+        fprintf(fp, "[%s] = [%S]", var->name, (wchar_t*)var->data);
 }
 
-void printVars(struct variables *anker)
+void print1DString(vars_t *var, FILE *fp, bool json)
 {
-    struct variables *ptr;
+    size_t x = 0, offset = 0;
 
-    printf("--------------------------------------------------------------\n");
+    if(json)
+        fprintf(fp, "\"%s\": [", var->name);
+    else
+        fprintf(fp, "[%s] = [", var->name);
 
-    ptr = anker;
-    while(ptr != NULL)
+    for(x=0; x < var->x_length; x++)
     {
-        switch(ptr->type)
-        {
-            case STRING:
-                printf("Name:[%s] = [%s]\n", ptr->name, (char*)ptr->data);
-                break;
-            case U_STRING:
-                printf("Name:[%s] = [%S]\n", ptr->name, (wchar_t*)ptr->data);
-                break;
-            case INT:
-                printf("Name:[%s] = [%d]\n", ptr->name, *(int*)ptr->data);
-                break;
-            case STRINGARRAY:
-                printArray(anker, ptr->name, true, NULL);
-                break;
-            case U_STRINGARRAY:
-                printArray(anker, ptr->name, true, NULL);
-                break;
-            case INTARRAY:
-                printArray(anker, ptr->name, true, NULL);
-                break;
-            case TWO_DSTRINGARRAY:
-                print2DArray(anker, ptr->name, true, NULL);
-                break;
-            case U_TWO_DSTRINGARRAY:
-                print2DArray(anker, ptr->name, true, NULL);
-                break;
-            case TWO_DINTARRAY:
-                print2DArray(anker, ptr->name, true, NULL);
-                break;
-
-
-        }
-        ptr = ptr->next;
+        offset = ((var->length)*sizeof(wchar_t))*x;
+        fprintf(fp, "\"%S\"", (wchar_t*)(var->data+offset));
+        if(x+1 < var->x_length)
+            fprintf(fp, ", ");
     }
-    printf("--------------------------------------------------------------\n");
-    return;
+    fprintf(fp, "]");
 }
 
-void printVar(struct variables *anker, char *name)
+void print2DString(vars_t *var, FILE *fp, bool json)
 {
-    struct variables *hptr;
+    size_t x = 0, y = 0, offset = 0;
 
-    hptr = anker;
-    while(hptr != NULL)
+    if(json)
+        fprintf(fp, "\"%s\": [", var->name);
+    else
+        fprintf(fp, "[%s] = [", var->name);
+
+    for(x=0; x < var->x_length; x++)
     {
-        if(strcmp(name, hptr->name) == 0)
+        fprintf(fp, "[");
+        for(y=0; y < var->y_length; y++)
         {
-            break;
+            offset = (var->y_length*(var->length*sizeof(wchar_t)));
+            offset = offset*(x)+((var->length*sizeof(wchar_t))*(y));
+            fprintf(fp, "\"%S\"", (wchar_t*)(var->data+offset));
+            if(y+1 < var->y_length)
+                fprintf(fp, ", ");
         }
-        hptr = hptr->next;
+        fprintf(fp, "]");
+        if(x+1 < var->x_length)
+            fprintf(fp, ", ");
     }
-    if(hptr == NULL)
-        return;
-
-    switch(hptr->type)
-        {
-            case STRING:
-                printf("Name:[%s] = [%s]\n", hptr->name, (char*)hptr->data);
-                break;
-            case INT:
-                printf("Name:[%s] = [%d]\n", hptr->name, *(int*)hptr->data);
-                break;
-            case STRINGARRAY:
-                printArray(anker, hptr->name, true, NULL);
-                break;
-            case INTARRAY:
-                printArray(anker, hptr->name, true, NULL);
-                break;
-            case TWO_DSTRINGARRAY:
-                print2DArray(anker, hptr->name, true, NULL);
-                break;
-            case U_TWO_DSTRINGARRAY:
-                print2DArray(anker, hptr->name, true, NULL);
-                break;
-            case TWO_DINTARRAY:
-                print2DArray(anker, hptr->name, true, NULL);
-                break;
-
-
-        }
+    fprintf(fp, "]");
 }
 
-void printArraytoFile(struct variables *anker, char *name, FILE *p_output)
+void print3DString(vars_t *var, FILE *fp, bool json)
 {
-    struct variables *ptr;
-    int i, tmp;
-    char buf[1000];
+    size_t x = 0, y = 0, z = 0, 
+        offset = 0, var_size = 0,
+        sizeofz = 0, sizeofy = 0;
 
-    ptr = anker;
+    var_size = var->length*sizeof(wchar_t);
+    sizeofz = var_size*(var->z_length);
+    sizeofy = sizeofz*(var->y_length);
 
-    while(ptr != NULL)
+    if(json)
+        fprintf(fp, "\"%s\": [", var->name);
+    else
+        fprintf(fp, "[%s] = [", var->name);
+
+    for(x=0; x < var->x_length; x++)
     {
-        if(cmp(ptr->name, name) && ptr->type == STRINGARRAY)
+        fprintf(fp, "[");
+        for(y=0; y < var->y_length; y++)
         {
-            fprintf(p_output, "Name: [%s] = ", name);
-            fprintf(p_output, "[");
-
-            for(i=0; i < ptr->length; i++)
+            fprintf(fp, "[");
+            for(z=0; z < var->z_length; z++)
             {
-                fprintf(p_output, "\"%s\"", ((char**)ptr->data)[i]);
-                if(i+1 < ptr->length)
-                {
-                    fprintf(p_output, ",");
-                }
+                offset = (x*sizeofy)+(y*sizeofz)+(var_size*z);
+                fprintf(fp, "\"%S\"", (wchar_t*)(var->data+offset));
+                if(z+1 < var->z_length)
+                    fprintf(fp, ", ");
             }
-
-            fprintf(p_output, "]");
-            fprintf(p_output, "\n");
+            fprintf(fp, "]");
+            if(y+1 < var->y_length)
+                fprintf(fp, ", ");
         }
-        else if(cmp(ptr->name, name) && ptr->type == U_STRINGARRAY)
-        {
-            fprintf(p_output, "Name: [%s] = ", name);
-            fprintf(p_output, "[");
-
-            for(i=0; i < ptr->x_length; i++)
-            {
-                fprintf(p_output, "\"%S\"", getUStringArrayVal(anker, name, i));
-                if(i+1 < ptr->x_length)
-                {
-                    fprintf(p_output, ",");
-                }
-            }
-
-            fprintf(p_output, "]");
-            fprintf(p_output, "\n");
-        }
-        else if(cmp(ptr->name, name) && ptr->type == INTARRAY)
-        {
-            fprintf(p_output, "Name: [%s] = ", name);
-
-            fprintf(p_output, "[");
-            for(i=0; i < ptr->length; i++)
-            {
-                memcpy(&tmp, ptr->data+(sizeof(int)*i), sizeof(int));
-                /*printf("%.4d", *(int*)ptr->data+(sizeof(int)*i));*/
-                fprintf(p_output, "%d", tmp);
-                if(i+1 < ptr->length)
-                {
-                    fprintf(p_output, ",");
-                }
-            }
-            fprintf(p_output, "]");
-            fprintf(p_output, "\n");
-
-        }
-        ptr = ptr->next;
+        fprintf(fp, "]");
+        if(x+1 < var->x_length)
+            fprintf(fp, ", ");
     }
-}
-
-int print2DArraytoFile(struct variables *anker, char *name, FILE *p_output)
-{
-    int x, y;
-    struct variables *ptr;
-    char buf[1000];
-
-    if((ptr = getVarPointer(anker, name)) == NULL)
-    {
-        fprintf(stderr, "Var not found\n");
-        sprintf(varhandle_error_str, "Unkown variable [%s]", name);
-        return(-1);
-    }
-
-    fprintf(p_output, "Name: [%s] = ", ptr->name);
-
-    fprintf(p_output, "\n[\n");
-    for(x=0; x < ptr->x_length; x++)
-    {  
-        fprintf(p_output, "\t[");
-
-        for(y=0; y < ptr->y_length; y++)
-        {
-            if(ptr->type == TWO_DSTRINGARRAY)
-            {
-                fprintf(p_output, "\"%s\"", ((char**)ptr->data)[ptr->x_length*x+y]);
-            }
-            else if(ptr->type == U_TWO_DSTRINGARRAY)
-            {
-                fprintf(p_output, "\"%S\"", getUString2DArrayVal(anker, name, x, y));
-            }
-            else if(ptr->type == TWO_DINTARRAY)
-            {
-                fprintf(p_output, "%d", ((int*)ptr->data)[ptr->x_length*x+y]);
-            }
-
-            if(y+1 < ptr->y_length)
-            {
-                fprintf(p_output, ", ");
-            }
-        }
-        fprintf(p_output, "]");
-        if(x+1 < ptr->x_length)
-            fprintf(p_output, ",");
-        fprintf(p_output, "\n");
-
-    }
-    fprintf(p_output, "]\n");
+    fprintf(fp, "]");
 }
 
 
-void printVarstoFile(struct variables *anker, FILE *p_output)
+void printGroup(vars_t *var, FILE *fp, bool json)
 {
-    struct variables *ptr;
+    int off = 0;
 
-    ptr = anker;
-    while(ptr != NULL)
+    if(json)
+        printf("\"%s\":{", var->name);
+    else
     {
-        switch(ptr->type)
-        {
-            case STRING:
-                fprintf(p_output, "Name:[%s] = [%s]\n", ptr->name, (char*)ptr->data);
-                break;
-            case U_STRING:
-                fprintf(p_output, "Name:[%s] = [%S]\n", ptr->name, (wchar_t*)ptr->data);
-                break;
-            case INT:
-                fprintf(p_output, "Name:[%s] = [%d]\n", ptr->name, *(int*)ptr->data);
-                break;
-            case U_STRINGARRAY:
-            case STRINGARRAY:
-                printArraytoFile(anker, ptr->name, p_output);
-                break;
-            case INTARRAY:
-                printArraytoFile(anker, ptr->name, p_output);
-                break;
-            case U_TWO_DSTRINGARRAY:
-            case TWO_DSTRINGARRAY:
-                print2DArraytoFile(anker, ptr->name, p_output);
-                break;
-            case TWO_DINTARRAY:
-                print2DArraytoFile(anker, ptr->name, p_output);
-                break;
-        }
-        ptr = ptr->next;
+        printf("Group: [%s]:\n", var->name);
+        off = 1;
     }
-    return;
+
+    printAllVarsToFile_in(var->next_lvl, fp, off, json);
+
+    if(json)
+        fprintf(fp, "}");
 }

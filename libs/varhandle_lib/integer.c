@@ -2,261 +2,606 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "standard.h"
-#include "varhandle.h"
-#include "management.h"
+#include "vars.h"
+#include "utils.h"
 
-int newIntVar(struct variables *anker, char *name, int value)
+//TODO: Write a function which replaces the variablen search code
+//TODO: change group type to an char pointer array so that you can read multiple groups
+
+int addGroup(vars_t *anker, char *name, int x_length, int y_length, int z_length)
 {
-    struct variables *ptr, *hptr;
+    vars_t *end = NULL,
+           *new = NULL;
 
-    ptr = anker;
-    while(ptr->next != NULL)
-        ptr = ptr->next;
-
-    if((hptr = malloc(sizeof(struct variables))) == NULL)
+    if(isDefined(anker, name))
     {
-        strcpy(varhandle_error_str, "MemoryError: Can not allocate Memory for variable Entry (newIntVar)");
-        return(-1);
+        return(GRP_ALREADY_DEFINED);
     }
 
-    strcpy(hptr->name, name);
+    end = goToAnkerEnd(anker);
 
-    if((hptr->data = malloc(sizeof(int))) == NULL)
+    if((new = malloc(sizeof(vars_t))) == NULL)
     {
-        strcpy(varhandle_error_str, "MemoryError: Can not allocate Memory for variable (newIntVar)");
-        return(-2);
+        return(MEMORY_ALLOC_ERROR);
     }
-    *(int*)hptr->data = value;
-    hptr->type = INT;
+    
+    if((new->name = malloc(strlen(name)+1)) == NULL)
+    {
+        free(new);
+        return(MEMORY_ALLOC_ERROR);
+    }
 
-    hptr->length = sizeof(int);
-    hptr->x_length = 0;
-    hptr->y_length = 0;
+    strcpy(new->name, name);
+    new->type = GROUP;
 
-    hptr->next = NULL;
+    if(x_length > 0)
+        new->x_length = x_length;
+    else
+        new->x_length = 0;
+    if(y_length > 0)
+        new->y_length = y_length;
+    else
+        new->y_length = 0;
+    if(z_length > 0)
+        new->z_length = z_length;
+    else
+        new->z_length = 0;
 
-    ptr->next = hptr;
+    end->next = new;
+    new->prev = end;
+    new->next_lvl = NULL;
+    new->next = NULL;
     return(0);
 }
 
-int getIntValue(struct variables *anker, char *name, int *value)
+int addInteger(vars_t *anker, char *group, char *name, int val)
 {
-    struct variables *ptr;
+    vars_t *new = NULL;
 
-    if((ptr = searchVar(anker, name)) == NULL)
-    { 
-        sprintf(varhandle_error_str, "Unkown Variable [%s]", name);
-        value = NULL;
-        return(-1);
+    int ret = 0;
+
+    if((ret = addNewVar(anker, &new, group, name)) != 0)
+        return(ret);
+
+    new->type = INTEGER;
+    if((new->data = malloc(sizeof(int))) == NULL)
+    {
+        free(new->name);
+        free(new);
+        return(MEMORY_ALLOC_ERROR);
     }
 
-   if(ptr->type != INT)
-   {
-        sprintf(varhandle_error_str, "TypeError: variable [%s] is not an integer", name);
-       return(-2);
-   }
-
-    *value = *(int*)ptr->data;
+    *((int*)new->data) = val;
     return(0);
 }
 
-int editIntVar(struct variables *anker, char *name, int value)
+int getInteger(vars_t *anker, char *group, char *name, int *val)
 {
-    struct variables *ptr;
+    vars_t *target = NULL,
+           *grp = NULL;
 
-    if((ptr = searchVar(anker, name)) == NULL)
+    if(group)
     {
-        sprintf(varhandle_error_str, "Unkown Variable [%s]", name);
-        return(-1);
+        if(!(grp = isDefined(anker, group)))
+        {
+            return(GRP_NOT_DEFINED);
+        }
+        if(!(target = isDefined(grp->next_lvl, name)))
+        {
+            return(VAR_NOT_DEFINED);
+        }
+    }
+    else
+    {
+        if(!(target = isDefined(anker, name)))
+        {
+            return(VAR_NOT_DEFINED);
+        }
     }
 
-   if(ptr->type != INT)
-   {
-        sprintf(varhandle_error_str, "TypeError: variable [%s] is not an integer", name);
-       return(-2);
-   }
+    *val = *(int*)(target->data);
 
-    *(int*)ptr->data = value;
+}
+
+int add1DIntegerArray(vars_t *anker, char *group, char *name, int length)
+{
+    vars_t *new = NULL;
+    int ret = 0;
+
+    if((ret = addNewVar(anker, &new, group, name)) != 0)
+        return(ret);
+
+    new->type = ONEDINTEGER;
+    new->x_length = length;
+    if((new->data = malloc(sizeof(int)*length)) == NULL)
+    {
+        free(new->name);
+        free(new);
+        return(MEMORY_ALLOC_ERROR);
+    }
     return(0);
 }
 
-
-
-//---------------------------------------------------------------------------
-
-int newIntArray(struct variables *anker, char *name, int x_length)
+int getIntegerFrom1DArray(vars_t *anker, char *group, char *name,
+                          int *i_target, int x_index)
 {
-    struct variables *ptr, *hptr;
+    vars_t *target = NULL,
+           *grp = NULL;
 
-    ptr = anker;
-    while(ptr->next != NULL)
-        ptr = ptr->next;
-
-    if((hptr = malloc(sizeof(struct variables))) == NULL)
+    if(group)
     {
-        strcpy(varhandle_error_str, "MemoryError: Can not allocate Memory for variable Entry (newIntArray)");
-        return(-1);
+        if(!(grp = isDefined(anker, group)))
+        {
+            return(GRP_NOT_DEFINED);
+        }
+        if(!(target = isDefined(grp->next_lvl, name)))
+        {
+            return(VAR_NOT_DEFINED);
+        }
+    }
+    else
+    {
+        if(!(target = isDefined(anker, name)))
+        {
+            return(VAR_NOT_DEFINED);
+        }
     }
 
-    hptr->type = INTARRAY;
-
-    hptr->length = sizeof(int);
-    hptr->x_length = x_length;
-    hptr->y_length = 0;
-
-    strcpy(hptr->name, name);
-
-    if((hptr->data = malloc(sizeof(int)*x_length)) == NULL)
+    if(x_index >= target->x_length)
     {
-        strcpy(varhandle_error_str, "MemoryError: Can not allocate Memory for variable (newIntArray)");
-        return(-2);
+        return(X_INDEX_OUT_OF_RANGE);
     }
 
-    hptr->next = NULL;
+    *i_target = ((int*)target->data)[x_index];
+    return(0);
 
-    ptr->next = hptr;
+}
+
+int edit1DIntegerArray(vars_t *anker, char *group, char *name, int val, int x_index)
+{
+    vars_t *target = NULL,
+           *grp = NULL;
+
+    if(group)
+    {
+        if(!(grp = isDefined(anker, group)))
+        {
+            return(GRP_NOT_DEFINED);
+        }
+        if(!(target = isDefined(grp->next_lvl, name)))
+        {
+            return(VAR_NOT_DEFINED);
+        }
+    }
+    else
+    {
+        if(!(target = isDefined(anker, name)))
+        {
+            return(VAR_NOT_DEFINED);
+        }
+    }
+
+    if(x_index >= target->x_length)
+    {
+        return(X_INDEX_OUT_OF_RANGE);
+    }
+
+    ((int*)target->data)[x_index] = val;
     return(0);
 }
 
-int getIntValuefromArray(struct variables *anker, char *name, int x_index, int *value)
+int editFull1DIntegerArray(vars_t *anker, char *group, char *name, void *val)
 {
-    struct variables *ptr;
-    ptr = anker;
+    vars_t *target = NULL,
+           *grp = NULL;
 
-    if((ptr = searchVar(anker, name)) == NULL)
+    if(group)
     {
-        sprintf(varhandle_error_str, "Unkown Variable [%s]", name);
-        return(-1);
+        if(!(grp = isDefined(anker, group)))
+        {
+            return(GRP_NOT_DEFINED);
+        }
+        if(!(target = isDefined(grp->next_lvl, name)))
+        {
+            return(VAR_NOT_DEFINED);
+        }
+    }
+    else
+    {
+        if(!(target = isDefined(anker, name)))
+        {
+            return(VAR_NOT_DEFINED);
+        }
     }
 
-    if(ptr->type != INTARRAY)
-    {
-        sprintf(varhandle_error_str, "TypeError: variable [%s] is not an integer array", name);
-        return(-2);
-    }
-
-    if(x_index >= ptr->x_length)
-    {
-        sprintf(varhandle_error_str, "IndexError: Index out of range");
-        return(-3);
-    }
-
-    *value =((int*)(ptr->data))[x_index];
-
-    return(0);
-}
-
-int editIntVarArray(struct variables *anker, char *name, int value, int x_index)
-{
-    struct variables *ptr;
-
-    if((ptr = searchVar(anker, name)) == NULL)
-    {
-        sprintf(varhandle_error_str, "Unkown Variable [%s]", name);
-        return(-1);
-    }
-
-    if(ptr->type != INTARRAY)
-    {
-        sprintf(varhandle_error_str, "TypeError: variable [%s] is not an integer array", name);
-        return(-2);
-    }
-
-    if(x_index >= ptr->x_length)
-    {
-        sprintf(varhandle_error_str, "IndexError: Index out of range");
-        return(-2);
-    }
-
-    ((int*)ptr->data)[x_index] = value;
-    return(0);
-}
-
-//---------------------------------------------------------------------------
-
-int new2DIntArray(struct variables *anker, char *name, int x_length,
-                   int y_length)
-{
-    struct variables *ptr, *hptr;
-
-    ptr = anker;
-    while(ptr->next != NULL)
-        ptr = ptr->next;
-
-    if((hptr = malloc(sizeof(struct variables))) == NULL)
-    {
-        strcpy(varhandle_error_str, "MemoryError: Can not allocate Memory for variable Entry (new2DIntArray)");
-        return(-1);
-    }
-
-    strcpy(hptr->name, name);
-
-    hptr->type = TWO_DINTARRAY;
-
-    hptr->length = sizeof(int);
-    hptr->x_length = x_length;
-    hptr->y_length = y_length;
-
-    if((hptr->data = malloc((x_length*y_length)*sizeof(int))) == NULL)
-    {
-        strcpy(varhandle_error_str, "MemoryError: Can not allocate Memory for variable (new2DIntArray)");
-        return(-2);
-    }
-
-    hptr->next = NULL;
-
-    ptr->next = hptr;
-    return(0);
-}
-
-int getIntValuefrom2DArray(struct variables *anker, char *name, int x, 
-                                int y, int *value)
-{
-    struct variables *ptr;
-
-    if((ptr = searchVar(anker, name)) == NULL)
-    {
-        sprintf(varhandle_error_str, "Unkown Variable [%s]", name);
-        return(-1);
-    }
-
-    if(x >= ptr->x_length || y >= ptr->y_length)
-    {
-        strcpy(varhandle_error_str, "Index Error: index out of range");
-        return(-2);
-    }
-
-    *value = ((int*)ptr->data)[ptr->x_length*x+y];
+    memcpy(target->data, val, sizeof(int)*target->x_length);
 
     return(0);
 }
 
-int editIntVar2DArray(struct variables *anker, char *name, int value, int x,
-                      int y)
+int createNewVarFrom1DIntegerArray(vars_t *inanker, vars_t *outanker,
+                                  char *group, char *name, char *out_grp,
+                                  char *new_name, int x_index)
 {
-    struct variables *ptr;
+    vars_t *target = NULL, *grp = NULL;
+    int ret = 0, i_target = 0;
 
-    if((ptr = searchVar(anker, name)) == NULL)
+    if(group)
     {
-        sprintf(varhandle_error_str, "Unkown Variable [%s]", name);
-        return(-1);
+        if(!(grp = isDefined(inanker, group)))
+        {
+            return(GRP_NOT_DEFINED);
+        }
+        if(!(target = isDefined(grp->next_lvl, name)))
+        {
+            return(VAR_NOT_DEFINED);
+        }
+    }
+    else
+    {
+        if(!(target = isDefined(inanker, name)))
+        {
+            return(VAR_NOT_DEFINED);
+        }
     }
 
-    if(ptr->type != TWO_DINTARRAY)
+    if(target->type != ONEDINTEGER)
+        return(WRONG_VAR_TYPE);
+
+    if((ret = getIntegerFrom1DArray(inanker, group, name, &i_target,
+                    x_index)) != 0)
     {
-        sprintf(varhandle_error_str, "TypeError: Varaible [%s] is not a two dimension integer array", name);
-        return(-2);
+        return(ret);
     }
 
-    if(x >= ptr->x_length || y >= ptr->y_length)
+    if((ret = addInteger(outanker, out_grp, new_name, i_target)) != 0)
     {
-        strcpy(varhandle_error_str, "Index Error: index out of range");
-        return(-3);
+        return(0);
     }
-
-    ((int*)ptr->data)[ptr->x_length*x+y] = value;
+    
     return(0);
 }
 
-//---------------------------------------------------------------------------
+int add2DIntegerArray(vars_t *anker, char *group, char *name, int x_length, int y_length)
+{
+    vars_t *new = NULL;
+    int ret = 0;
+
+    if((ret = addNewVar(anker, &new, group, name)) != 0)
+        return(ret);
+
+    new->type = TWODINTEGER;
+    new->x_length = x_length;
+    new->y_length = y_length;
+    if((new->data = malloc((x_length*y_length)*sizeof(int))) == NULL)
+    {
+        free(new->name);
+        free(new);
+        return(MEMORY_ALLOC_ERROR);
+    }
+    return(0);
+
+}
+
+int getIntegerFrom2DArray(vars_t *anker, char *group, char *name,
+                          int *i_target, int x_index, int y_index)
+{
+    vars_t *target = NULL,
+           *grp = NULL;
+    int offset = 0;
+
+    if(group)
+    {
+        if(!(grp = isDefined(anker, group)))
+        {
+            return(GRP_NOT_DEFINED);
+        }
+        if(!(target = isDefined(grp->next_lvl, name)))
+        {
+            return(VAR_NOT_DEFINED);
+        }
+    }
+    else
+    {
+        if(!(target = isDefined(anker, name)))
+        {
+            return(VAR_NOT_DEFINED);
+        }
+    }
+
+    if(x_index >= target->x_length)
+    {
+        return(X_INDEX_OUT_OF_RANGE);
+    }
+
+    if(y_index >= target->y_length)
+    {
+        return(X_INDEX_OUT_OF_RANGE);
+    }
+
+    offset = (x_index*target->y_length)+y_index;
+    *i_target = ((int*)target->data)[offset];
+    return(0);
+
+}
+
+int edit2DIntegerArray(vars_t *anker, char *group, char *name, int val, int x_index, int y_index)
+{
+    vars_t *target = NULL,
+           *grp = NULL;
+    size_t offset = 0;
+
+    if(group)
+    {
+        if(!(grp = isDefined(anker, group)))
+        {
+            return(GRP_NOT_DEFINED);
+        }
+        if(!(target = isDefined(grp->next_lvl, name)))
+        {
+            return(VAR_NOT_DEFINED);
+        }
+    }
+    else
+    {
+        if(!(target = isDefined(anker, name)))
+        {
+            return(VAR_NOT_DEFINED);
+        }
+    }
+
+    if(x_index >= target->x_length)
+        return(X_INDEX_OUT_OF_RANGE);
+    if(y_index >= target->y_length)
+        return(Y_INDEX_OUT_OF_RANGE);
+
+
+    offset = (x_index*target->y_length)+y_index;
+    ((int*)target->data)[offset] = val;
+    return(0);
+}
+
+int editFull2DIntegerArray(vars_t *anker, char *group, char *name, void *val)
+{
+    vars_t *target = NULL,
+           *grp = NULL;
+    size_t offset = 0;
+
+    if(group)
+    {
+        if(!(grp = isDefined(anker, group)))
+        {
+            return(GRP_NOT_DEFINED);
+        }
+        if(!(target = isDefined(grp->next_lvl, name)))
+        {
+            return(VAR_NOT_DEFINED);
+        }
+    }
+    else
+    {
+        if(!(target = isDefined(anker, name)))
+        {
+            return(VAR_NOT_DEFINED);
+        }
+    }
+
+    memcpy(target->data, val, (target->x_length*target->y_length)*sizeof(int));
+    return(0);
+}
+
+
+int createNew1DArrayFrom2DIntegerArray(vars_t *inanker, vars_t *outanker,
+                                  char *group, char *name, char *out_grp,
+                                  char *new_name, int x_index)
+{
+    int i = 0, ret = 0, i_target = 0,
+        y_length = 0;
+
+    if(getArrayLength(inanker, group, name, NULL, &y_length, NULL) != 0)
+    {
+        return(VAR_NOT_DEFINED);
+    }
+
+    if((ret = add1DIntegerArray(outanker, out_grp, new_name, y_length)) != 0)
+        return(ret);
+
+    for(; i < y_length; i++)
+    {
+        if((ret = getIntegerFrom2DArray(inanker, group, name, &i_target, x_index, i)))
+            return(ret);
+
+        if((ret = edit1DIntegerArray(outanker, out_grp, new_name, i_target, i)) != 0)
+            return(ret);
+    }
+    return(0);
+}
+
+int add3DIntegerArray(vars_t *anker, char *group, char *name, int x_length, int y_length, int z_length)
+{
+    vars_t *new = NULL;
+    int ret = 0;
+
+    if((ret = addNewVar(anker, &new, group, name)) != 0)
+        return(ret);
+
+    new->type = THREEDINTEGER;
+    new->x_length = x_length;
+    new->y_length = y_length;
+    new->z_length = z_length;
+    if((new->data = malloc(((x_length*y_length)*z_length)*sizeof(int))) == NULL)
+    {
+        free(new->name);
+        free(new);
+        return(MEMORY_ALLOC_ERROR);
+    }
+    return(0);
+
+}
+
+int getIntegerFrom3DArray(vars_t *anker, char *group, char *name,
+                          int *i_target, int x_index, int y_index, int z_index)
+{
+    vars_t *target = NULL,
+           *grp = NULL;
+
+    int offset = 0;
+
+    if(group)
+    {
+        if(!(grp = isDefined(anker, group)))
+        {
+            return(GRP_NOT_DEFINED);
+        }
+        if(!(target = isDefined(grp->next_lvl, name)))
+        {
+            return(VAR_NOT_DEFINED);
+        }
+    }
+    else
+    {
+        if(!(target = isDefined(anker, name)))
+        {
+            return(VAR_NOT_DEFINED);
+        }
+    }
+
+    if(x_index >= target->x_length)
+        return(X_INDEX_OUT_OF_RANGE);
+    if(y_index >= target->y_length)
+        return(Y_INDEX_OUT_OF_RANGE);
+    if(z_index >= target->z_length)
+        return(Z_INDEX_OUT_OF_RANGE);
+
+    offset = (z_index*target->x_length * target->y_length);
+    offset += (y_index*target->x_length) + x_index;
+    *i_target = ((int*)target->data)[offset];
+    return(0);
+
+}
+
+int edit3DIntegerArray(vars_t *anker, char *group, char *name, int val, int x_index, int y_index, int z_index)
+{
+    vars_t *target = NULL,
+           *grp = NULL;
+    size_t offset = 0;
+
+    if(group)
+    {
+        if(!(grp = isDefined(anker, group)))
+        {
+            return(GRP_NOT_DEFINED);
+        }
+        if(!(target = isDefined(grp->next_lvl, name)))
+        {
+            return(VAR_NOT_DEFINED);
+        }
+    }
+    else
+    {
+        if(!(target = isDefined(anker, name)))
+        {
+            return(VAR_NOT_DEFINED);
+        }
+    }
+
+    if(x_index >= target->x_length)
+        return(X_INDEX_OUT_OF_RANGE);
+    if(y_index >= target->y_length)
+        return(Y_INDEX_OUT_OF_RANGE);
+    if(z_index >= target->z_length)
+        return(Z_INDEX_OUT_OF_RANGE);
+
+    // ( z * xSize * ySize ) + ( y * xSize ) + x
+
+    offset = (z_index*target->x_length * target->y_length);
+    offset += (y_index*target->x_length) + x_index;
+    ((int*)target->data)[offset] = val;
+    return(0);
+}
+
+int createNew2DArrayFrom3DIntegerArray(vars_t *inanker, vars_t *outanker,
+                                  char *group, char *name, char *out_grp,
+                                  char *new_name, int x_index)
+{
+    int i = 0, x = 0, ret = 0, i_target = 0,
+        y_length = 0, z_length = 0;
+
+    if(getArrayLength(inanker, group, name, NULL, &y_length, &z_length) != 0)
+    {
+        return(VAR_NOT_DEFINED);
+    }
+
+    if((ret = add2DIntegerArray(outanker, out_grp, new_name, y_length, z_length)) != 0)
+        return(ret);
+
+    for(; i < y_length; i++)
+    {
+        for(x=0; x < z_length; x++)
+        {
+            if((ret = getIntegerFrom3DArray(inanker, group, name, &i_target, x_index, i, x)) != 0)
+                return(ret);
+
+            if((ret = edit2DIntegerArray(outanker, out_grp, new_name, i_target, i, x)) != 0)
+                return(ret);
+        }
+    }
+    return(0);
+}
+
+int createNew1DArrayFrom3DIntegerArray(vars_t *inanker, vars_t *outanker,
+                                  char *group, char *name, char *out_grp,
+                                  char *new_name, int x_index, int y_index)
+{
+    int i = 0, x = 0, ret = 0, i_target = 0,
+        y_length = 0, z_length = 0;
+
+    if(getArrayLength(inanker, group, name, NULL, NULL, &z_length) != 0)
+    {
+        return(VAR_NOT_DEFINED);
+    }
+
+    if((ret = add1DIntegerArray(outanker, out_grp, new_name, z_length)) != 0)
+        return(ret);
+
+    for(; i < z_length; i++)
+    {
+        if((ret = getIntegerFrom3DArray(inanker, group, name, &i_target, x_index, y_index, i)) != 0)
+            return(ret);
+
+        if((ret = edit1DIntegerArray(outanker, out_grp, new_name, i_target, i)) != 0)
+            return(ret);
+    }
+    return(0);
+}
+
+int editFull3DIntegerArray(vars_t *anker, char *group, char *name, void *val)
+{
+    vars_t *target = NULL,
+           *grp = NULL;
+    size_t offset = 0;
+
+    if(group)
+    {
+        if(!(grp = isDefined(anker, group)))
+        {
+            return(GRP_NOT_DEFINED);
+        }
+        if(!(target = isDefined(grp->next_lvl, name)))
+        {
+            return(VAR_NOT_DEFINED);
+        }
+    }
+    else
+    {
+        if(!(target = isDefined(anker, name)))
+        {
+            return(VAR_NOT_DEFINED);
+        }
+    }
+
+    memcpy(target->data, val, ((target->x_length*target->y_length)
+                *target->z_length)*sizeof(int));
+
+    return(0);
+}
