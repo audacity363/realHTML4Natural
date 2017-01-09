@@ -19,8 +19,7 @@
 ** START OF CODE TO BE CHANGED BY THE USER
 */
 
-extern long user_exit();
-extern long flipBuffer();
+extern long gen_page();
 
 
 /*
@@ -34,8 +33,7 @@ extern long flipBuffer();
 
 TAB_STRUCT n_call_table[] = {
 
-  { "GENPAGE", user_exit},
-  { "FLIPBUF", flipBuffer}
+  { "GENPAGE", gen_page}
 
 };
 

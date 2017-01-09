@@ -408,7 +408,7 @@ int getBooleanFrom3DArray(vars_t *anker, char *group, char *name,
 
 }
 
-int edit3DBoolArray(vars_t *anker, char *group, char *name, bool val, int x_index, int y_index, int z_index)
+int edit3DBooleanArray(vars_t *anker, char *group, char *name, bool val, int x_index, int y_index, int z_index)
 {
     vars_t *target = NULL, 
            *grp = NULL;
