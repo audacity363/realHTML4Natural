@@ -1,0 +1,18 @@
+OBJ = bool.o \
+	  float.o \
+	  integer.o \
+	  print.o \
+	  string.o \
+	  utils.o \
+
+INCLUDE = -I./src/
+
+lib: $(OBJ)
+	ar -vcru libvars.a ./bin/*.o
+	
+$(OBJ):
+	xlc -g -c ./src/$*.c $(INCLUDE) -o ./bin/$*.o
+
+clean:
+	rm -rf libvars.a
+	rm -rf ./bin/*.o

@@ -6,6 +6,8 @@
 #include "vars.h"
 #include "lda.h"
 
+void printfork(vars_t *anker);
+
 void start(char *filename, vars_t *anker)
 {
     FILE *lda = NULL;
