@@ -26,9 +26,9 @@ void start(char *filename, vars_t *anker)
     {
         fgets(line, sizeof(line), lda);
         unix_lda(line, anker);
+        memset(line, 0x00, sizeof(line));
     }
 
-    printfork(anker);
     fclose(lda);
 }
 

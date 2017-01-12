@@ -48,7 +48,7 @@ vars_t *isDefined(vars_t *anker, char *name)
         }
         hptr  = hptr->next;
     }
-    return(false);
+    return(NULL);
 }
 
 //Same as isDefined but with the option to search with groups

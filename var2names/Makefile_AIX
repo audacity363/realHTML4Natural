@@ -1,0 +1,24 @@
+OBJ = start.o
+
+INCLUDE = -I./src/ \
+		  -I../libs/varhandle_lib/src/ \
+		  -I../libs/nat-lda-parser/src/
+
+LIBS = -L./ -lvar2name \
+	   -L../libs/varhandle_lib/ -lldaparser\
+	   -L../libs/nat-lda-parser/ -lvars
+
+lib: $(OBJ)
+	ar -vcru libvar2name.a ./bin/*.o
+	
+$(OBJ):
+	xlc -g -c ./src/$*.c $(INCLUDE) -o ./bin/$*.o
+
+test:
+	xlc -g ./test_src/main.c $(INCLUDE) $(LIBS) -o ./test_src/main
+	./test_src/main
+
+clean:
+	rm -rf libvar2name.a
+	rm -rf ./bin/*.o
+	rm -rf ./test_src/main

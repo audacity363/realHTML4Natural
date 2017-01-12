@@ -17,6 +17,9 @@ int main(int argc, char *argv[])
 
     initVarAnker(&anker);
 
-    return(start(argv[1], anker));
+    start(argv[1], anker);
+
+    printfork(anker);
+    return(0);
 }
 

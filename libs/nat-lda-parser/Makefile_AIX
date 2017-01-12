@@ -15,5 +15,5 @@ clean:
 	rm -rf ./bin/*.o
 
 test:
-	make lib
-	gcc -g ./test_src/main.c $(INCLUDE) -o ./test -L./ -lldaparser -I./src/ $(LIBS)
+	xlc -g ./test_src/main.c $(INCLUDE) -o ./test_src/test -L./ -lldaparser -I./src/ $(LIBS)
+	./test_src/test ./test_files/TESTLDA.NSL

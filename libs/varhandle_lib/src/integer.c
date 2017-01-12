@@ -8,52 +8,6 @@
 //TODO: Write a function which replaces the variablen search code
 //TODO: change group type to an char pointer array so that you can read multiple groups
 
-int addGroup(vars_t *anker, char *name, int x_length, int y_length, int z_length)
-{
-    vars_t *end = NULL,
-           *new = NULL;
-
-    if(isDefined(anker, name))
-    {
-        return(GRP_ALREADY_DEFINED);
-    }
-
-    end = goToAnkerEnd(anker);
-
-    if((new = malloc(sizeof(vars_t))) == NULL)
-    {
-        return(MEMORY_ALLOC_ERROR);
-    }
-    
-    if((new->name = malloc(strlen(name)+1)) == NULL)
-    {
-        free(new);
-        return(MEMORY_ALLOC_ERROR);
-    }
-
-    strcpy(new->name, name);
-    new->type = GROUP;
-
-    if(x_length > 0)
-        new->x_length = x_length;
-    else
-        new->x_length = 0;
-    if(y_length > 0)
-        new->y_length = y_length;
-    else
-        new->y_length = 0;
-    if(z_length > 0)
-        new->z_length = z_length;
-    else
-        new->z_length = 0;
-
-    end->next = new;
-    new->prev = end;
-    new->next_lvl = NULL;
-    new->next = NULL;
-    return(0);
-}
-
 int addInteger(vars_t *anker, char *group, char *name, int val)
 {
     vars_t *new = NULL;

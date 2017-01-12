@@ -38,6 +38,11 @@ int unix_lda(char *line, vars_t *anker)
     vars_t *cur = malloc(sizeof(vars_t)),
            *hptr = NULL;
 
+    cur->prev = NULL;
+    cur->next = NULL;
+    cur->next_lvl = NULL;
+    cur->data = NULL;
+
     int definition_type = 0,
         i = 0,
         x = 0,
@@ -74,7 +79,7 @@ int unix_lda(char *line, vars_t *anker)
     if(line[0] == 'I')
     {
         sag_array_index = line[1] - 0x30;
-        printf("It is an Array. SAG index: [%d]\n", sag_array_index);
+        //printf("It is an Array. SAG index: [%d]\n", sag_array_index);
     }
     //I dont know for what this section is for. Just ignore is for the moment
     line+=13;
@@ -133,7 +138,7 @@ int unix_lda(char *line, vars_t *anker)
         //Groups dont have length parms. Just jump over them
         line+=5;
         cur->type = GROUP;
-        printf("Group\n");
+        //printf("Group\n");
     }
 
     //convert the char level to an integer
@@ -153,7 +158,7 @@ int unix_lda(char *line, vars_t *anker)
     }
 
     trimTrailingSpaces(tmp_name);
-    printf("name: [%s]\n", tmp_name);
+    //printf("name: [%s]\n", tmp_name);
 
     if(strlen(line) > 0)
     {
@@ -161,7 +166,7 @@ int unix_lda(char *line, vars_t *anker)
         parseArrayIndex(line, &index_type, array_length);
         for(i=0; i < index_type; i++)
         {
-            printf("Index: [%d]\n", array_length[i]);
+            //printf("Index: [%d]\n", array_length[i]);
         }
 
         updateVarType(cur, index_type, array_length);
@@ -241,6 +246,9 @@ int unix_lda(char *line, vars_t *anker)
     cur->name = malloc(strlen(tmp_name)+1);
     strcpy(cur->name, tmp_name);
 
+    cur->next_lvl = NULL;
+    cur->next = NULL;
+
     if(cur->level > cur_pos->level)
     {
         cur_pos->next_lvl = cur;
@@ -264,7 +272,7 @@ int unix_lda(char *line, vars_t *anker)
     }
 
     cur_pos = cur;
-    printf("\n");
+    //printf("\n");
     return(0);
 }
 
