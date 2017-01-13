@@ -1,0 +1,24 @@
+
+TARGET = clean lib
+MAKEFILENAME = -f Makefile_AIX
+
+all: nat
+	@echo "Done.."
+
+html_parser: var_lib
+	cd ./libs/html_parser/ && make $(MAKEFILENAME) $(TARGET)
+
+lda_parser: var_lib
+	cd ./libs/nat-lda-parser/ && make $(MAKEFILENAME) $(TARGET)
+
+var2name: var_lib utils lda_parser 
+	cd ./var2names/ && make $(MAKEFILENAME) $(TARGET)
+
+nat: html_parser var_lib utils lda_parser
+	cd ./natuser_lib/ && make $(MAKEFILENAME) $(TARGET)
+
+utils:
+	cd ./libs/utils/ && make $(MAKEFILENAME) $(TARGET)
+
+var_lib:
+	cd ./libs/varhandle_lib/ && make $(MAKEFILENAME) $(TARGET)

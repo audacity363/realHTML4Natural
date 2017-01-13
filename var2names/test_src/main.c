@@ -11,14 +11,10 @@ vars_t *handleGroup(vars_t *cur_var, vars_t *group);
 
 int main()
 {
-    vars_t *lda_anker = NULL, *hptr = NULL,
+    vars_t *hptr = NULL,
            *nat_anker = NULL;
 
-    initVarAnker(&lda_anker);
     initVarAnker(&nat_anker);
-
-    lda_anker = hptr->next_lvl;
-    printfork(lda_anker);
 
     addString(nat_anker, NULL, "tmp4", L"Hello World", 11);
     addInteger(nat_anker, NULL, "tmp5", 7);

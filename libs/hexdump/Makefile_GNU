@@ -1,0 +1,13 @@
+OBJ = hexdump.o
+
+INCLUDE = -I./src/
+
+lib: $(OBJ)
+	ar -vcru libhexdump.a ./bin/*.o
+	
+%.o: ./src/%.c
+	gcc -g -c $< $(INCLUDE) -o ./bin/$@
+
+clean:
+	rm -rf libhexdump.a
+	rm -rf ./bin/*.o

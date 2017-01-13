@@ -32,7 +32,7 @@ int startvar2name(vars_t *var_anker, char *lda_path, bool debug, FILE *logfile)
         return(-1);
     }
 
-    printfork(lda_anker);
+    printfork(lda_anker, logfile);
 
     if((page_grp  = searchPageStructure(lda_anker)) == NULL)
     {

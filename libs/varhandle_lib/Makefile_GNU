@@ -4,6 +4,7 @@ OBJ = bool.o \
 	  print.o \
 	  string.o \
 	  utils.o \
+	  groups.o
 
 INCLUDE = -I./src/
 
