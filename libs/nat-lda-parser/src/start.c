@@ -6,101 +6,104 @@
 #include "vars.h"
 #include "lda.h"
 
-void printfork(vars_t *anker);
-
-void start(char *filename, vars_t *anker)
+int startLDAParser(char *filename, vars_t *anker, bool debug, FILE *logfile)
 {
     FILE *lda = NULL;
     char line[2048];
+    int ret = 0;
 
     if((lda = fopen(filename, "r")) == NULL)
     {
-        fprintf(stderr, "%s\n", strerror(errno));
-        return;
+        if(debug == true)
+            fprintf(logfile, "%s\n", strerror(errno));
+        return(LDA_FILE_ERROR);
     }
 
     anker->level = 1;
 
-
     while(!feof(lda))
     {
         fgets(line, sizeof(line), lda);
-        unix_lda(line, anker);
+        if(strlen(line) == 0)
+            break;
+        if((ret = unix_lda(line, anker, debug, logfile)) != LDA_OK && ret != CONTINUE)
+            return(ret);
         memset(line, 0x00, sizeof(line));
     }
 
     fclose(lda);
+    return(LDA_OK);
 }
 
-void printTabs(int level)
+void printTabs(int level, FILE *logfile)
 {
     int i;
     for(i=0; i < level-1; i++)
     {
-        printf("\t");
+        fprintf(logfile, "\t");
     }
 
 }
 
-void printVarType(int type)
+void printVarType(int type, FILE *logfile)
 {
     switch(type)
     {
         case STRING:
-            printf("Type:     [String]\n");
+            fprintf(logfile, "Type:     [String]\n");
             break;
         case ONEDSTRING:
-            printf("Type:     [1D String]\n");
+            fprintf(logfile, "Type:     [1D String]\n");
             break;
         case TWODSTRING:
-            printf("Type:     [2D String]\n");
+            fprintf(logfile, "Type:     [2D String]\n");
             break;
         case THREEDSTRING:
-            printf("Type:     [3D String]\n");
+            fprintf(logfile, "Type:     [3D String]\n");
             break;
         case INTEGER:
-            printf("Type:     [int]\n");
+            fprintf(logfile, "Type:     [int]\n");
             break;
         case ONEDINTEGER:
-            printf("Type:     [1D int]\n");
+            fprintf(logfile, "Type:     [1D int]\n");
             break;
         case TWODINTEGER:
-            printf("Type:     [2D int]\n");
+            fprintf(logfile, "Type:     [2D int]\n");
             break;
         case THREEDINTEGER:
-            printf("Type:     [3D int]\n");
+            fprintf(logfile, "Type:     [3D int]\n");
             break;
         case FLOAT:
-            printf("Type:     [float]\n");
+            fprintf(logfile, "Type:     [float]\n");
             break;
         case ONEDFLOAT:
-            printf("Type:     [1D float]\n");
+            fprintf(logfile, "Type:     [1D float]\n");
             break;
         case TWODFLOAT:
-            printf("Type:     [2D float]\n");
+            fprintf(logfile, "Type:     [2D float]\n");
             break;
         case THREEDFLOAT:
-            printf("Type:     [2D float]\n");
+            fprintf(logfile, "Type:     [2D float]\n");
             break;
         case BOOL:
-            printf("Type:     [bool]\n");
+            fprintf(logfile, "Type:     [bool]\n");
             break;
         case ONEDBOOL:
-            printf("Type:     [1D bool]\n");
+            fprintf(logfile, "Type:     [1D bool]\n");
             break;
         case TWODBOOL:
-            printf("Type:     [2D bool]\n");
+            fprintf(logfile, "Type:     [2D bool]\n");
             break;
         case THREEDBOOL:
-            printf("Type:     [3D bool]\n");
+            fprintf(logfile, "Type:     [3D bool]\n");
             break;
         case GROUP:
-            printf("Type:     [Group leader]\n");
+            fprintf(logfile, "Type:     [Group leader]\n");
             break;
     }
 }
 
-void printfork(vars_t *anker)
+void printfork(vars_t *anker, FILE *logfile)
 {
     vars_t *hptr;
     int is_array = 0;
@@ -108,33 +111,33 @@ void printfork(vars_t *anker)
     hptr = anker;
     while(hptr != NULL)
     {
-        printTabs(hptr->level);
-        printf("Level:    [%d]\n", hptr->level);
-        printTabs(hptr->level);
-        printf("Name:     [%s]\n", hptr->name);
-        printTabs(hptr->level);
-        printVarType(hptr->type);
+        printTabs(hptr->level, logfile);
+        fprintf(logfile, "Level:    [%d]\n", hptr->level);
+        printTabs(hptr->level, logfile);
+        fprintf(logfile, "Name:     [%s]\n", hptr->name);
+        printTabs(hptr->level, logfile);
+        printVarType(hptr->type, logfile);
         if(hptr->x_length != -1)
         {
-            printTabs(hptr->level);
-            printf("X Length:    [%d]\n", hptr->x_length);
+            printTabs(hptr->level, logfile);
+            fprintf(logfile, "X Length:    [%d]\n", hptr->x_length);
         }
         if(hptr->y_length != -1)
         {
-            printTabs(hptr->level);
-            printf("Y Length:    [%d]\n", hptr->y_length);
+            printTabs(hptr->level, logfile);
+            fprintf(logfile, "Y Length:    [%d]\n", hptr->y_length);
         }
         if(hptr->z_length != -1)
         {
-            printTabs(hptr->level);
-            printf("Z Length:    [%d]\n", hptr->z_length);
+            printTabs(hptr->level, logfile);
+            fprintf(logfile, "Z Length:    [%d]\n", hptr->z_length);
         }
 
 
         if(hptr->next_lvl != NULL)
-            printfork(hptr->next_lvl);
+            printfork(hptr->next_lvl, logfile);
 
-        printf("\n");
+        fprintf(logfile, "\n");
         hptr = hptr->next;
     }
 }

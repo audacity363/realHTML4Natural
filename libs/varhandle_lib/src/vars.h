@@ -48,7 +48,9 @@ enum {
     FLOAT,
     ONEDFLOAT,
     TWODFLOAT,
-    THREEDFLOAT
+    THREEDFLOAT,
+
+    UNKOWN
 };
 
 typedef struct variables_s vars_t;

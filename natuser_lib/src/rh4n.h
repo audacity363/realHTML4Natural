@@ -7,6 +7,8 @@
 #define RH4N_VAR_LIBRARY_ERR 600
 #define RH4N_UNKOWN_INT_TYPE 700
 
+#define RH4N_GRP_HEAD "page"
+
 #define NAT_BOOL_SIZE 1
 
 struct settings_s {
@@ -29,5 +31,7 @@ void trimleadingSpaces(char *input);
 
 extern FILE *logfile;
 
+#ifndef VAR2NAME
 int handleAlphaVariable(int index, void *parmhandle, pnni_611_functions nni_funcs,
                     struct parameter_description pb, char *name, vars_t *anker);
+#endif

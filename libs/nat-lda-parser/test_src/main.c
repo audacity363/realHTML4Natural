@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "vars.h"
+#include "lda.h"
 
 int main(int argc, char *argv[])
 {
@@ -12,14 +13,16 @@ int main(int argc, char *argv[])
     }
 
     char error[2048];
+    int ret = 0;
 
     vars_t *anker = NULL;
 
     initVarAnker(&anker);
 
-    start(argv[1], anker);
+    if((ret = startLDAParser(argv[1], anker, true, stdout)) != LDA_OK)
+        return(ret);
 
-    printfork(anker);
+    printfork(anker, stdout);
     return(0);
 }
 

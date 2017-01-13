@@ -1,0 +1,19 @@
+OBJ = utils.o
+
+INCLUDE = 
+
+LIBS = 
+
+lib: $(OBJ)
+	ar -vcru libutils.a ./bin/*.o
+	
+$(OBJ):
+	xlc -g -c ./src/$*.c $(INCLUDE) -o ./bin/$*.o
+
+clean:
+	rm -rf libutils.a
+	rm -rf ./bin/*.o
+
+test:
+	xlc -g ./test_src/main.c $(INCLUDE) -o ./test_src/test -L./ -lldaparser -I./src/ $(LIBS)
+	./test_src/test ./test_files/TESTLDA.NSL

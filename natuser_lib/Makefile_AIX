@@ -5,10 +5,12 @@ VAR_OBJ = a_handling.o n_handling.o l_handling.o i_handling.o u_handling.o
 INCLUDE = -I./src/ \
 		  -I../include/ \
 		  -I../libs/varhandle_lib/src/ \
-		  -I../libs/hexdump/src/
+		  -I../libs/hexdump/src/ \
+		  -I../libs/utils/src/
 
 LIBS = -L../libs/varhandle_lib/ -lvars \
-	   -L../libs/hexdump/ -lhexdump
+	   -L../libs/hexdump/ -lhexdump \
+	   -L../libs/utils/ -lutils
 
 
 LFLAGS1 = -G -bsymbolic -bexpall -bnoentry

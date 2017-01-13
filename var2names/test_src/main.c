@@ -17,25 +17,6 @@ int main()
     initVarAnker(&lda_anker);
     initVarAnker(&nat_anker);
 
-    start("./test_src/TESTLDA.NSL", lda_anker);
-
-    hptr = lda_anker->next;
-
-    while(hptr)
-    {
-        if(strcmp(hptr->name, "PAGE") == 0)
-        {
-            break;
-        }
-        hptr = hptr->next;
-    }
-
-    if(hptr == NULL)
-    {
-        fprintf(stderr, "Error: hptr == NULL\n");
-        return(-1);
-    }
-
     lda_anker = hptr->next_lvl;
     printfork(lda_anker);
 
@@ -48,7 +29,11 @@ int main()
     addInteger(nat_anker, NULL, "tmp10", 8);
     addInteger(nat_anker, NULL, "tmp11", 9);
 
-    startvar2name(nat_anker->next, lda_anker);
+    if(startvar2name(nat_anker->next, "./test_src/TESTLDA.NSL", true, stdout) != 0)
+    {
+        printAllVars(nat_anker);
+        return(1);
+    }
 
     printAllVars(nat_anker);
     return(0);

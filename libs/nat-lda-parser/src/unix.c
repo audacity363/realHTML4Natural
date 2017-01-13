@@ -25,7 +25,7 @@ void updateVarType(vars_t *target, int index_type, int *index_length);
 vars_t *cur_pos = NULL;
 vars_t *grp_head = NULL;
 
-int unix_lda(char *line, vars_t *anker)
+int unix_lda(char *line, vars_t *anker, bool debug, FILE *logfile)
 {
     char *line_begin = NULL,
           c_var_type = 0,
@@ -65,8 +65,9 @@ int unix_lda(char *line, vars_t *anker)
 
     if((definition_type = unix_getDefinitionType(line)) == -1)
     {
-        fprintf(stderr, "Unkown definition type [%4.4s]\n", line);
-        return(-1);
+        if(debug == true)
+            fprintf(logfile, "Unkown definition type [%4.4s]\n", line);
+        return(LDA_UNKOWN_SAG_DEF_TYPE);
     }
 
     //Check if we can ignore this type
@@ -92,13 +93,17 @@ int unix_lda(char *line, vars_t *anker)
     {
         if((cur->type = unix_getVariablenType(c_var_type)) == TYPE_UNSUPPORTED)
         {
-            fprintf(stderr, "Variablen Type not supported\n");
-            return(BREAK);
+            if(debug == true)
+                fprintf(logfile, "Variablen Type not supported\n");
+
+            return(LDA_TYPE_NOT_SUPPORTED);
         }
         else if(cur->type == -2)
         {
-            fprintf(stderr, "Unkown Variablentype: [%c]\n", c_var_type);
-            return(BREAK);
+            if(debug == true)
+                fprintf(logfile, "Unkown Variablentype: [%c]\n", c_var_type);
+
+            return(LDA_UNKOWN_VAR_TYPE);
         }
 
         //check length parms
@@ -273,7 +278,7 @@ int unix_lda(char *line, vars_t *anker)
 
     cur_pos = cur;
     //printf("\n");
-    return(0);
+    return(LDA_OK);
 }
 
 /*
@@ -335,6 +340,8 @@ int unix_getVariablenType(char type)
         return(TYPE_UNSUPPORTED);
     else if(type == TYPE_UNICODE)
         return(STRING);
+    else if(type == TYPE_EMPTY)
+        return(UNKOWN);
 
     return(-2);
 }

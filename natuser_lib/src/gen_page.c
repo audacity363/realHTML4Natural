@@ -9,6 +9,7 @@
 #include "natni.h"
 #include "vars.h"
 #include "rh4n.h"
+#include "utils.h"
 
 #define LDAPOS 0
 #define TEMPLATEPOS 1
@@ -419,51 +420,4 @@ void CloseLib(void **shLib)
     dlclose(*shLib);
 }
 
-void trimSpaces(char *input)
-{
-    int length = strlen(input);
 
-    for(; length >= -1; length--)
-    {
-        if(input[length] != 0x20 && input[length] != 0x00)
-        {
-            input[length+1] = '\0';
-            break;
-        }
-    }
-}
-
-void trimleadingSpaces(char *input)
-{
-    int length = strlen(input), i;
-
-    for(i=0; i < length; i++)
-    {
-        if(input[i] != 0x20)
-            break;
-    }
-
-    length++;
-
-    memmove(input, input+i, length-i);
-}
-
-void trimSpaces4B(wchar_t *input)
-{
-    int byte_length = wcslen(input)*sizeof(wchar_t);
-
-    void *start = (void*)input,
-         *end = ((void*)input)+byte_length;
-    char c_null = 0x00,
-         c_space = 0x20;
-
-    while(end != start)
-    {
-        if(memcmp(end, &c_null, 1) != 0 && memcmp(end, &c_space, 1) != 0)
-            break;
-        memset(end, 0x00, 1);
-        end--;
-    }
-
-    
-}

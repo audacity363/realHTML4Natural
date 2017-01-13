@@ -7,6 +7,7 @@
 #include "natni.h"
 #include "vars.h"
 #include "rh4n.h"
+#include "utils.h"
 
 int handleUnicodeVariable(int index, void *parmhandle, pnni_611_functions nni_funcs,
                     struct parameter_description pb, char *name, vars_t *anker)

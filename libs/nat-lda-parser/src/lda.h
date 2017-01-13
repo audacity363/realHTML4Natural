@@ -28,8 +28,17 @@ enum
 #define TYPE_PACK          'P'
 #define TYPE_TIME          'T'
 #define TYPE_UNICODE       'U'
+#define TYPE_EMPTY         ' '
 
 #define LEN_NAME            32
 
 #define TYPE_UNSUPPORTED -1
 
+#define LDA_OK 0
+#define LDA_FILE_ERROR 3 
+#define LDA_TYPE_NOT_SUPPORTED 4
+#define LDA_UNKOWN_VAR_TYPE 5
+#define LDA_UNKOWN_SAG_DEF_TYPE 6
+
+int startLDAParser(char *filename, vars_t *anker, bool debug, FILE *logfile);
+int unix_lda(char *line, vars_t *anker, bool debug, FILE *logfile);
