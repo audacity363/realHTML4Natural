@@ -1,4 +1,4 @@
-OBJ = unix.o start.o
+OBJ = unix.o start.o free.o
 
 INCLUDE = -I../varhandle_lib/src/
 

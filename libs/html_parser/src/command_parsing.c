@@ -343,6 +343,7 @@ int parseCommand(wchar_t *begin, wchar_t *end, status_t *stat)
     ret = cmd_func(offset, stat);
 
     free(cmd_name);
+    cleanUpTokenList(&anker);
 
     return(ret);
 }

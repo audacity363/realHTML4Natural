@@ -5,6 +5,8 @@
 #include "vars.h"
 #include "utils.h"
 
+void freeVarFork(vars_t *start);
+
 int initVarAnker(vars_t **anker)
 {
     if(!(*anker = malloc(sizeof(vars_t))))
@@ -126,6 +128,52 @@ int removeVar(vars_t *anker, char *name)
     free(target->data);
     free(target);
     return(0);
+}
+
+void freeVarAnker(vars_t *anker)
+{
+    freeVarFork(anker);
+}
+
+void freeVarFork(vars_t *start)
+{
+    vars_t *hptr = NULL, *savptr = NULL;
+    hptr = start;
+    //got to the end of the anker when there is an fork free this one first
+    while(hptr)
+    {
+        if(hptr->next_lvl != NULL)
+            freeVarFork(hptr->next_lvl);
+        savptr = hptr;
+        hptr = hptr->next;
+    }
+    
+    hptr = savptr;
+
+    while(hptr->level == start->level && hptr != NULL)
+    {
+        free(hptr->name);
+        free(hptr->data);
+        hptr->name = NULL;
+        //reaced first entry
+        if(hptr->prev == NULL)
+        {
+            free(hptr);
+            break;
+        }
+
+        //reaced group head
+        if(hptr == start)
+        {
+            hptr->prev->next_lvl = NULL;
+            free(hptr);
+            break;
+        }
+
+        hptr = hptr->prev;
+        free(hptr->next);
+        hptr->next = NULL;
+    }
 }
 
 int addNewVar(vars_t *anker, vars_t **new, char *group, char *name)

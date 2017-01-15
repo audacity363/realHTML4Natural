@@ -14,7 +14,7 @@ INCLUDE = -I./src/ \
 LIBS = -L../varhandle_lib/ -lvars
 
 lib: $(OBJ)
-	gcc -o ./main $(INCLUDE) test/main.c ./bin/*.o $(LIBS)
+	gcc -g -o ./main $(INCLUDE) test/main.c ./bin/*.o $(LIBS)
 	
 %.o: ./src/%.c
 	gcc -g -c $< $(INCLUDE) -o ./bin/$@

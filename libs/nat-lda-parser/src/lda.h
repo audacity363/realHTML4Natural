@@ -42,3 +42,4 @@ enum
 
 int startLDAParser(char *filename, vars_t *anker, bool debug, FILE *logfile);
 int unix_lda(char *line, vars_t *anker, bool debug, FILE *logfile);
+void freeAnker(vars_t *anker);

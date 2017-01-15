@@ -32,8 +32,6 @@ int startvar2name(vars_t *var_anker, char *lda_path, bool debug, FILE *logfile)
         return(-1);
     }
 
-    printfork(lda_anker, logfile);
-
     if((page_grp  = searchPageStructure(lda_anker)) == NULL)
     {
         if(debug == true)
@@ -52,9 +50,10 @@ int startvar2name(vars_t *var_anker, char *lda_path, bool debug, FILE *logfile)
                     fprintf(logfile, "ERROR: [%s]\n", var_errorstrs[error_num]);
                 break;
         }
-        return(-1);
+        return(ret);
     }
 
+    freeAnker(lda_anker);
     return(0);
 }
 
@@ -131,8 +130,7 @@ vars_t *searchPageStructure(vars_t *lda_anker)
 
     while(hptr)
     {
-        tmp = str_toLower(hptr->name);
-        if(strcmp(tmp, RH4N_GRP_HEAD) == 0)
+        if(strcmp(str_toLower(hptr->name), RH4N_GRP_HEAD) == 0)
         {
             return(hptr);
         }

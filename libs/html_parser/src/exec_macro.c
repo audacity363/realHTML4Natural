@@ -11,6 +11,7 @@
 #define DEBUG
 
 int getArguments(token_t *start, macro_parms *parms);
+void cleanUpMacroExec(vars_t *macro_vars, macro_parms *parms);
 
 int exec_macro(token_t *anker, macro_definition_t *macro)
 {
@@ -57,8 +58,27 @@ int exec_macro(token_t *anker, macro_definition_t *macro)
         printf("%S\n", macro->body[i]);
 
     printf("---End Marco---\n");*/
+
+    cleanUpMacroExec(macro_vars, &parms);
+    //cleanUpTokenList(anker);
+
+    return(0);
 }
 
+void cleanUpMacroExec(vars_t *macro_vars, macro_parms *parms)
+{
+    int i;
+
+    freeVarAnker(macro_vars);
+
+    for(i=parms->parm_number-1; i > -1; i--)
+    {
+        free(parms->val[i]);
+    }
+
+    free(parms->val);
+    free(parms->type);
+}
 
 /*
  * TODO: Add parsing for index type (x,y,z) and append macro_parms with these
@@ -233,10 +253,10 @@ int saveParm(wchar_t *arg, macro_parms *parms, int index_type, int index_array[3
     }
 
     index = (++parms->parm_number);
-    //just so I have to write less
     index++;
     parms->val = realloc(parms->val, index*sizeof(void*));
     parms->type = realloc(parms->type, index*sizeof(int));
+    return(0);
 }
 
 //creates the variables for the macro block.
@@ -251,8 +271,8 @@ int addVariables(macro_parms *defaults, macro_parms *given, vars_t *vars)
     //first add all given vars
     for(; i < given->parm_number; i++)
     {
-        //It is a static value. Create a variable with this the default name 
-        //and teh given value
+        //It is a static value. Create a variable with the default name 
+        //and the given value
         if(given->type[i] != -1)
         {
             addVariableBasedOnType(vars, given->type[i], defaults->name[i], 

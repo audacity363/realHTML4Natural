@@ -102,6 +102,9 @@ int save_arg(macro_parms *macro, wchar_t *name, int found_val, wchar_t *val)
     }
 
     strcpy(macro->name[index], c_name);
+
+    free(c_name);
+
     if(found_val == true)
     {
         //Check if string
@@ -291,8 +294,8 @@ int end_macro_handling(token_t *anker, status_t *stat)
 
 
     //Get macro arguments with default values
-    args_value = malloc(sizeof(void*));
-    args_names = malloc(sizeof(wchar_t*));
+    //args_value = malloc(sizeof(void*));
+    //args_names = malloc(sizeof(wchar_t*));
 
     bool in_val = false;
     wchar_t arg_name[500], arg_val[500];
@@ -370,6 +373,9 @@ int end_macro_handling(token_t *anker, status_t *stat)
 
     saveMacro(c_name, cur_macro, stat);
 
+    free(c_name);
+
+    cleanUpTokenList(&head);
     return(0);
 }
 
@@ -393,7 +399,7 @@ int saveMacro(char *name, macro_parms *parms, status_t *body)
     }
 
 
-    //initialise all pointers to NULL for valgrind. It sould be working without
+    //initialise all pointers to NULL for valgrind. It should be working without
     //them but then valgrind show an "Conditional jump or move depends on uninitialised value(s)"
     //warning
     new->parms = NULL;
@@ -406,6 +412,7 @@ int saveMacro(char *name, macro_parms *parms, status_t *body)
     new->name = malloc(strlen(name)+1);
     strcpy(new->name, name);
 
+#if 0
     new->body = malloc(sizeof(wchar_t*)*body->sizeof_sav_buff);
     //initialise all pointers to NULL for valgrind. Reason: See last comment
     for(i=0; i < body->sizeof_sav_buff; i++)
@@ -414,7 +421,10 @@ int saveMacro(char *name, macro_parms *parms, status_t *body)
     for(i=1; i < body->sizeof_sav_buff; i++)
         new->body[i-1] = body->save_buff[i];
 
-    new->sizeof_body = body->sizeof_sav_buff-1;
+#endif
+
+    new->sizeof_body = body->sizeof_sav_buff;
+    new->body = body->save_buff;
 
     new->parms = parms;
 
@@ -453,30 +463,46 @@ int initMacroAnker(macro_definition_t **anker)
  */
 void freeMacros(macro_definition_t *anker)
 {
-    macro_definition_t *hptr = NULL, *last = NULL;
+    macro_definition_t *hptr = NULL, *last = NULL, *saveptr = NULL;
     int i = 0;
 
     hptr = anker->next;
 
     //Go to end of macro list
-    while(hptr->next)
+    while(hptr)
+    {
+        saveptr = hptr;
         hptr = hptr->next;
+    }
 
+    hptr = saveptr;
+    if(!hptr)
+        return;
 
     while(hptr->prev)
     {
-        for(i=0; i < hptr->parms->parm_number; i++)
+        for(i=hptr->parms->parm_number; i > -1; i--)
         {
             free(hptr->parms->name[i]);
+            hptr->parms->name[i] = NULL;
+
             free(hptr->parms->val[i]);
+            hptr->parms->val[i] = NULL;
         }
 
         free(hptr->parms->name);
-        free(hptr->parms->val);
-        free(hptr->parms->type);
-        free(hptr->parms);
+        hptr->parms->name = NULL;
 
-        for(i=0; i < hptr->sizeof_body; i++)
+        free(hptr->parms->val);
+        hptr->parms->val = NULL;
+
+        free(hptr->parms->type);
+        hptr->parms->type = NULL;
+
+        free(hptr->parms);
+        hptr->parms = NULL;
+
+        for(i=hptr->sizeof_body-1; i > -1; i--)
         {
             free(hptr->body[i]);
         }

@@ -70,6 +70,7 @@ int saveLine(wchar_t *line, status_t *stat)
     {
         stat->sizeof_sav_buff++;
         stat->save_buff = realloc(stat->save_buff, sizeof(wchar_t*)*stat->sizeof_sav_buff);
+        stat->save_buff[stat->sizeof_sav_buff-1] = NULL;
         stat->save_buff[stat->sizeof_sav_buff-1] = malloc((wcslen(line)+1)*sizeof(wchar_t)+1);
         wcscpy(stat->save_buff[stat->sizeof_sav_buff-1], line);
     }
@@ -80,7 +81,7 @@ void freeLineBuff(status_t *stat)
 {
     int i;
 
-    for(i=stat->sizeof_sav_buff-1; i > 0; i--)
+    for(i=stat->sizeof_sav_buff-1; i > -1; i--)
     {
         free(stat->save_buff[i]);
     }
@@ -335,8 +336,9 @@ int main()
     initMacroAnker(&macro_defs);
 
     printAllVars(vars_anker);
-#define INPUTSTRS_LENGTH 5
+#define INPUTSTRS_LENGTH 1 
 
+#if 0
     wchar_t *inputstrs[INPUTSTRS_LENGTH] = 
     {
         L"{% macro testmacro(hello=\"Test\", world, test) %}",
@@ -346,6 +348,12 @@ int main()
         L"{% testmacro(grparray, \"bla 1\", 28.81) %}"
     };
 
+#endif
+
+    wchar_t *inputstrs[INPUTSTRS_LENGTH] = 
+    {
+        L"{% typeof(float) %}"
+    };
     status.in_for = 0;
     status.in_if = 0;
     status.save_buff= NULL;
@@ -368,4 +376,5 @@ int main()
 #endif
     freeLineBuff(&status);
     freeMacros(macro_defs);
+    freeVarAnker(anker);
 }

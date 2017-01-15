@@ -10,7 +10,7 @@
 int addToken(token_t *anker, wchar_t *token, int type)
 {
     token_t *hptr = anker,
-            *new;
+            *new = NULL;
 
     while(hptr->next)
     {
@@ -129,4 +129,27 @@ token_t *jumpToOffset(token_t *anker, int offset)
     }
 
     return(hptr);
+}
+
+void cleanUpTokenList(token_t *anker)
+{
+    token_t *hptr = NULL, *saveptr = NULL;
+
+    hptr = anker->next;
+
+    while(hptr)
+    {
+        saveptr = hptr;
+        hptr = hptr->next;
+    }
+
+    hptr = saveptr;
+
+    while(hptr->prev)
+    {
+        hptr = hptr->prev;
+        free(hptr->next);
+        hptr->next = NULL;
+    }
+    //free(anker);
 }

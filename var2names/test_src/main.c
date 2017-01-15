@@ -32,5 +32,6 @@ int main()
     }
 
     printAllVars(nat_anker);
+    freeVarAnker(nat_anker);
     return(0);
 }
