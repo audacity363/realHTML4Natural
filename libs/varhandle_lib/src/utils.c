@@ -14,6 +14,19 @@ int initVarAnker(vars_t **anker)
         return(MEMORY_ALLOC_ERROR);
     }
 
+    (*anker)->name = NULL;
+    (*anker)->type = -1;
+    (*anker)->prev = NULL;
+    (*anker)->next_lvl = NULL;
+    (*anker)->next = NULL;
+
+    (*anker)->level = -1;
+    (*anker)->length = -1;
+    (*anker)->data = NULL;
+    (*anker)->z_length = -1;
+    (*anker)->y_length = -1;
+    (*anker)->x_length = -1;
+
     if(!((*anker)->name = malloc(1)))
     {
         free(*anker);
@@ -21,10 +34,7 @@ int initVarAnker(vars_t **anker)
     }
 
     (*anker)->name[0] = '\0';
-    (*anker)->type = -1;
-    (*anker)->prev = NULL;
-    (*anker)->next_lvl = NULL;
-    (*anker)->next = NULL;
+    
     return(0);
 }
 
@@ -209,6 +219,19 @@ int addNewVar(vars_t *anker, vars_t **new, char *group, char *name)
     {
         return(MEMORY_ALLOC_ERROR);
     }
+
+    (*new)->name = NULL;
+    (*new)->type = -1;
+    (*new)->level = -1;
+    (*new)->length = -1;
+    (*new)->name = NULL;
+    (*new)->data = NULL;
+    (*new)->z_length = -1;
+    (*new)->y_length = -1;
+    (*new)->x_length = -1;
+    (*new)->prev = NULL;
+    (*new)->next = NULL;
+    (*new)->next_lvl = NULL;
     
     if(((*new)->name = malloc(strlen(name)+1)) == NULL)
     {

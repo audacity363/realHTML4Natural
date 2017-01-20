@@ -71,7 +71,20 @@ int addGroup(vars_t *anker, char *name, int x_length, int y_length, int z_length
     {
         return(MEMORY_ALLOC_ERROR);
     }
-    
+
+    new->name = NULL;
+    new->type = -1;
+    new->level = -1;
+    new->length = -1;
+    new->name = NULL;
+    new->data = NULL;
+    new->z_length = -1;
+    new->y_length = -1;
+    new->x_length = -1;
+    new->prev = NULL;
+    new->next = NULL;
+    new->next_lvl = NULL;
+
     if((new->name = malloc(strlen(name)+1)) == NULL)
     {
         free(new);
