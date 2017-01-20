@@ -50,7 +50,10 @@ enum {
     TWODFLOAT,
     THREEDFLOAT,
 
-    UNKOWN
+    //Unkown is when in the LDA parser found a group head
+    UNKOWN,
+    //same as GROUP but the variable is a redefines one
+    REDEFINE
 };
 
 typedef struct variables_s vars_t;

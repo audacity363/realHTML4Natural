@@ -89,7 +89,7 @@ int unix_lda(char *line, vars_t *anker, bool debug, FILE *logfile)
     c_var_type = line[0];
     line++;
 
-    if(definition_type != SAG_GROUP_HEAD)
+    if(definition_type != SAG_GROUP_HEAD && definition_type != SAG_REDEFINE)
     {
         if((cur->type = unix_getVariablenType(c_var_type)) == TYPE_UNSUPPORTED)
         {
@@ -142,7 +142,12 @@ int unix_lda(char *line, vars_t *anker, bool debug, FILE *logfile)
     {
         //Groups dont have length parms. Just jump over them
         line+=5;
-        cur->type = GROUP;
+        if(definition_type == SAG_GROUP_HEAD)
+            cur->type = GROUP;
+        else
+        {
+            cur->type = REDEFINE;
+        }
         //printf("Group\n");
     }
 

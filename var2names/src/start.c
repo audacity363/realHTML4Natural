@@ -40,6 +40,8 @@ int startvar2name(vars_t *var_anker, char *lda_path, bool debug, FILE *logfile)
     }
     page_grp = page_grp->next_lvl;
 
+    printfork(page_grp, stdout);
+
     tmp = resolveName(var_anker, page_grp, var_anker);
     if(error != 0)
     {
@@ -53,7 +55,7 @@ int startvar2name(vars_t *var_anker, char *lda_path, bool debug, FILE *logfile)
         return(ret);
     }
 
-    freeAnker(lda_anker);
+    //freeLDAAnker(lda_anker);
     return(0);
 }
 
@@ -92,6 +94,11 @@ vars_t *resolveName(vars_t *nat_set, vars_t *lda_set, vars_t *var_anker)
             cur_nat_set = resolveName(cur_nat_set, cur_lda_set, var_anker);
             if(error != 0)
                 return(NULL);
+        }
+        else if(cur_lda_set->type == REDEFINE)
+        {
+            cur_lda_set = cur_lda_set->next;
+            continue;
         }
         else
         {

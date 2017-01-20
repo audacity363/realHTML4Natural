@@ -1,0 +1,24 @@
+OBJ = command_parsing.o \
+	  exec_if.o \
+	  exec_macro.o \
+	  for.o \
+	  if.o \
+	  json.o \
+	  macro.o \
+	  token_handling.o \
+	  variablen_parsing.o
+
+INCLUDE = -I./src/ \
+		  -I../varhandle_lib/src/
+
+LIBS = -L../varhandle_lib/ -lvars
+
+lib: $(OBJ)
+	xlc -g -o ./main $(INCLUDE) test/main.c ./bin/*.o $(LIBS)
+	
+$(OBJ):
+	xlc -g -c ./src/$*.c $(INCLUDE) -o ./bin/$*.o
+
+clean:
+	rm -rf libvars.a
+	rm -rf ./bin/*.o

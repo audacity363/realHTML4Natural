@@ -100,6 +100,12 @@ void printVarType(int type, FILE *logfile)
         case GROUP:
             fprintf(logfile, "Type:     [Group leader]\n");
             break;
+        case REDEFINE:
+            fprintf(logfile, "Type:     [Redefine]\n");
+            break;
+        case UNKOWN:
+            fprintf(logfile, "Type:     [Unkown]\n");
+            break;
     }
 }
 

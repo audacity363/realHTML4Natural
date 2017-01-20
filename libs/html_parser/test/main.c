@@ -352,7 +352,7 @@ int main()
 
     wchar_t *inputstrs[INPUTSTRS_LENGTH] = 
     {
-        L"{% typeof(float) %}"
+        L"{% genJSON(string3d, bool2d, hallo) %}"
     };
     status.in_for = 0;
     status.in_if = 0;
