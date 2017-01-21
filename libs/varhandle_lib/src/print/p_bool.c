@@ -126,7 +126,6 @@ void print2DBooleanWithXIndex(vars_t *var, FILE *fp, int x_index, bool json)
     else
         fprintf(fp, "[");
 
-    fprintf(fp, "[");
     for(y=0; y < var->y_length; y++)
     {
         offset = (x_index*var->y_length)+y;
@@ -137,6 +136,17 @@ void print2DBooleanWithXIndex(vars_t *var, FILE *fp, int x_index, bool json)
 
     fprintf(fp, "]");
 }
+
+void print2DBooleanWithXYIndex(vars_t *var, FILE *fp, int x_index, int y_index, bool json)
+{
+    size_t x = 0, y = 0, offset = 0;
+
+    if(json) fprintf(fp, "\"%s\": ", var->name);
+
+    offset = (x_index*var->y_length)+y_index;
+    printsingleBoolean(((bool*)var->data)[offset], fp, json);
+}
+
 void print3DBoolean(vars_t *var, FILE *fp, bool json)
 {
     size_t x = 0, y = 0, z = 0, offset = 0;

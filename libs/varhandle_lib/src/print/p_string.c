@@ -41,7 +41,7 @@ void printRaw1DString(vars_t *var, FILE *fp)
 {
     size_t x = 0, offset = 0;
 
-    fprintf(fp, "[%s] = [", var->name);
+    fprintf(fp, "[");
 
     for(x=0; x < var->x_length; x++)
     {

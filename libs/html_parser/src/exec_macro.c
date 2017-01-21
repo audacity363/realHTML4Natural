@@ -54,6 +54,9 @@ int exec_macro(token_t *anker, macro_definition_t *macro)
     printAllVars(macro_vars);
 #endif
 
+    //TODO: insert macro execution here
+    //      save and overwrite the global variablen anker
+    
     /*for(; i < macro->sizeof_body; i++)
         printf("%S\n", macro->body[i]);
 

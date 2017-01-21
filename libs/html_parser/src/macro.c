@@ -477,7 +477,10 @@ void freeMacros(macro_definition_t *anker)
 
     hptr = saveptr;
     if(!hptr)
+    {
+        free(anker);
         return;
+    }
 
     while(hptr->prev)
     {

@@ -7,6 +7,9 @@
 #include "parser.h"
 #include "token_handling.h"
 
+int printVariable(char *name, char *grpname, bool has_grp, int index_type, int *index_num);
+int handleONEDINTEGER(vars_t *target, int index_type, int *index);
+
 int getVarnameLength(token_t *anker)
 {
     token_t *hptr = anker->next;
@@ -46,6 +49,37 @@ void getVarname(token_t *anker, wchar_t *buff)
         hptr = hptr->next;
     }
     memset(buff+length, 0x00, sizeof(wchar_t));
+}
+
+/*
+ * checks if there is a groupname in the variable name.
+ * Returns: > 0 length of the group name
+ *          = 0 no group found
+ */
+int checkIfGroup(char *varname)
+{
+    char *point = NULL;
+    int length = 0;
+
+    if((point = strchr(varname, '.')) == NULL)
+        return(0);
+
+    length = point-varname;
+
+    return(length);
+    
+}
+
+/*
+ * copy the group with the length of grplength
+ * into the grpname buffer
+ * Returns: Pointer to the begin of the variable name
+ */
+char *getGroup(char *varname, int grplength, char *grpname)
+{
+    strncpy(grpname, varname, grplength);
+
+    return(varname+(grplength+1));
 }
 
 //Sucht den Index raus. 
@@ -88,11 +122,12 @@ int getIndex(token_t *anker, int *index_num)
         {
             in_brackets = false;
             c_index[i] = '\0';
-            if((index_num[0] = atoi(c_index)) == 0 && c_index[0] != '0')
+            if((index_num[index_type-1] = atoi(c_index)) == 0 && c_index[0] != '0')
             {
                 fprintf(stderr, "Conv Error\n");
                 return(-3);
             }
+            i=0;
         } 
         hptr = hptr->next;
     }
@@ -102,21 +137,28 @@ int getIndex(token_t *anker, int *index_num)
 int parseVariable(wchar_t *begin, wchar_t *end)
 {
     wchar_t *curpos = begin,
-            *variablename;
+            *wc_variablename = NULL;
+    char *variablename = NULL, *varname_sav = NULL, *grpname = NULL;
     token_t anker;
-    int varname_length, 
-        i = 0;
+    int varname_length = 0,
+        i = 0,
+        index_type = 0,
+        index[3] = {-1, -1, -1},
+        grplength = 0, ret = 0;
+
+    bool found_grp = false;
 
     anker.next = NULL;
     anker.prev = NULL;
 
+    //Create a tokenlist out of the string
     while(curpos+i <= end)
     {
         if(wcsncmp(curpos+i, L"{", 1) == 0)
             addToken(&anker, curpos+i, VARIABLEBEGIN);
         else if(wcsncmp(curpos+i, L"[", 1) == 0)
             addToken(&anker, curpos+i, INDEXOPEN);
-        else if(wcsncmp(curpos+i, L"[", 1) == 0)
+        else if(wcsncmp(curpos+i, L"]", 1) == 0)
             addToken(&anker, curpos+i, INDEXCLOSE);
         else if(wcsncmp(curpos+i, L"}", 1) == 0)
             addToken(&anker, curpos+i, VARIABLEEND);
@@ -127,21 +169,149 @@ int parseVariable(wchar_t *begin, wchar_t *end)
         i++;
     }
     printTokens(&anker);
+
     if((varname_length = getVarnameLength(&anker)) == 0) 
     {
+        deleteTokens(&anker);
         fprintf(stderr, "Keine Variable gefunden\n");
         return(-1);
     }
     varname_length++;
-    if((variablename = malloc(varname_length*sizeof(wchar_t))) == NULL)
+    if((wc_variablename = malloc(varname_length*sizeof(wchar_t))) == NULL)
     {
+        deleteTokens(&anker);
         return(-2);
     }
 
-    getVarname(&anker, variablename);
-    free(variablename);
+    if((variablename = malloc(varname_length)) == NULL)
+    {
+        free(wc_variablename);
+        deleteTokens(&anker);
+        return(-3);
+    }
+
+    getVarname(&anker, wc_variablename);
+
+    //varname_length includes the '\0' char and wcstombs returns the length without
+    //the null char
+    if(wcstombs(variablename, wc_variablename, varname_length) != varname_length-1)
+    {
+        free(variablename);
+        free(wc_variablename);
+        deleteTokens(&anker);
+        fprintf(stderr, "Unicode Char in variable name\n");
+        return(-4);
+    }
+    varname_sav = variablename;
+    index_type = getIndex(&anker, index);
+
+    if((grplength = checkIfGroup(variablename)) != 0)
+    {
+        if((grpname = malloc(grplength+1)) == NULL)
+        {
+            free(variablename);
+            free(wc_variablename);
+            deleteTokens(&anker);
+            fprintf(stderr, "Can not malloc memory for grpname\n");
+            return(-5);
+        }
+
+        variablename = getGroup(variablename, grplength, grpname);
+        found_grp = true;
+    }
+
+    if((ret = printVariable(variablename, grpname, found_grp, index_type, index)) < 0)
+    {
+        free(varname_sav);
+        free(wc_variablename);
+        free(grpname);
+        deleteTokens(&anker);
+        return(ret-5);
+    }
+    
+    free(varname_sav);
+    free(wc_variablename);
+    free(grpname);
 
     deleteTokens(&anker);
     printf("------------------------------------------------------\n");
+    return(0);
+}
+
+int printVariable(char *name, char *grpname, bool has_grp, int index_type, int *index_num)
+{
+    vars_t *target = NULL;
+
+    if(has_grp)
+    {
+        printf("Grpname: [%s]\n", grpname);
+        if((target = isDefinedGrp(vars_anker, grpname, name)) == NULL)
+        {
+            fprintf(stderr, "Unkown Variable or Group\n");
+            return(-1);
+        }
+    }
+    else
+    {
+        printf("Found name: [%s] with index = %d\n", name, index_type);
+        
+        if((target = isDefined(vars_anker, name)) == NULL)
+        {
+            fprintf(stderr, "Unkown Variable\n");
+            return(-2);
+        }
+    }
+
+    switch(target->type)
+    {
+        case INTEGER:
+            printRawInteger(target, stdout);
+            break;
+        case ONEDINTEGER:
+            handleONEDINTEGER(target, index_type, index_num);
+            break;
+        case TWODINTEGER:
+            handleTWODINTEGER(target, index_type, index_num);
+            break;
+        case THREEDINTEGER:
+            handleTHREEDINTEGER(target, index_type, index_num);
+            break;
+        case FLOAT:
+            printRawFloat(target, stdout);
+            break;
+        case ONEDFLOAT:
+            handleONEDFLOAT(target, index_type, index_num);
+            break;
+        case TWODFLOAT:
+            handleTWODFLOAT(target, index_type, index_num);
+            break;
+        case THREEDFLOAT:
+            handleTHREEDFLOAT(target, index_type, index_num);
+            break;
+        case BOOL:
+            printRawBoolean(target, stdout);
+            break;
+        case ONEDBOOL:
+            handleONEDBOOL(target, index_type, index_num);
+            break;
+        case TWODBOOL:
+            handleTWODBOOL(target, index_type, index_num);
+            break;
+        case THREEDBOOL:
+            handleTHREEDSTRING(target, index_type, index_num);
+            break;
+        case STRING:
+            printRawString(target, stdout);
+            break;
+        case ONEDSTRING:
+            handleONEDSTRING(target, index_type, index_num);
+            break;
+        case TWODSTRING:
+            handleTWODSTRING(target, index_type, index_num);
+            break;
+        case THREEDSTRING:
+            handleTHREEDSTRING(target, index_type, index_num);
+            break;
+    }
     return(0);
 }

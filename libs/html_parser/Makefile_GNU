@@ -6,7 +6,8 @@ OBJ = command_parsing.o \
 	  json.o \
 	  macro.o \
 	  token_handling.o \
-	  variablen_parsing.o
+	  variablen_parsing.o \
+	  variablen_handling.o
 
 INCLUDE = -I./src/ \
 		  -I../varhandle_lib/src/
@@ -14,7 +15,7 @@ INCLUDE = -I./src/ \
 LIBS = -L../varhandle_lib/ -lvars
 
 lib: $(OBJ)
-	gcc -g -o ./main $(INCLUDE) test/main.c ./bin/*.o $(LIBS)
+	gcc -g -o ./main $(INCLUDE) test_src/main.c ./bin/*.o $(LIBS)
 	
 %.o: ./src/%.c
 	gcc -g -c $< $(INCLUDE) -o ./bin/$@

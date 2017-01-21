@@ -352,8 +352,9 @@ int main()
 
     wchar_t *inputstrs[INPUTSTRS_LENGTH] = 
     {
-        L"{% genJSON(string3d, bool2d, hallo) %}"
+        L"{{ grparray.float1d[1] }}"
     };
+
     status.in_for = 0;
     status.in_if = 0;
     status.save_buff= NULL;

@@ -15,7 +15,7 @@ void printInteger(vars_t *var, FILE *fp, bool json)
 
 void printRawInteger(vars_t *var, FILE *fp)
 {
-    fprintf(fp, "%d", var->name, *((int*)var->data));
+    fprintf(fp, "%d", *((int*)var->data));
 }
 
 void print1DInteger(vars_t *var, FILE *fp, bool json)
@@ -258,7 +258,7 @@ void print3DIntegerWithXYZIndex(vars_t *var, FILE *fp, int x_index, int y_index,
     int x = 0, y = 0, z = 0,
         offset = 0, val = 0;
 
-    offset = (z*var->x_length * var->y_length);
+    offset = (z_index*var->x_length * var->y_length);
     offset += (y_index*var->x_length) + x_index;
 
     val = ((int*)var->data)[offset];

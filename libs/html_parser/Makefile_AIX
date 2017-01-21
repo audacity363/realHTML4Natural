@@ -14,7 +14,7 @@ INCLUDE = -I./src/ \
 LIBS = -L../varhandle_lib/ -lvars
 
 lib: $(OBJ)
-	xlc -g -o ./main $(INCLUDE) test/main.c ./bin/*.o $(LIBS)
+	xlc -g -o ./main $(INCLUDE) test_src/main.c ./bin/*.o $(LIBS)
 	
 $(OBJ):
 	xlc -g -c ./src/$*.c $(INCLUDE) -o ./bin/$*.o
@@ -22,3 +22,4 @@ $(OBJ):
 clean:
 	rm -rf libvars.a
 	rm -rf ./bin/*.o
+	rm -rf ./main

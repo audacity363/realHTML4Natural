@@ -38,6 +38,23 @@ void print1DFloat(vars_t *var, FILE *fp, bool json)
     fprintf(fp, "]");
 }
 
+void printRaw1DFloat(vars_t *var, FILE *fp)
+{
+    int i = 0;
+
+    fprintf(fp, "[");
+
+    for(i=0; i < var->x_length; i++)
+    {
+        fprintf(fp, "%f", ((double*)var->data)[i]);
+        if(i+1 < var->x_length)
+        {
+            fprintf(fp, ", ");
+        }
+    }
+    fprintf(fp, "]");
+}
+
 void print1DFloatWithXIndex(vars_t *var, FILE *fp, int x_index, bool json)
 {
     int i = 0;
@@ -191,7 +208,7 @@ void printRaw3DFloat(vars_t *var, FILE *fp)
     fprintf(fp, "]");
 }
 
-void printRaw3DFloatWithXIndex(vars_t *var, FILE *fp, int x_index, bool json)
+void print3DFloatWithXIndex(vars_t *var, FILE *fp, int x_index, bool json)
 {
     size_t x = 0, y = 0, z = 0, offset = 0;
 
@@ -219,7 +236,7 @@ void printRaw3DFloatWithXIndex(vars_t *var, FILE *fp, int x_index, bool json)
     fprintf(fp, "]");
 }
 
-void printRaw3DFloatWithXYIndex(vars_t *var, FILE *fp, int x_index, int y_index, 
+void print3DFloatWithXYIndex(vars_t *var, FILE *fp, int x_index, int y_index, 
                                 bool json)
 {
     size_t x = 0, y = 0, z = 0, offset = 0;
@@ -240,7 +257,7 @@ void printRaw3DFloatWithXYIndex(vars_t *var, FILE *fp, int x_index, int y_index,
     fprintf(fp, "]");
 }
 
-void printRaw3DFloatWithXYZIndex(vars_t *var, FILE *fp, int x_index, int y_index, 
+void print3DFloatWithXYZIndex(vars_t *var, FILE *fp, int x_index, int y_index, 
                                 int z_index, bool json)
 {
     size_t x = 0, y = 0, z = 0, offset = 0;

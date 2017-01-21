@@ -26,7 +26,6 @@ int end_for_handling(token_t *anker, status_t *stat)
 
     if(stat->in_for == 0)
     {
-        fprintf(stderr, "Found end-for without starting for\n");
         return(-1);
     }
     if(--stat->in_for != 0)
@@ -37,6 +36,7 @@ int end_for_handling(token_t *anker, status_t *stat)
     {
         return(JUSTSAVE);
     }
+
     printf("---------for body-------\n");
     for(i=1; i < stat->sizeof_sav_buff; i++)
     {

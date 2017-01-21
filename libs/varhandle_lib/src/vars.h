@@ -50,6 +50,7 @@ enum {
     TWODFLOAT,
     THREEDFLOAT,
 
+    REDEFINE,
     UNKOWN
 };
 
