@@ -315,6 +315,24 @@ int createNew1DArrayFrom2DBooleanArray(vars_t *inanker, vars_t *outanker,
     return(0);
 }
 
+int createNewVarFrom2DBooleanArray(vars_t *inanker, vars_t *outanker,
+                                  char *group, char *name, char *out_grp,
+                                  char *new_name, int x_index, int y_index)
+{
+    int i = 0, ret = 0, y_length = 0;
+    bool b_target = false;
+
+    if((ret = getBooleanFrom2DArray(inanker, group, name, &b_target, x_index, 
+            y_index)))
+        return(ret);
+
+    
+    if((ret = addBoolean(outanker, out_grp, new_name, b_target)) != 0)
+        return(ret);
+
+    return(0);
+}
+
 int editFull2DBooleanArray(vars_t *anker, char *group, char *name, void *val)
 {
     vars_t *target = NULL,
@@ -502,6 +520,26 @@ int createNew1DArrayFrom3DBooleanArray(vars_t *inanker, vars_t *outanker,
         if((ret = edit1DBooleanArray(outanker, out_grp, new_name, b_target, i)) != 0)
             return(ret);
     }
+    return(0);
+}
+
+int createNewVarFrom3DBooleanArray(vars_t *inanker, vars_t *outanker,
+                                  char *group, char *name, char *out_grp,
+                                  char *new_name, int x_index, int y_index,
+                                  int z_index)
+{
+    int i = 0, x = 0, ret = 0, 
+        y_length = 0, z_length = 0;
+
+    bool b_target = false;
+
+    if((ret = getBooleanFrom3DArray(inanker, group, name, &b_target, x_index,
+            y_index, z_index)) != 0)
+        return(ret);
+
+    if((ret = addBoolean(outanker, out_grp, new_name, b_target)) != 0)
+        return(ret);
+
     return(0);
 }
 

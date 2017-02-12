@@ -121,6 +121,30 @@ bool isDefinedBool(vars_t *anker, char *name)
     return(false);
 }
 
+bool isDefinedGrpBool(vars_t *anker, char *group, char *name)
+{
+    vars_t *grp = NULL, *target = NULL;
+    if(group)
+    {
+        if(!(grp = isDefined(anker, group)))
+        {
+            return(false);
+        }
+        if(!(target = isDefined(grp->next_lvl, name)))
+        {
+            return(false);
+        }
+    }
+    else
+    {
+        if(!(target = isDefined(anker, name)))
+        {
+            return(false);
+        }
+    }
+    return(true);
+}
+
 int removeVar(vars_t *anker, char *name)
 {
     vars_t *sav = NULL,

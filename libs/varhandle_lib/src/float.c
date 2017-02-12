@@ -340,6 +340,24 @@ int createNew1DArrayFrom2DFloatArray(vars_t *inanker, vars_t *outanker,
     return(0);
 }
 
+int createNewVarFrom2DFloatArray(vars_t *inanker, vars_t *outanker,
+                                  char *group, char *name, char *out_grp,
+                                  char *new_name, int x_index, int y_index)
+{
+    int i = 0, ret = 0,
+        y_length = 0;
+
+    double d_target = 0;
+
+    if((ret = getFloatFrom2DArray(inanker, group, name, &d_target, x_index, y_index)))
+        return(ret);
+
+    if((ret = addFloat(outanker, out_grp, new_name, d_target)) != 0)
+        return(ret);
+
+    return(0);
+}
+
 int editFull2DFloatArray(vars_t *anker, char *group, char *name, void *val)
 {
     vars_t *target = NULL,
@@ -528,6 +546,26 @@ int createNew1DArrayFrom3DFloatArray(vars_t *inanker, vars_t *outanker,
         if((ret = edit1DFloatArray(outanker, out_grp, new_name, d_target, i)) != 0)
             return(ret);
     }
+    return(0);
+}
+
+int createNewVarFrom3DFloatArray(vars_t *inanker, vars_t *outanker,
+                                  char *group, char *name, char *out_grp,
+                                  char *new_name, int x_index, int y_index,
+                                  int z_index)
+{
+    int i = 0, x = 0, ret = 0,
+        y_length = 0, z_length = 0;
+
+    double d_target = 0;
+
+        if((ret = getFloatFrom3DArray(inanker, group, name, &d_target, x_index,
+                y_index, z_index)) != 0)
+            return(ret);
+
+    if((ret = addFloat(outanker, out_grp, new_name, d_target)) != 0)
+        return(ret);
+
     return(0);
 }
 

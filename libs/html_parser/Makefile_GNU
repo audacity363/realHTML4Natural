@@ -2,6 +2,8 @@ OBJ = command_parsing.o \
 	  exec_if.o \
 	  exec_macro.o \
 	  for.o \
+	  for_cmd.o \
+	  for_startvalues.o \
 	  if.o \
 	  json.o \
 	  macro.o \
@@ -10,15 +12,18 @@ OBJ = command_parsing.o \
 	  variablen_handling.o
 
 INCLUDE = -I./src/ \
-		  -I../varhandle_lib/src/
+		  -I../varhandle_lib/src/ \
+		  -I../utils/src/
 
-LIBS = -L../varhandle_lib/ -lvars
+LIBS = -L../varhandle_lib/ -lvars \
+	   -L../utils/ -lutils
+
 
 lib: $(OBJ)
-	gcc -g -o ./main $(INCLUDE) test_src/main.c ./bin/*.o $(LIBS)
+	gcc -g3 -o ./main $(INCLUDE) test_src/main.c ./bin/*.o $(LIBS)
 	
 %.o: ./src/%.c
-	gcc -g -c $< $(INCLUDE) -o ./bin/$@
+	gcc -g3 -c $< $(INCLUDE) -o ./bin/$@
 
 clean:
 	rm -rf libvars.a

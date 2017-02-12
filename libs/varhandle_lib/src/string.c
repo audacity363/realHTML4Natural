@@ -7,8 +7,7 @@
 #include "utils.h"
 
 //TODO: Write copy function and track complete size of variable in vars_t struct
-//TODO: Write a function which replaces the variablen search code
-//TODO: change group type to an char pointer array so that you can read multiple groups
+//      (Do i really need this??)
 
 int getStringLength(vars_t *anker, char *group, char *name, int *length)
 {
@@ -40,7 +39,7 @@ int getStringLength(vars_t *anker, char *group, char *name, int *length)
        target->type != THREEDSTRING)
         return(WRONG_VAR_TYPE);
 
-    *length = target->length;
+    *length = target->length-1;
     return(0);
 
 }
@@ -491,13 +490,13 @@ int getStringFrom2DArray(vars_t *anker, char *group, char *name, wchar_t *val,
         }
     }
 
-    if(target->type != ONEDSTRING)
+    if(target->type != TWODSTRING)
         return(WRONG_VAR_TYPE);
 
-    if(target->x_length >= x_index)
+    if(target->x_length <= x_index)
         return(X_INDEX_OUT_OF_RANGE);
 
-    if(target->y_length >= y_index)
+    if(target->y_length <= y_index)
         return(Y_INDEX_OUT_OF_RANGE);
 
     if(wcslen((wchar_t*)target->data) >= length)
@@ -555,6 +554,41 @@ int createNew1DArrayFrom2DStringArray(vars_t *inanker, vars_t *outanker,
         }
     }
     
+    free(str_buff);
+    return(0);
+}
+
+int createNewVarFrom2DStringArray(vars_t *inanker, vars_t *outanker,
+                                       char *group, char *name, char *new_grp,
+                                       char *new_name, int x_index, int y_index)
+{
+    int i = 0, y_length = 0, str_length = 0;
+    wchar_t *str_buff = NULL;
+
+    if(getStringLength(inanker, group, name, &str_length) != 0)
+    {
+        return(-1);
+    }
+
+    if((str_buff = malloc(str_length*sizeof(wchar_t))) == NULL)
+    {
+        fprintf(stderr, "Malloc error [%s] [%d]\n", __FILE__, __LINE__);
+        return(-3);
+    }
+
+    if(getStringFrom2DArray(inanker, group, name, str_buff, str_length,
+        x_index, y_index) != 0)
+    {
+        free(str_buff);
+        return(-5);
+    }
+
+    if(addString(outanker, new_grp, new_name, str_buff, str_length-1) != 0)
+    {
+        free(str_buff);
+        return(-4);
+    }
+
     free(str_buff);
     return(0);
 }
@@ -698,13 +732,13 @@ int getStringFrom3DArray(vars_t *anker, char *group, char *name, wchar_t *val,
     if(target->type != THREEDSTRING)
         return(WRONG_VAR_TYPE);
 
-    if(target->x_length >= x_index)
+    if(target->x_length <= x_index)
         return(X_INDEX_OUT_OF_RANGE);
 
-    if(target->y_length >= y_index)
+    if(target->y_length <= y_index)
         return(Y_INDEX_OUT_OF_RANGE);
 
-    if(target->z_length >= z_index)
+    if(target->z_length <= z_index)
         return(Z_INDEX_OUT_OF_RANGE);
 
     if(wcslen((wchar_t*)target->data) >= length)
@@ -754,7 +788,7 @@ int createNew2DArrayFrom3DStringArray(vars_t *inanker, vars_t *outanker,
                                        char *group, char *name, char *new_grp,
                                        char *new_name, int x_index)
 {
-    int i = 0, x = 0, y_length = 0, z_length = 0, str_length = 0;
+    int i = 0, x = 0, y_length = 0, z_length = 0, str_length = 0, ret = 0;
     wchar_t *str_buff = NULL;
 
     if(getStringLength(inanker, group, name, &str_length) != 0)
@@ -782,13 +816,13 @@ int createNew2DArrayFrom3DStringArray(vars_t *inanker, vars_t *outanker,
 
     for(i=0; i < y_length; i++)
     {
-        for(x=0; i < z_length; x++)
+        for(x=0; x < z_length; x++)
         {
-            if(getStringFrom3DArray(inanker, group, name, str_buff, str_length,
-                x_index, i, x) != 0)
+            if((ret = getStringFrom3DArray(inanker, group, name, str_buff, str_length,
+                x_index, i, x)) != 0)
             {
                 free(str_buff);
-                return(-5);
+                return(ret);
             }
 
             if(edit2DStringArray(outanker, new_grp, new_name, str_buff, i, x) != 0)
@@ -848,6 +882,42 @@ int createNew1DArrayFrom3DStringArray(vars_t *inanker, vars_t *outanker,
         }
     }
     
+    free(str_buff);
+    return(0);
+}
+
+int createNewVarFrom3DStringArray(vars_t *inanker, vars_t *outanker,
+                                       char *group, char *name, char *new_grp,
+                                       char *new_name, int x_index, int y_index,
+                                       int z_index)
+{
+    int i = 0, y_length = 0, str_length = 0;
+    wchar_t *str_buff = NULL;
+
+    if(getStringLength(inanker, group, name, &str_length) != 0)
+    {
+        return(-1);
+    }
+
+    if((str_buff = malloc(str_length*sizeof(wchar_t))) == NULL)
+    {
+        fprintf(stderr, "Malloc error [%s] [%d]\n", __FILE__, __LINE__);
+        return(-3);
+    }
+
+    if(getStringFrom3DArray(inanker, group, name, str_buff, str_length,
+        x_index, y_index, z_index) != 0)
+    {
+        free(str_buff);
+        return(-5);
+    }
+
+    if(addString(outanker, new_grp, new_name, str_buff, str_length-1) != 0)
+    {
+        free(str_buff);
+        return(-4);
+    }
+
     free(str_buff);
     return(0);
 }

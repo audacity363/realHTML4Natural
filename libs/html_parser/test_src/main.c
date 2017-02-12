@@ -145,6 +145,8 @@ int parseLine(wchar_t *line, status_t *status)
                 }
                 else if(ret == EXIT)
                     return(EXIT);
+                else if(ret < 0)
+                    return(EXIT);
             }
             restlength=wcslen(end+2);
             prev_end = inputstr = end+2;
@@ -176,11 +178,11 @@ int initVars(vars_t *anker)
 
     addGroup(anker, "grparray", 10,0,0);
     addGroup(anker, "grptest", 0,0,0);
-    add1DIntegerArray(anker, "grparray", "array", 10);
+    add1DIntegerArray(anker, NULL, "array", 10);
     for(i=0; i < 10; i++)
     {
 
-        edit1DIntegerArray(anker, "grparray", "array", i, i);
+        edit1DIntegerArray(anker, NULL, "array", i, i);
     }
 
     addInteger(anker, NULL, "test", 677);
@@ -336,24 +338,34 @@ int main()
     initMacroAnker(&macro_defs);
 
     printAllVars(vars_anker);
-#define INPUTSTRS_LENGTH 1 
 
-#if 0
+#if 1
+
+/*
+ * implemet the following syntax:
+ * {% for user, link in users, links %}
+ *
+ * so that you can give the parser multiple array but the arrays have to be the 
+ * same length
+ */
+#define INPUTSTRS_LENGTH 4
     wchar_t *inputstrs[INPUTSTRS_LENGTH] = 
     {
-        L"{% macro testmacro(hello=\"Test\", world, test) %}",
-        L"<h1>Hello World</h1>",
-        L"{% end-macro %}",
-        L"<h1>Hello World</h1>",
-        L"{% testmacro(grparray, \"bla 1\", 28.81) %}"
+        L"{% for (entry1, entry) in (string3d[0][1], grparray.float1d) %}",
+        L"{{ entry }}",
+        L"{{ loop.i }}",
+        L"{% end-for %}"
     };
 
 #endif
 
+#if 0
+#define INPUTSTRS_LENGTH 1 
     wchar_t *inputstrs[INPUTSTRS_LENGTH] = 
     {
-        L"{{ grparray.float1d[1] }}"
+        L"{{ array }}"
     };
+#endif
 
     status.in_for = 0;
     status.in_if = 0;

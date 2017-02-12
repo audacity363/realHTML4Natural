@@ -88,7 +88,7 @@ char *getGroup(char *varname, int grplength, char *grpname)
 //                 2 = 2 Index gefunden
 //                 3 = 3 Index gefunden
 //Die gefundenn werden in das Array index_num geschrieben
-int getIndex(token_t *anker, int *index_num)
+int getIndexChar(token_t *anker, int *index_num)
 {
     int index_type = 0,
         in_brackets = false,
