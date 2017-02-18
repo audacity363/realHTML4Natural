@@ -16,7 +16,8 @@ void cleanUpMacroExec(vars_t *macro_vars, macro_parms *parms);
 int exec_macro(token_t *anker, macro_definition_t *macro)
 {
     int i = 0, ret = 0;
-    vars_t *macro_vars;
+    vars_t *macro_vars, *vars_backup;
+    status_t status = {-1, 0, 0, 0, 0, 0, NULL};
 
     macro_parms parms = {0, NULL, NULL, NULL};
 
@@ -50,22 +51,30 @@ int exec_macro(token_t *anker, macro_definition_t *macro)
 
     addVariables(macro->parms, &parms, macro_vars);
 
-#if 1
+    vars_backup = vars_anker;
+    vars_anker = macro_vars;
+
+#if 0
     printAllVars(macro_vars);
 #endif
 
     //TODO: insert macro execution here
     //      save and overwrite the global variablen anker
-    
-    /*for(; i < macro->sizeof_body; i++)
-        printf("%S\n", macro->body[i]);
+    ret = 0; 
+    for(i=1; i < macro->sizeof_body; i++)
+    {
+        if((ret = parseLine(macro->body[i], &status)) == EXIT)
+            break;
+    }
 
-    printf("---End Marco---\n");*/
+    //printf("---End Marco---\n");
+    
+    vars_anker = vars_backup;
 
     cleanUpMacroExec(macro_vars, &parms);
     //cleanUpTokenList(anker);
 
-    return(0);
+    return(ret);
 }
 
 void cleanUpMacroExec(vars_t *macro_vars, macro_parms *parms)

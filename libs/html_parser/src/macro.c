@@ -178,12 +178,15 @@ int save_arg(macro_parms *macro, wchar_t *name, int found_val, wchar_t *val)
     }
 
     macro->parm_number++;
+
     macro->name = realloc(macro->name, sizeof(char*)*(macro->parm_number+1));
-    //macro->name[macro->parm_number] = NULL;
+    macro->name[macro->parm_number] = NULL;
+
     macro->val = realloc(macro->val, sizeof(void*)*(macro->parm_number+1));
-    //macro->val[macro->parm_number] = NULL;
+    macro->val[macro->parm_number] = NULL;
+    
     macro->type = realloc(macro->type, sizeof(int*)*(macro->parm_number+1));
-    //macro->type[macro->parm_number] = -1;
+    macro->type[macro->parm_number] = -1;
 
     return(0);
 }
@@ -194,7 +197,7 @@ int end_macro_handling(token_t *anker, status_t *stat)
     wchar_t macro_name[500],
             *macro_pos = NULL,
             **args_names = NULL;
-    char *c_name;
+    char *c_name = NULL;
     bool found_space = false;
 
     int args_number = 0;
@@ -204,10 +207,7 @@ int end_macro_handling(token_t *anker, status_t *stat)
     
     cur_macro = malloc(sizeof(macro_parms));
 
-    cur_macro->parm_number = 0;
-    cur_macro->name = NULL;
-    cur_macro->val = NULL;
-    cur_macro->type = NULL;
+    bzero(cur_macro, sizeof(macro_parms));
 
     token_t head = {' ', -1, NULL, NULL},
             *hptr = NULL;
@@ -222,6 +222,7 @@ int end_macro_handling(token_t *anker, status_t *stat)
         fprintf(stderr, "Unclosed for block in macro\n");
         return(EXIT);
     }
+    stat->just_save = 0;
 
     if((cur_macro->name = malloc(sizeof(char*))) == NULL)
     {
@@ -300,6 +301,9 @@ int end_macro_handling(token_t *anker, status_t *stat)
     bool in_val = false;
     wchar_t arg_name[500], arg_val[500];
     int name_index = 0, val_index = 0, arg_type = 0;
+
+    bzero(arg_name, sizeof(arg_name));
+    bzero(arg_val, sizeof(arg_val));
 
     hptr = hptr->next;
     while(hptr)
