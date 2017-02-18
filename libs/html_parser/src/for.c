@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <wchar.h>
 
 #include "vars.h"
 #include "parser.h"
@@ -115,6 +116,7 @@ int end_for_handling(token_t *anker, status_t *stat)
                          0, 0, NULL};
 
     vars_t *for_vars = NULL;
+    wchar_t **for_body = NULL;
 
     status_t for_parser_stat;
     for_parser_stat.in_for = 0;
@@ -180,16 +182,40 @@ status.array.array_length[i][1],status.array.array_length[i][2]);
     calculateForEnd(status, &for_end);
 
    //printf("For end: [%d]\n", for_end);
+   
+    //To get commands behind the for cmd to work
+    if((for_body = malloc(sizeof(wchar_t*)*stat->sizeof_sav_buff)) == NULL)
+    {
+        fprintf(stderr, "Can not allocate Memory for the for body\n");
+        return(-3);
+    }
 
+    wchar_t *behind_formcd;
+    int offset = 0;
+
+    if((behind_formcd = wcsstr(stat->save_buff[0], L"%}")) != NULL)
+    {
+        if(wcslen(behind_formcd) > 2)
+        {
+            for_body[0] = behind_formcd+2;
+            offset = 1;
+        }
+    }
+
+    for(i=offset;i < stat->sizeof_sav_buff;i++)
+    {
+        for_body[i] = stat->save_buff[i];
+    }
+   
 
     for(status.index=0; status.index <= for_end; status.index++)
     {
     //    setLoopValue(varname, status, vars_anker, status.index);
         setStartValue(varname, status, vars_anker);
 
-        for(i=1; i < stat->sizeof_sav_buff; i++)
+        for(i=0; i < stat->sizeof_sav_buff; i++)
         {
-            if(parseLine(stat->save_buff[i], &for_parser_stat) == EXIT)
+            if(parseLine(for_body[i], &for_parser_stat) == EXIT)
             {
                 fprintf(stderr, "EXIT\n");
                 return(EXIT);

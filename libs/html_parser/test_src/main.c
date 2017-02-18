@@ -12,14 +12,33 @@
 vars_t *vars_anker;
 macro_definition_t *macro_defs;
 
-//Gibt den Typ des Blocker zurueck. Wenn nichts gefunden false 
+//Returns the type of block found
 //Variablenblock = VARIABLENBLOCK
 //Commandblock = COMMANDBLOCK
-//TODO: don't use wccstr. Search with a for loop and return the first founded 
-//block
+//false = no block was found
 int searchBlockBegin(wchar_t *str, wchar_t **pos)
 {
     wchar_t *begin;
+    int x = 0,
+        length = wcslen(str);
+
+
+    for(; x < length; x++)
+    {
+        if(memcmp(str+x, VARIABLEBEGIN_STR, sizeof(wchar_t)*2) == 0)
+        {
+            *pos = str+x;
+            return(VARIABLEBLOCK);
+        }
+        else if(memcmp(str+x, COMMANDBEGIN_STR, sizeof(wchar_t)*2) == 0)
+        {
+            *pos = str+x;
+            return(COMMANDBLOCK);
+        }
+    }
+
+    return(false);
+
 
     if((begin = wcsstr(str, VARIABLEBEGIN_STR)) != NULL)
     {
@@ -353,12 +372,11 @@ int main()
  * so that you can give the parser multiple array but the arrays have to be the 
  * same length
  */
-#define INPUTSTRS_LENGTH 3
+#define INPUTSTRS_LENGTH 2
     wchar_t *inputstrs[INPUTSTRS_LENGTH] = 
     {
-        L"{% for entry in string3d[0] %}",
-        L"<h1>{{ entry1 }}</h1><span>{{ loop.i }} {{entry}}</span>\n",
-        L"{% end-for %}"
+        L"{% for entry in string3d[0] %}<h2>{{ loop.i }}</h2>",
+        L"{% end-for %}\n"
     };
 
 #endif
