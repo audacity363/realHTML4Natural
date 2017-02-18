@@ -147,20 +147,46 @@ bool isDefinedGrpBool(vars_t *anker, char *group, char *name)
 
 int removeVar(vars_t *anker, char *name)
 {
-    vars_t *sav = NULL,
-           *target = NULL;
 
-    if((target = isDefined(anker, name)) == NULL)
+    //fprintf(stderr, "removing [%s] from the list\n", name);
+    vars_t *sav = NULL,
+           *target = NULL,
+           *hptr = NULL;
+
+    /*if((target = isDefined(anker, name)) == NULL)
     {
         return(VAR_NOT_DEFINED);
     }
       
     sav = target->prev;   
+
     sav->next = target->next;
 
     free(target->name);
     free(target->data);
+    free(target);*/
+    
+    hptr = anker;
+
+    while(hptr->next)
+    {
+        if(strcmp(hptr->next->name, name) == 0)
+        {
+            break;
+        }
+        hptr = hptr->next;
+    }
+
+    if(hptr->next == NULL)
+        return(VAR_NOT_DEFINED);
+    
+    target = hptr->next;
+    hptr->next = hptr->next->next; 
+
+    free(target->name);
+    free(target->data);
     free(target);
+
     return(0);
 }
 

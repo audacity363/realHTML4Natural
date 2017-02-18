@@ -66,28 +66,31 @@ int parseForCMD(token_t *start, for_status *stat)
 
     trimleadingSpaces(c_cmd);
 
-    printf("cmd: [%s]\n", c_cmd);
+    //printf("cmd: [%s]\n", c_cmd);
 
     if(memcmp(c_cmd, RANGE_STR, strlen(RANGE_STR)) == 0)
     {
         //It is the range() command
-        printf("found the range() command\n");
+        //printf("found the range() command\n");
         stat->for_type = RANGE;   
         if((ret = parse_rangeCMD(c_cmd, stat)) != 0)
         {
+            free(c_cmd);
             return(ret-3);
         }
     }
     else
     {
         //It is a variable
-        printf("Found a variable\n");
+        //printf("Found a variable\n");
         stat->for_type = ARRAY;   
         if((ret = parse_ForVariable(c_cmd, stat)) != 0)
         {
+            free(c_cmd);
             return(ret-10);
         }
     }
+    free(c_cmd);
     return(0);
 }
 
@@ -150,7 +153,57 @@ int parse_ForVariable(char *cmd, for_status *stat)
 
     if(cmd[0] != '(')
     {
-        //Just one variable
+        //Just one variablen
+        if((stat->array.name = malloc(sizeof(char*))) == NULL)
+        {
+            fprintf(stderr, "Memory alloc error in for varname parsing (name saving)\n");
+            return(-1);
+        }
+        if((stat->array.grp = malloc(sizeof(char*))) == NULL)
+        {
+            fprintf(stderr, "Memory alloc error in for varname parsing (grp saving)\n");
+            return(-1);
+        }
+        stat->array.grp[stat->array.var_count] = NULL;
+        if((stat->array.array_length = malloc(sizeof(int*))) == NULL)
+        {
+            fprintf(stderr, "Memory alloc error in for varname parsing (length saving)\n");
+            return(-1);
+        }
+        if((stat->array.type = malloc(sizeof(int))) == NULL)
+        {
+            fprintf(stderr, "Memory alloc error in for varname parsing (type saving)\n");
+            return(-1);
+        }
+        if((stat->array.index_type = malloc(sizeof(int))) == NULL)
+        {
+            fprintf(stderr, "Memory alloc error in for varname parsing (index type)\n");
+            return(-1);
+        }
+        if((stat->array.x_index = malloc(sizeof(int))) == NULL)
+        {
+            fprintf(stderr, "Memory alloc error in for varname parsing (x index\n");
+            return(-1);
+        }
+        if((stat->array.y_index = malloc(sizeof(int))) == NULL)
+        {
+            fprintf(stderr, "Memory alloc error in for varname parsing (y index)\n");
+            return(-1);
+        }
+
+        stat->array.var_count = 1;
+        RemoveSpaces(cmd);
+        if((stat->array.name[0] = malloc(strlen(cmd)+1)) == NULL)
+        {
+            fprintf(stderr, "Memory alloc error in for varname parsing\n");
+            return(-1);
+        }
+        strcpy(stat->array.name[0], cmd);
+        if(getVariableProperties(stat, 0) < 0)
+        {
+            return(-2);
+        }
+        return(0);
     }
 
     cmd++;
@@ -178,6 +231,7 @@ int parse_ForVariable(char *cmd, for_status *stat)
                 fprintf(stderr, "Memory alloc error in for varname parsing (grp saving)\n");
                 return(-1);
             }
+            stat->array.grp[stat->array.var_count] = NULL;
             if((stat->array.array_length = malloc(sizeof(int*))) == NULL)
             {
                 fprintf(stderr, "Memory alloc error in for varname parsing (length saving)\n");
@@ -219,6 +273,7 @@ int parse_ForVariable(char *cmd, for_status *stat)
                 fprintf(stderr, "Memory realloc error in for varname parsing (name)\n");
                 return(-1);
             }
+            stat->array.grp[stat->array.var_count] = NULL;
             if((stat->array.array_length = realloc(stat->array.array_length,
                 sizeof(int*)*(stat->array.var_count+1))) == NULL)
             {
@@ -300,7 +355,7 @@ int checkIfMultipleVarnames(char *found_names, for_status *stat)
 
     comma = strtok(found_names, ",");
 
-    printf("Multiple varname:\n");
+    //printf("Multiple varname:\n");
     while(comma)
     {
         if(stat->var_count == 0)
@@ -313,7 +368,7 @@ int checkIfMultipleVarnames(char *found_names, for_status *stat)
         }
         else
         {
-            if((stat->varnames = realloc(stat->varnames, sizeof(char*)*stat->var_count+1)) == NULL)
+            if((stat->varnames = realloc(stat->varnames, sizeof(char*)*(stat->var_count+1))) == NULL)
             {
                 fprintf(stderr, "Memory alloc error in for varname parsing\n");
                 return(-3);
@@ -327,7 +382,7 @@ int checkIfMultipleVarnames(char *found_names, for_status *stat)
 
         RemoveSpaces(comma);
         strcpy(stat->varnames[stat->var_count++], comma);
-        printf("var: [%s]\n", comma);
+        //printf("var: [%s]\n", comma);
         comma = strtok(NULL, ",");
     }
 
@@ -355,7 +410,7 @@ int getVariableProperties(for_status *stat, int index)
     
     if((point = strchr(stat->array.name[index], '.')) != NULL)
     {
-        //a grroup was found
+        //a group was found
         point[0] = '\0';
         if((stat->array.grp[index] = malloc((strlen(stat->array.name[index])+1)*sizeof(char))) == NULL)
         {
@@ -412,7 +467,7 @@ int getIndex(char *variable, int *x, int *y, int *z)
         //Kein Index angeben
         return(0);
     }
-    if((index_buff = malloc(strlen(open_bracked))) == NULL)
+    if((index_buff = malloc(strlen(open_bracked)+1)) == NULL)
     {
         fprintf(stderr, "Error while allocating memory: [%s]", strerror(errno));
         return(-1);

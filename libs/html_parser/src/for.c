@@ -104,7 +104,7 @@ char *getForVariable(token_t *cmd, token_t **end_token)
 int end_for_handling(token_t *anker, status_t *stat)
 {
     int i, ret = 0,
-        for_end = 0;
+        for_end = 0, x = 0;
 
     token_t head = {' ', -1, NULL, NULL},
             *cmd_start = NULL;
@@ -165,7 +165,8 @@ int end_for_handling(token_t *anker, status_t *stat)
     {
         goto end;
     }
-    for(i=0; i < status.array.var_count; i++)
+
+    /*for(i=0; i < status.array.var_count; i++)
     {
         printf("name: [%s]\n", status.array.name[i]);
         printf("\tvar_type: [%d]\n", status.array.type[i]);
@@ -174,11 +175,11 @@ status.array.array_length[i][1],status.array.array_length[i][2]);
         printf("\tindex_type: [%d]\n", status.array.index_type[i]);
         printf("\tx_index: [%d]\n", status.array.x_index[i]);
         printf("\ty_index: [%d]\n", status.array.y_index[i]);
-    }
+    }*/
 
     calculateForEnd(status, &for_end);
 
-    printf("For end: [%d]\n", for_end);
+   //printf("For end: [%d]\n", for_end);
 
 
     for(status.index=0; status.index <= for_end; status.index++)
@@ -202,6 +203,32 @@ status.array.array_length[i][1],status.array.array_length[i][2]);
     //TODO: Add a new function "removeGrp" for removing a full group
     removeVar(vars_anker, varname); 
 end:
+
+    for(i=0; i < status.var_count; i++)
+    {
+        free(status.varnames[i]);
+        if(status.for_type == ARRAY)
+        {
+            free(status.array.array_length[i]);
+            free(status.array.name[i]);
+            free(status.array.grp[i]);
+        } 
+    }
+
+    free(status.varnames);
+
+    if(status.for_type == ARRAY)
+    {
+        free(status.array.type);
+        free(status.array.y_index);
+        free(status.array.x_index);
+        free(status.array.length);
+        free(status.array.index_type);
+        free(status.array.array_length);
+        free(status.array.name);
+        free(status.array.grp);
+    }
+
     stat->just_save = false;
     stat->lookfor = 0;
 

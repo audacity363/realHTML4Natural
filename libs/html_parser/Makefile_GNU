@@ -25,6 +25,16 @@ lib: $(OBJ)
 %.o: ./src/%.c
 	gcc -g3 -c $< $(INCLUDE) -o ./bin/$@
 
+test: lib check_mem
+	@echo "Done..."
+
+check_mem:
+	valgrind \
+		--leak-check=full \
+		--show-leak-kinds=all \
+		--track-origins=yes \
+		./main 1> valgrind.log 2>&1
+
 clean:
 	rm -rf libvars.a
 	rm -rf ./bin/*.o

@@ -151,6 +151,8 @@ int parseVariable(wchar_t *begin, wchar_t *end)
     anker.next = NULL;
     anker.prev = NULL;
 
+    memset(&anker, 0x00, sizeof(token_t));
+
     //Create a tokenlist out of the string
     while(curpos+i <= end)
     {
@@ -168,7 +170,7 @@ int parseVariable(wchar_t *begin, wchar_t *end)
             addToken(&anker, curpos+i, CHAR);
         i++;
     }
-    printTokens(&anker);
+    //printTokens(&anker);
 
     if((varname_length = getVarnameLength(&anker)) == 0) 
     {
@@ -207,7 +209,7 @@ int parseVariable(wchar_t *begin, wchar_t *end)
 
     if((grplength = checkIfGroup(variablename)) != 0)
     {
-        if((grpname = malloc(grplength+1)) == NULL)
+        if((grpname = calloc(1, grplength+1)) == NULL)
         {
             free(variablename);
             free(wc_variablename);
@@ -234,7 +236,7 @@ int parseVariable(wchar_t *begin, wchar_t *end)
     free(grpname);
 
     deleteTokens(&anker);
-    printf("------------------------------------------------------\n");
+    //printf("\n------------------------------------------------------\n");
     return(0);
 }
 
@@ -244,7 +246,7 @@ int printVariable(char *name, char *grpname, bool has_grp, int index_type, int *
 
     if(has_grp)
     {
-        printf("Grpname: [%s]\n", grpname);
+        //printf("Grpname: [%s]\n", grpname);
         if((target = isDefinedGrp(vars_anker, grpname, name)) == NULL)
         {
             fprintf(stderr, "Unkown Variable or Group\n");
@@ -253,7 +255,7 @@ int printVariable(char *name, char *grpname, bool has_grp, int index_type, int *
     }
     else
     {
-        printf("Found name: [%s] with index = %d\n", name, index_type);
+        //printf("Found name: [%s] with index = %d\n", name, index_type);
         
         if((target = isDefined(vars_anker, name)) == NULL)
         {

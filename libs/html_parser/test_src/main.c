@@ -15,6 +15,8 @@ macro_definition_t *macro_defs;
 //Gibt den Typ des Blocker zurueck. Wenn nichts gefunden false 
 //Variablenblock = VARIABLENBLOCK
 //Commandblock = COMMANDBLOCK
+//TODO: don't use wccstr. Search with a for loop and return the first founded 
+//block
 int searchBlockBegin(wchar_t *str, wchar_t **pos)
 {
     wchar_t *begin;
@@ -104,7 +106,7 @@ int parseLine(wchar_t *line, status_t *status)
         between_len = 0,
         ret = 0;
 
-    printf("parse: [%S]\n", inputstr);
+    //printf("parse: [%S]\n", inputstr);
     while(restlength != 0) 
     { 
         if((inblock = searchBlockBegin(inputstr, &begin)) != false)
@@ -114,13 +116,14 @@ int parseLine(wchar_t *line, status_t *status)
             {
                 between_len = begin - prev_end;
                 //printf("between_len: [%d]\n", between_len);
-                printf("Kenn ich nicht [%.*S]\n", between_len, prev_end);
+                printf("%.*S", between_len, prev_end);
             }
             //Text vor dem ersten Block ausgeben
             if(!prev_end)
             {
                 between_len = begin - inputstr;
-                printf("Kenn ich nicht [%.*S]\n", between_len, inputstr);
+                if(!status->just_save)
+                    printf("%.*S", between_len, inputstr);
             }
             if(searchBlockEnd(begin, &end, inblock) == false)
             {
@@ -154,10 +157,12 @@ int parseLine(wchar_t *line, status_t *status)
         //Text hinter dem letzen Block ausgeben
         else
         {
-            printf("kenn ich nicht: [%S]\n", inputstr);
+            //printf("kenn ich nicht: [%S]\n", inputstr);
             restlength = restlength - wcslen(inputstr);
             if(status->just_save)
                 saveLine(line, status);
+            else
+                printf("%S", inputstr);
         }
     }
 
@@ -348,12 +353,11 @@ int main()
  * so that you can give the parser multiple array but the arrays have to be the 
  * same length
  */
-#define INPUTSTRS_LENGTH 4
+#define INPUTSTRS_LENGTH 3
     wchar_t *inputstrs[INPUTSTRS_LENGTH] = 
     {
-        L"{% for (entry1, entry) in (string3d[0][1], grparray.float1d) %}",
-        L"{{ entry }}",
-        L"{{ loop.i }}",
+        L"{% for entry in string3d[0] %}",
+        L"<h1>{{ entry1 }}</h1><span>{{ loop.i }} {{entry}}</span>\n",
         L"{% end-for %}"
     };
 

@@ -78,9 +78,16 @@ int setStartValue(char *tmp_var, for_status stat, vars_t *anker)
 {
     int (*start_func)(for_status, vars_t*, int) = NULL, i, x;
 
-    addGroup(anker, "loop", 0, 0, 0);
+    if(isDefinedGrpBool(anker, "loop", "i") == true)
+    {
+        editInteger(anker, "loop", "i", stat.index);
+    }
+    else
+    {
+        addGroup(anker, "loop", 0, 0, 0);
 
-    addInteger(anker, "loop", "i", 0);
+        addInteger(anker, "loop", "i", stat.index);
+    }
 
     if(stat.for_type == RANGE)
     {
