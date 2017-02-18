@@ -91,6 +91,7 @@ void printAllVarsToFileJSON(vars_t *anker, FILE *fp)
     fprintf(fp, "}\n");
 }
 
+//Add Group parsing
 int printVarsToFileJSON(vars_t *anker, char **var_names, int length, FILE *fp)
 {
     int i = 0, x = 0;
@@ -157,10 +158,10 @@ void printGroup(vars_t *var, FILE *fp, bool json)
     int off = 0;
 
     if(json)
-        printf("\"%s\":{", var->name);
+        fprintf(fp, "\"%s\":{", var->name);
     else
     {
-        printf("Group: [%s]:\n", var->name);
+        fprintf(fp, "Group: [%s]:\n", var->name);
         off = 1;
     }
 

@@ -9,186 +9,6 @@
 #include "token_handling.h"
 #include "macro.h"
 
-vars_t *vars_anker;
-macro_definition_t *macro_defs;
-
-//Returns the type of block found
-//Variablenblock = VARIABLENBLOCK
-//Commandblock = COMMANDBLOCK
-//false = no block was found
-int searchBlockBegin(wchar_t *str, wchar_t **pos)
-{
-    wchar_t *begin;
-    int x = 0,
-        length = wcslen(str);
-
-
-    for(; x < length; x++)
-    {
-        if(memcmp(str+x, VARIABLEBEGIN_STR, sizeof(wchar_t)*2) == 0)
-        {
-            *pos = str+x;
-            return(VARIABLEBLOCK);
-        }
-        else if(memcmp(str+x, COMMANDBEGIN_STR, sizeof(wchar_t)*2) == 0)
-        {
-            *pos = str+x;
-            return(COMMANDBLOCK);
-        }
-    }
-
-    return(false);
-
-
-    if((begin = wcsstr(str, VARIABLEBEGIN_STR)) != NULL)
-    {
-        *pos = begin;
-        return(VARIABLEBLOCK);
-    }
-    else if((begin = wcsstr(str, COMMANDBEGIN_STR)) != NULL)
-    {
-        *pos = begin;
-        return(COMMANDBLOCK);
-    }
-    return(false);
-}
-
-int searchBlockEnd(wchar_t *str, wchar_t **pos, int type)
-{
-    wchar_t *end;
-
-    if(type == VARIABLEBLOCK)
-    {
-        if((end = wcsstr(str, VARIABLEEND_STR)) != NULL)
-        {
-            *pos = end;
-            return(true);
-        }
-        return(false);
-    }
-    else if(type == COMMANDBLOCK)
-    {
-        if((end = wcsstr(str, COMMANDEND_STR)) != NULL)
-        {
-            *pos = end;
-            return(true);
-        }
-        return(false);
-    }
-    return(false);
-}
-
-int saveLine(wchar_t *line, status_t *stat)
-{
-    if(stat->sizeof_sav_buff == 0)
-    {
-        stat->save_buff = malloc(sizeof(wchar_t*));
-        stat->save_buff[0] = malloc((wcslen(line)+1)*sizeof(wchar_t));
-        wcscpy(stat->save_buff[0], line);
-        stat->sizeof_sav_buff = 1;
-    }
-    else
-    {
-        stat->sizeof_sav_buff++;
-        stat->save_buff = realloc(stat->save_buff, sizeof(wchar_t*)*stat->sizeof_sav_buff);
-        stat->save_buff[stat->sizeof_sav_buff-1] = NULL;
-        stat->save_buff[stat->sizeof_sav_buff-1] = malloc((wcslen(line)+1)*sizeof(wchar_t)+1);
-        wcscpy(stat->save_buff[stat->sizeof_sav_buff-1], line);
-    }
-    return(0);
-}
-
-void freeLineBuff(status_t *stat)
-{
-    int i;
-
-    for(i=stat->sizeof_sav_buff-1; i > -1; i--)
-    {
-        free(stat->save_buff[i]);
-    }
-    free(stat->save_buff);
-    stat->save_buff = NULL;
-    stat->sizeof_sav_buff = 0;
-}
-
-int parseLine(wchar_t *line, status_t *status)
-{
-    wchar_t *inputstr = line,
-         *begin,
-         *end,
-         *prev_end = NULL,
-         *backup_line = line;
-    size_t len = wcslen(line),
-           restlength = len;
-    int i,
-        inblock = false,
-        between_len = 0,
-        ret = 0;
-
-    //printf("parse: [%S]\n", inputstr);
-    while(restlength != 0) 
-    { 
-        if((inblock = searchBlockBegin(inputstr, &begin)) != false)
-        {
-            //Text zwischen den Bloecken ausgeben
-            if(prev_end)
-            {
-                between_len = begin - prev_end;
-                //printf("between_len: [%d]\n", between_len);
-                printf("%.*S", between_len, prev_end);
-            }
-            //Text vor dem ersten Block ausgeben
-            if(!prev_end)
-            {
-                between_len = begin - inputstr;
-                if(!status->just_save)
-                    printf("%.*S", between_len, inputstr);
-            }
-            if(searchBlockEnd(begin, &end, inblock) == false)
-            {
-                fprintf(stderr, "Syntax Error Missing Endbracked\n");
-                break;
-            }
-            else if(inblock == VARIABLEBLOCK)
-            {
-                if(status->just_save)
-                {
-                    saveLine(line, status);
-                    break;
-                }
-                parseVariable(begin, end);
-            }
-            else if(inblock == COMMANDBLOCK)
-            {
-                if((ret = parseCommand(begin, end, status)) == JUSTSAVE)
-                {
-                    saveLine(backup_line, status);
-                    break;
-                }
-                else if(ret == EXIT)
-                    return(EXIT);
-                else if(ret < 0)
-                    return(EXIT);
-            }
-            restlength=wcslen(end+2);
-            prev_end = inputstr = end+2;
-        }
-        //Text hinter dem letzen Block ausgeben
-        else
-        {
-            //printf("kenn ich nicht: [%S]\n", inputstr);
-            restlength = restlength - wcslen(inputstr);
-            if(status->just_save)
-                saveLine(line, status);
-            else
-                printf("%S", inputstr);
-        }
-    }
-
-}
-
-
-
 int initVars(vars_t *anker)
 {
     int ret, i, x, y, z;
@@ -343,13 +163,11 @@ int initVars(vars_t *anker)
 
 int main()
 {
-    status_t status;  
-    int i, ret;
     vars_t *anker = NULL;
 
     setlocale(LC_ALL, "");
 
-    if((ret = initVarAnker(&anker)) != 0)
+    if(initVarAnker(&anker) != 0)
     {
         return(1);
     }
@@ -357,59 +175,10 @@ int main()
     if(initVars(anker) != 0)
         return(-1);
 
-    vars_anker = anker;
+    printAllVars(anker);
 
-    initMacroAnker(&macro_defs);
 
-    printAllVars(vars_anker);
+    start(anker, "./test_src/templates/test.html", "./test_src/bla");
 
-#if 1
-
-/*
- * implemet the following syntax:
- * {% for user, link in users, links %}
- *
- * so that you can give the parser multiple array but the arrays have to be the 
- * same length
- */
-#define INPUTSTRS_LENGTH 2
-    wchar_t *inputstrs[INPUTSTRS_LENGTH] = 
-    {
-        L"{% for entry in string3d[0] %}<h2>{{ loop.i }}</h2>",
-        L"{% end-for %}\n"
-    };
-
-#endif
-
-#if 0
-#define INPUTSTRS_LENGTH 1 
-    wchar_t *inputstrs[INPUTSTRS_LENGTH] = 
-    {
-        L"{{ array }}"
-    };
-#endif
-
-    status.in_for = 0;
-    status.in_if = 0;
-    status.save_buff= NULL;
-    status.just_save = 0;
-    status.sizeof_sav_buff = 0;
-
-    for(i=0; i < INPUTSTRS_LENGTH; i++)
-    {
-        if(parseLine(inputstrs[i], &status) == EXIT)
-            break;
-    }
-
-    /*for(i=0; i < status.sizeof_sav_buff; i++)
-    {
-        printf("%s\n", status.save_buff[i]);
-    }*/
-
-#ifdef DEBUG
-    listAllMacros(macro_defs);
-#endif
-    freeLineBuff(&status);
-    freeMacros(macro_defs);
     freeVarAnker(anker);
 }

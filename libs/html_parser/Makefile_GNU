@@ -1,4 +1,6 @@
-OBJ = command_parsing.o \
+OBJ = start.o \
+	  line_parser.o \
+	  command_parsing.o \
 	  exec_if.o \
 	  exec_macro.o \
 	  for.o \

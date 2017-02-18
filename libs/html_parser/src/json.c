@@ -54,7 +54,7 @@ int exec_json(token_t *anker, status_t *stat)
         hptr = hptr->next;
     }
 
-    if(printVarsToFileJSON(vars_anker, varnames, var_count, stdout) != 0)
+    if(printVarsToFileJSON(vars_anker, varnames, var_count, f_output) != 0)
     {
         //variable not known
         for(i=0; i < var_count; i++)

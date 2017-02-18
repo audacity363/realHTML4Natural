@@ -18,6 +18,8 @@
 #define JUSTSAVE 300
 #define EXIT 400
 
+#define MAXLINELENGTH 2048
+
 enum {
     COMMANDBEGIN,
     COMMANDEND,
@@ -119,6 +121,7 @@ typedef struct macro_definition_s macro_definition_t;
 
 extern vars_t *vars_anker;
 extern macro_definition_t *macro_defs;
+extern FILE *f_output;
 
 void freeLineBuff(status_t *stat);
 int parseLine(wchar_t *line, status_t *status);

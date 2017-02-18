@@ -267,7 +267,7 @@ int printVariable(char *name, char *grpname, bool has_grp, int index_type, int *
     switch(target->type)
     {
         case INTEGER:
-            printRawInteger(target, stdout);
+            printRawInteger(target, f_output);
             break;
         case ONEDINTEGER:
             handleONEDINTEGER(target, index_type, index_num);
@@ -279,7 +279,7 @@ int printVariable(char *name, char *grpname, bool has_grp, int index_type, int *
             handleTHREEDINTEGER(target, index_type, index_num);
             break;
         case FLOAT:
-            printRawFloat(target, stdout);
+            printRawFloat(target, f_output);
             break;
         case ONEDFLOAT:
             handleONEDFLOAT(target, index_type, index_num);
@@ -291,7 +291,7 @@ int printVariable(char *name, char *grpname, bool has_grp, int index_type, int *
             handleTHREEDFLOAT(target, index_type, index_num);
             break;
         case BOOL:
-            printRawBoolean(target, stdout);
+            printRawBoolean(target, f_output);
             break;
         case ONEDBOOL:
             handleONEDBOOL(target, index_type, index_num);
@@ -303,7 +303,7 @@ int printVariable(char *name, char *grpname, bool has_grp, int index_type, int *
             handleTHREEDSTRING(target, index_type, index_num);
             break;
         case STRING:
-            printRawString(target, stdout);
+            printRawString(target, f_output);
             break;
         case ONEDSTRING:
             handleONEDSTRING(target, index_type, index_num);

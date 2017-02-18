@@ -16,7 +16,7 @@ int handleONEDINTEGER(vars_t *target, int index_type, int *index)
 
     if(index_type == 0)
     {
-        printRaw1DInteger(target, stdout);
+        printRaw1DInteger(target, f_output);
         return(0);
     }
     else
@@ -26,7 +26,7 @@ int handleONEDINTEGER(vars_t *target, int index_type, int *index)
             fprintf(stderr, "X index out of range\n");
             return(-2);
         }
-        print1DIntegerWithXIndex(target, stdout, index[0], false);
+        print1DIntegerWithXIndex(target, f_output, index[0], false);
     }
     return(0);
 }
@@ -41,7 +41,7 @@ int handleTWODINTEGER(vars_t *target, int index_type, int *index)
 
     if(index_type == 0)
     {
-        printRaw2DInteger(target, stdout);
+        printRaw2DInteger(target, f_output);
         return(0);
     }
     else if(index_type == 1)
@@ -51,7 +51,7 @@ int handleTWODINTEGER(vars_t *target, int index_type, int *index)
             fprintf(stderr, "X index out of range\n");
             return(-2);
         }
-        print2DIntegerWithXIndex(target, stdout, index[0], false);
+        print2DIntegerWithXIndex(target, f_output, index[0], false);
     }
     else
     {
@@ -65,7 +65,7 @@ int handleTWODINTEGER(vars_t *target, int index_type, int *index)
             fprintf(stderr, "Y index out of range\n");
             return(-3);
         }
-        print2DIntegerWithXYIndex(target, stdout, index[0], index[1], false);
+        print2DIntegerWithXYIndex(target, f_output, index[0], index[1], false);
     }
     return(0);
 }
@@ -74,7 +74,7 @@ int handleTHREEDINTEGER(vars_t *target, int index_type, int *index)
 {
     if(index_type == 0)
     {
-        printRaw3DInteger(target, stdout);
+        printRaw3DInteger(target, f_output);
         return(0);
     }
     else if(index_type == 1)
@@ -84,7 +84,7 @@ int handleTHREEDINTEGER(vars_t *target, int index_type, int *index)
             fprintf(stderr, "X index out of range\n");
             return(-2);
         }
-        print3DIntegerWithXIndex(target, stdout, index[0], false);
+        print3DIntegerWithXIndex(target, f_output, index[0], false);
     }
     else if(index_type == 2)
     {
@@ -98,7 +98,7 @@ int handleTHREEDINTEGER(vars_t *target, int index_type, int *index)
             fprintf(stderr, "Y index out of range\n");
             return(-3);
         }
-        print3DIntegerWithXYIndex(target, stdout, index[0], index[1], false);
+        print3DIntegerWithXYIndex(target, f_output, index[0], index[1], false);
 
     }
     else
@@ -118,7 +118,7 @@ int handleTHREEDINTEGER(vars_t *target, int index_type, int *index)
             fprintf(stderr, "Y index out of range\n");
             return(-3);
         }
-        print3DIntegerWithXYZIndex(target, stdout, index[0], index[1], index[2], false);
+        print3DIntegerWithXYZIndex(target, f_output, index[0], index[1], index[2], false);
     }
     return(0);
 }
@@ -133,7 +133,7 @@ int handleONEDBOOL(vars_t *target, int index_type, int *index)
 
     if(index_type == 0)
     {
-        printRaw1DBoolean(target, stdout);
+        printRaw1DBoolean(target, f_output);
         return(0);
     }
     else
@@ -143,7 +143,7 @@ int handleONEDBOOL(vars_t *target, int index_type, int *index)
             fprintf(stderr, "X index out of range\n");
             return(-2);
         }
-        print1DBooleanWithXIndex(target, stdout, index[0], false);
+        print1DBooleanWithXIndex(target, f_output, index[0], false);
     }
     return(0);
 }
@@ -158,7 +158,7 @@ int handleTWODBOOL(vars_t *target, int index_type, int *index)
 
     if(index_type == 0)
     {
-        printRaw2DBoolean(target, stdout);
+        printRaw2DBoolean(target, f_output);
         return(0);
     }
     else if(index_type == 1)
@@ -168,7 +168,7 @@ int handleTWODBOOL(vars_t *target, int index_type, int *index)
             fprintf(stderr, "X index out of range\n");
             return(-2);
         }
-        print2DBooleanWithXIndex(target, stdout, index[0], false);
+        print2DBooleanWithXIndex(target, f_output, index[0], false);
     }
     else
     {
@@ -182,7 +182,7 @@ int handleTWODBOOL(vars_t *target, int index_type, int *index)
             fprintf(stderr, "Y index out of range\n");
             return(-3);
         }
-        print2DBooleanWithXYIndex(target, stdout, index[0], index[1], false);
+        print2DBooleanWithXYIndex(target, f_output, index[0], index[1], false);
     }
     return(0);
 }
@@ -191,7 +191,7 @@ int handleTHREEDBOOL(vars_t *target, int index_type, int *index)
 {
     if(index_type == 0)
     {
-        printRaw3DBoolean(target, stdout);
+        printRaw3DBoolean(target, f_output);
         return(0);
     }
     else if(index_type == 1)
@@ -201,7 +201,7 @@ int handleTHREEDBOOL(vars_t *target, int index_type, int *index)
             fprintf(stderr, "X index out of range\n");
             return(-2);
         }
-        print3DBooleanWithXIndex(target, stdout, index[0], false);
+        print3DBooleanWithXIndex(target, f_output, index[0], false);
     }
     else if(index_type == 2)
     {
@@ -215,7 +215,7 @@ int handleTHREEDBOOL(vars_t *target, int index_type, int *index)
             fprintf(stderr, "Y index out of range\n");
             return(-3);
         }
-        print3DBooleanWithXYIndex(target, stdout, index[0], index[1], false);
+        print3DBooleanWithXYIndex(target, f_output, index[0], index[1], false);
 
     }
     else
@@ -235,7 +235,7 @@ int handleTHREEDBOOL(vars_t *target, int index_type, int *index)
             fprintf(stderr, "Y index out of range\n");
             return(-3);
         }
-        print3DBooleanWithXYZIndex(target, stdout, index[0], index[1], index[2], false);
+        print3DBooleanWithXYZIndex(target, f_output, index[0], index[1], index[2], false);
     }
     return(0);
 }
@@ -250,7 +250,7 @@ int handleONEDFLOAT(vars_t *target, int index_type, int *index)
 
     if(index_type == 0)
     {
-        printRaw1DFloat(target, stdout);
+        printRaw1DFloat(target, f_output);
         return(0);
     }
     else
@@ -260,7 +260,7 @@ int handleONEDFLOAT(vars_t *target, int index_type, int *index)
             fprintf(stderr, "X index out of range\n");
             return(-2);
         }
-        print1DFloatWithXIndex(target, stdout, index[0], false);
+        print1DFloatWithXIndex(target, f_output, index[0], false);
     }
     return(0);
 }
@@ -275,7 +275,7 @@ int handleTWODFLOAT(vars_t *target, int index_type, int *index)
 
     if(index_type == 0)
     {
-        printRaw2DFloat(target, stdout);
+        printRaw2DFloat(target, f_output);
         return(0);
     }
     else if(index_type == 1)
@@ -285,7 +285,7 @@ int handleTWODFLOAT(vars_t *target, int index_type, int *index)
             fprintf(stderr, "X index out of range\n");
             return(-2);
         }
-        print2DFloatWithXIndex(target, stdout, index[0], false);
+        print2DFloatWithXIndex(target, f_output, index[0], false);
     }
     else
     {
@@ -299,7 +299,7 @@ int handleTWODFLOAT(vars_t *target, int index_type, int *index)
             fprintf(stderr, "Y index out of range\n");
             return(-3);
         }
-        print2DFloatWithXYIndex(target, stdout, index[0], index[1], false);
+        print2DFloatWithXYIndex(target, f_output, index[0], index[1], false);
     }
     return(0);
 }
@@ -308,7 +308,7 @@ int handleTHREEDFLOAT(vars_t *target, int index_type, int *index)
 {
     if(index_type == 0)
     {
-        printRaw3DFloat(target, stdout);
+        printRaw3DFloat(target, f_output);
         return(0);
     }
     else if(index_type == 1)
@@ -318,7 +318,7 @@ int handleTHREEDFLOAT(vars_t *target, int index_type, int *index)
             fprintf(stderr, "X index out of range\n");
             return(-2);
         }
-        print3DFloatWithXIndex(target, stdout, index[0], false);
+        print3DFloatWithXIndex(target, f_output, index[0], false);
     }
     else if(index_type == 2)
     {
@@ -332,7 +332,7 @@ int handleTHREEDFLOAT(vars_t *target, int index_type, int *index)
             fprintf(stderr, "Y index out of range\n");
             return(-3);
         }
-        print3DFloatWithXYIndex(target, stdout, index[0], index[1], false);
+        print3DFloatWithXYIndex(target, f_output, index[0], index[1], false);
 
     }
     else
@@ -352,7 +352,7 @@ int handleTHREEDFLOAT(vars_t *target, int index_type, int *index)
             fprintf(stderr, "Y index out of range\n");
             return(-3);
         }
-        print3DFloatWithXYZIndex(target, stdout, index[0], index[1], index[2], false);
+        print3DFloatWithXYZIndex(target, f_output, index[0], index[1], index[2], false);
     }
     return(0);
 }
@@ -367,7 +367,7 @@ int handleONEDSTRING(vars_t *target, int index_type, int *index)
 
     if(index_type == 0)
     {
-        printRaw1DString(target, stdout);
+        printRaw1DString(target, f_output);
         return(0);
     }
     else
@@ -377,7 +377,7 @@ int handleONEDSTRING(vars_t *target, int index_type, int *index)
             fprintf(stderr, "X index out of range\n");
             return(-2);
         }
-        print1DStringWithXIndex(target, stdout, index[0], false);
+        print1DStringWithXIndex(target, f_output, index[0], false);
     }
     return(0);
 }
@@ -392,7 +392,7 @@ int handleTWODSTRING(vars_t *target, int index_type, int *index)
 
     if(index_type == 0)
     {
-        printRaw2DString(target, stdout);
+        printRaw2DString(target, f_output);
         return(0);
     }
     else if(index_type == 1)
@@ -402,7 +402,7 @@ int handleTWODSTRING(vars_t *target, int index_type, int *index)
             fprintf(stderr, "X index out of range\n");
             return(-2);
         }
-        print2DStringWithXIndex(target, stdout, index[0], false);
+        print2DStringWithXIndex(target, f_output, index[0], false);
     }
     else
     {
@@ -416,7 +416,7 @@ int handleTWODSTRING(vars_t *target, int index_type, int *index)
             fprintf(stderr, "Y index out of range\n");
             return(-3);
         }
-        print2DStringWithXYIndex(target, stdout, index[0], index[1], false);
+        print2DStringWithXYIndex(target, f_output, index[0], index[1], false);
     }
     return(0);
 }
@@ -425,7 +425,7 @@ int handleTHREEDSTRING(vars_t *target, int index_type, int *index)
 {
     if(index_type == 0)
     {
-        printRaw3DString(target, stdout);
+        printRaw3DString(target, f_output);
         return(0);
     }
     else if(index_type == 1)
@@ -435,7 +435,7 @@ int handleTHREEDSTRING(vars_t *target, int index_type, int *index)
             fprintf(stderr, "X index out of range\n");
             return(-2);
         }
-        print3DStringWithXIndex(target, stdout, index[0], false);
+        print3DStringWithXIndex(target, f_output, index[0], false);
     }
     else if(index_type == 2)
     {
@@ -449,7 +449,7 @@ int handleTHREEDSTRING(vars_t *target, int index_type, int *index)
             fprintf(stderr, "Y index out of range\n");
             return(-3);
         }
-        print3DStringWithXYIndex(target, stdout, index[0], index[1], false);
+        print3DStringWithXYIndex(target, f_output, index[0], index[1], false);
 
     }
     else
@@ -469,7 +469,7 @@ int handleTHREEDSTRING(vars_t *target, int index_type, int *index)
             fprintf(stderr, "Y index out of range\n");
             return(-3);
         }
-        print3DStringWithXYZIndex(target, stdout, index[0], index[1], index[2], false);
+        print3DStringWithXYZIndex(target, f_output, index[0], index[1], index[2], false);
     }
     return(0);
 }
