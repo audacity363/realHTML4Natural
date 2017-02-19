@@ -8,7 +8,8 @@ A full documentation you can find here: http://engemann.me/realhtml/docs
 
 
 ### Warning:
-In general the framework works but the webserver runs on http and not https. I don't know if there are some big bugs or memory leaks.
+In general the framework works but the webserver runs on http and not https. I don't know if there are some big bugs or memory leaks. (When you want to use the bleeding edge version the develop branch would be the right thing for you).
+This is the first version of the framework. She was meant to just show that there is a better way to handle Natural in the web. I currently working on a new version wich will be completly tested and ready for production use (See the develop branch for more informations).
 
 ## Quick start guide
 
