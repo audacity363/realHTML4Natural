@@ -49,7 +49,11 @@ int exec_macro(token_t *anker, macro_definition_t *macro)
     if((ret = initVarAnker(&macro_vars)) != 0)
         return(ret);
 
-    addVariables(macro->parms, &parms, macro_vars);
+    if((ret = addVariables(macro->parms, &parms, macro_vars)) != 0)
+    {
+        fprintf(stderr, "MAcro ret: [%d\n", ret);
+        return(ret);
+    }
 
     vars_backup = vars_anker;
     vars_anker = macro_vars;
@@ -308,6 +312,7 @@ int addVariables(macro_parms *defaults, macro_parms *given, vars_t *vars)
                 given->index_type[i], given->index[i]);
         }
     }
+    return(0);
 }
 
 #undef DEBUG

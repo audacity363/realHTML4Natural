@@ -91,13 +91,27 @@ int setStartValue(char *tmp_var, for_status stat, vars_t *anker)
 
     if(stat.for_type == RANGE)
     {
-        if(stat.range.start != -1)
+        if(isDefinedGrpBool(anker, NULL, tmp_var) == false)
         {
-            addInteger(anker, NULL, tmp_var, stat.range.start);
+            if(stat.range.start != -1)
+            {
+                addInteger(anker, NULL, tmp_var, stat.range.start);
+            }
+            else
+            {
+                addInteger(anker, NULL, tmp_var, 0);
+            }
         }
         else
         {
-            addInteger(anker, NULL, tmp_var, 0);
+            if(stat.range.start != -1)
+            {
+                editInteger(anker, NULL, tmp_var, stat.range.start+stat.index);
+            }
+            else
+            {
+                editInteger(anker, NULL, tmp_var, stat.index);
+            }
         }
         return(0);
     }

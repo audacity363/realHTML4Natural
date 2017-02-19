@@ -242,7 +242,7 @@ int getStringFrom1DArray(vars_t *anker, char *group, char *name, wchar_t *val,
     if(x_index >= target->x_length)
         return(X_INDEX_OUT_OF_RANGE);
 
-    offset = ((target->length+1)*sizeof(wchar_t))*x_index;
+    offset = (target->length*sizeof(wchar_t))*x_index;
 
     if(wcslen((wchar_t*)target->data) >= length)
         return(BUFFER_TO_SAMLL);
@@ -618,7 +618,7 @@ int editFull2DStringArray(vars_t *anker, char *group, char *name, void *val)
         }
     }
 
-    memcpy(target->data, val, (((target->length+1)*sizeof(wchar_t))*(target->y_length))*(target->x_length));
+    memcpy(target->data, val, ((target->length*sizeof(wchar_t))*(target->y_length))*(target->x_length));
     return(0);
 }
 

@@ -135,7 +135,7 @@ int end_for_handling(token_t *anker, status_t *stat)
     }
     if(stat->lookfor != FORBLOCK)
     {
-        return(-3);
+        //return(-3);
         return(JUSTSAVE);
     }
 
@@ -208,7 +208,8 @@ status.array.array_length[i][1],status.array.array_length[i][2]);
     }
    
 
-    for(status.index=0; status.index <= for_end; status.index++)
+    //Execute the for loop
+    for(status.index=0; status.index < for_end; status.index++)
     {
     //    setLoopValue(varname, status, vars_anker, status.index);
         setStartValue(varname, status, vars_anker);
@@ -266,6 +267,10 @@ end:
 
 int freeForVars(for_status stat, vars_t *anker)
 {
+    //When it is just one Integer Variable we dont delete it
+    if(stat.for_type == RANGE)
+        return(0);
+
     int i = 0;
 
     for(; i < stat.var_count; i++)

@@ -205,7 +205,7 @@ int parseVariable(wchar_t *begin, wchar_t *end)
         return(-4);
     }
     varname_sav = variablename;
-    index_type = getIndex(&anker, index);
+    index_type = getIndexChar(&anker, index);
 
     if((grplength = checkIfGroup(variablename)) != 0)
     {

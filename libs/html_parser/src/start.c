@@ -44,9 +44,11 @@ int start(vars_t *variablen, char *template, char *output)
 
     while(getLineFromFile(f_template, line) == true)
     {
-        if(parseLine(line, &status) == EXIT)
+        if((ret = parseLine(line, &status)) == EXIT)
             break;
     }
+
+    printf("Ret: [%d]\n", ret);
 
 #ifdef DEBUG
     listAllMacros(macro_defs);

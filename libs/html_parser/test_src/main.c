@@ -15,6 +15,17 @@ int initVars(vars_t *anker)
     float t = 82.62;
     wchar_t strbuff[100];
 
+
+    add2DStringArray(anker, NULL, "tableinfos", 100, 10, 2);
+    for(i=0; i < 10; i++)
+    {
+        swprintf(strbuff, 100, L"firstname %d", i);
+        edit2DStringArray(anker, NULL, "tableinfos", strbuff, i, 0);
+
+        swprintf(strbuff, 100, L"lastname %d", i);
+        edit2DStringArray(anker, NULL, "tableinfos", strbuff, i, 1);
+    } 
+
     if((ret = addGroup(anker, "hallo", 0,0,0)) != 0)
     {
         return(1);

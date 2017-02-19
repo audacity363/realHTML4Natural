@@ -1,4 +1,16 @@
-{% for entry in string3d[0] %}<h2>{{ loop.i }}</h2>
+{% macro table(infos) %}
+<table>
+{% for row in infos %}
+    {{ row[1] }}
+    <tr>
+    {% for entry in row %}
+        <td>{{ entry }}</td>
+    {% end-for %}
+    </tr>
 {% end-for %}
+</table>
+{% end-macro %}
+
+{% table(tableinfos) %}
 
 {% genJSON(bool, hallo) %}
