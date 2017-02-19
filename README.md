@@ -4,7 +4,7 @@ The project started in 2014 because i had enough from the slow and inconvenient 
 
 You can find more informations here: http://engemann.me/realhtml
 
-A full documentation you can find here: http://engemann.me/realhtml
+A full documentation you can find here: http://engemann.me/realhtml/docs
 
 
 ### Warning:
@@ -14,6 +14,7 @@ In general the framework works but the webserver runs on http and not https. I d
 
 1. create a route file like [this](web_server/routes.xml)
 2. create a config file like [this](web_server/config.xml)
+(I would highly recommend to use the [TomcatConnector](https://github.com/audacity363/realHTML_TomcatConnector) inset of this Webserver)
 3. start the webserver with ./web_server/miniweb
 4. create a new subprogram in a natural library which looks like this:
 ``` natural
