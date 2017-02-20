@@ -1,7 +1,6 @@
 {% macro table(infos) %}
 <table>
 {% for row in infos %}
-    {{ row[1] }}
     <tr>
     {% for entry in row %}
         <td>{{ entry }}</td>
@@ -12,5 +11,9 @@
 {% end-macro %}
 
 {% table(tableinfos) %}
+
+{% if bool == true %}
+<span>Alles klar</span>
+{% end-if %}
 
 {% genJSON(bool, hallo) %}

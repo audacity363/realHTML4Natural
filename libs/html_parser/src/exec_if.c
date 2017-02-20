@@ -206,7 +206,7 @@ int operator_table[SIZE_OF_COMPARE_TABLE][OPERATOR_COUNT] =
 int if_getVarType(if_parms_t *parm)
 {
     int ret = 0;
-    char *c_val = NULL;
+    char *c_val = NULL, *grp_delmiter = NULL, *grp = NULL;
 
     if(parm->type == IFSTR)
         return(STRING);
@@ -216,10 +216,27 @@ int if_getVarType(if_parms_t *parm)
     
     wcstombs(c_val, parm->val, wcslen(parm->val)+1);
 
-    if((ret = getVarType(vars_anker, NULL, c_val)) < 0)
+    //Check if a group is specified
+    if((grp_delmiter = strchr(c_val, '.')) != NULL)
     {
-        free(c_val);
-        return(-1);
+        grp_delmiter[0] = '\0';
+        grp = c_val; c_val = ++grp_delmiter;
+    }
+     
+    if((ret = getVarType(vars_anker, grp, c_val)) == (GRP_NOT_DEFINED*-1) ||
+        ret == (VAR_NOT_DEFINED*-1))
+    {
+        //Variable was not found and is was a group specified
+        //When no group is specified it could be an integer or float
+        //TODO: Add Float parsing
+        if(grp != NULL)
+        {
+            free(c_val);
+            return(-1);
+        }
+
+        parm->type = IFINT;
+        return(INTEGER);
     }
     free(c_val);
 
@@ -446,22 +463,81 @@ int exec_if(if_parms_t *parms, wchar_t **body, int body_length)
     return(0);
 }
 
-int convertNames(if_parms_t *left, if_parms_t *right, char **leftname, char **rightname)
+int convertNames(if_parms_t *left, if_parms_t *right, char **leftname, char **rightname, 
+    char **left_grp, char **right_grp)
 {   
-    if(!(*leftname = malloc(wcslen(left->val)+1)))
-    {
-        printf("Malloc error\n");
-        return(-1);
-    }
-    wcstombs(*leftname, left->val, wcslen(left->val)+1);
+    wchar_t *grp_delmiter = NULL;
 
-    if(!(*rightname = malloc(wcslen(right->val)+1)))
+    if((grp_delmiter = wcschr(left->val, L'.')) != NULL)
     {
-        free(leftname);
-        printf("Malloc error\n");
-        return(-1);
+        grp_delmiter[0] = L'\0';
+        /**leftname = grp_delmiter+1;
+        *left_grp = left->val;*/
+        if((*leftname = malloc(wcslen(grp_delmiter+1)+1)) == NULL)
+        {
+            fprintf(stderr, "Malloc Error in if name conversion\n");
+            return(-1);
+        }
+
+        if((*left_grp = malloc(wcslen(left->val)+1)) == NULL)
+        {
+            free(*leftname);
+            fprintf(stderr, "Malloc Error in if name conversion\n");
+            return(-1);
+        }
+
+        wcstombs(*left_grp, left->val, wcslen(left->val)+1);
+        wcstombs(*leftname, grp_delmiter+1, wcslen(grp_delmiter)+1);
     }
-    wcstombs(*rightname, right->val, wcslen(right->val)+1);
+    else
+    {
+        *left_grp = NULL;
+        if(!(*leftname = malloc(wcslen(left->val)+1)))
+        {
+            fprintf(stderr, "Malloc Error in if name conversion\n");
+            return(-1);
+        }
+        wcstombs(*leftname, left->val, wcslen(left->val)+1);
+    }
+
+    if((grp_delmiter = wcschr(right->val, L'.')) != NULL)
+    {
+        grp_delmiter[0] = L'\0';
+        if((*rightname = malloc(wcslen(grp_delmiter+1)+1)) == NULL)
+        {
+            free(*leftname);
+            if(!*left_grp) free(*left_grp);
+            fprintf(stderr, "Malloc Error in if name conversion\n");
+            return(-1);
+        }
+
+        if((*right_grp = malloc(wcslen(right->val)+1)) == NULL)
+        {
+            free(*rightname);
+            free(*leftname);
+            if(!*left_grp) free(*left_grp);
+
+            fprintf(stderr, "Malloc Error in if name conversion\n");
+            return(-1);
+        }
+
+        wcstombs(*right_grp, right->val, wcslen(right->val)+1);
+        wcstombs(*rightname, grp_delmiter+1, wcslen(grp_delmiter)+1);
+    }
+    else
+    {
+        *right_grp = NULL;
+        if(!(*rightname = malloc(wcslen(right->val)+1)))
+        {
+            free(*leftname);
+            if(!*left_grp) free(*left_grp);
+
+            fprintf(stderr, "Malloc Error in if name conversion\n");
+            return(-1);
+        }
+        wcstombs(*rightname, right->val, wcslen(right->val)+1);
+    }
+
     return(0);
 }
 
@@ -475,8 +551,8 @@ void freeNames(char **leftname, char **rightname)
 int SSEQ(if_parms_t *leftval, if_parms_t *compare, if_parms_t *rightval)
 {
     int left_length = 0, right_length = 0,
-        cmp_ret = 0;
-    char *left_name = NULL, *right_name = NULL;
+        cmp_ret = 0, ret = 0;
+    char *left_name = NULL, *right_name = NULL, *left_grp = NULL, *right_grp = NULL;
     wchar_t *left_val = NULL, *right_val = NULL;
 
     if(leftval->type != IFSTR)
@@ -497,14 +573,15 @@ int SSEQ(if_parms_t *leftval, if_parms_t *compare, if_parms_t *rightval)
             return(-2);
         }
 
-        if(!(left_val = malloc(left_length*sizeof(wchar_t))))
+        if(!(left_val = malloc((++left_length)*sizeof(wchar_t))))
         {
             free(left_name);
             return(-3);
         }
 
-        if(getString(vars_anker, NULL, left_name, left_val, left_length))
+        if((ret = getString(vars_anker, NULL, left_name, left_val, left_length)) != 0)
         {
+            printf("error: [%s]\n", var_errorstrs[ret]);
             free(left_name);
             free(left_val);
             return(-4);
@@ -582,21 +659,21 @@ int FIEQ(if_parms_t *leftval, if_parms_t *compare, if_parms_t *rightval)
     double left_val = 0;   
     int right_val = 0,
         ret = 0;
-    char *left_name = NULL,
-         *right_name = NULL;
+    char *left_name = NULL, *left_grp = NULL,
+         *right_name = NULL, *right_grp = NULL;
     
-    if(convertNames(leftval, rightval, &left_name, &right_name) < 0)
+    if(convertNames(leftval, rightval, &left_name, &right_name, &left_grp, &right_grp) < 0)
     {
         return(-1);
     }
     
-    if((ret = getFloat(vars_anker, NULL, left_name, &left_val)) == GRP_NOT_DEFINED ||
+    if((ret = getFloat(vars_anker, left_grp, left_name, &left_val)) == GRP_NOT_DEFINED ||
         ret == VAR_NOT_DEFINED)
     {
         printf("error: [%s]\n", var_errorstrs[ret]);
         return(-2);
     }
-    if((ret = getInteger(vars_anker, NULL, right_name, &right_val)) == GRP_NOT_DEFINED ||
+    if((ret = getInteger(vars_anker, right_grp, right_name, &right_val)) == GRP_NOT_DEFINED ||
         ret == VAR_NOT_DEFINED)
     {
         printf("error: [%s]\n", var_errorstrs[ret]);
@@ -630,10 +707,10 @@ int FILT(if_parms_t *leftval, if_parms_t *compare, if_parms_t *rightval)
     double left_val = 0;   
     int right_val = 0,
         ret = 0;
-    char *left_name = NULL,
-         *right_name = NULL;
+    char *left_name = NULL, *left_grp = NULL,
+         *right_name = NULL, *right_grp = NULL;
     
-    if(convertNames(leftval, rightval, &left_name, &right_name) < 0)
+    if(convertNames(leftval, rightval, &left_name, &right_name, &left_grp, &right_grp) < 0)
     {
         return(-1);
     }
@@ -665,21 +742,21 @@ int FILTEQ(if_parms_t *leftval, if_parms_t *compare, if_parms_t *rightval)
     double left_val = 0;   
     int right_val = 0,
         ret = 0;
-    char *left_name = NULL,
-         *right_name = NULL;
+    char *left_name = NULL, *left_grp = NULL,
+         *right_name = NULL, *right_grp = NULL;
     
-    if(convertNames(leftval, rightval, &left_name, &right_name) < 0)
+    if(convertNames(leftval, rightval, &left_name, &right_name, &left_grp, &right_grp) < 0)
     {
         return(-1);
     }
     
-    if((ret = getFloat(vars_anker, NULL, left_name, &left_val)) == GRP_NOT_DEFINED ||
+    if((ret = getFloat(vars_anker, left_grp, left_name, &left_val)) == GRP_NOT_DEFINED ||
         ret == VAR_NOT_DEFINED)
     {
         printf("error: [%s]\n", var_errorstrs[ret]);
         return(-2);
     }
-    if((ret = getInteger(vars_anker, NULL, right_name, &right_val)) == GRP_NOT_DEFINED ||
+    if((ret = getInteger(vars_anker, right_grp, right_name, &right_val)) == GRP_NOT_DEFINED ||
         ret == VAR_NOT_DEFINED)
     {
         printf("error: [%s]\n", var_errorstrs[ret]);
@@ -700,21 +777,21 @@ int FIGT(if_parms_t *leftval, if_parms_t *compare, if_parms_t *rightval)
     double left_val = 0;   
     int right_val = 0,
         ret = 0;
-    char *left_name = NULL,
-         *right_name = NULL;
+    char *left_name = NULL, *left_grp = NULL,
+         *right_name = NULL, *right_grp = NULL;
     
-    if(convertNames(leftval, rightval, &left_name, &right_name) < 0)
+    if(convertNames(leftval, rightval, &left_name, &right_name, &left_grp, &right_grp) < 0)
     {
         return(-1);
     }
     
-    if((ret = getFloat(vars_anker, NULL, left_name, &left_val)) == GRP_NOT_DEFINED ||
+    if((ret = getFloat(vars_anker, left_grp, left_name, &left_val)) == GRP_NOT_DEFINED ||
         ret == VAR_NOT_DEFINED)
     {
         printf("error: [%s]\n", var_errorstrs[ret]);
         return(-2);
     }
-    if((ret = getInteger(vars_anker, NULL, right_name, &right_val)) == GRP_NOT_DEFINED ||
+    if((ret = getInteger(vars_anker, right_grp, right_name, &right_val)) == GRP_NOT_DEFINED ||
         ret == VAR_NOT_DEFINED)
     {
         printf("error: [%s]\n", var_errorstrs[ret]);
@@ -735,21 +812,21 @@ int FIGTEQ(if_parms_t *leftval, if_parms_t *compare, if_parms_t *rightval)
     double left_val = 0;   
     int right_val = 0,
         ret = 0;
-    char *left_name = NULL,
-         *right_name = NULL;
+    char *left_name = NULL, *left_grp = NULL,
+         *right_name = NULL, *right_grp = NULL;
     
-    if(convertNames(leftval, rightval, &left_name, &right_name) < 0)
+    if(convertNames(leftval, rightval, &left_name, &right_name, &left_grp, &right_grp) < 0)
     {
         return(-1);
     }
     
-    if((ret = getFloat(vars_anker, NULL, left_name, &left_val)) == GRP_NOT_DEFINED ||
+    if((ret = getFloat(vars_anker, left_grp, left_name, &left_val)) == GRP_NOT_DEFINED ||
         ret == VAR_NOT_DEFINED)
     {
         printf("error: [%s]\n", var_errorstrs[ret]);
         return(-2);
     }
-    if((ret = getInteger(vars_anker, NULL, right_name, &right_val)) == GRP_NOT_DEFINED ||
+    if((ret = getInteger(vars_anker, right_grp, right_name, &right_val)) == GRP_NOT_DEFINED ||
         ret == VAR_NOT_DEFINED)
     {
         printf("error: [%s]\n", var_errorstrs[ret]);
@@ -771,21 +848,21 @@ int FFEQ(if_parms_t *leftval, if_parms_t *compare, if_parms_t *rightval)
     double left_val = 0,
         right_val = 0;
     int ret = 0;
-    char *left_name = NULL,
-         *right_name = NULL;
+    char *left_name = NULL, *left_grp = NULL,
+         *right_name = NULL, *right_grp = NULL;
     
-    if(convertNames(leftval, rightval, &left_name, &right_name) < 0)
+    if(convertNames(leftval, rightval, &left_name, &right_name, &left_grp, &right_grp) < 0)
     {
         return(-1);
     }
     
-    if((ret = getFloat(vars_anker, NULL, left_name, &left_val)) == GRP_NOT_DEFINED ||
+    if((ret = getFloat(vars_anker, left_grp, left_name, &left_val)) == GRP_NOT_DEFINED ||
         ret == VAR_NOT_DEFINED)
     {
         printf("error: [%s]\n", var_errorstrs[ret]);
         return(-2);
     }
-    if((ret = getFloat(vars_anker, NULL, right_name, &right_val)) == GRP_NOT_DEFINED ||
+    if((ret = getFloat(vars_anker, right_grp, right_name, &right_val)) == GRP_NOT_DEFINED ||
         ret == VAR_NOT_DEFINED)
     {
         printf("error: [%s]\n", var_errorstrs[ret]);
@@ -821,21 +898,21 @@ int FFLT(if_parms_t *leftval, if_parms_t *compare, if_parms_t *rightval)
     double left_val = 0,
         right_val = 0;
     int ret = 0;
-    char *left_name = NULL,
-         *right_name = NULL;
+    char *left_name = NULL, *left_grp = NULL,
+         *right_name = NULL, *right_grp = NULL;
     
-    if(convertNames(leftval, rightval, &left_name, &right_name) < 0)
+    if(convertNames(leftval, rightval, &left_name, &right_name, &left_grp, &right_grp) < 0)
     {
         return(-1);
     }
     
-    if((ret = getFloat(vars_anker, NULL, left_name, &left_val)) == GRP_NOT_DEFINED ||
+    if((ret = getFloat(vars_anker, left_grp, left_name, &left_val)) == GRP_NOT_DEFINED ||
         ret == VAR_NOT_DEFINED)
     {
         printf("error: [%s]\n", var_errorstrs[ret]);
         return(-2);
     }
-    if((ret = getFloat(vars_anker, NULL, right_name, &right_val)) == GRP_NOT_DEFINED ||
+    if((ret = getFloat(vars_anker, right_grp, right_name, &right_val)) == GRP_NOT_DEFINED ||
         ret == VAR_NOT_DEFINED)
     {
         printf("error: [%s]\n", var_errorstrs[ret]);
@@ -856,21 +933,21 @@ int FFLTEQ(if_parms_t *leftval, if_parms_t *compare, if_parms_t *rightval)
     double left_val = 0,
         right_val = 0;
     int ret = 0;
-    char *left_name = NULL,
-         *right_name = NULL;
+    char *left_name = NULL, *left_grp = NULL,
+         *right_name = NULL, *right_grp = NULL;
     
-    if(convertNames(leftval, rightval, &left_name, &right_name) < 0)
+    if(convertNames(leftval, rightval, &left_name, &right_name, &left_grp, &right_grp) < 0)
     {
         return(-1);
     }
     
-    if((ret = getFloat(vars_anker, NULL, left_name, &left_val)) == GRP_NOT_DEFINED ||
+    if((ret = getFloat(vars_anker, left_grp, left_name, &left_val)) == GRP_NOT_DEFINED ||
         ret == VAR_NOT_DEFINED)
     {
         printf("error: [%s]\n", var_errorstrs[ret]);
         return(-2);
     }
-    if((ret = getFloat(vars_anker, NULL, right_name, &right_val)) == GRP_NOT_DEFINED ||
+    if((ret = getFloat(vars_anker, right_grp, right_name, &right_val)) == GRP_NOT_DEFINED ||
         ret == VAR_NOT_DEFINED)
     {
         printf("error: [%s]\n", var_errorstrs[ret]);
@@ -891,21 +968,21 @@ int FFGT(if_parms_t *leftval, if_parms_t *compare, if_parms_t *rightval)
     double left_val = 0,
         right_val = 0;
     int ret = 0;
-    char *left_name = NULL,
-         *right_name = NULL;
+    char *left_name = NULL, *left_grp = NULL,
+         *right_name = NULL, *right_grp = NULL;
     
-    if(convertNames(leftval, rightval, &left_name, &right_name) < 0)
+    if(convertNames(leftval, rightval, &left_name, &right_name, &left_grp, &right_grp) < 0)
     {
         return(-1);
     }
     
-    if((ret = getFloat(vars_anker, NULL, left_name, &left_val)) == GRP_NOT_DEFINED ||
+    if((ret = getFloat(vars_anker, left_grp, left_name, &left_val)) == GRP_NOT_DEFINED ||
         ret == VAR_NOT_DEFINED)
     {
         printf("error: [%s]\n", var_errorstrs[ret]);
         return(-2);
     }
-    if((ret = getFloat(vars_anker, NULL, right_name, &right_val)) == GRP_NOT_DEFINED ||
+    if((ret = getFloat(vars_anker, right_grp, right_name, &right_val)) == GRP_NOT_DEFINED ||
         ret == VAR_NOT_DEFINED)
     {
         printf("error: [%s]\n", var_errorstrs[ret]);
@@ -926,21 +1003,21 @@ int FFGTEQ(if_parms_t *leftval, if_parms_t *compare, if_parms_t *rightval)
     double left_val = 0,
         right_val = 0;
     int ret = 0;
-    char *left_name = NULL,
-         *right_name = NULL;
+    char *left_name = NULL, *left_grp = NULL,
+         *right_name = NULL, *right_grp = NULL;
     
-    if(convertNames(leftval, rightval, &left_name, &right_name) < 0)
+    if(convertNames(leftval, rightval, &left_name, &right_name, &left_grp, &right_grp) < 0)
     {
         return(-1);
     }
     
-    if((ret = getFloat(vars_anker, NULL, left_name, &left_val)) == GRP_NOT_DEFINED ||
+    if((ret = getFloat(vars_anker, left_grp, left_name, &left_val)) == GRP_NOT_DEFINED ||
         ret == VAR_NOT_DEFINED)
     {
         printf("error: [%s]\n", var_errorstrs[ret]);
         return(-2);
     }
-    if((ret = getFloat(vars_anker, NULL, right_name, &right_val)) == GRP_NOT_DEFINED ||
+    if((ret = getFloat(vars_anker, right_grp, right_name, &right_val)) == GRP_NOT_DEFINED ||
         ret == VAR_NOT_DEFINED)
     {
         printf("error: [%s]\n", var_errorstrs[ret]);
@@ -963,24 +1040,42 @@ int IIEQ(if_parms_t *leftval, if_parms_t *compare, if_parms_t *rightval)
         right_val = 0;
     int ret = 0;
     char *left_name = NULL,
-         *right_name = NULL;
+         *left_grp = NULL,
+         *right_name = NULL,
+         *right_grp = NULL,
+         *grp_delmiter = NULL;
     
-    if(convertNames(leftval, rightval, &left_name, &right_name) < 0)
+    if(convertNames(leftval, rightval, &left_name, &right_name, &left_grp, &right_grp) < 0)
     {
         return(-1);
     }
-    
-    if((ret = getInteger(vars_anker, NULL, left_name, &left_val)) == GRP_NOT_DEFINED ||
-        ret == VAR_NOT_DEFINED)
+
+    if(leftval->type == IFINT)
     {
-        printf("error: [%s]\n", var_errorstrs[ret]);
-        return(-2);
+        left_val = wcstol(leftval->val, NULL, 10);
     }
-    if((ret = getInteger(vars_anker, NULL, right_name, &right_val)) == GRP_NOT_DEFINED ||
-        ret == VAR_NOT_DEFINED)
+    else
     {
-        printf("error: [%s]\n", var_errorstrs[ret]);
-        return(-2);
+        if((ret = getInteger(vars_anker, left_grp, left_name, &left_val)) == GRP_NOT_DEFINED ||
+            ret == VAR_NOT_DEFINED)
+        {
+            printf("error: [%s]\n", var_errorstrs[ret]);
+            return(-2);
+        }
+    }
+
+    if(rightval->type == IFINT)
+    {
+        right_val = wcstol(rightval->val, NULL, 10);
+    }
+    else
+    {
+        if((ret = getInteger(vars_anker, right_grp, right_name, &right_val)) == GRP_NOT_DEFINED ||
+            ret == VAR_NOT_DEFINED)
+        {
+            printf("error: [%s]\n", var_errorstrs[ret]);
+            return(-2);
+        }
     }
 
     if(left_val == right_val)
@@ -994,6 +1089,9 @@ int IIEQ(if_parms_t *leftval, if_parms_t *compare, if_parms_t *rightval)
 //Integer Integer Unequals
 int IIUE(if_parms_t *leftval, if_parms_t *compare, if_parms_t *rightval)
 {
+    int ret = IIEQ(leftval, compare, rightval);
+    if(ret == 1)
+        return(0);
     return(1);
 }
 //Integer Integer Less then
@@ -1002,27 +1100,43 @@ int IILT(if_parms_t *leftval, if_parms_t *compare, if_parms_t *rightval)
     int left_val = 0,
         right_val = 0;
     int ret = 0;
-    char *left_name = NULL,
-         *right_name = NULL;
+    char *left_name = NULL, *left_grp = NULL,
+         *right_name = NULL, *right_grp = NULL;
     
-    if(convertNames(leftval, rightval, &left_name, &right_name) < 0)
+    if(convertNames(leftval, rightval, &left_name, &right_name, &left_grp, &right_grp) < 0)
     {
         return(-1);
     }
-    
-    if((ret = getInteger(vars_anker, NULL, left_name, &left_val)) == GRP_NOT_DEFINED ||
-        ret == VAR_NOT_DEFINED)
+   
+    if(leftval->type == IFINT)
     {
-        printf("error: [%s]\n", var_errorstrs[ret]);
-        return(-2);
+        left_val = wcstol(leftval->val, NULL, 10);
     }
-    if((ret = getInteger(vars_anker, NULL, right_name, &right_val)) == GRP_NOT_DEFINED ||
-        ret == VAR_NOT_DEFINED)
+    else
     {
-        printf("error: [%s]\n", var_errorstrs[ret]);
-        return(-2);
+        if((ret = getInteger(vars_anker, left_grp, left_name, &left_val)) == GRP_NOT_DEFINED ||
+            ret == VAR_NOT_DEFINED)
+        {
+            printf("error: [%s]\n", var_errorstrs[ret]);
+            return(-2);
+        }
     }
 
+    if(rightval->type == IFINT)
+    {
+        right_val = wcstol(rightval->val, NULL, 10);
+    }
+    else
+    {
+        if((ret = getInteger(vars_anker, right_grp, right_name, &right_val)) == GRP_NOT_DEFINED ||
+            ret == VAR_NOT_DEFINED)
+        {
+            printf("error: [%s]\n", var_errorstrs[ret]);
+            return(-2);
+        }
+    }
+
+ 
     if(left_val < right_val)
     {
         freeNames(&left_name, &right_name);
@@ -1037,25 +1151,40 @@ int IILTEQ(if_parms_t *leftval, if_parms_t *compare, if_parms_t *rightval)
     int left_val = 0,
         right_val = 0;
     int ret = 0;
-    char *left_name = NULL,
-         *right_name = NULL;
+    char *left_name = NULL, *left_grp = NULL,
+         *right_name = NULL, *right_grp = NULL;
     
-    if(convertNames(leftval, rightval, &left_name, &right_name) < 0)
+    if(convertNames(leftval, rightval, &left_name, &right_name, &left_grp, &right_grp) < 0)
     {
         return(-1);
     }
     
-    if((ret = getInteger(vars_anker, NULL, left_name, &left_val)) == GRP_NOT_DEFINED ||
-        ret == VAR_NOT_DEFINED)
+    if(leftval->type == IFINT)
     {
-        printf("error: [%s]\n", var_errorstrs[ret]);
-        return(-2);
+        left_val = wcstol(leftval->val, NULL, 10);
     }
-    if((ret = getInteger(vars_anker, NULL, right_name, &right_val)) == GRP_NOT_DEFINED ||
-        ret == VAR_NOT_DEFINED)
+    else
     {
-        printf("error: [%s]\n", var_errorstrs[ret]);
-        return(-2);
+        if((ret = getInteger(vars_anker, left_grp, left_name, &left_val)) == GRP_NOT_DEFINED ||
+            ret == VAR_NOT_DEFINED)
+        {
+            printf("error: [%s]\n", var_errorstrs[ret]);
+            return(-2);
+        }
+    }
+
+    if(rightval->type == IFINT)
+    {
+        right_val = wcstol(rightval->val, NULL, 10);
+    }
+    else
+    {
+        if((ret = getInteger(vars_anker, right_grp, right_name, &right_val)) == GRP_NOT_DEFINED ||
+            ret == VAR_NOT_DEFINED)
+        {
+            printf("error: [%s]\n", var_errorstrs[ret]);
+            return(-2);
+        }
     }
 
     if(left_val <= right_val)
@@ -1072,25 +1201,40 @@ int IIGT(if_parms_t *leftval, if_parms_t *compare, if_parms_t *rightval)
     int left_val = 0,
         right_val = 0;
     int ret = 0;
-    char *left_name = NULL,
-         *right_name = NULL;
+    char *left_name = NULL, *left_grp = NULL,
+         *right_name = NULL, *right_grp = NULL;
     
-    if(convertNames(leftval, rightval, &left_name, &right_name) < 0)
+    if(convertNames(leftval, rightval, &left_name, &right_name, &left_grp, &right_grp) < 0)
     {
         return(-1);
     }
     
-    if((ret = getInteger(vars_anker, NULL, left_name, &left_val)) == GRP_NOT_DEFINED ||
-        ret == VAR_NOT_DEFINED)
+    if(leftval->type == IFINT)
     {
-        printf("error: [%s]\n", var_errorstrs[ret]);
-        return(-2);
+        left_val = wcstol(leftval->val, NULL, 10);
     }
-    if((ret = getInteger(vars_anker, NULL, right_name, &right_val)) == GRP_NOT_DEFINED ||
-        ret == VAR_NOT_DEFINED)
+    else
     {
-        printf("error: [%s]\n", var_errorstrs[ret]);
-        return(-2);
+        if((ret = getInteger(vars_anker, left_grp, left_name, &left_val)) == GRP_NOT_DEFINED ||
+            ret == VAR_NOT_DEFINED)
+        {
+            printf("error: [%s]\n", var_errorstrs[ret]);
+            return(-2);
+        }
+    }
+
+    if(rightval->type == IFINT)
+    {
+        right_val = wcstol(rightval->val, NULL, 10);
+    }
+    else
+    {
+        if((ret = getInteger(vars_anker, right_grp, right_name, &right_val)) == GRP_NOT_DEFINED ||
+            ret == VAR_NOT_DEFINED)
+        {
+            printf("error: [%s]\n", var_errorstrs[ret]);
+            return(-2);
+        }
     }
 
     if(left_val > right_val)
@@ -1107,27 +1251,41 @@ int IIGTEQ(if_parms_t *leftval, if_parms_t *compare, if_parms_t *rightval)
     int left_val = 0,
         right_val = 0;
     int ret = 0;
-    char *left_name = NULL,
-         *right_name = NULL;
+    char *left_name = NULL, *left_grp = NULL,
+         *right_name = NULL, *right_grp = NULL;
     
-    if(convertNames(leftval, rightval, &left_name, &right_name) < 0)
+    if(convertNames(leftval, rightval, &left_name, &right_name, &left_grp, &right_grp) < 0)
     {
         return(-1);
     }
     
-    if((ret = getInteger(vars_anker, NULL, left_name, &left_val)) == GRP_NOT_DEFINED ||
-        ret == VAR_NOT_DEFINED)
+    if(leftval->type == IFINT)
     {
-        printf("error: [%s]\n", var_errorstrs[ret]);
-        return(-2);
+        left_val = wcstol(leftval->val, NULL, 10);
     }
-    if((ret = getInteger(vars_anker, NULL, right_name, &right_val)) == GRP_NOT_DEFINED ||
-        ret == VAR_NOT_DEFINED)
+    else
     {
-        printf("error: [%s]\n", var_errorstrs[ret]);
-        return(-2);
+        if((ret = getInteger(vars_anker, left_grp, left_name, &left_val)) == GRP_NOT_DEFINED ||
+            ret == VAR_NOT_DEFINED)
+        {
+            printf("error: [%s]\n", var_errorstrs[ret]);
+            return(-2);
+        }
     }
 
+    if(rightval->type == IFINT)
+    {
+        right_val = wcstol(rightval->val, NULL, 10);
+    }
+    else
+    {
+        if((ret = getInteger(vars_anker, right_grp, right_name, &right_val)) == GRP_NOT_DEFINED ||
+            ret == VAR_NOT_DEFINED)
+        {
+            printf("error: [%s]\n", var_errorstrs[ret]);
+            return(-2);
+        }
+    }
     if(left_val >= right_val)
     {
         freeNames(&left_name, &right_name);

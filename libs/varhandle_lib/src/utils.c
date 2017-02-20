@@ -309,18 +309,18 @@ int getVarType(vars_t *anker, char *group, char *name)
     {
         if(!(grp = isDefined(anker, group)))
         {
-            return(-1);
+            return(GRP_NOT_DEFINED*-1);
         }
         if(!(target = isDefined(grp->next_lvl, name)))
         {
-            return(-2);
+            return(VAR_NOT_DEFINED*-1);
         }
     }
     else
     {
         if(!(target = isDefined(anker, name)))
         {
-            return(-2);
+            return(VAR_NOT_DEFINED*-1);
         }
     }
 

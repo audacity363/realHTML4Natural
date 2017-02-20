@@ -54,6 +54,7 @@ int getInteger(vars_t *anker, char *group, char *name, int *val)
     }
 
     *val = *(int*)(target->data);
+    return(0);
 
 }
 
@@ -82,6 +83,7 @@ int editInteger(vars_t *anker, char *group, char *name, int val)
     }
 
     *(int*)(target->data) = val;
+    return(0);
 
 }
 
