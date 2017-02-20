@@ -84,6 +84,14 @@ struct if_parms_s
 {
     wchar_t *val;
     int val_length;
+
+    //data is a pointer to the real data in the variablen struct 
+    //or the parsed value
+    void *data;
+    //would be sizeof(int||double||bool||string length)
+    int sizeof_data;
+
+
     int type;
     int varlib_type;
     int hasindex;

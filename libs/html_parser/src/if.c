@@ -57,6 +57,9 @@ token_t *jumpOverCMDName(token_t *anker)
     return(hptr);
 }
 
+//when it is not a variable parse the value and write it into data. When it is
+//a variable get the pointer to the value in the variablen list. When it is a
+//array: calculate the offset and save this pointer
 int addParm(if_parms_t *parms, int val_len, wchar_t *val, int str, int compare, index_parms index)
 {
     int type = -1;
