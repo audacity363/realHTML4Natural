@@ -1,6 +1,9 @@
 #define true 1
 #define false 0
 
+#define TRUE_STR "true"
+#define FALSE_STR "false"
+
 #define VAR_ALREADY_DEFINED 1
 #define MEMORY_ALLOC_ERROR 2
 #define VAR_NOT_DEFINED 3

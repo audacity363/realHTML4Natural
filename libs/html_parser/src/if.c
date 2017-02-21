@@ -57,11 +57,195 @@ token_t *jumpOverCMDName(token_t *anker)
     return(hptr);
 }
 
+int getCompareType(int length, wchar_t *cmp_str)
+{
+        if(wcsncmp(cmp_str, IFLESSTHEN_STR, length) == 0)
+            return(IFLESSTHEN);
+        if(wcsncmp(cmp_str, IFLESSTHENEQUAL_STR, length) == 0)
+            return(IFLESSTHENEQUAL);
+        if(wcsncmp(cmp_str, IFEQUALS_STR, length) == 0)
+            return(IFEQUALS);
+        if(wcsncmp(cmp_str, IFUNEQUALS_STR, length) == 0)
+            return(IFUNEQUALS);
+        if(wcsncmp(cmp_str, IFGREATERTHEN_STR, length) == 0)
+            return(IFGREATERTHEN);
+        if(wcsncmp(cmp_str, IFGREATERTHENEQUALS_STR, length) == 0)
+            return(IFGREATERTHENEQUALS);
+        if(wcsncmp(cmp_str, IFIN_STR, length) == 0)
+            return(IFIN);
+        return(-1);
+}
+
+int computePtrOffset(vars_t *target, index_parms index, int size)
+{
+    //TODO: Add Error handling for the index
+    int sizeofz = 0, sizeofy = 0, offset = 0;
+
+    if(index.index_type == 3)
+    {
+        sizeofz = size*(target->z_length);
+        sizeofy = sizeofz*(target->y_length);
+        offset = (index.index[0]*sizeofy)+
+            (index.index[1]*sizeofz)+(size*index.index[2]);
+    }
+    else if(index.index_type == 2)
+    {
+        offset = (target->y_length*size);
+        offset = offset*(index.index[0])+(size*index.index[1]);
+    }
+    else if(index.index_type == 1)
+    {
+
+        offset = size*(index.index[0]);
+    }
+
+    printf("offset: [%d]\n", offset);
+    return(offset);
+
+}
+
+int getSizeofVariable(vars_t *target)
+{
+    if(target->type == INTEGER || target->type == ONEDINTEGER || 
+        target->type == TWODINTEGER || target->type == THREEDINTEGER)
+        return(sizeof(int));
+
+    if(target->type == BOOL || target->type == ONEDBOOL || 
+        target->type == TWODBOOL|| target->type == THREEDBOOL)
+        return(sizeof(bool));
+
+    if(target->type == FLOAT || target->type == ONEDFLOAT || 
+        target->type == TWODFLOAT || target->type == THREEDFLOAT)
+        return(sizeof(double));
+
+    if(target->type == STRING || target->type == ONEDSTRING || 
+        target->type == TWODSTRING || target->type == THREEDSTRING)
+        return(target->length*sizeof(wchar_t));
+
+    return(-1);
+}
+
 //when it is not a variable parse the value and write it into data. When it is
 //a variable get the pointer to the value in the variablen list. When it is a
 //array: calculate the offset and save this pointer
 int addParm(if_parms_t *parms, int val_len, wchar_t *val, int str, int compare, index_parms index)
 {
+    if_parms_t *new = NULL, *hptr = parms;
+    char *c_val = NULL, *grp_delmiter = NULL,
+         *var_name = NULL, *grp_name = NULL;
+
+    vars_t *target = NULL;
+
+    int offset = 0;
+
+    if((new = malloc(sizeof(if_parms_t))) == NULL)
+    {
+        fprintf(stderr, "Malloc Error in new if parm\n");
+        return(-1);
+    }
+
+    new->type = -1;
+
+    if(str)
+    {
+        if((new->data = malloc((wcslen(val)+1)*sizeof(wchar_t))) == NULL)
+        {
+            fprintf(stderr, "Malloc Error in saving if string value\n");
+            return(-2);
+        }
+        wcscpy(new->data, val);
+        new->sizeof_data = (wcslen(val)+1)*sizeof(wchar_t);
+    }
+    else if(compare)
+    {
+        if((new->type = getCompareType(val_len, val)) == -1)
+        {
+            fprintf(stderr, "Unkown compare char\n");
+            return(-2);
+        }
+    }
+    else
+    {
+        //Convert the unicode string into a ascii string
+        if((c_val = malloc(wcslen(val)+1)) == NULL)
+        {
+            fprintf(stderr, "Malloc Error in if name conversion\n");
+            return(-3);
+        }
+        if(wcstombs(c_val, val, wcslen(val)+1) == -1)
+        {
+            fprintf(stderr, "Error: Unicode Char in variablen name\n");
+            return(-4);
+        }
+
+        //Check if it is a boolean
+        if(strcmp(c_val, TRUE_STR) == 0)
+        {
+            if((new->data = malloc(sizeof(bool))) == NULL)
+            {
+                fprintf(stderr, "Malloc Error while bool parsing in if\n");
+                return(-5);
+            }
+            *((bool*)new->data) = true;
+            new->sizeof_data = sizeof(bool);
+            goto save;
+        }
+        else if(strcmp(c_val, FALSE_STR) == 0)
+        {
+            if((new->data = malloc(sizeof(bool))) == NULL)
+            {
+                fprintf(stderr, "Malloc Error while bool parsing in if\n");
+                return(-5);
+            }
+            *((bool*)new->data) = false;
+            new->sizeof_data = sizeof(bool);
+            goto save;
+        }
+            
+        //Check if a group is specified
+        if((grp_delmiter = strchr(c_val, '.')) != NULL)
+        {
+            grp_delmiter[0] = '\0';
+            grp_name = c_val;
+            var_name = ++grp_delmiter;
+        }
+        else
+        {
+            var_name = c_val;
+        }
+
+        if((target = isDefinedGrp(vars_anker, grp_name, var_name)) == NULL)
+        {
+            //It is not a variable. It must be an integer, boolean, float or 
+            //the variable is just not defined
+            //TODO: Add integer parsing
+            if((new->data = malloc(sizeof(int))) == NULL)
+            {
+                fprintf(stderr, "Malloc Errir while int parsing in if\n");
+                return(-5);
+            }
+            *((int*)new->data) = strtol(c_val, NULL, 10);
+            new->sizeof_data = sizeof(int);
+        }
+        else
+        {
+            new->sizeof_data = getSizeofVariable(target);
+            offset = computePtrOffset(target, index, new->sizeof_data);
+            new->data = target->data+offset;
+        }
+
+    }
+
+save:
+    while(hptr->next)
+        hptr = hptr->next;
+
+    new->next = NULL; 
+    new->prev = hptr;
+
+    hptr->next = new;
+    
+#if 0
     int type = -1;
     if_parms_t *new,
                *hptr = parms;
@@ -100,6 +284,7 @@ int addParm(if_parms_t *parms, int val_len, wchar_t *val, int str, int compare, 
     new->prev = hptr;
 
     hptr->next = new;
+#endif
 
     return(0);
 
@@ -232,7 +417,7 @@ int end_if_handling(token_t *anker, status_t *stat)
     token_t head = {' ', -1, NULL, NULL},
             *parm_start,
             *last_parm;
-    if_parms_t parms = {NULL, -1, -1, -1, -1, -1, -1, -1, NULL, NULL};
+    if_parms_t parms = {NULL, -1, NULL, -1, -1, -1, -1, -1, -1, -1, NULL, NULL};
 
     if(stat->in_if == 0)
     {
@@ -259,7 +444,7 @@ int end_if_handling(token_t *anker, status_t *stat)
         last_parm = findNextParm(&parms, last_parm);
     }
 
-    printParms(&parms);
+    //printParms(&parms);
 
     stat->just_save = false;
     stat->lookfor = 0;
