@@ -5,6 +5,7 @@
 
 #include "vars.h"
 #include "parser.h"
+#include "parser_errno.h"
 #include "for.h"
 #include "rh4n_utils.h"
 
@@ -29,12 +30,12 @@ int parseForCMD(token_t *start, for_status *stat)
 
     if(hptr == NULL)
     {
-        fprintf(stderr, "Syntax error in for command\n");
+        parser_errno = FOR_SYNTAX_ERROR;
         return(-1);
     }
     if(hptr->next == NULL)
     {
-        fprintf(stderr, "Syntax error in for command\n");
+        parser_errno = FOR_SYNTAX_ERROR;
         return(-1);
     }
 
@@ -53,13 +54,13 @@ int parseForCMD(token_t *start, for_status *stat)
 
     if((c_cmd = malloc(wcslen(cmd)+1)) == NULL)
     {
-        fprintf(stderr, "malloc error in for_cmd_parsing\n");
+        parser_errno = MEM_ALLOC_ERROR;
         return(-2);
     }
 
     if(wcstombs(c_cmd, cmd, wcslen(cmd)+1) != wcslen(cmd))
     {
-        fprintf(stderr, "Unicode Char in for command\n");
+        parser_errno = UNICODE_IN_VARNAME;
         free(c_cmd);
         return(-3);
     }
@@ -109,7 +110,7 @@ int parse_rangeCMD(char *cmd, for_status *stat)
     printf("start: [%s]\n", cmd);
     if(cmd[0] != '(')
     {
-        fprintf(stderr, "Syntax error in for command. Missing (\n");
+        parser_errno = MISSING_OPEN_BRACKET;
         return(-1);
     }
 
@@ -122,7 +123,7 @@ int parse_rangeCMD(char *cmd, for_status *stat)
             start = (int)strtol(tmp_buff, &endptr, 10);
             if(tmp_buff == endptr)
             {
-                fprintf(stderr, "Invalid value in range command\n");
+                parser_errno = RANGE_INVALID_VALUE;
                 return(-2);
             }
             x=0;
@@ -134,7 +135,7 @@ int parse_rangeCMD(char *cmd, for_status *stat)
     end = (int)strtol(tmp_buff, &endptr, 10);
     if(tmp_buff == endptr)
     {
-        fprintf(stderr, "Invalid value in range command\n");
+        parser_errno = RANGE_INVALID_VALUE;
         return(-2);
     }
 
@@ -156,38 +157,38 @@ int parse_ForVariable(char *cmd, for_status *stat)
         //Just one variablen
         if((stat->array.name = malloc(sizeof(char*))) == NULL)
         {
-            fprintf(stderr, "Memory alloc error in for varname parsing (name saving)\n");
+            parser_errno = MEM_ALLOC_ERROR;
             return(-1);
         }
         if((stat->array.grp = malloc(sizeof(char*))) == NULL)
         {
-            fprintf(stderr, "Memory alloc error in for varname parsing (grp saving)\n");
+            parser_errno = MEM_ALLOC_ERROR;
             return(-1);
         }
         stat->array.grp[stat->array.var_count] = NULL;
         if((stat->array.array_length = malloc(sizeof(int*))) == NULL)
         {
-            fprintf(stderr, "Memory alloc error in for varname parsing (length saving)\n");
+            parser_errno = MEM_ALLOC_ERROR;
             return(-1);
         }
         if((stat->array.type = malloc(sizeof(int))) == NULL)
         {
-            fprintf(stderr, "Memory alloc error in for varname parsing (type saving)\n");
+            parser_errno = MEM_ALLOC_ERROR;
             return(-1);
         }
         if((stat->array.index_type = malloc(sizeof(int))) == NULL)
         {
-            fprintf(stderr, "Memory alloc error in for varname parsing (index type)\n");
+            parser_errno = MEM_ALLOC_ERROR;
             return(-1);
         }
         if((stat->array.x_index = malloc(sizeof(int))) == NULL)
         {
-            fprintf(stderr, "Memory alloc error in for varname parsing (x index\n");
+            parser_errno = MEM_ALLOC_ERROR;
             return(-1);
         }
         if((stat->array.y_index = malloc(sizeof(int))) == NULL)
         {
-            fprintf(stderr, "Memory alloc error in for varname parsing (y index)\n");
+            parser_errno = MEM_ALLOC_ERROR;
             return(-1);
         }
 
@@ -195,7 +196,7 @@ int parse_ForVariable(char *cmd, for_status *stat)
         RemoveSpaces(cmd);
         if((stat->array.name[0] = malloc(strlen(cmd)+1)) == NULL)
         {
-            fprintf(stderr, "Memory alloc error in for varname parsing\n");
+            parser_errno = MEM_ALLOC_ERROR;
             return(-1);
         }
         strcpy(stat->array.name[0], cmd);
@@ -210,7 +211,7 @@ int parse_ForVariable(char *cmd, for_status *stat)
 
     if((clamps = strchr(cmd, ')')) == NULL)
     {
-        fprintf(stderr, "Syntax error: Missing ')' in multiple variablen specification\n");
+        parser_errno = MISSING_CLOSE_BRACKET;
         return(-1);
     }
 
@@ -223,38 +224,38 @@ int parse_ForVariable(char *cmd, for_status *stat)
         {
             if((stat->array.name = malloc(sizeof(char*))) == NULL)
             {
-                fprintf(stderr, "Memory alloc error in for varname parsing (name saving)\n");
+                parser_errno = MEM_ALLOC_ERROR;
                 return(-1);
             }
             if((stat->array.grp = malloc(sizeof(char*))) == NULL)
             {
-                fprintf(stderr, "Memory alloc error in for varname parsing (grp saving)\n");
+                parser_errno = MEM_ALLOC_ERROR;
                 return(-1);
             }
             stat->array.grp[stat->array.var_count] = NULL;
             if((stat->array.array_length = malloc(sizeof(int*))) == NULL)
             {
-                fprintf(stderr, "Memory alloc error in for varname parsing (length saving)\n");
+                parser_errno = MEM_ALLOC_ERROR;
                 return(-1);
             }
             if((stat->array.type = malloc(sizeof(int))) == NULL)
             {
-                fprintf(stderr, "Memory alloc error in for varname parsing (type saving)\n");
+                parser_errno = MEM_ALLOC_ERROR;
                 return(-1);
             }
             if((stat->array.index_type = malloc(sizeof(int))) == NULL)
             {
-                fprintf(stderr, "Memory alloc error in for varname parsing (index type)\n");
+                parser_errno = MEM_ALLOC_ERROR;
                 return(-1);
             }
             if((stat->array.x_index = malloc(sizeof(int))) == NULL)
             {
-                fprintf(stderr, "Memory alloc error in for varname parsing (x index\n");
+                parser_errno = MEM_ALLOC_ERROR;
                 return(-1);
             }
             if((stat->array.y_index = malloc(sizeof(int))) == NULL)
             {
-                fprintf(stderr, "Memory alloc error in for varname parsing (y index)\n");
+                parser_errno = MEM_ALLOC_ERROR;
                 return(-1);
             }
             
@@ -264,44 +265,44 @@ int parse_ForVariable(char *cmd, for_status *stat)
             if((stat->array.name = realloc(stat->array.name,
                 sizeof(char*)*(stat->array.var_count+1))) == NULL)
             {
-                fprintf(stderr, "Memory realloc error in for varname parsing (name)\n");
+                parser_errno = MEM_REALLOC_ERROR;
                 return(-1);
             }
             if((stat->array.grp = realloc(stat->array.grp,
                 sizeof(char*)*(stat->array.var_count+1))) == NULL)
             {
-                fprintf(stderr, "Memory realloc error in for varname parsing (name)\n");
+                parser_errno = MEM_REALLOC_ERROR;
                 return(-1);
             }
             stat->array.grp[stat->array.var_count] = NULL;
             if((stat->array.array_length = realloc(stat->array.array_length,
                 sizeof(int*)*(stat->array.var_count+1))) == NULL)
             {
-                fprintf(stderr, "Memory realloc error in for varname parsing (name)\n");
+                parser_errno = MEM_REALLOC_ERROR;
                 return(-1);
             }
             if((stat->array.type= realloc(stat->array.type,
                 sizeof(int)*(stat->array.var_count+1))) == NULL)
             {
-                fprintf(stderr, "Memory realloc error in for varname parsing (name)\n");
+                parser_errno = MEM_REALLOC_ERROR;
                 return(-1);
             }
             if((stat->array.index_type = realloc(stat->array.index_type,
                 sizeof(int)*(stat->array.var_count+1))) == NULL)
             {
-                fprintf(stderr, "Memory realloc error in for varname parsing (index type)\n");
+                parser_errno = MEM_REALLOC_ERROR;
                 return(-1);
             }
             if((stat->array.x_index = realloc(stat->array.x_index,
                 sizeof(int)*(stat->array.var_count+1))) == NULL)
             {
-                fprintf(stderr, "Memory realloc error in for varname parsing (x index)\n");
+                parser_errno = MEM_REALLOC_ERROR;
                 return(-1);
             }
             if((stat->array.y_index = realloc(stat->array.y_index,
                 sizeof(int)*(stat->array.var_count+1))) == NULL)
             {
-                fprintf(stderr, "Memory realloc error in for varname parsing (y index)\n");
+                parser_errno = MEM_REALLOC_ERROR;
                 return(-1);
             }
         }
@@ -310,7 +311,7 @@ int parse_ForVariable(char *cmd, for_status *stat)
         
         if((stat->array.name[stat->array.var_count] = malloc(strlen(comma)+1)) == NULL)
         {
-            fprintf(stderr, "Memory alloc error in for varname parsing\n");
+            parser_errno = MEM_ALLOC_ERROR;
             return(-1);
         }
         strcpy(stat->array.name[stat->array.var_count++], comma);
@@ -339,12 +340,12 @@ int checkIfMultipleVarnames(char *found_names, for_status *stat)
         //Only one variable
         if((stat->varnames = malloc(sizeof(char*))) == NULL)
         {
-            fprintf(stderr, "Memory alloc error in for varname parsing\n");
+            parser_errno = MEM_ALLOC_ERROR;
             return(-1);
         }
         if((stat->varnames[0] = malloc(strlen(found_names)+1)) == NULL)
         {
-            fprintf(stderr, "Memory alloc error in for varname parsing\n");
+            parser_errno = MEM_ALLOC_ERROR;
             return(-2);
         }
 
@@ -362,7 +363,7 @@ int checkIfMultipleVarnames(char *found_names, for_status *stat)
         {
             if((stat->varnames = malloc(sizeof(char*))) == NULL)
             {
-                fprintf(stderr, "Memory alloc error in for varname parsing\n");
+                parser_errno = MEM_ALLOC_ERROR;
                 return(-3);
             }
         }
@@ -370,13 +371,13 @@ int checkIfMultipleVarnames(char *found_names, for_status *stat)
         {
             if((stat->varnames = realloc(stat->varnames, sizeof(char*)*(stat->var_count+1))) == NULL)
             {
-                fprintf(stderr, "Memory alloc error in for varname parsing\n");
+                parser_errno = MEM_REALLOC_ERROR;
                 return(-3);
             }
         }
         if((stat->varnames[stat->var_count] = malloc(strlen(comma)+1)) == NULL)
         {
-            fprintf(stderr, "Memory alloc error in for varname parsing\n");
+            parser_errno = MEM_ALLOC_ERROR;
             return(-3);
         }
 
@@ -406,15 +407,13 @@ int getVariableProperties(for_status *stat, int index)
     stat->array.x_index[index] = x_index;
     stat->array.y_index[index] = y_index;
 
-    
-    
     if((point = strchr(stat->array.name[index], '.')) != NULL)
     {
         //a group was found
         point[0] = '\0';
         if((stat->array.grp[index] = malloc((strlen(stat->array.name[index])+1)*sizeof(char))) == NULL)
         {
-            fprintf(stderr, "Memory alloc Error while saving grp (for head parsing)\n");
+            parser_errno = MEM_ALLOC_ERROR;
             return(-1);
         }
         strcpy(stat->array.grp[index], stat->array.name[index]);
@@ -431,20 +430,20 @@ int getVariableProperties(for_status *stat, int index)
 
     if(isDefinedGrpBool(vars_anker, grp, var) == false)
     {
-        fprintf(stderr, "Variable is not defined\n");
+        parser_errno = NOT_DEFINED_VAR;
         return(-1);
     }
 
     if((stat->array.array_length[index] = malloc(sizeof(int)*3)) == NULL)
     {
-        fprintf(stderr, "Memory alloc error while saving the array length in for head parsing\n");
+        parser_errno = MEM_ALLOC_ERROR;
         return(-2);
     }
 
     if(getArrayLength(vars_anker, grp, var, &stat->array.array_length[index][0],
         &stat->array.array_length[index][1], &stat->array.array_length[index][2]) < 0)
     {
-        fprintf(stderr, "Unkown variable\n");
+        parser_errno = MEM_ALLOC_ERROR;
         return(-3);
     }
     
@@ -469,7 +468,7 @@ int getIndex(char *variable, int *x, int *y, int *z)
     }
     if((index_buff = malloc(strlen(open_bracked)+1)) == NULL)
     {
-        fprintf(stderr, "Error while allocating memory: [%s]", strerror(errno));
+        parser_errno = MEM_ALLOC_ERROR;    
         return(-1);
     }
     strcpy(index_buff, open_bracked);
@@ -479,7 +478,7 @@ int getIndex(char *variable, int *x, int *y, int *z)
 
     if((close_bracked = strchr(index_buff, ']')) == NULL)
     {
-        fprintf(stderr, "Syntax Error: Missing \"]\"");
+        parser_errno = MISSING_CLOSE_INDEX;
         free(index_buff);
         return(-2);
     }
@@ -487,7 +486,7 @@ int getIndex(char *variable, int *x, int *y, int *z)
 
     if(str_isdigit(index_buff) < 0)
     {
-        fprintf(stderr, "Syntax Error: Index is not a number");
+        parser_errno = INT_CONVERSION_ERROR;
         free(index_buff);
         return(-4);
     }
@@ -505,7 +504,7 @@ int getIndex(char *variable, int *x, int *y, int *z)
 
     if(index_buff[0] != '[')
     {
-        fprintf(stderr, "Syntax Error: Unexpected Token: [%s]", index_buff);
+        parser_errno = UNEXPECTED_TOKEN;
         free(index_buff);
         return(-5);
     }
@@ -513,7 +512,7 @@ int getIndex(char *variable, int *x, int *y, int *z)
 
     if((close_bracked = strchr(index_buff, ']')) == NULL)
     {
-        fprintf(stderr, "Syntax Error: Missing \"]\"");
+        parser_errno = MISSING_CLOSE_INDEX;
         free(index_buff);
         return(-6);
     }
@@ -521,7 +520,7 @@ int getIndex(char *variable, int *x, int *y, int *z)
 
     if(str_isdigit(index_buff) < 0)
     {
-        fprintf(stderr, "Syntax Error: Index is not a number");
+        parser_errno = INT_CONVERSION_ERROR;
         free(index_buff);
         return(-8);
     }

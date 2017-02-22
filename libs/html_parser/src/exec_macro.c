@@ -5,6 +5,7 @@
 
 #include "vars.h"
 #include "parser.h"
+#include "parser_errno.h"
 #include "command_parsing.h"
 #include "macro.h"
 
@@ -26,7 +27,7 @@ int exec_macro(token_t *anker, macro_definition_t *macro)
     if(parms.parm_number > macro->parms->parm_number)
     {
         //To much arguments
-        fprintf(stderr, "to much prameters\n");
+        parser_errno = MACRO_TOO_MANY_ARGS;
         return(EXIT);
     }
     if(parms.parm_number < macro->parms->parm_number)
@@ -37,7 +38,7 @@ int exec_macro(token_t *anker, macro_definition_t *macro)
             if(macro->parms->type[i] == -1)
             {
                 //Found an argument with no default value
-                fprintf(stderr, "Parameters does not match\n");
+                parser_errno = MACRO_ARGS_MISSMATCH;
                 return(EXIT);
             }
         }
@@ -51,7 +52,8 @@ int exec_macro(token_t *anker, macro_definition_t *macro)
 
     if((ret = addVariables(macro->parms, &parms, macro_vars)) != 0)
     {
-        fprintf(stderr, "MAcro ret: [%d\n", ret);
+        varhandle_error = ret;
+        parser_errno = VAR_HANDLE_ERROR;
         return(ret);
     }
 
@@ -110,7 +112,7 @@ int getArguments(token_t *start, macro_parms *parms)
 
     if(memcmp(&start->val, L"(", sizeof(wchar_t)) != 0)
     {
-        fprintf(stderr, "Missing \"(\"\n");
+        parser_errno = MISSING_OPEN_BRACKET;
         return(-1);
     }
 
@@ -301,7 +303,8 @@ int addVariables(macro_parms *defaults, macro_parms *given, vars_t *vars)
             if((ret = copyVariableNewName(vars_anker, vars, NULL,
                         (char*)given->val[i], NULL, defaults->name[i])) != 0)
            {
-               fprintf(stderr, "Varerror: [%d]\n", ret);
+               varhandle_error = ret;
+               parser_errno = VAR_HANDLE_ERROR;
                return(ret);
            }
         }

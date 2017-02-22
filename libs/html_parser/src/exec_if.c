@@ -5,6 +5,7 @@
 
 #include "vars.h"
 #include "parser.h"
+#include "parser_errno.h"
 #include "exec_if.h"
 #include "error_vars.h"
 

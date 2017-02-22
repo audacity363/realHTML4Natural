@@ -5,6 +5,7 @@
 
 #include "vars.h"
 #include "parser.h"
+#include "parser_errno.h"
 #include "for.h"
 #include "for_startvalues.h"
 
@@ -83,13 +84,13 @@ char *getForVariable(token_t *cmd, token_t **end_token)
 
     if((c_varname = malloc(wcslen(varname)+1)) == NULL)
     {
-        fprintf(stderr, "for_handling: can not alloc malloc for for variable\n");
+        parser_errno = MEM_ALLOC_ERROR;
         return(NULL);
     }
 
     if(wcstombs(c_varname, varname, wcslen(varname)+1) != wcslen(varname))
     {
-        fprintf(stderr, "Unicode Char in variable name\n");
+        parser_errno = UNICODE_IN_VARNAME;
         free(c_varname);
         return(NULL);
     }
@@ -155,7 +156,7 @@ int end_for_handling(token_t *anker, status_t *stat)
 
     if(cmd_start->next == NULL)
     {
-        fprintf(stderr, "Error in for head (Just found one variable. Missing a space?)\n");
+        parser_errno = FOR_TOO_FEW_ARGS;
         freeLineBuff(stat);
         cleanUpTokenList(&head);
         free(varname);
@@ -186,7 +187,7 @@ status.array.array_length[i][1],status.array.array_length[i][2]);
     //To get commands behind the for cmd to work
     if((for_body = malloc(sizeof(wchar_t*)*stat->sizeof_sav_buff)) == NULL)
     {
-        fprintf(stderr, "Can not allocate Memory for the for body\n");
+        parser_errno = MEM_ALLOC_ERROR;
         return(-3);
     }
 
@@ -218,7 +219,6 @@ status.array.array_length[i][1],status.array.array_length[i][2]);
         {
             if(parseLine(for_body[i], &for_parser_stat) == EXIT)
             {
-                fprintf(stderr, "EXIT\n");
                 return(EXIT);
             }
         }
@@ -287,7 +287,7 @@ int calculateForEnd(for_status stat, int *for_end)
     {
         if(stat.var_count != stat.array.var_count)
         {
-            fprintf(stderr, "var count from the temp and specified variablen are not equals\n");
+            parser_errno = FOR_ARGS_MISSMATCH;
             return(-3);
         }
 

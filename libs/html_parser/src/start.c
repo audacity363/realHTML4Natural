@@ -7,12 +7,17 @@
 
 #include "vars.h"
 #include "parser.h"
+#include "parser_errno.h"
 #include "token_handling.h"
 #include "macro.h"
+
+#include "error_str.h"
 
 vars_t *vars_anker;
 macro_definition_t *macro_defs;
 FILE *f_output;
+int parser_errno = 0;
+int varhandle_error = 0;
 
 int start(vars_t *variablen, char *template, char *output)
 {
@@ -49,6 +54,12 @@ int start(vars_t *variablen, char *template, char *output)
     }
 
     printf("Ret: [%d]\n", ret);
+
+    if(parser_errno != 0)
+    {
+        printf("Error number:  [%02d]\n", parser_errno);
+        printf("Error message: [%s]\n", parser_error_strs[parser_errno]);
+    }
 
 #ifdef DEBUG
     listAllMacros(macro_defs);

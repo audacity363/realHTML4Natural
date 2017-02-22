@@ -133,3 +133,4 @@ extern FILE *f_output;
 
 void freeLineBuff(status_t *stat);
 int parseLine(wchar_t *line, status_t *status);
+

@@ -5,6 +5,7 @@
 
 #include "vars.h"
 #include "parser.h"
+#include "parser_errno.h"
 #include "token_handling.h"
 #include "command_parsing.h"
 #include "if.h"
@@ -57,6 +58,32 @@ token_t *jumpOverCMDName(token_t *anker)
     return(hptr);
 }
 
+bool checkIndexRange(vars_t *target, index_parms index)
+{
+    switch(index.index_type)
+    {
+        case 3:
+            if(target->z_length < index.index[2])
+            {
+                parser_errno = INDEX_Z_OUT_OF_RANGE;
+                return(false);
+            }
+        case 2:
+            if(target->y_length < index.index[1])
+            {
+                parser_errno = INDEX_Y_OUT_OF_RANGE;
+                return(false);
+            }
+        case 1:
+            if(target->x_length < index.index[0])
+            {
+                parser_errno = INDEX_X_OUT_OF_RANGE;
+                return(false);
+            }
+    }
+    return(true);
+}
+
 int getCompareType(int length, wchar_t *cmp_str)
 {
         if(wcsncmp(cmp_str, IFLESSTHEN_STR, length) == 0)
@@ -81,6 +108,11 @@ int computePtrOffset(vars_t *target, index_parms index, int size)
     //TODO: Add Error handling for the index
     int sizeofz = 0, sizeofy = 0, offset = 0;
 
+    if(checkIndexRange(target, index) == false)
+    {
+        return(-1);
+    }
+
     if(index.index_type == 3)
     {
         sizeofz = size*(target->z_length);
@@ -99,7 +131,7 @@ int computePtrOffset(vars_t *target, index_parms index, int size)
         offset = size*(index.index[0]);
     }
 
-    printf("offset: [%d]\n", offset);
+    //printf("offset: [%d]\n", offset);
     return(offset);
 
 }
@@ -140,7 +172,7 @@ int addParm(if_parms_t *parms, int val_len, wchar_t *val, int str, int compare, 
 
     if((new = malloc(sizeof(if_parms_t))) == NULL)
     {
-        fprintf(stderr, "Malloc Error in new if parm\n");
+        parser_errno = MEM_ALLOC_ERROR;
         return(-1);
     }
 
@@ -150,7 +182,7 @@ int addParm(if_parms_t *parms, int val_len, wchar_t *val, int str, int compare, 
     {
         if((new->data = malloc((wcslen(val)+1)*sizeof(wchar_t))) == NULL)
         {
-            fprintf(stderr, "Malloc Error in saving if string value\n");
+            parser_errno = MEM_ALLOC_ERROR;
             return(-2);
         }
         wcscpy(new->data, val);
@@ -160,7 +192,7 @@ int addParm(if_parms_t *parms, int val_len, wchar_t *val, int str, int compare, 
     {
         if((new->type = getCompareType(val_len, val)) == -1)
         {
-            fprintf(stderr, "Unkown compare char\n");
+            parser_errno = UNSUPPORTED_COMPARE;
             return(-2);
         }
     }
@@ -169,12 +201,12 @@ int addParm(if_parms_t *parms, int val_len, wchar_t *val, int str, int compare, 
         //Convert the unicode string into a ascii string
         if((c_val = malloc(wcslen(val)+1)) == NULL)
         {
-            fprintf(stderr, "Malloc Error in if name conversion\n");
+            parser_errno = MEM_ALLOC_ERROR;
             return(-3);
         }
         if(wcstombs(c_val, val, wcslen(val)+1) == -1)
         {
-            fprintf(stderr, "Error: Unicode Char in variablen name\n");
+            parser_errno = UNICODE_IN_VARNAME;
             return(-4);
         }
 
@@ -183,7 +215,7 @@ int addParm(if_parms_t *parms, int val_len, wchar_t *val, int str, int compare, 
         {
             if((new->data = malloc(sizeof(bool))) == NULL)
             {
-                fprintf(stderr, "Malloc Error while bool parsing in if\n");
+                parser_errno = MEM_ALLOC_ERROR;
                 return(-5);
             }
             *((bool*)new->data) = true;
@@ -194,7 +226,7 @@ int addParm(if_parms_t *parms, int val_len, wchar_t *val, int str, int compare, 
         {
             if((new->data = malloc(sizeof(bool))) == NULL)
             {
-                fprintf(stderr, "Malloc Error while bool parsing in if\n");
+                parser_errno = MEM_ALLOC_ERROR;
                 return(-5);
             }
             *((bool*)new->data) = false;
@@ -221,15 +253,25 @@ int addParm(if_parms_t *parms, int val_len, wchar_t *val, int str, int compare, 
             //TODO: Add integer parsing
             if((new->data = malloc(sizeof(int))) == NULL)
             {
-                fprintf(stderr, "Malloc Errir while int parsing in if\n");
+                parser_errno = MEM_ALLOC_ERROR;
                 return(-5);
             }
-            *((int*)new->data) = strtol(c_val, NULL, 10);
+            char *end_ptr = NULL, *tmp = NULL;
+            tmp = strchr(c_val, '\0');
+            *((int*)new->data) = strtol(c_val, &end_ptr, 10);
+            if(end_ptr >= c_val && end_ptr < tmp)
+            {
+                parser_errno = INT_CONVERSION_ERROR;
+                return(NULL);
+            }
             new->sizeof_data = sizeof(int);
         }
         else
         {
-            new->sizeof_data = getSizeofVariable(target);
+            if((new->sizeof_data = getSizeofVariable(target)) == -1)
+            {
+                return(-1);
+            }
             offset = computePtrOffset(target, index, new->sizeof_data);
             new->data = target->data+offset;
         }
@@ -245,49 +287,7 @@ save:
 
     hptr->next = new;
     
-#if 0
-    int type = -1;
-    if_parms_t *new,
-               *hptr = parms;
-
-    if(str)
-    {
-        type = IFSTR;
-    }
-    else if(compare)
-    {
-        type = IFCOMPARE;
-    }
-    else if(!str && !compare)
-    {
-        type = IFVARIABLE;
-    }
-
-    while(hptr->next)
-        hptr = hptr->next;
-
-    if((new = malloc(sizeof(if_parms_t))) == NULL)
-        return(-1);
-    new->type = type;
-    new->val_length = val_len;
-    if((new->val = malloc(val_len*sizeof(wchar_t))) == NULL)
-    {
-        free(new);
-        return(-2);
-    }    
-    wcscpy(new->val, val);
-    new->hasindex = index.index_type;
-    new->index1d = index.index[0];
-    new->index2d = index.index[1];
-    new->index3d = index.index[2];
-    new->next = NULL;
-    new->prev = hptr;
-
-    hptr->next = new;
-#endif
-
     return(0);
-
 }
 
 void printParms(if_parms_t *anker)
@@ -320,6 +320,21 @@ void printParms(if_parms_t *anker)
     }
 }
 
+token_t *jumpOverSpaces(token_t *tokens)
+{
+    token_t *hptr = tokens;
+
+    while(hptr)
+    {
+        if(hptr->type != SPACE)
+        {
+            return(hptr);
+        }
+        hptr = hptr->next;
+    }
+    return(NULL);
+}
+
 token_t *findNextParm(if_parms_t *parms, token_t *tokens)
 {
     token_t *hptr = tokens;
@@ -332,7 +347,8 @@ token_t *findNextParm(if_parms_t *parms, token_t *tokens)
     wchar_t *buff = malloc(sizeof(wchar_t));
     wchar_t index_buff[4] = {0, 0, 0, 0};
     index_parms index = {0, {-1, -1, -1}};
-   
+  
+    hptr = jumpOverSpaces(hptr);
 
     while(hptr)
     {
@@ -379,8 +395,18 @@ token_t *findNextParm(if_parms_t *parms, token_t *tokens)
             memcpy(buff+(length-1), &hptr->val, sizeof(wchar_t));
             buff = realloc(buff, ++length*sizeof(wchar_t));
         }
+        else if(hptr->type == BLOCKEND)
+            break;
         hptr = hptr->next;
     }
+
+    //Found just a index declaration
+    if(index.index_type != 0 && length == 1)
+    {
+        parser_errno = FOUND_SINGLE_INDEX;
+        return(NULL);
+    }
+
     if(!hptr || length == 1)
     {
         free(buff);
@@ -392,7 +418,11 @@ token_t *findNextParm(if_parms_t *parms, token_t *tokens)
 
     printf("Index_type :[%d]\n", index.index_type);
 
-    addParm(parms, length, buff, found_str, found_compare, index);
+    if(addParm(parms, length, buff, found_str, found_compare, index) != 0)
+    {
+        free(buff);
+        return(NULL);
+    }
 
     free(buff);
 
@@ -421,7 +451,7 @@ int end_if_handling(token_t *anker, status_t *stat)
 
     if(stat->in_if == 0)
     {
-        fprintf(stderr, "Found end-if without starting for\n");
+        parser_errno = END_IF_WITHOUT_START;
         return(-1);
     }
     if(--stat->in_if != 0)
@@ -442,6 +472,10 @@ int end_if_handling(token_t *anker, status_t *stat)
     while(last_parm)
     {
         last_parm = findNextParm(&parms, last_parm);
+    }
+    if(parser_errno != 0)
+    {
+        return(-2);
     }
 
     //printParms(&parms);
