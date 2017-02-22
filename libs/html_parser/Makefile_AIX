@@ -1,0 +1,36 @@
+OBJ = start.o \
+	  line_parser.o \
+	  command_parsing.o \
+	  exec_if.o \
+	  exec_macro.o \
+	  for.o \
+	  for_cmd.o \
+	  for_startvalues.o \
+	  if.o \
+	  json.o \
+	  macro.o \
+	  token_handling.o \
+	  variablen_parsing.o \
+	  variablen_handling.o
+
+INCLUDE = -I./src/ \
+		  -I../varhandle_lib/src/ \
+		  -I../utils/src/
+
+LIBS = -L../varhandle_lib/ -lvars \
+	   -L../utils/ -lutils
+
+lib: $(OBJ)
+	xlc -g -o ./main $(INCLUDE) test_src/main.c ./bin/*.o $(LIBS)
+	
+$(OBJ):
+	xlc -g -c ./src/$*.c $(INCLUDE) -o ./bin/$*.o
+
+exec:
+	./main
+	cat ./test_src/bla
+
+clean:
+	rm -rf libvars.a
+	rm -rf ./bin/*.o
+	rm -rf ./main

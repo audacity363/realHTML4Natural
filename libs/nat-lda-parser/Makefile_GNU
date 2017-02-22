@@ -1,0 +1,19 @@
+OBJ = unix.o start.o free.o
+
+INCLUDE = -I../varhandle_lib/src/
+
+LIBS = -L../varhandle_lib/ -lvars
+
+lib: $(OBJ)
+	ar -vcru libldaparser.a ./bin/*.o
+	
+%.o: ./src/%.c
+	gcc -g -c $< $(INCLUDE) -o ./bin/$@
+
+clean:
+	rm -rf libldaparser.a
+	rm -rf ./bin/*.o
+
+test:
+	make lib
+	gcc -g ./test_src/main.c $(INCLUDE) -o ./test -L./ -lldaparser -I./src/ $(LIBS)

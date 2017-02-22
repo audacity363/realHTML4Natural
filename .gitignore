@@ -1,7 +1,5 @@
-*.swp
+core
+.*.swp
 *~
-.nfs*
 *.o
 *.a
-*.lst
-core*

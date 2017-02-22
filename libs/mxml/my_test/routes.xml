@@ -1,8 +1,0 @@
-<realHtml>
-    <route path="/notizen">
-        <programm>TEST</programm>
-        <alias></alias>
-        <return></return>
-        <library>TGAP0734</library>
-    </route>
-</realHtml>

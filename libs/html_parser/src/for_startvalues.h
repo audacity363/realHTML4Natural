@@ -1,0 +1,26 @@
+int setStartValue(char *tmp_var, for_status stat, vars_t *anker);
+
+int startval_1di0index(for_status stat, vars_t *anker, int index);
+int startval_2di0index(for_status stat, vars_t *anker, int index);
+int startval_3di0index(for_status stat, vars_t *anker, int index);
+int startval_2di1index(for_status stat, vars_t *anker, int index);
+int startval_3di1index(for_status stat, vars_t *anker, int index);
+int startval_3di2index(for_status stat, vars_t *anker, int index);
+int startval_1df0index(for_status stat, vars_t *anker, int index);
+int startval_2df0index(for_status stat, vars_t *anker, int index);
+int startval_3df0index(for_status stat, vars_t *anker, int index);
+int startval_2df1index(for_status stat, vars_t *anker, int index);
+int startval_3df1index(for_status stat, vars_t *anker, int index);
+int startval_3df2index(for_status stat, vars_t *anker, int index);
+int startval_1db0index(for_status stat, vars_t *anker, int index);
+int startval_2db0index(for_status stat, vars_t *anker, int index);
+int startval_3db0index(for_status stat, vars_t *anker, int index);
+int startval_2db1index(for_status stat, vars_t *anker, int index);
+int startval_3db1index(for_status stat, vars_t *anker, int index);
+int startval_3db2index(for_status stat, vars_t *anker, int index);
+int startval_1ds0index(for_status stat, vars_t *anker, int index);
+int startval_2ds0index(for_status stat, vars_t *anker, int index);
+int startval_3ds0index(for_status stat, vars_t *anker, int index);
+int startval_2ds1index(for_status stat, vars_t *anker, int index);
+int startval_3ds1index(for_status stat, vars_t *anker, int index);
+int startval_3ds2index(for_status stat, vars_t *anker, int index);

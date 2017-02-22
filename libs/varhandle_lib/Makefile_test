@@ -1,2 +1,0 @@
-all:
-	xlc -g test.c -o test -L./ -lvarhandle -I../../hexdump/ -L../../hexdump/ -lhexdump

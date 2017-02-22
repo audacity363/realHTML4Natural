@@ -1,0 +1,86 @@
+##################################################### (c) Software AG 1998
+# File            : $NATDIR/$NATVERS/samples/sysexuex/Makedyn
+# Creation date   : 13:42:18 04.09.02
+# Machine         : aix43_32
+# NATURAL version : 511
+##########################################################################
+#
+#  Generate shared library with user defined callable modules 
+#  to be used by natural.
+#
+#  The generated library will be located at the current directory.
+#  Before using natural with this library you have to specify it
+#  at the NATUSER environment variable!
+#
+##########################################################################
+#
+# Set own userexit files
+#
+USEROBJS = arr3gl.o myc3gl.o mycadd.o mycedit.o natusk01.o vardyn.o
+#
+# Set name of shared library
+#
+USERLIB  = userlib.so
+#
+# Set include directory
+#
+INCDIR   = -I. -I$(NATDIR)/$(NATVERS)/samples/sysexuex
+#
+##########################################################################
+#
+#  DO NOT CHANGE ANYTHING BEHIND THIS LINE !!!
+#
+##########################################################################
+#
+# Set some general variables
+#
+CC	= cc_r
+CFLAGS  =  -q64
+LD	= ld
+LFLAGS1 = -G -bsymbolic -bexpall -bnoentry
+LFLAGS2 = -b64 -ldl -L${SAG}/common/lib -lsaglic -blibpath:/usr/lib/threads:/usr/lib:/lib -lc_r
+#
+NATOBJ  = ncuxinit.o
+#
+##########################################################################
+default_text:
+	@echo '============================================================'
+	@echo ' NATURAL link script                         (c) SOFTWARE AG'
+	@echo ' for user exits in shared libraries'
+	@echo '============================================================'
+	@echo 'This Makefile is currently executing the default rule for'
+	@echo 'giving you some help.'
+	@echo ''
+	@echo 'Use following command line for compiling the user exit'
+	@echo 'sources and linking them into a shared library'
+	@echo ''
+	@echo '  make -f Makedyn lib'
+	@echo ''
+	@echo 'To use the shared lib you must set the NATUSER environment'
+	@echo 'variable before starting NATURAL'
+	@echo ''
+
+##########################################################################
+#
+# Rule to build the shared library
+# (call 'make lib' at command line) 
+#
+lib : $(USERLIB)
+
+$(USERLIB) : $(NATOBJ) $(USEROBJS) 
+	$(LD) $(LFLAGS1) $(NATOBJ) $(USEROBJS) $(LFLAGS2) -o $(USERLIB) 
+	-rm -f $(NATOBJ) $(USEROBJS)
+
+clean : 
+	-rm -f $(USERLIB)
+	-rm -f *.o
+
+#
+# Rule to compile a .c file
+#
+.c.o:
+	@echo "Hello World"
+	$(CC) $(CFLAGS) -c -O $(INCDIR) -DOS_UNIX=1 -DDYN_UEXIT=1 $*.c
+
+#
+

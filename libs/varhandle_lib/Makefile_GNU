@@ -1,0 +1,30 @@
+OBJ = bool.o \
+	  float.o \
+	  integer.o \
+	  string.o \
+	  utils.o \
+	  groups.o
+
+PRINT_OBJ = p_bool.o \
+		    p_float.o \
+			p_string.o \
+			p_integer.o \
+			print.o \
+
+INCLUDE = -I./src/
+
+lib: $(OBJ)
+	ar -vcru libvars.a ./bin/*.o ./bin/print/*.o
+	
+$(OBJ): $(PRINT_OBJ)
+	gcc -g -c ./src/$*.c $(INCLUDE) -o ./bin/$*.o 
+
+$(PRINT_OBJ):
+	gcc -g -c ./src/print/$*.c $(INCLUDE) -o ./bin/print/$*.o
+	
+test:
+	gcc -g ./test_src/main.c $(INCLUDE) -o ./test_src/main -L./ -lvars
+
+clean:
+	rm -rf libvars.a
+	rm -rf ./bin/*.o

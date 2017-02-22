@@ -1,0 +1,16 @@
+0001**DF          0   A20   1REALHTML_LDANAME
+0002**DF          0   A20   1REALHTML_TEMPLATE
+0003**DS          0         1PAGE
+0004**DK          0   A100  2FILENAME
+0005**DR          0        R2FILENAME
+0006**DFR         0   A50   3RETEST1
+0007**DFR         0   A50   3RETEST2
+0008**DK          0   I4    2ITEST
+0009**DS          0         2GRP1
+0010**DK          0   A10   3ATEST
+0011**DK          0   U30   3UTEST
+0012**DS          0         3GRP2
+0013**DK          0   A10   4GRP2TEST1
+0014**DK          0   I4    4GRP2TEST2
+0015**DK          0   I4    2I2TEST
+0016**DK          0   I2    2I3TEST
