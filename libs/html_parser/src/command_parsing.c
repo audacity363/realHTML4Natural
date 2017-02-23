@@ -12,6 +12,8 @@
 #include "json.h"
 #include "macro.h"
 
+#include "parser_errno.h"
+
 int printVars_handling(token_t*, status_t*);
 int typeof_handling(token_t*, status_t*);
 int genJSON_handling(token_t*, status_t*);
@@ -80,66 +82,66 @@ int typeof_handling(token_t *anker, status_t *stat)
 
     if((ret = getVarType(vars_anker, NULL, c_name_buff)) == -1)
     {
-        fprintf(stderr, "Group not found\n");
+        parser_errno = NOT_DEFINED_VAR;
         return(EXIT);
     }
     else if(ret == -2)
     {
-        fprintf(stderr, "Var not found\n");
+        parser_errno = NOT_DEFINED_VAR;
         return(EXIT);
     }
     switch(ret)
     {
         case GROUP:
-            printf("Group Leader\n");
+            fprintf(f_output, "Group Leader\n");
             break;
         case INTEGER:
-            printf("integer\n");
+            fprintf(f_output, "integer\n");
             break;
         case ONEDINTEGER:
-            printf("one dimension integer array\n");
+            fprintf(f_output, "one dimension integer array\n");
             break;
         case TWODINTEGER:
-            printf("two dimension integer array\n");
+            fprintf(f_output, "two dimension integer array\n");
             break;
         case THREEDINTEGER:
-            printf("three dimension integer array\n");
+            fprintf(f_output, "three dimension integer array\n");
             break;
         case STRING:
-            printf("string\n");
+            fprintf(f_output, "string\n");
             break;
         case ONEDSTRING:
-            printf("one dimension string array\n");
+            fprintf(f_output, "one dimension string array\n");
             break;
         case TWODSTRING:
-            printf("two dimension string array\n");
+            fprintf(f_output, "two dimension string array\n");
             break;
         case THREEDSTRING:
-            printf("three dimension string array\n");
+            fprintf(f_output, "three dimension string array\n");
             break;
         case BOOL:
-            printf("boolean\n");
+            fprintf(f_output, "boolean\n");
             break;
         case ONEDBOOL:
-            printf("one dimension boolean array\n");
+            fprintf(f_output, "one dimension boolean array\n");
             break;
         case TWODBOOL:
-            printf("two dimension boolean array\n");
+            fprintf(f_output, "two dimension boolean array\n");
             break;
         case THREEDBOOL:
-            printf("three dimension boolean array\n");
+            fprintf(f_output, "three dimension boolean array\n");
             break;
         case FLOAT:
-            printf("float\n");
+            fprintf(f_output, "float\n");
             break;
         case ONEDFLOAT:
-            printf("one dimension float array\n");
+            fprintf(f_output, "one dimension float array\n");
             break;
         case TWODFLOAT:
-            printf("two dimension float array\n");
+            fprintf(f_output, "two dimension float array\n");
             break;
         case THREEDFLOAT:
-            printf("three dimension float array\n");
+            fprintf(f_output, "three dimension float array\n");
             break;
     }
     return(0);
@@ -147,18 +149,20 @@ int typeof_handling(token_t *anker, status_t *stat)
 
 int genJSON_handling(token_t *anker, status_t *stat)
 {
+    //TODO: Add index parsing
     if(stat->just_save)
         return(JUSTSAVE);
-    printf("JSON function\n");
     exec_json(anker, stat);
     return(0);
 }
 
 int printVars_handling(token_t *anker, status_t *stat)
 {
-    printf("<pre>");
-    printAllVarsToFile(vars_anker, stdout);
-    printf("</pre>\n");
+    if(stat->just_save)
+        return(JUSTSAVE);
+    fprintf(f_output, "<pre>");
+    printAllVarsToFile(vars_anker, f_output);
+    fprintf(f_output, "</pre>\n");
     return(0);
 }
 
@@ -315,7 +319,7 @@ int parseCommand(wchar_t *begin, wchar_t *end, status_t *stat)
 
     if((cmd_name = malloc((cmd_name_length+1)*sizeof(wchar_t))) == NULL)
     {
-        fprintf(stderr, "Memalloc for cmd name failed\n");
+        parser_errno = MEM_ALLOC_ERROR;
         return(-1);
     }
 
@@ -332,7 +336,7 @@ int parseCommand(wchar_t *begin, wchar_t *end, status_t *stat)
     {
         if((macro = findMacro(cmd_name)) == NULL)
         {
-            fprintf(stderr, "Unkown function or macro\n");
+            parser_errno = UNKOWN_FUNCTION;
             return(-2);
         }
         free(cmd_name);

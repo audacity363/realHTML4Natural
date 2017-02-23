@@ -1,6 +1,7 @@
 char *parser_error_strs[] = 
 {
-    "",
+
+    "OK",
     "InternalError: Memory allocation failed",
     "InternalError: Memory reallocation failed",
     "ParserError: Unicode in a variablename",
@@ -10,7 +11,7 @@ char *parser_error_strs[] =
     "IndexError: X Index out of range",
     "SyntaxError: Unknown comparator",
     "SyntaxError: Index specification without variable name",
-    "SyntaxError: end-if without a if head"
+    "SyntaxError: end-if without a if head",
     "InternalError: Can not open template file",
     "InternalError: Can not open output file",
     "InternalError: Can not read from template file",
@@ -34,5 +35,7 @@ char *parser_error_strs[] =
     "SyntaxError: Missing 'macro' keyword",
     "SyntaxError: Error in macro head syntax",
     "SyntaxError: Missing \"[\"",
-    "SyntaxError: Variable block is empty"
+    "SyntaxError: Variable block is empty",
+    "NameError: Unkown function or macro",
+    "IndexError: Plain variables are not supported in for loop"
 };

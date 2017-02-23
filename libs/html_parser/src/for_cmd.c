@@ -50,6 +50,12 @@ int parseForCMD(token_t *start, for_status *stat)
         hptr = hptr->next;
     }
 
+    if(i == 0)
+    {
+        parser_errno = FOR_SYNTAX_ERROR;
+        return(-2);
+    }
+
     memset(cmd+i, 0x00, sizeof(wchar_t));
 
     if((c_cmd = malloc(wcslen(cmd)+1)) == NULL)
@@ -443,7 +449,7 @@ int getVariableProperties(for_status *stat, int index)
     if(getArrayLength(vars_anker, grp, var, &stat->array.array_length[index][0],
         &stat->array.array_length[index][1], &stat->array.array_length[index][2]) < 0)
     {
-        parser_errno = MEM_ALLOC_ERROR;
+        parser_errno = VAR_HANDLE_ERROR;
         return(-3);
     }
     

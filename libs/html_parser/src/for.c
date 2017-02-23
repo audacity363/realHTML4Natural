@@ -180,6 +180,19 @@ status.array.array_length[i][1],status.array.array_length[i][2]);
         printf("\ty_index: [%d]\n", status.array.y_index[i]);
     }*/
 
+    if(status.for_type == ARRAY)
+    {
+        for(i=0; i < status.array.var_count; i++)
+        {
+            if(status.array.type[i] == INTEGER || status.array.type[i] == STRING || 
+               status.array.type[i] == BOOL || status.array.type[i] == FLOAT)
+            {
+                parser_errno = FOR_UNSUPPORTED_TYPE;
+                return(EXIT);
+            }
+        }
+    }
+
     calculateForEnd(status, &for_end);
 
    //printf("For end: [%d]\n", for_end);

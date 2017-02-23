@@ -16,12 +16,13 @@ void printsingleBoolean(bool val, FILE *fp, bool json)
 void printBoolean(vars_t *var, FILE *fp, bool json)
 {
     if(json)
-        fprintf(fp, "\"%s\": [", var->name);
+        fprintf(fp, "\"%s\": ", var->name);
     else
         fprintf(fp, "[%s] = [", var->name);
 
     printsingleBoolean(*((bool*)var->data), fp, json);
-    fprintf(fp, "]");
+    if(!json)
+        fprintf(fp, "]");
 }
 
 void printRawBoolean(vars_t *var, FILE *fp)
