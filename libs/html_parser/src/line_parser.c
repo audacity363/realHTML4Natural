@@ -9,6 +9,8 @@
 #include "token_handling.h"
 #include "macro.h"
 
+#include "parser_errno.h"
+
 //Returns the type of block found
 //Variablenblock = VARIABLENBLOCK
 //Commandblock = COMMANDBLOCK
@@ -34,19 +36,6 @@ int searchBlockBegin(wchar_t *str, wchar_t **pos)
         }
     }
 
-    return(false);
-
-
-    if((begin = wcsstr(str, VARIABLEBEGIN_STR)) != NULL)
-    {
-        *pos = begin;
-        return(VARIABLEBLOCK);
-    }
-    else if((begin = wcsstr(str, COMMANDBEGIN_STR)) != NULL)
-    {
-        *pos = begin;
-        return(COMMANDBLOCK);
-    }
     return(false);
 }
 
@@ -144,6 +133,7 @@ int parseLine(wchar_t *line, status_t *status)
             if(searchBlockEnd(begin, &end, inblock) == false)
             {
                 fprintf(stderr, "Syntax Error Missing Endbracked\n");
+                parser_errno = MISSING_CMD_BLOCK_END;
                 break;
             }
             else if(inblock == VARIABLEBLOCK)

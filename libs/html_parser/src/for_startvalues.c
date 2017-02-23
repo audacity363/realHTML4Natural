@@ -7,6 +7,8 @@
 #include "for.h"
 #include "for_startvalues.h"
 
+#include "parser_errno.h"
+
 /*
  * Lookup for the function wich creates the new variable and sets it start value
  * First Index is the variablen Type, the second the index type. Index type 3
@@ -133,6 +135,7 @@ int setStartValue(char *tmp_var, for_status stat, vars_t *anker)
         if(start_func == NULL)
         {
             fprintf(stderr, "Combination out of variable type and index type are not supported\n");
+            parser_errno = UNSUPPORTED_INDEX;
             return(-2);
         }
         start_func(stat, anker, x);
@@ -141,6 +144,7 @@ int setStartValue(char *tmp_var, for_status stat, vars_t *anker)
 
 }
 
+//TODO: Add Error handling for alls varhandle_lib function
 // Integer handles
 int startval_1di0index(for_status stat, vars_t *anker, int index)
 {

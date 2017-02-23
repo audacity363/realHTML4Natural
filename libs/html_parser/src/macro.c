@@ -8,12 +8,14 @@
 #include "command_parsing.h"
 #include "macro.h"
 
+#include "parser_errno.h"
+
 
 int macro_handling(token_t *anker, status_t *stat)
 {
     if(stat->just_save == true)
     {
-        fprintf(stderr, "Macro definition not allowed in if or for block\n");
+        parser_errno = MACRO_BLOCK_IN_IF_FOR;
         return(EXIT);
     }
 
@@ -89,7 +91,7 @@ int save_arg(macro_parms *macro, wchar_t *name, int found_val, wchar_t *val)
 
     if((c_name = malloc(wcslen(name)+1)) == NULL)
     {
-        fprintf(stderr, "[%s.%d]: malloc error\n", __FILE__, __LINE__);
+        parser_errno = MEM_ALLOC_ERROR;
         return(-1);
     }
 
@@ -97,7 +99,7 @@ int save_arg(macro_parms *macro, wchar_t *name, int found_val, wchar_t *val)
 
     if((macro->name[index] = malloc(strlen(c_name)+1)) == NULL)
     {
-        fprintf(stderr, "[%s.%d]: malloc error\n", __FILE__, __LINE__);
+        parser_errno = MEM_ALLOC_ERROR;
         return(-2);
     }
 
@@ -114,7 +116,7 @@ int save_arg(macro_parms *macro, wchar_t *name, int found_val, wchar_t *val)
             //Copy value without quotation marks
             if((macro->val[index] = malloc(wcslen(val)*sizeof(wchar_t))) == NULL)
             {
-                fprintf(stderr, "[%s.%d]: malloc error\n",__FILE__, __LINE__);
+                parser_errno = MEM_ALLOC_ERROR;
                 return(-1);
             }
             memset(macro->val[index], 0x00, wcslen(val)*sizeof(wchar_t));
@@ -128,7 +130,7 @@ int save_arg(macro_parms *macro, wchar_t *name, int found_val, wchar_t *val)
 
             if((macro->val[index] = malloc(sizeof(double))) == NULL)
             {
-                fprintf(stderr, "[%s.%d]: malloc error\n",__FILE__, __LINE__);
+                parser_errno = MEM_ALLOC_ERROR;
                 return(-1);
             }
 
@@ -140,7 +142,7 @@ int save_arg(macro_parms *macro, wchar_t *name, int found_val, wchar_t *val)
             macro->type[index] = BOOL;
             if((macro->val[index] = malloc(sizeof(bool))) == NULL)
             {
-                fprintf(stderr, "[%s.%d]: malloc error\n",__FILE__, __LINE__);
+                parser_errno = MEM_ALLOC_ERROR;
                 return(-1);
             }
             *((bool*)macro->val[index]) = true;
@@ -152,7 +154,7 @@ int save_arg(macro_parms *macro, wchar_t *name, int found_val, wchar_t *val)
             macro->type[index] = BOOL;
             if((macro->val[index] = malloc(sizeof(bool))) == NULL)
             {
-                fprintf(stderr, "[%s.%d]: malloc error\n",__FILE__, __LINE__);
+                parser_errno = MEM_ALLOC_ERROR;
                 return(-1);
             }
             *((bool*)macro->val[index]) = false;
@@ -165,7 +167,7 @@ int save_arg(macro_parms *macro, wchar_t *name, int found_val, wchar_t *val)
 
             if((macro->val[index] = malloc(sizeof(int))) == NULL)
             {
-                fprintf(stderr, "[%s.%d]: malloc error\n",__FILE__, __LINE__);
+                parser_errno = MEM_ALLOC_ERROR;
                 return(-1);
             }
             *((int*)macro->val[index]) = int_buff;
@@ -179,13 +181,25 @@ int save_arg(macro_parms *macro, wchar_t *name, int found_val, wchar_t *val)
 
     macro->parm_number++;
 
-    macro->name = realloc(macro->name, sizeof(char*)*(macro->parm_number+1));
+    if((macro->name = realloc(macro->name, sizeof(char*)*(macro->parm_number+1))) == NULL)
+    {
+        parser_errno = MEM_REALLOC_ERROR;
+        return(-2);
+    }
     macro->name[macro->parm_number] = NULL;
 
-    macro->val = realloc(macro->val, sizeof(void*)*(macro->parm_number+1));
+    if((macro->val = realloc(macro->val, sizeof(void*)*(macro->parm_number+1))) == NULL)
+    {
+        parser_errno = MEM_REALLOC_ERROR;
+        return(-2);
+    }
     macro->val[macro->parm_number] = NULL;
     
-    macro->type = realloc(macro->type, sizeof(int*)*(macro->parm_number+1));
+    if((macro->type = realloc(macro->type, sizeof(int*)*(macro->parm_number+1))) == NULL)
+    {
+        parser_errno = MEM_REALLOC_ERROR;
+        return(-2);
+    }
     macro->type[macro->parm_number] = -1;
 
     return(0);
@@ -214,33 +228,33 @@ int end_macro_handling(token_t *anker, status_t *stat)
 
     if(stat->in_if != 0)
     {
-        fprintf(stderr, "Unclosed if block in macro\n");
+        parser_errno = UNCLOSED_IF_BLOCK;
         return(EXIT);
     }
     if(stat->in_for != 0)
     {
-        fprintf(stderr, "Unclosed for block in macro\n");
+        parser_errno = UNCLOSED_FOR_BLOCK;
         return(EXIT);
     }
     stat->just_save = 0;
 
     if((cur_macro->name = malloc(sizeof(char*))) == NULL)
     {
-        fprintf(stderr, "[%s.%d]: malloc error\n",__FILE__, __LINE__);
+        parser_errno = MEM_ALLOC_ERROR;
         return(EXIT);
     }
     cur_macro->name[0] = NULL;
 
     if((cur_macro->val = malloc(sizeof(void*))) == NULL)
     {
-        fprintf(stderr, "[%s.%d]: malloc error\n",__FILE__, __LINE__);
+        parser_errno = MEM_ALLOC_ERROR;
         return(EXIT);
     }
     cur_macro->val[0] = NULL;
 
     if((cur_macro->type = malloc(sizeof(int*))) == NULL)
     {
-        fprintf(stderr, "[%s.%d]: malloc error\n",__FILE__, __LINE__);
+        parser_errno = MEM_ALLOC_ERROR;
         return(EXIT);
     }
     cur_macro->type[0] = -1;
@@ -252,7 +266,7 @@ int end_macro_handling(token_t *anker, status_t *stat)
 
     if((macro_pos = wcsstr(stat->save_buff[0], L"macro")) == NULL)
     {
-        fprintf(stderr, "Did not find macro keyword in macro head\n");
+        parser_errno = MISSING_MACRO_WORD;
         return(EXIT);
     }
 
@@ -263,7 +277,7 @@ int end_macro_handling(token_t *anker, status_t *stat)
         hptr = hptr->next;
         if(!hptr)
         {
-            fprintf(stderr, "Macro offset to high\n");
+            parser_errno = MACRO_SYNTAX_ERROR;
             return(EXIT);
         }
     }
@@ -398,7 +412,7 @@ int saveMacro(char *name, macro_parms *parms, status_t *body)
 
     if((new = malloc(sizeof(macro_definition_t))) == NULL)
     {
-        fprintf(stderr, "[%s.%d]: malloc error\n",__FILE__, __LINE__);
+        parser_errno = MEM_ALLOC_ERROR;
         return(-1);
     }
 
@@ -447,7 +461,7 @@ int initMacroAnker(macro_definition_t **anker)
 {
     if((*anker = malloc(sizeof(macro_definition_t))) == NULL)
     {
-        fprintf(stderr, "[%s.%d]: malloc error\n",__FILE__, __LINE__);
+        parser_errno = MEM_ALLOC_ERROR;
         return(-1);
     }
 
@@ -530,7 +544,7 @@ macro_definition_t *findMacro(wchar_t *name)
 
     if((c_name = malloc(wcslen(name)+1)) == NULL)
     {
-        fprintf(stderr, "[%s.%d]: malloc error\n",__FILE__, __LINE__);
+        parser_errno = MEM_ALLOC_ERROR;
         return(NULL);
     }
 

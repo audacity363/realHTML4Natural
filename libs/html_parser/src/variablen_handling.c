@@ -6,11 +6,13 @@
 #include "vars.h"
 #include "parser.h"
 
+#include "parser_errno.h"
+
 int handleONEDINTEGER(vars_t *target, int index_type, int *index)
 {
     if(index_type > 1)
     {
-        fprintf(stderr, "Index type not supported\n");
+        parser_errno = UNSUPPORTED_INDEX;
         return(-1);
     }
 
@@ -23,7 +25,7 @@ int handleONEDINTEGER(vars_t *target, int index_type, int *index)
     {
         if(target->x_length <= index[0])
         {
-            fprintf(stderr, "X index out of range\n");
+            parser_errno = INDEX_X_OUT_OF_RANGE;
             return(-2);
         }
         print1DIntegerWithXIndex(target, f_output, index[0], false);
@@ -35,7 +37,7 @@ int handleTWODINTEGER(vars_t *target, int index_type, int *index)
 {
     if(index_type > 2)
     {
-        fprintf(stderr, "Index type not supported\n");
+        parser_errno = UNSUPPORTED_INDEX;
         return(-1);
     }
 
@@ -48,7 +50,7 @@ int handleTWODINTEGER(vars_t *target, int index_type, int *index)
     {
         if(target->x_length <= index[0])
         {
-            fprintf(stderr, "X index out of range\n");
+            parser_errno = INDEX_X_OUT_OF_RANGE;
             return(-2);
         }
         print2DIntegerWithXIndex(target, f_output, index[0], false);
@@ -57,12 +59,12 @@ int handleTWODINTEGER(vars_t *target, int index_type, int *index)
     {
         if(target->x_length <= index[0])
         {
-            fprintf(stderr, "X index out of range\n");
+            parser_errno = INDEX_X_OUT_OF_RANGE;
             return(-2);
         }
         if(target->y_length <= index[1])
         {
-            fprintf(stderr, "Y index out of range\n");
+            parser_errno = INDEX_Y_OUT_OF_RANGE;
             return(-3);
         }
         print2DIntegerWithXYIndex(target, f_output, index[0], index[1], false);
@@ -81,7 +83,7 @@ int handleTHREEDINTEGER(vars_t *target, int index_type, int *index)
     {
         if(target->x_length <= index[0])
         {
-            fprintf(stderr, "X index out of range\n");
+            parser_errno = INDEX_X_OUT_OF_RANGE;
             return(-2);
         }
         print3DIntegerWithXIndex(target, f_output, index[0], false);
@@ -90,12 +92,12 @@ int handleTHREEDINTEGER(vars_t *target, int index_type, int *index)
     {
         if(target->x_length <= index[0])
         {
-            fprintf(stderr, "X index out of range\n");
+            parser_errno = INDEX_X_OUT_OF_RANGE;
             return(-2);
         }
         if(target->y_length <= index[1])
         {
-            fprintf(stderr, "Y index out of range\n");
+            parser_errno = INDEX_Y_OUT_OF_RANGE;
             return(-3);
         }
         print3DIntegerWithXYIndex(target, f_output, index[0], index[1], false);
@@ -105,17 +107,17 @@ int handleTHREEDINTEGER(vars_t *target, int index_type, int *index)
     {
         if(target->x_length <= index[0])
         {
-            fprintf(stderr, "X index out of range\n");
+            parser_errno = INDEX_X_OUT_OF_RANGE;
             return(-2);
         }
         if(target->y_length <= index[1])
         {
-            fprintf(stderr, "Y index out of range\n");
+            parser_errno = INDEX_Y_OUT_OF_RANGE;
             return(-3);
         }
         if(target->z_length <= index[2])
         {
-            fprintf(stderr, "Y index out of range\n");
+            parser_errno = INDEX_Z_OUT_OF_RANGE;
             return(-3);
         }
         print3DIntegerWithXYZIndex(target, f_output, index[0], index[1], index[2], false);
@@ -127,7 +129,7 @@ int handleONEDBOOL(vars_t *target, int index_type, int *index)
 {
     if(index_type > 1)
     {
-        fprintf(stderr, "Index type not supported\n");
+        parser_errno = UNSUPPORTED_INDEX;
         return(-1);
     }
 
@@ -140,7 +142,7 @@ int handleONEDBOOL(vars_t *target, int index_type, int *index)
     {
         if(target->x_length <= index[0])
         {
-            fprintf(stderr, "X index out of range\n");
+            parser_errno = INDEX_X_OUT_OF_RANGE;
             return(-2);
         }
         print1DBooleanWithXIndex(target, f_output, index[0], false);
@@ -152,7 +154,7 @@ int handleTWODBOOL(vars_t *target, int index_type, int *index)
 {
     if(index_type > 2)
     {
-        fprintf(stderr, "Index type not supported\n");
+        parser_errno = UNSUPPORTED_INDEX;
         return(-1);
     }
 
@@ -165,7 +167,7 @@ int handleTWODBOOL(vars_t *target, int index_type, int *index)
     {
         if(target->x_length <= index[0])
         {
-            fprintf(stderr, "X index out of range\n");
+            parser_errno = INDEX_X_OUT_OF_RANGE;
             return(-2);
         }
         print2DBooleanWithXIndex(target, f_output, index[0], false);
@@ -174,12 +176,12 @@ int handleTWODBOOL(vars_t *target, int index_type, int *index)
     {
         if(target->x_length <= index[0])
         {
-            fprintf(stderr, "X index out of range\n");
+            parser_errno = INDEX_X_OUT_OF_RANGE;
             return(-2);
         }
         if(target->y_length <= index[1])
         {
-            fprintf(stderr, "Y index out of range\n");
+            parser_errno = INDEX_Y_OUT_OF_RANGE;
             return(-3);
         }
         print2DBooleanWithXYIndex(target, f_output, index[0], index[1], false);
@@ -198,7 +200,7 @@ int handleTHREEDBOOL(vars_t *target, int index_type, int *index)
     {
         if(target->x_length <= index[0])
         {
-            fprintf(stderr, "X index out of range\n");
+            parser_errno = INDEX_X_OUT_OF_RANGE;
             return(-2);
         }
         print3DBooleanWithXIndex(target, f_output, index[0], false);
@@ -207,12 +209,12 @@ int handleTHREEDBOOL(vars_t *target, int index_type, int *index)
     {
         if(target->x_length <= index[0])
         {
-            fprintf(stderr, "X index out of range\n");
+            parser_errno = INDEX_X_OUT_OF_RANGE;
             return(-2);
         }
         if(target->y_length <= index[1])
         {
-            fprintf(stderr, "Y index out of range\n");
+            parser_errno = INDEX_Y_OUT_OF_RANGE;
             return(-3);
         }
         print3DBooleanWithXYIndex(target, f_output, index[0], index[1], false);
@@ -222,17 +224,16 @@ int handleTHREEDBOOL(vars_t *target, int index_type, int *index)
     {
         if(target->x_length <= index[0])
         {
-            fprintf(stderr, "X index out of range\n");
-            return(-2);
+            parser_errno = INDEX_X_OUT_OF_RANGE;
         }
         if(target->y_length <= index[1])
         {
-            fprintf(stderr, "Y index out of range\n");
+            parser_errno = INDEX_Y_OUT_OF_RANGE;
             return(-3);
         }
         if(target->z_length <= index[2])
         {
-            fprintf(stderr, "Y index out of range\n");
+            parser_errno = INDEX_Z_OUT_OF_RANGE;
             return(-3);
         }
         print3DBooleanWithXYZIndex(target, f_output, index[0], index[1], index[2], false);
@@ -244,7 +245,7 @@ int handleONEDFLOAT(vars_t *target, int index_type, int *index)
 {
     if(index_type > 1)
     {
-        fprintf(stderr, "Index type not supported\n");
+        parser_errno = UNSUPPORTED_INDEX;
         return(-1);
     }
 
@@ -257,7 +258,7 @@ int handleONEDFLOAT(vars_t *target, int index_type, int *index)
     {
         if(target->x_length <= index[0])
         {
-            fprintf(stderr, "X index out of range\n");
+            parser_errno = INDEX_X_OUT_OF_RANGE;
             return(-2);
         }
         print1DFloatWithXIndex(target, f_output, index[0], false);
@@ -269,7 +270,7 @@ int handleTWODFLOAT(vars_t *target, int index_type, int *index)
 {
     if(index_type > 2)
     {
-        fprintf(stderr, "Index type not supported\n");
+        parser_errno = UNSUPPORTED_INDEX;
         return(-1);
     }
 
@@ -282,7 +283,7 @@ int handleTWODFLOAT(vars_t *target, int index_type, int *index)
     {
         if(target->x_length <= index[0])
         {
-            fprintf(stderr, "X index out of range\n");
+            parser_errno = INDEX_X_OUT_OF_RANGE;
             return(-2);
         }
         print2DFloatWithXIndex(target, f_output, index[0], false);
@@ -291,12 +292,12 @@ int handleTWODFLOAT(vars_t *target, int index_type, int *index)
     {
         if(target->x_length <= index[0])
         {
-            fprintf(stderr, "X index out of range\n");
+            parser_errno = INDEX_X_OUT_OF_RANGE;
             return(-2);
         }
         if(target->y_length <= index[1])
         {
-            fprintf(stderr, "Y index out of range\n");
+            parser_errno = INDEX_Y_OUT_OF_RANGE;
             return(-3);
         }
         print2DFloatWithXYIndex(target, f_output, index[0], index[1], false);
@@ -315,7 +316,7 @@ int handleTHREEDFLOAT(vars_t *target, int index_type, int *index)
     {
         if(target->x_length <= index[0])
         {
-            fprintf(stderr, "X index out of range\n");
+            parser_errno = INDEX_X_OUT_OF_RANGE;
             return(-2);
         }
         print3DFloatWithXIndex(target, f_output, index[0], false);
@@ -324,12 +325,12 @@ int handleTHREEDFLOAT(vars_t *target, int index_type, int *index)
     {
         if(target->x_length <= index[0])
         {
-            fprintf(stderr, "X index out of range\n");
+            parser_errno = INDEX_X_OUT_OF_RANGE;
             return(-2);
         }
         if(target->y_length <= index[1])
         {
-            fprintf(stderr, "Y index out of range\n");
+            parser_errno = INDEX_Y_OUT_OF_RANGE;
             return(-3);
         }
         print3DFloatWithXYIndex(target, f_output, index[0], index[1], false);
@@ -339,17 +340,17 @@ int handleTHREEDFLOAT(vars_t *target, int index_type, int *index)
     {
         if(target->x_length <= index[0])
         {
-            fprintf(stderr, "X index out of range\n");
+            parser_errno = INDEX_X_OUT_OF_RANGE;
             return(-2);
         }
         if(target->y_length <= index[1])
         {
-            fprintf(stderr, "Y index out of range\n");
+            parser_errno = INDEX_Y_OUT_OF_RANGE;
             return(-3);
         }
         if(target->z_length <= index[2])
         {
-            fprintf(stderr, "Y index out of range\n");
+            parser_errno = INDEX_Z_OUT_OF_RANGE;
             return(-3);
         }
         print3DFloatWithXYZIndex(target, f_output, index[0], index[1], index[2], false);
@@ -361,7 +362,7 @@ int handleONEDSTRING(vars_t *target, int index_type, int *index)
 {
     if(index_type > 1)
     {
-        fprintf(stderr, "Index type not supported\n");
+        parser_errno = UNSUPPORTED_INDEX;
         return(-1);
     }
 
@@ -374,7 +375,7 @@ int handleONEDSTRING(vars_t *target, int index_type, int *index)
     {
         if(target->x_length <= index[0])
         {
-            fprintf(stderr, "X index out of range\n");
+            parser_errno = INDEX_X_OUT_OF_RANGE;
             return(-2);
         }
         print1DStringWithXIndex(target, f_output, index[0], false);
@@ -386,7 +387,7 @@ int handleTWODSTRING(vars_t *target, int index_type, int *index)
 {
     if(index_type > 2)
     {
-        fprintf(stderr, "Index type not supported\n");
+        parser_errno = UNSUPPORTED_INDEX;
         return(-1);
     }
 
@@ -399,7 +400,7 @@ int handleTWODSTRING(vars_t *target, int index_type, int *index)
     {
         if(target->x_length <= index[0])
         {
-            fprintf(stderr, "X index out of range\n");
+            parser_errno = INDEX_X_OUT_OF_RANGE;
             return(-2);
         }
         print2DStringWithXIndex(target, f_output, index[0], false);
@@ -408,12 +409,12 @@ int handleTWODSTRING(vars_t *target, int index_type, int *index)
     {
         if(target->x_length <= index[0])
         {
-            fprintf(stderr, "X index out of range\n");
+            parser_errno = INDEX_X_OUT_OF_RANGE;
             return(-2);
         }
         if(target->y_length <= index[1])
         {
-            fprintf(stderr, "Y index out of range\n");
+            parser_errno = INDEX_Y_OUT_OF_RANGE;
             return(-3);
         }
         print2DStringWithXYIndex(target, f_output, index[0], index[1], false);
@@ -432,7 +433,7 @@ int handleTHREEDSTRING(vars_t *target, int index_type, int *index)
     {
         if(target->x_length <= index[0])
         {
-            fprintf(stderr, "X index out of range\n");
+            parser_errno = INDEX_X_OUT_OF_RANGE;
             return(-2);
         }
         print3DStringWithXIndex(target, f_output, index[0], false);
@@ -441,12 +442,12 @@ int handleTHREEDSTRING(vars_t *target, int index_type, int *index)
     {
         if(target->x_length <= index[0])
         {
-            fprintf(stderr, "X index out of range\n");
+            parser_errno = INDEX_X_OUT_OF_RANGE;
             return(-2);
         }
         if(target->y_length <= index[1])
         {
-            fprintf(stderr, "Y index out of range\n");
+            parser_errno = INDEX_Y_OUT_OF_RANGE;
             return(-3);
         }
         print3DStringWithXYIndex(target, f_output, index[0], index[1], false);
@@ -456,17 +457,17 @@ int handleTHREEDSTRING(vars_t *target, int index_type, int *index)
     {
         if(target->x_length <= index[0])
         {
-            fprintf(stderr, "X index out of range\n");
+            parser_errno = INDEX_X_OUT_OF_RANGE;
             return(-2);
         }
         if(target->y_length <= index[1])
         {
-            fprintf(stderr, "Y index out of range\n");
+            parser_errno = INDEX_Y_OUT_OF_RANGE;
             return(-3);
         }
         if(target->z_length <= index[2])
         {
-            fprintf(stderr, "Y index out of range\n");
+            parser_errno = INDEX_Z_OUT_OF_RANGE;
             return(-3);
         }
         print3DStringWithXYZIndex(target, f_output, index[0], index[1], index[2], false);

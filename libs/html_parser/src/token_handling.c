@@ -7,6 +7,8 @@
 #include "parser.h"
 #include "token_handling.h"
 
+#include "parser_errno.h"
+
 int addToken(token_t *anker, wchar_t *token, int type)
 {
     token_t *hptr = anker,
@@ -19,6 +21,7 @@ int addToken(token_t *anker, wchar_t *token, int type)
     
     if((new = malloc(sizeof(token_t))) == NULL)
     {
+        parser_errno = MEM_ALLOC_ERROR;
         return(false);
     }
 

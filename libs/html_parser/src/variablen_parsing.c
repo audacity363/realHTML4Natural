@@ -7,6 +7,8 @@
 #include "parser.h"
 #include "token_handling.h"
 
+#include "parser_errno.h"
+
 int printVariable(char *name, char *grpname, bool has_grp, int index_type, int *index_num);
 int handleONEDINTEGER(vars_t *target, int index_type, int *index);
 
@@ -101,7 +103,7 @@ int getIndexChar(token_t *anker, int *index_num)
     {
         if(hptr->type == INDEXOPEN && in_brackets == true)
         {
-            fprintf(stderr, "Syntax Error. Missing \"]\"\n");
+            parser_errno = MISSING_CLOSE_INDEX;
             return(-1);
         }
         else if(hptr->type == INDEXOPEN && in_brackets == false)
@@ -115,7 +117,7 @@ int getIndexChar(token_t *anker, int *index_num)
         }
         else if(hptr->type == INDEXCLOSE && in_brackets == false)
         {
-            fprintf(stderr, "Syntax Error. Missing \"[\"\n");
+            parser_errno = MISSING_OPEN_INDEX;
             return(-2);
         }
         else if(hptr->type == INDEXCLOSE && in_brackets == true)
@@ -124,7 +126,7 @@ int getIndexChar(token_t *anker, int *index_num)
             c_index[i] = '\0';
             if((index_num[index_type-1] = atoi(c_index)) == 0 && c_index[0] != '0')
             {
-                fprintf(stderr, "Conv Error\n");
+                parser_errno = INT_CONVERSION_ERROR;
                 return(-3);
             }
             i=0;
@@ -175,18 +177,20 @@ int parseVariable(wchar_t *begin, wchar_t *end)
     if((varname_length = getVarnameLength(&anker)) == 0) 
     {
         deleteTokens(&anker);
-        fprintf(stderr, "Keine Variable gefunden\n");
+        parser_errno = EMPTY_VAR_BLOCK;
         return(-1);
     }
     varname_length++;
     if((wc_variablename = malloc(varname_length*sizeof(wchar_t))) == NULL)
     {
+        parser_errno = MEM_ALLOC_ERROR;
         deleteTokens(&anker);
         return(-2);
     }
 
     if((variablename = malloc(varname_length)) == NULL)
     {
+        parser_errno = MEM_ALLOC_ERROR;
         free(wc_variablename);
         deleteTokens(&anker);
         return(-3);
@@ -201,7 +205,7 @@ int parseVariable(wchar_t *begin, wchar_t *end)
         free(variablename);
         free(wc_variablename);
         deleteTokens(&anker);
-        fprintf(stderr, "Unicode Char in variable name\n");
+        parser_errno = UNICODE_IN_VARNAME;
         return(-4);
     }
     varname_sav = variablename;
@@ -214,7 +218,7 @@ int parseVariable(wchar_t *begin, wchar_t *end)
             free(variablename);
             free(wc_variablename);
             deleteTokens(&anker);
-            fprintf(stderr, "Can not malloc memory for grpname\n");
+            parser_errno = MEM_ALLOC_ERROR;
             return(-5);
         }
 
@@ -249,7 +253,7 @@ int printVariable(char *name, char *grpname, bool has_grp, int index_type, int *
         //printf("Grpname: [%s]\n", grpname);
         if((target = isDefinedGrp(vars_anker, grpname, name)) == NULL)
         {
-            fprintf(stderr, "Unkown Variable or Group\n");
+            parser_errno = NOT_DEFINED_VAR;
             return(-1);
         }
     }
@@ -259,7 +263,7 @@ int printVariable(char *name, char *grpname, bool has_grp, int index_type, int *
         
         if((target = isDefined(vars_anker, name)) == NULL)
         {
-            fprintf(stderr, "Unkown Variable\n");
+            parser_errno = NOT_DEFINED_VAR;
             return(-2);
         }
     }

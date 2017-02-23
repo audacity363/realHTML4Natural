@@ -6,6 +6,8 @@
 #include "vars.h"
 #include "parser.h"
 
+#include "parser_errno.h"
+
 int exec_json(token_t *anker, status_t *stat)
 {
     char **varnames = NULL;
@@ -19,6 +21,7 @@ int exec_json(token_t *anker, status_t *stat)
 
     if(!(varnames = malloc(sizeof(char*))))
     {
+        parser_errno = MEM_ALLOC_ERROR;
         return(-1);
     }
 
@@ -31,6 +34,7 @@ int exec_json(token_t *anker, status_t *stat)
             memset(name_buff+index_name, 0x00, sizeof(wchar_t));
             if(!(varnames[var_count] = malloc(sizeof(char)*wcslen(name_buff))))
             {
+                parser_errno = MEM_ALLOC_ERROR;
                 for(i=0; i < var_count; i++)
                     free(varnames[i]);
                 free(varnames);
@@ -41,6 +45,7 @@ int exec_json(token_t *anker, status_t *stat)
 
             if(!(varnames = realloc(varnames, sizeof(char*)*((++var_count)+1))))
             {
+                parser_errno = MEM_REALLOC_ERROR;
                 return(-3);
             }
 
@@ -57,6 +62,7 @@ int exec_json(token_t *anker, status_t *stat)
     if(printVarsToFileJSON(vars_anker, varnames, var_count, f_output) != 0)
     {
         //variable not known
+        parser_errno = NOT_DEFINED_VAR;
         for(i=0; i < var_count; i++)
             free(varnames[i]);
         free(varnames);
