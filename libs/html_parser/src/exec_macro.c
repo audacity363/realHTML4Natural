@@ -335,9 +335,19 @@ int addVariables(macro_parms *defaults, macro_parms *given, vars_t *vars)
         }
         else if(given->type[i] == -1 && given->index_type[i] != 0)
         {
+            if((varname = strchr((char*)given->val[i], '.')) != NULL)
+            {
+                varname[0] = '\0';
+                varname++;
+                grp = (char*)given->val[i];
+            }
+            else
+                varname = (char*)given->val[i];
+
             copyVariableNewNameWithIndex(vars_anker, vars,
-                NULL, (char*)given->val[i], NULL, defaults->name[i],
+                grp, varname, NULL, defaults->name[i],
                 given->index_type[i], given->index[i]);
+           varname = grp = NULL;
         }
     }
     return(0);
