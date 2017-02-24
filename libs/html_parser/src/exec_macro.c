@@ -204,6 +204,7 @@ int saveParm(wchar_t *arg, macro_parms *parms, int index_type, int index_array[3
     int index = parms->parm_number;
     double d_buff = 0;
     char *c_name = NULL, *index_pos = NULL;
+    char *grp = NULL, *varname = NULL;
 
 
     //Look for a String
@@ -214,14 +215,15 @@ int saveParm(wchar_t *arg, macro_parms *parms, int index_type, int index_array[3
         wcsncpy((wchar_t*)parms->val[index], arg+1, wcslen(arg)-1);
     }
     //Look for a float
-    else if(wcschr(arg, L'.') != NULL)
+    //With this pice of code groups get wrong parsed
+    /*else if(wcschr(arg, L'.') != NULL)
     {
         parms->type[index] = FLOAT;
 
         d_buff = wcstod(arg, NULL);
         parms->val[index] = malloc(sizeof(double));
         *((double*)parms->val[index]) = d_buff;
-    }
+    }*/
     //Look for a true boolean
     else if(wcscmp(arg, L"true") == 0)
     {
@@ -249,7 +251,17 @@ int saveParm(wchar_t *arg, macro_parms *parms, int index_type, int index_array[3
             printf("Index: (%s)\n", index_pos+1);
 #endif
         }
-        if(isDefinedBool(vars_anker, c_name) == false)
+        //Use isDefinedGrpBool and split the 
+        //c_name in group and name
+        if((varname = strchr(c_name, '.')) != NULL)
+        {
+            grp = c_name;
+            varname[0] = '\0';
+            varname++;
+        }
+        else
+            varname = c_name;
+        if(isDefinedGrpBool(vars_anker, grp, varname) == false)
         {
             //Var ist not defined. It is an integer
             free(c_name);
@@ -257,6 +269,7 @@ int saveParm(wchar_t *arg, macro_parms *parms, int index_type, int index_array[3
         }
         else
         {
+            varname[-1] = '.';
             parms->val[index] = malloc(strlen(c_name)+1);
             strcpy((char*)parms->val[index], c_name);
             //-1 means here that it is a variable
@@ -285,6 +298,7 @@ int saveParm(wchar_t *arg, macro_parms *parms, int index_type, int index_array[3
 int addVariables(macro_parms *defaults, macro_parms *given, vars_t *vars)
 {
     int i = 0, ret = 0;
+    char *grp = NULL, *varname = NULL;
 
     //first add all given vars
     for(; i < given->parm_number; i++)
@@ -300,13 +314,24 @@ int addVariables(macro_parms *defaults, macro_parms *given, vars_t *vars)
         //new name
         else if(given->type[i] == -1 && given->index_type[i] == 0)
         {
-            if((ret = copyVariableNewName(vars_anker, vars, NULL,
-                        (char*)given->val[i], NULL, defaults->name[i])) != 0)
+            printf("Adding name: [%s]\n", (char*)given->val[i]);
+            if((varname = strchr((char*)given->val[i], '.')) != NULL)
+            {
+                varname[0] = '\0';
+                varname++;
+                grp = (char*)given->val[i];
+            }
+            else
+                varname = (char*)given->val[i];
+
+            if((ret = copyVariableNewName(vars_anker, vars, grp,
+                        varname, NULL, defaults->name[i])) != 0)
            {
                varhandle_error = ret;
                parser_errno = VAR_HANDLE_ERROR;
                return(ret);
            }
+           varname = grp = NULL;
         }
         else if(given->type[i] == -1 && given->index_type[i] != 0)
         {
