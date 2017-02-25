@@ -14,6 +14,7 @@ enum
 
 #define CONTINUE 1
 #define BREAK 2
+#define EXIT 3
 
 //definitions from the natni.h file from the software AG
 #define TYPE_ALPHA         'A'
@@ -40,6 +41,5 @@ enum
 #define LDA_UNKOWN_VAR_TYPE 5
 #define LDA_UNKOWN_SAG_DEF_TYPE 6
 
-int startLDAParser(char *filename, vars_t *anker, bool debug, FILE *logfile);
-int unix_lda(char *line, vars_t *anker, bool debug, FILE *logfile);
-void freeAnker(vars_t *anker);
+int getVariablenType(char type);
+void printfork(vars_t *anker, FILE *logfile);
