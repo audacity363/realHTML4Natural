@@ -1,4 +1,4 @@
-OBJ = unix.o start.o free.o
+OBJ = start.o printLDA.o
 
 INCLUDE = -I../varhandle_lib/src/
 
@@ -15,5 +15,11 @@ clean:
 	rm -rf ./bin/*.o
 
 test:
-	make lib
-	gcc -g ./test_src/main.c $(INCLUDE) -o ./test -L./ -lldaparser -I./src/ $(LIBS)
+	#make -f Makefile_GNU lib
+	#gcc -g ./test_src/main.c $(INCLUDE) -o ./test -L./ -lldaparser -I./src/ $(LIBS)
+	gcc -g ./src/start.c ./src/printLDA.c $(INCLUDE) -o ./testbin $(LIBS)
+	./testbin ./test_files/system/AULMAELI.NGL
+	#./testbin ./test_files/TEST.NGL
+
+bulk_test:
+	find ./test_files/system/ -exec /home/tom/Documents/realHTML4Natural/libs/nat-lda-parser/testbin {} \; 2>&1 >/dev/null #| grep Filename
