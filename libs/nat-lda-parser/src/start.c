@@ -16,6 +16,7 @@
 #define LDA_VIEW "VIEW OF"
 #define LDA_CONST "CONST"
 #define LDA_INIT "INIT"
+#define LDA_HEADER_OFFSET 72
 
 #define COMPARE_HEAD_STR(x) strcmp(x, LDA_DEFINE_DATA) == 0
 #define COMPARE_FOOT_STR(x) strcmp(x, LDA_END_DEFINED_DATA) == 0
@@ -24,7 +25,10 @@
 #define CHECK_IF_CONST(x) strstr(x, LDA_CONST) != NULL
 #define CHECK_IF_INIT(x) strstr(x, LDA_INIT) != NULL
 
-#ifdef Py_DEBUG
+FILE *logfile;
+char *error_str;
+
+#ifdef LOGDEBUG
 int debug_int = 1;
 #define D(x) if (!debug_int); else x
 #else
@@ -41,26 +45,27 @@ vars_t *cur_pos = NULL;
 vars_t *grp_head = NULL;
 int grp_head_index_type = -1;
 
-int main(int argc, char *argv[])
+int startLDAParser(char *ldapath, vars_t *anker, FILE *logfile_l, char *error_buffer)
 {
-    if(argc != 2)
-    {
-        fprintf(stderr, "Usage: %s filename\n", argv[0]);
-        return(-1);
-    }
-
-    vars_t *anker = NULL;
-
-    initVarAnker(&anker);
-
     anker->level = 1;
 
-    FILE *fp = fopen(argv[1], "r");
+    FILE *fp = NULL;
 
     char header[72], cur_chr, *complete_line = NULL;
     int length = 0, ret = 0;
 
-    fread(header, 72, 1, fp);
+    logfile = logfile_l;
+    error_str = error_buffer;
+
+    if((fp = fopen(ldapath, "r")) == NULL)
+    {
+        sprintf(error_str, "Error opening [%s]\nError: [%s]\n", ldapath, strerror(errno));
+        fprintf(logfile, "%s\n", error_str);
+        return(-1);
+    }
+
+    //Jump over the LDA header
+    fread(header, LDA_HEADER_OFFSET, 1, fp);
 
     complete_line = malloc(1);
 
@@ -71,15 +76,18 @@ int main(int argc, char *argv[])
             complete_line[length] = 0x00;
             if((ret = parseLine(complete_line, length, anker)) == EXIT)
             {
-                fprintf(stderr, "Filename: [%s]\n", argv[1]);
+                sprintf(error_str, "%sSomething went wrong while parsing [%s]\n", error_str, ldapath);
+                fprintf(logfile, "%s", error_str);
                 fclose(fp);
-                exit(1);
+                free(complete_line);
+                return(-2);
             }
             else if(ret == BREAK)
             {
                 break;
             }
             free(complete_line);
+            complete_line = NULL;
             complete_line = malloc(1);
             length = 0;
         }
@@ -87,18 +95,20 @@ int main(int argc, char *argv[])
             break;
         else
         {
-            //printf("%c", cur_chr);
             complete_line[length++] = cur_chr;
             if((complete_line = realloc(complete_line, length+1)) == NULL)
             {
-                printf("[%s]\n", strerror(errno));
+                sprintf(error_str, "%sSomething went wrong while parsing [%s]\nError: [%s]\n", 
+                    error_str, ldapath, strerror(errno));
+                fprintf(logfile, "%s", error_str);
                 return(-2);
             }
         }
     }
 
-    printfork(anker, stdout);
+    free(complete_line);
     fclose(fp);
+
     return(0);
 }
 
@@ -114,8 +124,8 @@ int parseLine(char *complete_line, int length, vars_t *anker)
     //Views are not allowed
     if(CHECK_IF_VIEW(line))
     {
-        printf("Views are not allowed\n");
-        return(BREAK);
+        sprintf(error_str, "Views are not allowed in the LDA\n");
+        return(EXIT);
     }
     else if(CHECK_IF_CONST(line))
     {
@@ -175,32 +185,49 @@ int parseLine(char *complete_line, int length, vars_t *anker)
         line++;
     }
     varname[varname_length] = 0x00;
-    D(printf("Varname: [%s]\n", varname));
-    cur->name = malloc(strlen(varname)+1);
-    strcpy(cur->name, varname);
 
     for(;line[0] == 0x20 && strlen(line) > 0; line++);
 
     //It is a new group without an array
     if(strlen(line) == 0)
     {
-        D(printf("New Group\n\n"));
+        D(fprintf(logfile, "New Group\n\n"));
+
+        cur->name = malloc(strlen(varname)+1);
+        strcpy(cur->name, varname);
+
         cur->type = GROUP;
-        D(printfork(cur, stdout));
         goto save;
     }
 
     if(COMPARE_REDEFINE_STR(varname))
     {
-        D(printf("It is a REDEFINE\n\n"));
+        D(fprintf(logfile, "It is a REDEFINE\n\n"));
+
+        //Get the name from the redefined variable
+        varname_length = 0;
+        while(line[0] != 0x20 && strlen(line) > 0)
+        {
+            varname[varname_length++] = line[0];
+            line++;
+        }
+        varname[varname_length] = 0x00;
+
+        cur->name = malloc(strlen(varname)+1);
+        strcpy(cur->name, varname);
+
         cur->type = REDEFINE;
-        D(printfork(cur, stdout));
         goto save;
     }
 
+    D(fprintf(logfile, "Varname: [%s]\n", varname));
+    cur->name = malloc(strlen(varname)+1);
+    strcpy(cur->name, varname);
+
     if(*line != 0x28)
     {
-        fprintf(stderr, "Syntax Error in LDA\n");
+        sprintf(error_str, "Something went totaly wrong. Unexcpected char [%c] in LDA\n", *line);
+        sprintf(error_str, "%sLine: [%s]\n", error_str, line);
         return(EXIT);
     }
 
@@ -209,7 +236,7 @@ int parseLine(char *complete_line, int length, vars_t *anker)
     //It is a new group with array specification
     if((vartype = getVariablenType(*line)) == -2)
     {
-        D(printf("New Group with Index specification\n"));
+        D(fprintf(logfile, "New Group with Index specification\n"));
         if(getArrayType(line, &index_type, index) == NULL)
             return(EXIT);
         cur->type = GROUP;
@@ -217,16 +244,16 @@ int parseLine(char *complete_line, int length, vars_t *anker)
         cur->y_length = index[1];
         cur->z_length = index[2];
 
-        D(printfork(cur, stdout));
+        D(printfork(cur, logfile));
         goto save;
     }
     else if(vartype == TYPE_UNSUPPORTED)
     {
-        printf("Variabletype [%c] currently not supported\n", *line);
-        return(BREAK);
+        sprintf(error_str, "Variabletype [%c] currently not supported\n", *line);
+        return(EXIT);
     }
 
-    D(printf("vartype: [%d]\n", vartype));
+    D(fprintf(logfile, "vartype: [%d]\n", vartype));
     cur->type = vartype;
 
     line++;
@@ -274,7 +301,7 @@ save:
         cur_pos = cur;
     }
 
-    D(printfork(cur, stdout));
+    D(printfork(cur, logfile));
     return(0);
 }
 

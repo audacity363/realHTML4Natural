@@ -41,5 +41,6 @@ enum
 #define LDA_UNKOWN_VAR_TYPE 5
 #define LDA_UNKOWN_SAG_DEF_TYPE 6
 
-int getVariablenType(char type);
+int startLDAParser(char *ldapath, vars_t *anker, FILE *logfile_l, char *error_buffer);
 void printfork(vars_t *anker, FILE *logfile);
+void freeFork(vars_t *start);

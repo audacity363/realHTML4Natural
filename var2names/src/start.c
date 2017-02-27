@@ -11,36 +11,38 @@
 #include "rh4n.h"
 #include "rh4n_utils.h"
 
-#define LOGDEBUG(debug, logfile, fmt, args...) if(debug == true) \
-                                               {fprintf(logfile, fmt, ##args);}
-
 vars_t *resolveName(vars_t *cur_var, vars_t *group, vars_t *var_anker);
 vars_t *searchPageStructure(vars_t *lda_anker);
 
 int error_num = 0;
 int error = false;
 
-int startvar2name(vars_t *var_anker, char *lda_path, bool debug, FILE *logfile)
+int startvar2name(vars_t *var_anker, char *lda_path, bool debug, FILE *logfile, char *error_buff)
 {
     vars_t *tmp = NULL, *lda_anker = NULL, *page_grp = NULL;
     int ret = 0;
 
     initVarAnker(&lda_anker);
 
-    if((ret = startLDAParser(lda_path, lda_anker, debug, logfile)) != LDA_OK)
+    if((ret = startLDAParser(lda_path, lda_anker, logfile, error_buff)) != LDA_OK)
     {
         return(-1);
     }
+
+    if(debug)
+        printfork(page_grp, logfile);
+        
 
     if((page_grp  = searchPageStructure(lda_anker)) == NULL)
     {
-        if(debug == true)
-            fprintf(logfile, "ERROR: [%s] not found in LDA: [%s]\n", RH4N_GRP_HEAD, lda_path);
-        return(-1);
+        sprintf(error_buff, "ERROR: Structure [%s] not found in LDA: [%s]\n", RH4N_GRP_HEAD, lda_path);
+        fprintf(logfile, "%s", error_buff);
+        return(-2);
     }
     page_grp = page_grp->next_lvl;
 
-    printfork(page_grp, stdout);
+    if(debug)
+        printfork(page_grp, logfile);
 
     tmp = resolveName(var_anker, page_grp, var_anker);
     if(error != 0)
@@ -48,14 +50,18 @@ int startvar2name(vars_t *var_anker, char *lda_path, bool debug, FILE *logfile)
         switch(error)
         {
             case RH4N_VAR_LIBRARY_ERR:
-                if(debug == true)
-                    fprintf(logfile, "ERROR: [%s]\n", var_errorstrs[error_num]);
+                sprintf(error_buff, "ERROR: [%s]\n", var_errorstrs[error_num]);
+                fprintf(logfile, "%s", error_buff);
+                break;
+            case RH4N_NO_MEMORY:
+                sprintf(error_buff, "Something went totaly wrong: Error while allocating Memory\n");
+                fprintf(logfile, "%s", error_buff);
                 break;
         }
-        return(ret);
+        return(-3);
     }
 
-    //freeLDAAnker(lda_anker);
+    freeLDAAnker(lda_anker);
     return(0);
 }
 
