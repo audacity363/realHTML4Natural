@@ -19,9 +19,8 @@ int main(int argc, char *argv[])
 
     initVarAnker(&anker);
 
-    if((ret = startLDAParser(argv[1], anker, true, stdout)) != LDA_OK)
-        return(ret);
-
+    if(startLDAParser(argv[1], anker, stdout, error) < 0)
+        return(-1);
     printfork(anker, stdout);
     return(0);
 }

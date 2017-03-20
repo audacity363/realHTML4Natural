@@ -19,9 +19,12 @@ FILE *f_output;
 int parser_errno = 0;
 int varhandle_error = 0;
 
-int start(vars_t *variablen, char *template, char *output)
+int start(vars_t *variablen, char *template, char *output, FILE *logfile)
 {
-    FILE *f_template = NULL;
+    FILE *f_template = NULL, *old_stdout = stdout;
+
+    //stdout = logfile;
+    //freopen("/tmp/parser_debug.log", "w", stdout);
 
     int ret = 0;
 
@@ -33,13 +36,13 @@ int start(vars_t *variablen, char *template, char *output)
 
     if((f_template = fopen(template, "r")) == NULL)
     {
-        fprintf(stderr, "Error while opening template: [%s]\n", strerror(errno));
+        fprintf(logfile, "Error while opening template: [%s]\n", strerror(errno));
         return(-1);
     }
 
     if((f_output = fopen(output, "w")) == NULL)
     {
-        fprintf(stderr, "Error while opening Outputfile: [%s]\n", strerror(errno));
+        fprintf(logfile, "Error while opening Outputfile: [%s]\n", strerror(errno));
         return(-2);
     }
 
@@ -57,8 +60,8 @@ int start(vars_t *variablen, char *template, char *output)
 
     if(parser_errno != 0)
     {
-        printf("Error number:  [%02d]\n", parser_errno);
-        printf("Error message: [%s]\n", parser_error_strs[parser_errno]);
+        fprintf(logfile, "Error number:  [%02d]\n", parser_errno);
+        fprintf(logfile, "Error message: [%s]\n", parser_error_strs[parser_errno]);
     }
 
 #ifdef DEBUG
@@ -70,6 +73,9 @@ int start(vars_t *variablen, char *template, char *output)
 
     fclose(f_template);
     fclose(f_output);
+
+    //stdout = old_stdout;
+    return(0);
 }
 
 int getLineFromFile(FILE *template, wchar_t *line)

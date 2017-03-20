@@ -24,6 +24,8 @@ int startvar2name(vars_t *var_anker, char *lda_path, bool debug, FILE *logfile, 
 
     initVarAnker(&lda_anker);
 
+    fprintf(logfile, "Start parsing LDA [%s]\n", lda_path);
+    fflush(logfile);
     if((ret = startLDAParser(lda_path, lda_anker, logfile, error_buff)) != LDA_OK)
     {
         return(-1);
@@ -31,19 +33,27 @@ int startvar2name(vars_t *var_anker, char *lda_path, bool debug, FILE *logfile, 
 
     if(debug)
         printfork(page_grp, logfile);
+
+    fflush(logfile);
         
 
     if((page_grp  = searchPageStructure(lda_anker)) == NULL)
     {
         sprintf(error_buff, "ERROR: Structure [%s] not found in LDA: [%s]\n", RH4N_GRP_HEAD, lda_path);
         fprintf(logfile, "%s", error_buff);
+        fflush(logfile);
         return(-2);
     }
     page_grp = page_grp->next_lvl;
 
-    if(debug)
+    if(debug) {
+        fprintf(logfile, "Page Struct\n");
         printfork(page_grp, logfile);
+    }
+    fflush(logfile);
 
+    fprintf(logfile, "Start Resolve name\n");
+    fflush(logfile);
     tmp = resolveName(var_anker, page_grp, var_anker);
     if(error != 0)
     {
@@ -52,10 +62,12 @@ int startvar2name(vars_t *var_anker, char *lda_path, bool debug, FILE *logfile, 
             case RH4N_VAR_LIBRARY_ERR:
                 sprintf(error_buff, "ERROR: [%s]\n", var_errorstrs[error_num]);
                 fprintf(logfile, "%s", error_buff);
+                fflush(logfile);
                 break;
             case RH4N_NO_MEMORY:
                 sprintf(error_buff, "Something went totaly wrong: Error while allocating Memory\n");
                 fprintf(logfile, "%s", error_buff);
+                fflush(logfile);
                 break;
         }
         return(-3);

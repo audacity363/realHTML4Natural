@@ -34,7 +34,7 @@ void freeFork(vars_t *start)
         //reaced first entry
         if(hptr->prev == NULL)
         {
-            free(hptr);
+            //free(hptr);
             break;
         }
 

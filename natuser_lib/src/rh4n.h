@@ -28,10 +28,14 @@ int checkNNIReturnCode(int);
 void convert2Bto4BString(char*, wchar_t*, int);
 void convert1Bto4BString(char*, wchar_t*, int);
 void trimleadingSpaces(char *input);
+char *getSetting(struct settings_s *settings, char *name);
+int getNames(vars_t *anker, struct rh4n_parms *parms);
+
 
 extern FILE *logfile;
 
 #ifndef VAR2NAME
+
 int handleAlphaVariable(int index, void *parmhandle, pnni_611_functions nni_funcs,
                     struct parameter_description pb, char *name, vars_t *anker);
 #endif

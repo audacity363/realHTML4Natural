@@ -28,9 +28,10 @@
 FILE *logfile;
 char *error_str;
 
+
 #ifdef LOGDEBUG
 int debug_int = 1;
-#define D(x) if (!debug_int); else x
+#define D(x) if (!debug_int); else x; fflush(logfile);
 #else
 #define D(x)
 #endif
@@ -61,8 +62,10 @@ int startLDAParser(char *ldapath, vars_t *anker, FILE *logfile_l, char *error_bu
     {
         sprintf(error_str, "Error opening [%s]\nError: [%s]\n", ldapath, strerror(errno));
         fprintf(logfile, "%s\n", error_str);
+        fflush(logfile);
         return(-1);
     }
+
 
     //Jump over the LDA header
     fread(header, LDA_HEADER_OFFSET, 1, fp);
@@ -74,12 +77,14 @@ int startLDAParser(char *ldapath, vars_t *anker, FILE *logfile_l, char *error_bu
         if(cur_chr == 0x00)
         {
             complete_line[length] = 0x00;
-            if((ret = parseLine(complete_line, length, anker)) == EXIT)
+            if((ret = parseLDALine(complete_line, length, anker)) == EXIT)
             {
                 sprintf(error_str, "%sSomething went wrong while parsing [%s]\n", error_str, ldapath);
                 fprintf(logfile, "%s", error_str);
+                fflush(logfile);
                 fclose(fp);
                 free(complete_line);
+                cur_pos = NULL;
                 return(-2);
             }
             else if(ret == BREAK)
@@ -101,18 +106,24 @@ int startLDAParser(char *ldapath, vars_t *anker, FILE *logfile_l, char *error_bu
                 sprintf(error_str, "%sSomething went wrong while parsing [%s]\nError: [%s]\n", 
                     error_str, ldapath, strerror(errno));
                 fprintf(logfile, "%s", error_str);
+                fflush(logfile);
+                cur_pos = NULL;
                 return(-2);
             }
         }
     }
 
+    D(printfork(anker, logfile));
+
     free(complete_line);
     fclose(fp);
+
+    cur_pos = NULL;
 
     return(0);
 }
 
-int parseLine(char *complete_line, int length, vars_t *anker)
+int parseLDALine(char *complete_line, int length, vars_t *anker)
 {
     int level = -1, varname_length = 0,
         vartype = -1, i = 0, var_length = -3,
@@ -138,7 +149,7 @@ int parseLine(char *complete_line, int length, vars_t *anker)
 
 
 
-    D(printf("[%s]\n", line));
+    D(fprintf(logfile, "[%s]\n", line));
 
     vars_t *cur = malloc(sizeof(vars_t)),
            *hptr = NULL;
@@ -161,7 +172,10 @@ int parseLine(char *complete_line, int length, vars_t *anker)
         return(BREAK);
     }
     for(;*line == 0x20; line++);
+       
     //line++;
+
+    D(fprintf(logfile, "Check first char in line\n"));
 
     //Check if it is a init value
     if(*line == '<')
@@ -281,18 +295,21 @@ int parseLine(char *complete_line, int length, vars_t *anker)
 save:
     if(cur->level > cur_pos->level)
     {
+        D(fprintf(logfile, "create new level cur: [%d] new: [%d]\n", cur_pos->level, cur->level));
         cur_pos->next_lvl = cur;
         cur->prev = cur_pos;
         cur_pos = cur;
     }
     else if(cur->level == cur_pos->level)
     {
+        D(fprintf(logfile, "same level\n"));
         cur_pos->next = cur;
         cur->prev = cur_pos;
         cur_pos = cur;
     }
     else if(cur->level < cur_pos->level)
     {
+        D(fprintf(logfile, "Search prev level [%d] cur level [%d]\n", cur->level, cur_pos->level));
         hptr = cur_pos;
         while(hptr->level != cur->level)
             hptr = hptr->prev;
