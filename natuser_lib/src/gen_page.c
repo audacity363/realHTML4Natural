@@ -48,49 +48,68 @@ long gen_page(WORD nparms, void *parmhandle, void *traditional)
 
     pnni_611_functions nni_funcs;
     void *shlib = NULL;
+    char *logfilepath = NULL;
 
     vars_t *var_anker = NULL;
 
-    if((logfile = fopen("/tmp/t_logfile.log", "w")) == NULL)
+    /*if((logfile = fopen("/tmp/t_logfile.log", "w")) == NULL)
     {
         return(100);
     }
     fprintf(logfile, "Lets Go\n");
-    fflush(logfile);
+    fflush(logfile);*/
 
     if(initVarAnker(&var_anker) != 0)
     {
-        fprintf(logfile, "Error while init var anker\n");
+        /*fprintf(logfile, "Error while init var anker\n");
         fflush(logfile);
-        fclose(logfile);
+        fclose(logfile);*/
         return(-1);
     }
 
 
     if(OpenLib(&shlib, NAT_LIB_NAME) < 0)
     {
-        fprintf(logfile, "Error while loading natural.so\n");
+        /*fprintf(logfile, "Error while loading natural.so\n");
         fflush(logfile);
-        fclose(logfile);
+        fclose(logfile);*/
         return(-2);
     }
 
-    fprintf(logfile, "Done loading SO. Pointer: [%p]\n", shlib);
-    fflush(logfile);
+    /*fprintf(logfile, "Done loading SO. Pointer: [%p]\n", shlib);
+    fflush(logfile);*/
 
     if((nni_funcs = initNNI(shlib)) == 0x00)
     {
         CloseLib(&shlib);
-        fflush(logfile);
-        fclose(logfile);
+        //fflush(logfile);
+        //fclose(logfile);
         return(-3);
     }
+
+    //First read out the setting so we know if the logging should be enabled or not
+    if((ret = parseSettings(parmhandle, nni_funcs, &parms.settings)) != NNI_RC_OK)
+        goto cleanup;
+
+    for(i=0; i < parms.settings.length; i++)
+        fprintf(logfile, "[%s]=[%s]\n", parms.settings.key[i], parms.settings.value[i]);
+    fflush(logfile);
+
+    if(checkSettings(&parms.settings) < 0)
+    {
+        ret = -5;
+        goto cleanup;
+    }
+
+
+
+    fprintf(logfile, "parmhandle:[%p]\n\n", parmhandle);
 
     //Read out the LDA name    
     if((ret = getSettingParm(parmhandle, nni_funcs, &parms.lda_name, LDAPOS)) == -1)
     {
-        fprintf(logfile, "ret: [%d]\n", ret);
-        fflush(logfile);
+        /*fprintf(logfile, "ret: [%d]\n", ret);
+        fflush(logfile);*/
         ret = RH4N_LDA_FORMAT_ERR;
         goto cleanup;
     }
@@ -98,6 +117,27 @@ long gen_page(WORD nparms, void *parmhandle, void *traditional)
         goto cleanup;
 
     trimSpaces(parms.lda_name);
+
+    if(strcmp(getSetting(&parms.settings, "debug"), "true") == 0)
+    {
+        //Debug enabled log into /tmp/<LDANAME>.log
+        logfilepath = malloc((10+strlen(parms.lda_name))*sizeof(char));
+        sprintf(logfilepath, "/tmp/%s.log", parms.lda_name);
+
+        if((logfile = fopen(logfilepath, "w")) == NULL)
+        {
+            ret = -1;
+            goto cleanup;
+        }
+    }
+    else
+    {
+        if((logfile = fopen("/dev/null", "w")) == NULL)
+        {
+            ret = -1;
+            goto cleanup;
+        }
+    }
 
     fprintf(logfile, "LDAname: [%s]\n", parms.lda_name);
     fflush(logfile);
@@ -124,21 +164,7 @@ long gen_page(WORD nparms, void *parmhandle, void *traditional)
     else if(ret != NNI_RC_OK)
         goto cleanup;
 
-    if((ret = parseSettings(parmhandle, nni_funcs, &parms.settings)) != NNI_RC_OK)
-        goto cleanup;
-
-    for(i=0; i < parms.settings.length; i++)
-        fprintf(logfile, "[%s]=[%s]\n", parms.settings.key[i], parms.settings.value[i]);
-    fflush(logfile);
-
-    if(checkSettings(&parms.settings) < 0)
-    {
-        ret = -5;
-        goto cleanup;
-    }
-
-
-    fprintf(logfile, "parmhandle:[%p]\n\n", parmhandle);
+    
     fflush(logfile);
     for(var_index=4; var_index < nparms; var_index++)
     {
@@ -157,6 +183,9 @@ long gen_page(WORD nparms, void *parmhandle, void *traditional)
     printAllVarsToFile(var_anker, logfile);
 
 cleanup:
+
+    if(logfilepath != NULL)
+        free(logfilepath);
 
     free(parms.lda_name);
     free(parms.template_name);
@@ -409,7 +438,7 @@ int checkSettings(struct settings_s *settings)
         }
         if(found[i] == 0)
         {
-            fprintf(logfile, "Error: Setting [%s] was not found\n", must_set_settings[i]);
+            printf("Error: Setting [%s] was not found\n", must_set_settings[i]);
             return(-1);
         }
     }
@@ -541,16 +570,14 @@ pnni_611_functions initNNI(void *lib)
     if(!(pf_nni_get_interface = (PF_NNI_GET_INTERFACE)dlsym(lib, GET_INTERFACE_FUNC)))
     {
         error = dlerror();
-        fprintf(logfile, "Error while loading Function [%s]: [%s]\n", GET_INTERFACE_FUNC,
+        printf("Error while loading Function [%s]: [%s]\n", GET_INTERFACE_FUNC,
             error);
-        fflush(logfile);
         return(NULL);
     }
 
     if(((pf_nni_get_interface)(NNI_VERSION_611, (void**)&s_funcs)) != NNI_RC_OK)
     {
-        fprintf(logfile, "...Error while gettings Function Table\n");
-        fflush(logfile);
+        printf("...Error while gettings Function Table\n");
         return(NULL);
     }
 
@@ -565,7 +592,7 @@ int OpenLib(void **shLib, char *name)
     if(!*shLib)
     {
         error = dlerror();
-        fprintf(logfile, "Error while loading Module [%s]: [%s]\n", name, error);
+        printf("Error while loading Module [%s]: [%s]\n", name, error);
         return(-1);
     }
     return(0);
