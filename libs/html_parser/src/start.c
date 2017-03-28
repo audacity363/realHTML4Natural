@@ -16,15 +16,13 @@
 vars_t *vars_anker;
 macro_definition_t *macro_defs;
 FILE *f_output;
+FILE *logfile;
 int parser_errno = 0;
 int varhandle_error = 0;
 
-int start(vars_t *variablen, char *template, char *output, FILE *logfile)
+int start(vars_t *variablen, char *template, char *output, FILE *l_logfile)
 {
     FILE *f_template = NULL, *old_stdout = stdout;
-
-    //stdout = logfile;
-    //freopen("/tmp/parser_debug.log", "w", stdout);
 
     int ret = 0;
 
@@ -33,6 +31,8 @@ int start(vars_t *variablen, char *template, char *output, FILE *logfile)
     status_t status = {-1, 0, 0, 0, 0, 0, NULL};
 
     setlocale(LC_ALL, "");
+
+    logfile = l_logfile;
 
     if((f_template = fopen(template, "r")) == NULL)
     {
@@ -74,7 +74,6 @@ int start(vars_t *variablen, char *template, char *output, FILE *logfile)
     fclose(f_template);
     fclose(f_output);
 
-    //stdout = old_stdout;
     return(0);
 }
 

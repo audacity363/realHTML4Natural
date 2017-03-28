@@ -130,6 +130,7 @@ typedef struct macro_definition_s macro_definition_t;
 extern vars_t *vars_anker;
 extern macro_definition_t *macro_defs;
 extern FILE *f_output;
+extern FILE *logfile;
 
 void freeLineBuff(status_t *stat);
 int parseLine(wchar_t *line, status_t *status);

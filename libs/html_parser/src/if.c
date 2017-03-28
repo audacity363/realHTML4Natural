@@ -443,6 +443,7 @@ token_t *findParms(if_parms_t *parms, token_t *head)
 int end_if_handling(token_t *anker, status_t *stat)
 {
     wchar_t *if_head;
+    int ret = 0;
 
     token_t head = {' ', -1, NULL, NULL},
             *parm_start,
@@ -483,8 +484,8 @@ int end_if_handling(token_t *anker, status_t *stat)
     stat->just_save = false;
     stat->lookfor = 0;
 
-    exec_if(&parms, stat->save_buff, stat->sizeof_sav_buff);
+    ret = exec_if(&parms, stat->save_buff, stat->sizeof_sav_buff);
 
     freeLineBuff(stat);
-    return(0);
+    return(ret);
 }
