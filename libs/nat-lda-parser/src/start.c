@@ -41,6 +41,7 @@ char *getVariablenLength(char *line, int *length, int type);
 char *getArrayType(char *line, int *array_type, int *index);
 char *my_strtok(char *str, char delmiter);
 void updateVarType(vars_t *target, int index_type);
+int getVariablenType(char type);
 
 vars_t *cur_pos = NULL;
 vars_t *grp_head = NULL;
