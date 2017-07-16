@@ -4,6 +4,10 @@ The project started in 2014 because i had enough from the slow and inconvenient 
 
 A full documentation you can find here: http://engemann.me/realhtml/docs
 
+Builds successfully with the gcc under RedHat 7.3, OpenSuse 42.2, Debian 8.8 and with the xlc under AIX 7.1
+
+Tested successfully under AIX 7.1
+
 
 ### Warning:
 #### For Version 2.0_beta:
