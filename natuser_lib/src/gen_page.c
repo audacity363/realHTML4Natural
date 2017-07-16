@@ -235,6 +235,7 @@ int readOutVariable(int index, void *parmhandle, pnni_611_functions nni_funcs,
                     pd, tmp_name, anker);
             break;
         case NNI_TYPE_FLOAT:
+            //TODO: implementieren
             break;
         case NNI_TYPE_LOG:
             ret = handleLogicVariable(index, parmhandle, nni_funcs,

@@ -14,11 +14,14 @@ lda_parser: var_lib
 var2name: var_lib utils lda_parser 
 	cd ./var2names/ && make $(MAKEFILENAME) $(TARGET)
 
-nat: html_parser var_lib utils lda_parser
+nat: html_parser var_lib utils lda_parser var2name hexdump
 	cd ./natuser_lib/ && make $(MAKEFILENAME) $(TARGET)
 
 utils:
 	cd ./libs/utils/ && make $(MAKEFILENAME) $(TARGET)
 
-var_lib:
+var_lib: utils
 	cd ./libs/varhandle_lib/ && make $(MAKEFILENAME) $(TARGET)
+
+hexdump:
+	cd ./libs/hexdump/ && make $(MAKEFILENAME) $(TARGET)

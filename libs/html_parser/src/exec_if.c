@@ -7,7 +7,6 @@
 #include "parser.h"
 #include "parser_errno.h"
 #include "exec_if.h"
-#include "error_vars.h"
 
 /*
  * Currently the if just works with one query. The rest of the

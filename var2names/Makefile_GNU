@@ -15,7 +15,7 @@ lib: $(OBJ)
 	ar -vcru libvar2name.a ./bin/*.o
 	
 %.o: ./src/%.c
-	gcc -g -c $< $(INCLUDE) -o ./bin/$@
+	gcc -g -fPIC -c $< $(INCLUDE) -o ./bin/$@
 
 test:
 	gcc -g ./test_src/main.c $(INCLUDE) $(LIBS) -o ./test_src/main

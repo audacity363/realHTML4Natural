@@ -17,10 +17,10 @@ lib: $(OBJ)
 	ar -vcru libvars.a ./bin/*.o ./bin/print/*.o
 	
 $(OBJ): $(PRINT_OBJ)
-	gcc -g -c ./src/$*.c $(INCLUDE) -o ./bin/$*.o 
+	gcc -g -fPIC -c ./src/$*.c $(INCLUDE) -o ./bin/$*.o 
 
 $(PRINT_OBJ):
-	gcc -g -c ./src/print/$*.c $(INCLUDE) -o ./bin/print/$*.o
+	gcc -g -fPIC -c ./src/print/$*.c $(INCLUDE) -o ./bin/print/$*.o
 	
 test:
 	gcc -g ./test_src/main.c $(INCLUDE) -o ./test_src/main -L./ -lvars

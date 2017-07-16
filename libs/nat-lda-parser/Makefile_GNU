@@ -8,7 +8,7 @@ lib: $(OBJ)
 	ar -vcru libldaparser.a ./bin/*.o
 	
 %.o: ./src/%.c
-	gcc -g -c $< $(INCLUDE) -o ./bin/$@
+	gcc -g -fPIC -c $< $(INCLUDE) -o ./bin/$@
 
 clean:
 	rm -rf libldaparser.a
