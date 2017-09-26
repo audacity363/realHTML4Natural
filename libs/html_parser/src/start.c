@@ -37,14 +37,12 @@ int start(vars_t *variablen, char *template, char *output, FILE *l_logfile)
     if((f_template = fopen(template, "r")) == NULL)
     {
         fprintf(logfile, "Error while opening template: [%s]\n", strerror(errno));
-        printf("Error while opening template: [%s]\n", strerror(errno));
         return(-1);
     }
 
     if((f_output = fopen(output, "w")) == NULL)
     {
         fprintf(logfile, "Error while opening Outputfile: [%s]\n", strerror(errno));
-        printf("Error while opening Outputfile: [%s]\n", strerror(errno));
         return(-2);
     }
 
@@ -74,10 +72,7 @@ int start(vars_t *variablen, char *template, char *output, FILE *l_logfile)
     freeMacros(macro_defs);
 
     fclose(f_template);
-    fflush(f_output);
     fclose(f_output);
-
-    printf("closing output file: [%s] pid: [%d]\n", output, getpid());
 
     return(0);
 }

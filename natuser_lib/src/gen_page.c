@@ -602,5 +602,3 @@ void CloseLib(void **shLib)
 {
     dlclose(*shLib);
 }
-
-
