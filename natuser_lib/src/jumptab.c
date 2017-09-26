@@ -20,6 +20,7 @@
 */
 
 extern long gen_page();
+extern long gen_json();
 
 
 /*
@@ -33,6 +34,7 @@ extern long gen_page();
 
 TAB_STRUCT n_call_table[] = {
 
+  { "GENJSON", gen_json},
   { "GENPAGE", gen_page}
 
 };

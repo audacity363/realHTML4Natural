@@ -14,7 +14,7 @@ lda_parser: var_lib
 var2name: var_lib utils lda_parser 
 	cd ./var2names/ && make $(MAKEFILENAME) $(TARGET)
 
-nat: html_parser var_lib utils lda_parser
+nat: var2name html_parser var_lib utils lda_parser
 	cd ./natuser_lib/ && make $(MAKEFILENAME) $(TARGET)
 
 utils:

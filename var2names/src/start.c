@@ -11,51 +11,70 @@
 #include "rh4n.h"
 #include "rh4n_utils.h"
 
-#define LOGDEBUG(debug, logfile, fmt, args...) if(debug == true) \
-                                               {fprintf(logfile, fmt, ##args);}
-
 vars_t *resolveName(vars_t *cur_var, vars_t *group, vars_t *var_anker);
-vars_t *searchPageStructure(vars_t *lda_anker);
+vars_t *searchPageStructure(vars_t *lda_anker, char*);
 
 int error_num = 0;
 int error = false;
 
-int startvar2name(vars_t *var_anker, char *lda_path, bool debug, FILE *logfile)
+int startvar2name(vars_t *var_anker, char *lda_path, bool debug, FILE *logfile, char *groupname, char *error_buff)
 {
     vars_t *tmp = NULL, *lda_anker = NULL, *page_grp = NULL;
     int ret = 0;
 
     initVarAnker(&lda_anker);
 
-    if((ret = startLDAParser(lda_path, lda_anker, debug, logfile)) != LDA_OK)
+    fprintf(logfile, "Start parsing LDA [%s]\n", lda_path);
+    fprintf(logfile, "Debug = [%d]\n", debug);
+    fflush(logfile);
+    if((ret = startLDAParser(lda_path, lda_anker, logfile, error_buff)) != LDA_OK)
     {
         return(-1);
     }
 
-    if((page_grp  = searchPageStructure(lda_anker)) == NULL)
+    if(debug)
+        printfork(lda_anker, logfile);
+
+    fflush(logfile);
+        
+
+    if((page_grp  = searchPageStructure(lda_anker, groupname)) == NULL)
     {
-        if(debug == true)
-            fprintf(logfile, "ERROR: [%s] not found in LDA: [%s]\n", RH4N_GRP_HEAD, lda_path);
-        return(-1);
+        sprintf(error_buff, "ERROR: Structure [%s] not found in LDA: [%s]\n", groupname, lda_path);
+        fprintf(logfile, "%s", error_buff);
+        fflush(logfile);
+        return(-2);
     }
     page_grp = page_grp->next_lvl;
 
-    printfork(page_grp, stdout);
+    if(debug) {
+        fprintf(logfile, "Page Struct\n");
+        printfork(page_grp, logfile);
+    }
+    fflush(logfile);
 
+    fprintf(logfile, "Start Resolve name\n");
+    fflush(logfile);
     tmp = resolveName(var_anker, page_grp, var_anker);
     if(error != 0)
     {
         switch(error)
         {
             case RH4N_VAR_LIBRARY_ERR:
-                if(debug == true)
-                    fprintf(logfile, "ERROR: [%s]\n", var_errorstrs[error_num]);
+                sprintf(error_buff, "ERROR: [%s]\n", var_errorstrs[error_num]);
+                fprintf(logfile, "%s", error_buff);
+                fflush(logfile);
+                break;
+            case RH4N_NO_MEMORY:
+                sprintf(error_buff, "Something went totaly wrong: Error while allocating Memory\n");
+                fprintf(logfile, "%s", error_buff);
+                fflush(logfile);
                 break;
         }
-        return(ret);
+        return(-3);
     }
 
-    //freeLDAAnker(lda_anker);
+    freeLDAAnker(lda_anker);
     return(0);
 }
 
@@ -129,7 +148,7 @@ vars_t *resolveName(vars_t *nat_set, vars_t *lda_set, vars_t *var_anker)
     return(cur_nat_set);
 }
 
-vars_t *searchPageStructure(vars_t *lda_anker)
+vars_t *searchPageStructure(vars_t *lda_anker, char *groupname)
 {
     vars_t *hptr = lda_anker->next;
 
@@ -137,7 +156,7 @@ vars_t *searchPageStructure(vars_t *lda_anker)
 
     while(hptr)
     {
-        if(strcmp(str_toLower(hptr->name), RH4N_GRP_HEAD) == 0)
+        if(strcmp(str_toLower(hptr->name), groupname) == 0)
         {
             return(hptr);
         }

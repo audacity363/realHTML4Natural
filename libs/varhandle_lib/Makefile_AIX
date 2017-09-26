@@ -26,3 +26,4 @@ $(PRINT_OBJ):
 clean:
 	rm -rf libvars.a
 	rm -rf ./bin/*.o
+	rm -rf ./bin/print/*.o

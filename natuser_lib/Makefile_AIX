@@ -1,4 +1,4 @@
-OBJ = ncuxinit.o gen_page.o jumptab.o
+OBJ = ncuxinit.o gen_page.o gen_json.o jumptab.o
 
 VAR_OBJ = a_handling.o n_handling.o l_handling.o i_handling.o u_handling.o
 
@@ -6,11 +6,17 @@ INCLUDE = -I./src/ \
 		  -I../include/ \
 		  -I../libs/varhandle_lib/src/ \
 		  -I../libs/hexdump/src/ \
-		  -I../libs/utils/src/
+		  -I../libs/utils/src/ \
+		  -I../libs/nat-lda-parser/src/ \
+		  -I../libs/html_parser/src/ \
+		  -I../var2names/src/
 
 LIBS = -L../libs/varhandle_lib/ -lvars \
 	   -L../libs/hexdump/ -lhexdump \
-	   -L../libs/utils/ -lutils
+	   -L../libs/utils/ -lutils \
+	   -L../libs/nat-lda-parser/ -lldaparser \
+	   -L../libs/html_parser/ -lhtml_parser \
+	   -L../var2names/ -lvar2name
 
 
 LFLAGS1 = -G -bsymbolic -bexpall -bnoentry
@@ -36,6 +42,6 @@ test:
 	gcc -g ./test_src/main.c $(INCLUDE) -o ./test -L./ -lldaparser -I./src/ $(LIBS)
 
 callnat:
-	export NATUSER=/u/it/a140734/realHTML4Natural/natuser_lib/librealHTML4Natural.so \
-	&& natural parm=logiparm etid=$$$$ STACK="(logon tgap0734;testcall;fin)"
-	cat ./logfile.log
+	export NATUSER=/u/it/a140734/rh4n/realHTML4Natural/natuser_lib/librealHTML4Natural.so \
+		&& natural parm=logiparm etid=$$$$ STACK="(logon tgap0734;testcall;fin)"
+	cat /tmp/TESTLDA.log

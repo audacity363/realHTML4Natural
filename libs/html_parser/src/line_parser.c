@@ -132,7 +132,7 @@ int parseLine(wchar_t *line, status_t *status)
             }
             if(searchBlockEnd(begin, &end, inblock) == false)
             {
-                fprintf(stderr, "Syntax Error Missing Endbracked\n");
+                fprintf(logfile, "Syntax Error Missing Endbracked\n");
                 parser_errno = MISSING_CMD_BLOCK_END;
                 break;
             }

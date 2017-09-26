@@ -48,6 +48,9 @@ int (*function_dic_v[FUNCTION_DIC_LENGTH])(token_t *anker, status_t *stat) = {
 
 int exit_handling(token_t *anker, status_t *stat)
 {
+    if(stat->just_save)
+        return(JUSTSAVE);
+
     return(EXIT);
 }
 
@@ -328,7 +331,7 @@ int parseCommand(wchar_t *begin, wchar_t *end, status_t *stat)
     if((offset = jumpToOffset(&anker, end_cmd_offset)) == NULL)
     {
         free(cmd_name);
-        fprintf(stderr, "Offset to high\n");
+        fprintf(logfile, "Offset to high\n");
         return(-3);
     }
 
@@ -345,6 +348,7 @@ int parseCommand(wchar_t *begin, wchar_t *end, status_t *stat)
     }
 
     ret = cmd_func(offset, stat);
+    //fprintf(logfile, "Return code from the called handle: [%d]\n", ret);
 
     free(cmd_name);
     cleanUpTokenList(&anker);

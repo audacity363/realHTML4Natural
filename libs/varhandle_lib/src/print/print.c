@@ -86,9 +86,9 @@ void printAllVarsJSON(vars_t *anker)
 
 void printAllVarsToFileJSON(vars_t *anker, FILE *fp)
 {
-    fprintf(fp, "{\n");
+    fprintf(fp, "{");
     printAllVarsToFile_in(anker, fp, 0, true);
-    fprintf(fp, "}\n");
+    fprintf(fp, "}");
 }
 
 //Add Group parsing
@@ -137,8 +137,11 @@ void printAllVarsToFile_in(vars_t *anker, FILE *fp, int offset, bool json)
         {
             if(print_function_dic_i[i] == hptr->type)
             {
-                for(x=0; x < offset; x++)
-                    printf("\t");
+                if(!json)
+                {
+                    for(x=0; x < offset; x++)
+                        printf("\t");
+                }
                 print_func = print_function_dic_v[i];
                 print_func(hptr, fp, json);
             }

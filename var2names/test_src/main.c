@@ -11,21 +11,21 @@ vars_t *handleGroup(vars_t *cur_var, vars_t *group);
 
 int main()
 {
+    char error_buffer[2024];
     vars_t *hptr = NULL,
            *nat_anker = NULL;
 
     initVarAnker(&nat_anker);
 
-    addString(nat_anker, NULL, "tmp4", L"Hello World", 11);
-    addInteger(nat_anker, NULL, "tmp5", 7);
-    addString(nat_anker, NULL, "tmp6", L"Hello World1", 12);
-    addString(nat_anker, NULL, "tmp7", L"Hello World2", 12);
-    addString(nat_anker, NULL, "tmp8", L"Hello World3", 12);
-    addInteger(nat_anker, NULL, "tmp9", 10);
-    addInteger(nat_anker, NULL, "tmp10", 8);
-    addInteger(nat_anker, NULL, "tmp11", 9);
+    add1DStringArray(nat_anker, NULL, "tmp1", 10, 10);
+    add1DStringArray(nat_anker, NULL, "tmp2", 10, 10);
+    add2DStringArray(nat_anker, NULL, "tmp3", 10, 10, 20);
 
-    if(startvar2name(nat_anker->next, "./test_src/TESTLDA.NSL", true, stdout) != 0)
+    //add3DStringArray(nat_anker, NULL, "tmp4", 1, 2, 4, 30);
+    //addString(nat_anker, NULL, "tmp5", L"Hello World", 11);
+    
+
+    if(startvar2name(nat_anker->next, "./test_src/TEST.NGL", true, stdout, error_buffer) != 0)
     {
         printAllVars(nat_anker);
         return(1);

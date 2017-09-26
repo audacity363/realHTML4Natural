@@ -16,7 +16,8 @@
 int exec_if(if_parms_t *parms, wchar_t **body, int body_length)
 {
     int i = 0,
-        length = -1, memcmpret = 0;
+        length = -1, memcmpret = 0,
+        ret = 0;
 
     int truth_lookup[7] =  
     {
@@ -44,12 +45,7 @@ int exec_if(if_parms_t *parms, wchar_t **body, int body_length)
                *compare = NULL,
                *rightval = NULL;
 
-    status_t status;  
-
-    status.in_for = 0;
-    status.in_if = 0;
-    status.save_buff= NULL;
-    status.sizeof_sav_buff = 0;
+    status_t status = {-1, 0, 0, 0, 0, 0, NULL};
 
     //Check if the first three parms are set
     if(!parms->next)
@@ -71,7 +67,7 @@ int exec_if(if_parms_t *parms, wchar_t **body, int body_length)
 
     
     memcmpret = memcmp(leftval->data, rightval->data, length);
-    printf("Memret: [%d]\n", memcmpret);
+    fprintf(logfile, "Memret: [%d]\n", memcmpret);
 
     for(i=0; i < 6; i++)
     {
@@ -82,18 +78,24 @@ int exec_if(if_parms_t *parms, wchar_t **body, int body_length)
     if(memcmpret < 0)
         memcmpret += 3;
 
-    printf("the truth: [%d]\n", truth_table[i][memcmpret]);
+    fprintf(logfile, "the truth: [%d]\n", truth_table[i][memcmpret]);
     if(truth_table[i][memcmpret] == 0)
     {
         return(0);
     }
 
-    printf("---------If body-------\n");
+    fprintf(logfile, "Body length: [%d]\n", body_length);
+
+    fprintf(logfile, "---------If body-------\n");
     for(i=1; i < body_length; i++)
     {
-        parseLine(body[i], &status);
+        fprintf(logfile, "line: [%S]\n", body[i]);
+        if((ret = parseLine(body[i], &status)) == EXIT)
+            break;
+        //fprintf(logfile, "ret: [%d]\n", ret);
     }
-    printf("---------end-if--------\n");
+    //fprintf(logfile, "last ret: [%d]\n", ret);
+    fprintf(logfile, "---------end-if--------\n");
     freeLineBuff(&status);
-    return(0);
+    return(ret);
 }
