@@ -16,9 +16,13 @@ int handleAlphaVariable(int index, void *parmhandle, pnni_611_functions nni_func
 
     wchar_t *wc_buffer = NULL;
     int ret = 0, i = 0, x = 0, y = 0, z = 0, dyn_flag = 0,
-        length = 0, max_length = 0, occ[3];
+        length = 0, max_length = 0, occ[3], x_array = 0;
 
     dyn_flag = pb.flags & NNI_FLG_DYNVAR;
+    x_array = pb.flags & NNI_FLG_XARRAY;
+
+    if(x_array && pb.length_all == 0) 
+        return(RH4N_XARRAY_ERROR);
 
     if(pb.dimensions == 0)
     {
@@ -40,7 +44,7 @@ int handleAlphaVariable(int index, void *parmhandle, pnni_611_functions nni_func
         {
             free(c_tmp_buff);
             free(wc_buffer);
-            return(ret);
+            return(ret*-1);
         }
 
         
@@ -65,7 +69,7 @@ int handleAlphaVariable(int index, void *parmhandle, pnni_611_functions nni_func
                 ret = nni_funcs->pf_nni_get_parm_array_length(nni_funcs, index, parmhandle, &length, occ);
                 if(checkNNIReturnCode(ret) != NNI_RC_OK)
                 {
-                    return(ret);
+                    return(ret*-1);
                 }
                 if(length > max_length)
                     max_length = length;
@@ -104,7 +108,7 @@ int handleAlphaVariable(int index, void *parmhandle, pnni_611_functions nni_func
             {
                 free(c_tmp_buff);
                 free(wc_buffer);
-                return(ret);
+                return(ret*-1);
             }
 
 
@@ -134,7 +138,7 @@ int handleAlphaVariable(int index, void *parmhandle, pnni_611_functions nni_func
                     ret = nni_funcs->pf_nni_get_parm_array_length(nni_funcs, index, parmhandle, &length, occ);
                     if(checkNNIReturnCode(ret) != NNI_RC_OK)
                     {
-                        return(ret);
+                        return(ret*-1);
                     }
                     if(length > max_length)
                         max_length = length;
@@ -180,7 +184,7 @@ int handleAlphaVariable(int index, void *parmhandle, pnni_611_functions nni_func
                 {
                     free(c_tmp_buff);
                     free(wc_buffer);
-                    return(ret);
+                    return(ret*-1);
                 }
                 
                 convert1Bto4BString(c_tmp_buff, wc_buffer, strlen(c_tmp_buff)+1);
@@ -211,7 +215,7 @@ int handleAlphaVariable(int index, void *parmhandle, pnni_611_functions nni_func
                         ret = nni_funcs->pf_nni_get_parm_array_length(nni_funcs, index, parmhandle, &length, occ);
                         if(checkNNIReturnCode(ret) != NNI_RC_OK)
                         {
-                            return(ret);
+                            return(ret*-1);
                         }
                         if(length > max_length)
                             max_length = length;
@@ -257,7 +261,7 @@ int handleAlphaVariable(int index, void *parmhandle, pnni_611_functions nni_func
                     {
                         free(c_tmp_buff);
                         free(wc_buffer);
-                        return(ret);
+                        return(ret*-1);
                     }
 
                     convert1Bto4BString(c_tmp_buff, wc_buffer, strlen(c_tmp_buff)+1);

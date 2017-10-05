@@ -18,6 +18,9 @@ int handleUnicodeVariable(int index, void *parmhandle, pnni_611_functions nni_fu
     int ret = 0, i = 0, x = 0, y = 0, z = 0, dyn_flag = 0,
         length = 0, max_length = 0, occ[3];
 
+    if((pb.flags & NNI_FLG_XARRAY) && pb.length_all == 0)
+        return(RH4N_XARRAY_ERROR);
+
     dyn_flag = pb.flags & NNI_FLG_DYNVAR;
 
     if(pb.dimensions == 0)
@@ -40,7 +43,7 @@ int handleUnicodeVariable(int index, void *parmhandle, pnni_611_functions nni_fu
         {
             free(c_tmp_buff);
             free(wc_buffer);
-            return(ret);
+            return(ret*-1);
         }
 
         convert2Bto4BString(c_tmp_buff, wc_buffer, pb.length);
@@ -64,7 +67,7 @@ int handleUnicodeVariable(int index, void *parmhandle, pnni_611_functions nni_fu
                 ret = nni_funcs->pf_nni_get_parm_array_length(nni_funcs, index, parmhandle, &length, occ);
                 if(checkNNIReturnCode(ret) != NNI_RC_OK)
                 {
-                    return(ret);
+                    return(ret*-1);
                 }
                 if(length > max_length)
                     max_length = length;
@@ -103,7 +106,7 @@ int handleUnicodeVariable(int index, void *parmhandle, pnni_611_functions nni_fu
             {
                 free(c_tmp_buff);
                 free(wc_buffer);
-                return(ret);
+                return(ret*-1);
             }
 
             convert2Bto4BString(c_tmp_buff, wc_buffer, strlen(c_tmp_buff)+1);
@@ -131,7 +134,7 @@ int handleUnicodeVariable(int index, void *parmhandle, pnni_611_functions nni_fu
                     ret = nni_funcs->pf_nni_get_parm_array_length(nni_funcs, index, parmhandle, &length, occ);
                     if(checkNNIReturnCode(ret) != NNI_RC_OK)
                     {
-                        return(ret);
+                        return(ret*-1);
                     }
                     if(length > max_length)
                         max_length = length;
@@ -177,7 +180,7 @@ int handleUnicodeVariable(int index, void *parmhandle, pnni_611_functions nni_fu
                 {
                     free(c_tmp_buff);
                     free(wc_buffer);
-                    return(ret);
+                    return(ret*-1);
                 }
 
                 
@@ -209,7 +212,7 @@ int handleUnicodeVariable(int index, void *parmhandle, pnni_611_functions nni_fu
                         ret = nni_funcs->pf_nni_get_parm_array_length(nni_funcs, index, parmhandle, &length, occ);
                         if(checkNNIReturnCode(ret) != NNI_RC_OK)
                         {
-                            return(ret);
+                            return(ret*-1);
                         }
                         if(length > max_length)
                             max_length = length;
@@ -255,7 +258,7 @@ int handleUnicodeVariable(int index, void *parmhandle, pnni_611_functions nni_fu
                     {
                         free(c_tmp_buff);
                         free(wc_buffer);
-                        return(ret);
+                        return(ret*-1);
                     }
 
                     convert2Bto4BString(c_tmp_buff, wc_buffer, strlen(c_tmp_buff)+1);

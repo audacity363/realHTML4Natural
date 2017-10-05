@@ -3,3 +3,5 @@ core
 *~
 *.o
 *.a
+*.so
+.nfs*

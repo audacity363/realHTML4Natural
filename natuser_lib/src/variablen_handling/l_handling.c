@@ -18,9 +18,14 @@ bool convertToBool(char res)
 int handleLogicVariable(int index, void *parmhandle, pnni_611_functions nni_funcs,
                     struct parameter_description pd, char *name, vars_t *anker)
 {
-    int ret = 0, x, y, z, occ[3];
+    int ret = 0, x, y, z, occ[3], x_array;
     char result = 0;
     bool b_buff = false;
+
+    x_array = pd.flags & NNI_FLG_XARRAY;
+
+    if(x_array && pd.length_all == 0)
+        return(RH4N_XARRAY_ERROR);
 
     fprintf(logfile, "Bool length: [%d]\n", pd.byte_length);
 
@@ -28,7 +33,7 @@ int handleLogicVariable(int index, void *parmhandle, pnni_611_functions nni_func
     {
         ret = nni_funcs->pf_nni_get_parm(nni_funcs, index, parmhandle, NAT_BOOL_SIZE, &result);
         if(checkNNIReturnCode(ret) != NNI_RC_OK)
-            return(ret);
+            return(ret*-1);
 
         b_buff = convertToBool(result);
 
@@ -48,7 +53,7 @@ int handleLogicVariable(int index, void *parmhandle, pnni_611_functions nni_func
             occ[0] = x; occ[1] = occ[2] = 0;
             ret = nni_funcs->pf_nni_get_parm_array(nni_funcs, index, parmhandle, NAT_BOOL_SIZE, &result, occ);
             if(checkNNIReturnCode(ret) != NNI_RC_OK)
-                return(ret);
+                return(ret*-1);
 
             b_buff = convertToBool(result);
 
@@ -70,7 +75,7 @@ int handleLogicVariable(int index, void *parmhandle, pnni_611_functions nni_func
                 occ[0] = x; occ[1] = y; occ[2] = 0;
                 ret = nni_funcs->pf_nni_get_parm_array(nni_funcs, index, parmhandle, NAT_BOOL_SIZE, &result, occ);
                 if(checkNNIReturnCode(ret) != NNI_RC_OK)
-                    return(ret);
+                    return(ret*-1);
 
                 b_buff = convertToBool(result);
 
@@ -93,7 +98,7 @@ int handleLogicVariable(int index, void *parmhandle, pnni_611_functions nni_func
                     occ[0] = x; occ[1] = y; occ[2] = z;
                     ret = nni_funcs->pf_nni_get_parm_array(nni_funcs, index, parmhandle, NAT_BOOL_SIZE, &result, occ);
                     if(checkNNIReturnCode(ret) != NNI_RC_OK)
-                        return(ret);
+                        return(ret*-1);
 
                     b_buff = convertToBool(result);
 

@@ -1,4 +1,4 @@
-OBJ = ncuxinit.o gen_page.o gen_json.o jumptab.o
+OBJ = ncuxinit.o gen_page.o gen_json.o jumptab.o natutils.o
 
 VAR_OBJ = a_handling.o n_handling.o l_handling.o i_handling.o u_handling.o
 
@@ -43,5 +43,5 @@ test:
 
 callnat:
 	export NATUSER=/u/it/a140734/rh4n/realHTML4Natural/natuser_lib/librealHTML4Natural.so \
-		&& natural parm=logiparm etid=$$$$ STACK="(logon tgap0734;testcall;fin)"
+		&& natural parm=logiparm etid=$$$$ STACK="(logon tgap0734;callt;fin)"
 	cat /tmp/TESTLDA.log

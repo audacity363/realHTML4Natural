@@ -26,6 +26,9 @@ int shiftInt(int, int);
 int handleIntegerVariable(int index, void *parmhandle, pnni_611_functions nni_funcs,
                     struct parameter_description pd, char *name, vars_t *anker)
 {
+    if((pd.flags & NNI_FLG_XARRAY) && pd.length_all == 0)
+        return(RH4N_XARRAY_ERROR);
+
     if(pd.length == 1 && pd.dimensions == 0)
         return(handleI1Variable(index, parmhandle, nni_funcs, pd, name, anker));
     else if(pd.length == 1 && pd.dimensions == 1)
@@ -71,7 +74,7 @@ int handleI1Variable(int index, void *parmhandle, pnni_611_functions nni_funcs,
 
     ret = nni_funcs->pf_nni_get_parm(nni_funcs, index, parmhandle, sizeof(NATTYP_I1), &i1_buff);
     if(checkNNIReturnCode(ret) != NNI_RC_OK)
-        return(ret);
+        return(ret*-1);
 
     if(addInteger(anker, NULL, name, i1_buff) < 0)
         return(RH4N_VAR_LIBRARY_ERR);
@@ -93,7 +96,7 @@ int handleI11DVariable(int index, void *parmhandle, pnni_611_functions nni_funcs
         occ[0] = x; occ[1] = occ[2] = 0;
         ret = nni_funcs->pf_nni_get_parm_array(nni_funcs, index, parmhandle, sizeof(NATTYP_I1), &i1_buff, occ);
         if(checkNNIReturnCode(ret) != NNI_RC_OK)
-            return(ret);
+            return(ret*-1);
 
         if(edit1DIntegerArray(anker, NULL, name, i1_buff, x) < 0)
             return(RH4N_VAR_LIBRARY_ERR);
@@ -117,7 +120,7 @@ int handleI12DVariable(int index, void *parmhandle, pnni_611_functions nni_funcs
             occ[0] = x; occ[1] = y; occ[2] = 0;
             ret = nni_funcs->pf_nni_get_parm_array(nni_funcs, index, parmhandle, sizeof(NATTYP_I1), &i1_buff, occ);
             if(checkNNIReturnCode(ret) != NNI_RC_OK)
-                return(ret);
+                return(ret*-1);
 
             if(edit2DIntegerArray(anker, NULL, name, i1_buff, x, y) < 0)
                 return(RH4N_VAR_LIBRARY_ERR);
@@ -142,7 +145,7 @@ int handleI13DVariable(int index, void *parmhandle, pnni_611_functions nni_funcs
                 occ[0] = x; occ[1] = y; occ[2] = z;
                 ret = nni_funcs->pf_nni_get_parm_array(nni_funcs, index, parmhandle, sizeof(NATTYP_I1), &i1_buff, occ);
                 if(checkNNIReturnCode(ret) != NNI_RC_OK)
-                    return(ret);
+                    return(ret*-1);
 
                 if(edit3DIntegerArray(anker, NULL, name, i1_buff, x, y, z) < 0)
                     return(RH4N_VAR_LIBRARY_ERR);
@@ -159,7 +162,7 @@ int handleI2Variable(int index, void *parmhandle, pnni_611_functions nni_funcs,
 
     ret = nni_funcs->pf_nni_get_parm(nni_funcs, index, parmhandle, sizeof(NATTYP_I2), &i2_buff);
     if(checkNNIReturnCode(ret) != NNI_RC_OK)
-        return(ret);
+        return(ret*-1);
 
     if(addInteger(anker, NULL, name, i2_buff) < 0)
         return(RH4N_VAR_LIBRARY_ERR);
@@ -181,7 +184,7 @@ int handleI21DVariable(int index, void *parmhandle, pnni_611_functions nni_funcs
         occ[0] = x; occ[1] = occ[2] = 0;
         ret = nni_funcs->pf_nni_get_parm_array(nni_funcs, index, parmhandle, sizeof(NATTYP_I2), &i2_buff, occ);
         if(checkNNIReturnCode(ret) != NNI_RC_OK)
-            return(ret);
+            return(ret*-1);
 
         if(edit1DIntegerArray(anker, NULL, name, i2_buff, x) < 0)
             return(RH4N_VAR_LIBRARY_ERR);
@@ -205,7 +208,7 @@ int handleI22DVariable(int index, void *parmhandle, pnni_611_functions nni_funcs
             occ[0] = x; occ[1] = y; occ[2] = 0;
             ret = nni_funcs->pf_nni_get_parm_array(nni_funcs, index, parmhandle, sizeof(NATTYP_I2), &i2_buff, occ);
             if(checkNNIReturnCode(ret) != NNI_RC_OK)
-                return(ret);
+                return(ret*-1);
 
             if(edit2DIntegerArray(anker, NULL, name, i2_buff, x, y) < 0)
                 return(RH4N_VAR_LIBRARY_ERR);
@@ -230,7 +233,7 @@ int handleI23DVariable(int index, void *parmhandle, pnni_611_functions nni_funcs
                 occ[0] = x; occ[1] = y; occ[2] = z;
                 ret = nni_funcs->pf_nni_get_parm_array(nni_funcs, index, parmhandle, sizeof(NATTYP_I2), &i2_buff, occ);
                 if(checkNNIReturnCode(ret) != NNI_RC_OK)
-                    return(ret);
+                    return(ret*-1);
 
                 if(edit3DIntegerArray(anker, NULL, name, i2_buff, x, y, z) < 0)
                     return(RH4N_VAR_LIBRARY_ERR);
@@ -247,7 +250,7 @@ int handleI4Variable(int index, void *parmhandle, pnni_611_functions nni_funcs,
 
     ret = nni_funcs->pf_nni_get_parm(nni_funcs, index, parmhandle, sizeof(NATTYP_I4), &i4_buff);
     if(checkNNIReturnCode(ret) != NNI_RC_OK)
-        return(ret);
+        return(ret*-1);
 
     if(addInteger(anker, NULL, name, i4_buff) < 0)
         return(RH4N_VAR_LIBRARY_ERR);
@@ -269,7 +272,7 @@ int handleI41DVariable(int index, void *parmhandle, pnni_611_functions nni_funcs
         occ[0] = x; occ[1] = occ[2] = 0;
         ret = nni_funcs->pf_nni_get_parm_array(nni_funcs, index, parmhandle, sizeof(NATTYP_I4), &i4_buff, occ);
         if(checkNNIReturnCode(ret) != NNI_RC_OK)
-            return(ret);
+            return(ret*-1);
 
         if(edit1DIntegerArray(anker, NULL, name, i4_buff, x) < 0)
             return(RH4N_VAR_LIBRARY_ERR);
@@ -293,7 +296,7 @@ int handleI42DVariable(int index, void *parmhandle, pnni_611_functions nni_funcs
             occ[0] = x; occ[1] = y; occ[2] = 0;
             ret = nni_funcs->pf_nni_get_parm_array(nni_funcs, index, parmhandle, sizeof(NATTYP_I4), &i4_buff, occ);
             if(checkNNIReturnCode(ret) != NNI_RC_OK)
-                return(ret);
+                return(ret*-1);
 
             if(edit2DIntegerArray(anker, NULL, name, i4_buff, x, y) < 0)
                 return(RH4N_VAR_LIBRARY_ERR);
@@ -318,7 +321,7 @@ int handleI43DVariable(int index, void *parmhandle, pnni_611_functions nni_funcs
                 occ[0] = x; occ[1] = y; occ[2] = z;
                 ret = nni_funcs->pf_nni_get_parm_array(nni_funcs, index, parmhandle, sizeof(NATTYP_I4), &i4_buff, occ);
                 if(checkNNIReturnCode(ret) != NNI_RC_OK)
-                    return(ret);
+                    return(ret*-1);
 
                 if(edit3DIntegerArray(anker, NULL, name, i4_buff, x, y, z) < 0)
                     return(RH4N_VAR_LIBRARY_ERR);

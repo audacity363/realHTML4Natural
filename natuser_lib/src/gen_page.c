@@ -12,15 +12,12 @@
 #include "utils.h"
 #include "var2name.h"
 #include "parser.h"
+#include "natutils.h"
 
 #define LDAPOS 0
 #define TEMPLATEPOS 1
 #define DELIVERFILEPOS 2
 #define SETTINGSPOS 3
-
-#define NAT_LIB_NAME "libnatural.so"
-#define GET_INTERFACE_FUNC "nni_get_interface"
-
 
 char *must_set_settings[] = {
     "templates",
@@ -28,9 +25,6 @@ char *must_set_settings[] = {
     "natsrc"
 };
 
-int OpenLib(void **shLib, char *name);
-void CloseLib(void **shLib);
-pnni_611_functions initNNI(void *lib);
 void trimSpaces(char*);
 int parseSettings(void *parmhandle, pnni_611_functions nni_funcs,
     struct settings_s *settings);
@@ -189,6 +183,10 @@ cleanup:
 
     free(parms.lda_name);
     free(parms.template_name);
+
+    if(ret != 0)
+        logError(ret, parms.tmp_file, logfile);
+
     free(parms.tmp_file);
     for(i=0; i < parms.settings.length; i++)
     {
@@ -520,85 +518,4 @@ int checkNNIReturnCode(int ret)
     fprintf(logfile, "-------------------------------------------------\n");
     fflush(logfile);
     return(ret);
-}
-
-void convert2Bto4BString(char *inbuffer, wchar_t *outbuffer, int length)
-{
-    int i, offset;
-
-    void *v_in, *v_out, *v_tmp;
-
-    v_in = (void*)inbuffer;
-    v_out = (void*)outbuffer;
-
-    for(i=0; i < length; i++)
-    {
-        offset = (sizeof(wchar_t)*i)+2;
-
-        v_tmp = v_out+offset;
-
-        memcpy(v_tmp, v_in+(i*2), 2);
-    }
-}
-
-void convert1Bto4BString(char *inbuffer, wchar_t *outbuffer, int length)
-{
-    int i, offset;
-
-    void *v_in, *v_out, *v_tmp;
-
-    v_in = (void*)inbuffer;
-    v_out = (void*)outbuffer;
-
-    for(i=0; i < length; i++)
-    {
-        offset = (sizeof(wchar_t)*i)+3;
-
-        v_tmp = v_out+offset;
-
-        memcpy(v_tmp, v_in+i, 1);
-    }
-}
-
-pnni_611_functions initNNI(void *lib)
-{
-    pnni_611_functions s_funcs;
-    PF_NNI_GET_INTERFACE pf_nni_get_interface = 0;
-    int rc = 0;
-    char *error = NULL;
-
-    if(!(pf_nni_get_interface = (PF_NNI_GET_INTERFACE)dlsym(lib, GET_INTERFACE_FUNC)))
-    {
-        error = dlerror();
-        printf("Error while loading Function [%s]: [%s]\n", GET_INTERFACE_FUNC,
-            error);
-        return(NULL);
-    }
-
-    if(((pf_nni_get_interface)(NNI_VERSION_611, (void**)&s_funcs)) != NNI_RC_OK)
-    {
-        printf("...Error while gettings Function Table\n");
-        return(NULL);
-    }
-
-    return(s_funcs);
-}
-
-int OpenLib(void **shLib, char *name)
-{
-    char *error;
-
-    *shLib = dlopen(name, RTLD_NOW);
-    if(!*shLib)
-    {
-        error = dlerror();
-        printf("Error while loading Module [%s]: [%s]\n", name, error);
-        return(-1);
-    }
-    return(0);
-}
-
-void CloseLib(void **shLib)
-{
-    dlclose(*shLib);
 }

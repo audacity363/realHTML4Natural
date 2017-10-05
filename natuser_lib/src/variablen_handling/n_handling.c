@@ -22,7 +22,9 @@ int handleNumericVariable(int index, void *parmhandle, pnni_611_functions nni_fu
         x=0, y=0, z=0,
         occ[3];
 
-    fprintf(logfile, "sum: [%d]\n", sum_length);
+
+    if((pd.flags & NNI_FLG_XARRAY) && pd.length_all == 0)
+        return(RH4N_XARRAY_ERROR);
 
     if((nat_buff = malloc(sum_length)) == NULL)
         return(RH4N_NO_MEMORY);
@@ -48,6 +50,7 @@ int handleNumericVariable(int index, void *parmhandle, pnni_611_functions nni_fu
         ret = nni_funcs->pf_nni_get_parm(nni_funcs, index, parmhandle, sum_length, nat_buff);
         if(checkNNIReturnCode(ret) != NNI_RC_OK)
         {
+            ret = ret*-1;
             goto end;
         }
 
@@ -56,6 +59,7 @@ int handleNumericVariable(int index, void *parmhandle, pnni_611_functions nni_fu
                 sum_length, pd.precision, sum_length+3, c_buff);
         if(checkNNIReturnCode(ret) != NNI_RC_OK)
         {
+            ret = ret*-1;
             goto end;
         }
 
@@ -86,6 +90,7 @@ int handleNumericVariable(int index, void *parmhandle, pnni_611_functions nni_fu
             ret = nni_funcs->pf_nni_get_parm_array(nni_funcs, index, parmhandle, sum_length, nat_buff, occ);
             if(checkNNIReturnCode(ret) != NNI_RC_OK)
             {
+                ret = ret*-1;
                 goto end;
             }
 
@@ -94,6 +99,7 @@ int handleNumericVariable(int index, void *parmhandle, pnni_611_functions nni_fu
                     sum_length, pd.precision, sum_length+3, c_buff);
             if(checkNNIReturnCode(ret) != NNI_RC_OK)
             {
+                ret = ret*-1;
                 goto end;
             }
 
@@ -104,6 +110,7 @@ int handleNumericVariable(int index, void *parmhandle, pnni_611_functions nni_fu
 
             if((ret = edit1DStringArray(anker, NULL, name, wc_buff, x)) != 0)
             {
+                ret = RH4N_VAR_LIBRARY_ERR;
                 goto end;
             }
         }
@@ -125,6 +132,7 @@ int handleNumericVariable(int index, void *parmhandle, pnni_611_functions nni_fu
                 ret = nni_funcs->pf_nni_get_parm_array(nni_funcs, index, parmhandle, sum_length, nat_buff, occ);
                 if(checkNNIReturnCode(ret) != NNI_RC_OK)
                 {
+                    ret = ret*-1;
                     goto end;
                 }
 
@@ -133,6 +141,7 @@ int handleNumericVariable(int index, void *parmhandle, pnni_611_functions nni_fu
                         sum_length, pd.precision, sum_length+3, c_buff);
                 if(checkNNIReturnCode(ret) != NNI_RC_OK)
                 {
+                    ret = ret*-1;
                     goto end;
                 }
 
@@ -142,6 +151,7 @@ int handleNumericVariable(int index, void *parmhandle, pnni_611_functions nni_fu
 
                 if((ret = edit2DStringArray(anker, NULL, name, wc_buff, x, y)) != 0)
                 {
+                    ret = ret*-1;
                     goto end;
                 }
             }
@@ -165,6 +175,7 @@ int handleNumericVariable(int index, void *parmhandle, pnni_611_functions nni_fu
                     ret = nni_funcs->pf_nni_get_parm_array(nni_funcs, index, parmhandle, sum_length, nat_buff, occ);
                     if(checkNNIReturnCode(ret) != NNI_RC_OK)
                     {
+                        ret = ret*-1;
                         goto end;
                     }
 
@@ -173,6 +184,7 @@ int handleNumericVariable(int index, void *parmhandle, pnni_611_functions nni_fu
                             sum_length, pd.precision, sum_length+3, c_buff);
                     if(checkNNIReturnCode(ret) != NNI_RC_OK)
                     {
+                        ret = ret*-1;
                         goto end;
                     }
 

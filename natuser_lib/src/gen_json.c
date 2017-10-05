@@ -12,22 +12,16 @@
 #include "utils.h"
 #include "var2name.h"
 #include "parser.h"
+#include "natutils.h"
 
 #define LDAPOS 0
 #define TEMPLATEPOS 1
 #define DELIVERFILEPOS 2
 #define SETTINGSPOS 3
 
-#define NAT_LIB_NAME "libnatural.so"
-#define GET_INTERFACE_FUNC "nni_get_interface"
-
-
 //Defined in gen_page.c
 extern char *must_set_settings[];
 
-int OpenLib(void **shLib, char *name);
-void CloseLib(void **shLib);
-pnni_611_functions initNNI(void *lib);
 void trimSpaces(char*);
 int parseSettings(void *parmhandle, pnni_611_functions nni_funcs,
     struct settings_s *settings);
@@ -61,18 +55,15 @@ long gen_json(WORD nparms, void *parmhandle, void *traditional)
 
     if(initVarAnker(&var_anker) != 0)
     {
-        /*fprintf(logfile, "Error while init var anker\n");
-        fflush(logfile);
-        fclose(logfile);*/
         return(1);
     }
 
 
     if(OpenLib(&shlib, NAT_LIB_NAME) < 0)
     {
-        /*fprintf(logfile, "Error while loading natural.so\n");
-        fflush(logfile);
-        fclose(logfile);*/
+        logfile = fopen("/tmp/rh4n_panic", "w");
+        fprintf(logfile, "Error loading SO for natural NI\n");
+        fclose(logfile);
         return(2);
     }
 
@@ -100,8 +91,6 @@ long gen_json(WORD nparms, void *parmhandle, void *traditional)
         ret = 5;
         goto cleanup;
     }
-
-
 
     fprintf(logfile, "parmhandle:[%p]\n\n", parmhandle);
 
@@ -194,6 +183,10 @@ cleanup:
 
     free(parms.lda_name);
     free(parms.template_name);
+
+    if(ret != 0)
+        logError(ret, parms.tmp_file, logfile);
+
     free(parms.tmp_file);
     for(i=0; i < parms.settings.length; i++)
     {
