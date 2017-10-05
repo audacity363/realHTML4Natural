@@ -18,7 +18,7 @@ int handleUnicodeVariable(int index, void *parmhandle, pnni_611_functions nni_fu
     int ret = 0, i = 0, x = 0, y = 0, z = 0, dyn_flag = 0,
         length = 0, max_length = 0, occ[3];
 
-    if((pb.flags & NNI_FLG_XARRAY) && pb.length_all == 0)
+    if((pb.flags & NNI_FLG_XARRAY) && pb.occurrences[0] == 0)
         return(RH4N_XARRAY_ERROR);
 
     dyn_flag = pb.flags & NNI_FLG_DYNVAR;

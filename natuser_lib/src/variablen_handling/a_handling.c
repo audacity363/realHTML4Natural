@@ -21,7 +21,7 @@ int handleAlphaVariable(int index, void *parmhandle, pnni_611_functions nni_func
     dyn_flag = pb.flags & NNI_FLG_DYNVAR;
     x_array = pb.flags & NNI_FLG_XARRAY;
 
-    if(x_array && pb.length_all == 0) 
+    if(x_array && pb.occurrences[0] == 0) 
         return(RH4N_XARRAY_ERROR);
 
     if(pb.dimensions == 0)

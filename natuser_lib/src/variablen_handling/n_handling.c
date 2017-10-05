@@ -23,7 +23,7 @@ int handleNumericVariable(int index, void *parmhandle, pnni_611_functions nni_fu
         occ[3];
 
 
-    if((pd.flags & NNI_FLG_XARRAY) && pd.length_all == 0)
+    if((pd.flags & NNI_FLG_XARRAY) && pd.occurrences[0] == 0)
         return(RH4N_XARRAY_ERROR);
 
     if((nat_buff = malloc(sum_length)) == NULL)

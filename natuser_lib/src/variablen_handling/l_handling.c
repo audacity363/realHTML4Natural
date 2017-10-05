@@ -24,7 +24,7 @@ int handleLogicVariable(int index, void *parmhandle, pnni_611_functions nni_func
 
     x_array = pd.flags & NNI_FLG_XARRAY;
 
-    if(x_array && pd.length_all == 0)
+    if(x_array && pd.occurrences[0] == 0)
         return(RH4N_XARRAY_ERROR);
 
     fprintf(logfile, "Bool length: [%d]\n", pd.byte_length);

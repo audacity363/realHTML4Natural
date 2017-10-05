@@ -26,7 +26,7 @@ int shiftInt(int, int);
 int handleIntegerVariable(int index, void *parmhandle, pnni_611_functions nni_funcs,
                     struct parameter_description pd, char *name, vars_t *anker)
 {
-    if((pd.flags & NNI_FLG_XARRAY) && pd.length_all == 0)
+    if((pd.flags & NNI_FLG_XARRAY) && pd.occurrences[0] == 0)
         return(RH4N_XARRAY_ERROR);
 
     if(pd.length == 1 && pd.dimensions == 0)
