@@ -22,3 +22,6 @@ utils:
 
 var_lib:
 	cd ./libs/varhandle_lib/ && make $(MAKEFILENAME) $(TARGET)
+
+clean:
+	find ./ -name '*.[oa]' -exec rm {} \;

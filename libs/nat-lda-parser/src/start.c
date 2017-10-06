@@ -41,6 +41,7 @@ char *getVariablenLength(char *line, int *length, int type);
 char *getArrayType(char *line, int *array_type, int *index);
 char *my_strtok(char *str, char delmiter);
 void updateVarType(vars_t *target, int index_type);
+int getVariablenType(char type);
 
 vars_t *cur_pos = NULL;
 vars_t *grp_head = NULL;
@@ -248,7 +249,7 @@ int parseLDALine(char *complete_line, int length, vars_t *anker)
     line++;
 
     //It is a new group with array specification
-    if((vartype = getVariablenType(*line)) == -2)
+    if((vartype = getVariablenType(line[0])) == -2)
     {
         D(fprintf(logfile, "New Group with Index specification\n"));
         if(getArrayType(line, &index_type, index) == NULL)

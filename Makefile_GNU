@@ -24,3 +24,6 @@ var_lib: utils
 
 hexdump:
 	cd ./libs/hexdump/ && make $(MAKEFILENAME) $(TARGET)
+
+clean:
+	find ./ -name '*.[oa]' -exec rm {} \;
