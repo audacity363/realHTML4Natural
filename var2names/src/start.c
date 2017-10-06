@@ -55,7 +55,7 @@ int startvar2name(vars_t *var_anker, char *lda_path, bool debug, FILE *logfile, 
 
     fprintf(logfile, "Start Resolve name\n");
     fflush(logfile);
-    tmp = resolveName(var_anker, page_grp, var_anker);
+    tmp = resolveName(var_anker->next, page_grp, var_anker);
     if(error != 0)
     {
         switch(error)
@@ -131,6 +131,7 @@ vars_t *resolveName(vars_t *nat_set, vars_t *lda_set, vars_t *var_anker)
 
             if(in_grp == true)
             {            
+                printf("Move to group [%s]\n", grp_name);
                 if((ret = moveVariableToGroup(var_anker, cur_nat_set->name, grp_name, &cur_nat_set)) != 0)
                 {
                     error_num = ret;
@@ -142,6 +143,14 @@ vars_t *resolveName(vars_t *nat_set, vars_t *lda_set, vars_t *var_anker)
             {
                 cur_nat_set = cur_nat_set->next;
             }
+        }
+        if(cur_lda_set->next == NULL && in_grp)
+        {
+            while(cur_lda_set->type != GROUP)
+            {
+                cur_lda_set = cur_lda_set->prev;
+            }
+            in_grp = false;
         }
         cur_lda_set = cur_lda_set->next;
     }

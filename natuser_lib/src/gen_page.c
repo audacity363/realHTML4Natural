@@ -311,7 +311,7 @@ int getNames(vars_t *anker, struct rh4n_parms *parms, char *groupname)
     fprintf(logfile, "LDA path [%s]\n", lda_path);
     fflush(logfile);
     
-    if(startvar2name(anker->next, lda_path, true, logfile, groupname, error_buffer) != 0)
+    if(startvar2name(anker, lda_path, true, logfile, groupname, error_buffer) != 0)
     {
         fprintf(logfile, "Error while loading names [%s]\n", error_buffer);
         fflush(logfile);

@@ -17,16 +17,13 @@ int main()
 
     initVarAnker(&nat_anker);
 
-    add1DStringArray(nat_anker, NULL, "tmp1", 10, 10);
-    add1DStringArray(nat_anker, NULL, "tmp2", 10, 10);
-    add2DStringArray(nat_anker, NULL, "tmp3", 10, 10, 20);
+    addString(nat_anker, NULL, "var1", L"val1", 5);
+    addString(nat_anker, NULL, "var2", L"val2", 5);
+    addString(nat_anker, NULL, "var3", L"val3", 5);
 
-    //add3DStringArray(nat_anker, NULL, "tmp4", 1, 2, 4, 30);
-    //addString(nat_anker, NULL, "tmp5", L"Hello World", 11);
-    
-
-    if(startvar2name(nat_anker->next, "./test_src/TEST.NGL", true, stdout, error_buffer) != 0)
+    if(startvar2name(nat_anker, "./test_src/TESTLDA.NGL", true, stdout, "page", error_buffer) != 0)
     {
+        printf("Error: [%s]\n", error_buffer);
         printAllVars(nat_anker);
         return(1);
     }

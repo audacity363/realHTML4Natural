@@ -17,7 +17,7 @@ lib: $(OBJ)
 	ar -vcru libvars.a ./bin/*.o ./bin/print/*.o
 	
 $(OBJ): $(PRINT_OBJ)
-	xlc -g -c ./src/$*.c $(INCLUDE) -o ./bin/$*.o
+	xlc -g -c src/$*.c $(INCLUDE) -o ./bin/$*.o
 
 $(PRINT_OBJ):
 	xlc -g -c ./src/print/$*.c $(INCLUDE) -o ./bin/print/$*.o
