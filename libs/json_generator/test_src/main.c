@@ -19,7 +19,7 @@ int main()
     add1DStringArray(anker, "grp1", "field2", 12, 5);
     add1DBooleanArray(anker, "grp1", "field3", 5);
 
-    addString(anker, NULL, "field5", L"Hello", 12);
+    addString(anker, "grp1", "field5", L"Hello", 12);
 
     printAllVars(anker);
 

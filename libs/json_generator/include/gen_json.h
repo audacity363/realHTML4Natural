@@ -12,6 +12,7 @@ bool checkGroupArray(vars_t *grp);
 int printGroupArray(vars_t *grp, FILE *output);
 int getGroupArrayLength(vars_t *grp);
 void printEntry(vars_t *var, int x, int y, int z, FILE *output);
+int printGroupEntries(vars_t *grp, FILE *output);
 
 void J_printInteger(vars_t *var, FILE *output);
 void J_print1DIntegerX(vars_t *var, int x, FILE *output);

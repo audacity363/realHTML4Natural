@@ -23,6 +23,7 @@ int generateJson(vars_t *var_anker, char *output_path, FILE *logfile)
 
     while(hptr)
     {
+        fprintf(outputfile, "\"%s\":", hptr->name);
         if(hptr->type == GROUP)
         {
             if(checkGroupArray(hptr) == true)
@@ -31,12 +32,14 @@ int generateJson(vars_t *var_anker, char *output_path, FILE *logfile)
                 printGroupArray(hptr, outputfile);
             }
             else
+            {
                 DEV_PRINT(("Generate JSON objects with entries from [%s]\n", hptr->name));
+                printGroupEntries(hptr, outputfile);
+            }
         }
         else
         {
             DEV_PRINT(("Generate JSON for: [%s]", hptr->name));
-            fprintf(outputfile, "\"%s\":", hptr->name);
             printEntry(hptr, -1, -1, -1, outputfile);
         }
 
@@ -52,14 +55,12 @@ int generateJson(vars_t *var_anker, char *output_path, FILE *logfile)
     return(0);
 }
 
-//int print
-
 int printGroupArray(vars_t *grp, FILE *output)
 {
     int array_length = 0, i=0;
     vars_t *hptr = NULL;
 
-    fprintf(output, "\"%s\":[", grp->name);
+    fputc('[', output);
 
     array_length = getGroupArrayLength(grp);
 
@@ -84,6 +85,25 @@ int printGroupArray(vars_t *grp, FILE *output)
     fprintf(output, "]");
 }
 
+int printGroupEntries(vars_t *grp, FILE *output)
+{
+
+    vars_t *hptr = grp->next_lvl;
+
+    fputc('{', output);
+
+    while(hptr)
+    {
+        fprintf(output, "\"\%s\":", hptr->name);
+        printEntry(hptr, -1, -1, -1, output);
+
+        if(hptr->next)
+            fputc(',', output);
+
+        hptr = hptr->next;
+    }
+    fputc('}', output);
+}
 
 bool checkGroupArray(vars_t *grp)
 {
