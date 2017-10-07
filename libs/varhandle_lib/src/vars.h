@@ -18,6 +18,8 @@
 #define BUFFER_TO_SAMLL 12
 #define INDEX_IS_NOT_SUPPORTED 13
 
+#define NUMBER_BASIC_VAR_TYPES 4
+
 
 struct variables_s
 {
