@@ -21,4 +21,5 @@ clean:
 test:
 	xlc -g ./test_src/main.c $(INCLUDE) -o ./test_src/main $(LIBS)
 	./test_src/main
+	cat test_src/test.out
 	

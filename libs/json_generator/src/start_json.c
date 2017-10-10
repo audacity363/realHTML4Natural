@@ -125,6 +125,12 @@ bool checkGroupArray(vars_t *grp)
     
     array_length = hptr->x_length;
 
+    // It is not and array
+    if(array_length == -1)
+    {
+        return(false);
+    }
+
     while(hptr)
     {
         /*if(hptr->y_length > 0)

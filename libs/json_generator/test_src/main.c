@@ -19,13 +19,16 @@ int main()
     add1DStringArray(anker, "grp1", "field2", 12, 5);
     add1DBooleanArray(anker, "grp1", "field3", 5);
 
-    addString(anker, "grp1", "field5", L"Hello", 12);
 
     printAllVars(anker);
 
     //printEntry(anker->next->next_lvl->next, -1, -1, -1, stdout);
+    
+    addGroup(anker, "grp2", 0, 0, 0);
+    addString(anker, "grp2", "field5", L"Hello", 12);
+    addString(anker, "grp2", "field6", L"Hello", 12);
 
-    generateJson(anker, "./test_src/test.out", stdout);
+    startJSONgenerator(anker, "./test_src/test.out", stdout);
 
     freeVarAnker(anker);
     return(0);
