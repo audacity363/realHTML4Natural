@@ -1,23 +1,26 @@
-OBJ = ncuxinit.o gen_page.o gen_json.o jumptab.o natutils.o
+OBJ = ncuxinit.o gen_page.o gen_json.o gen_json_objs.o jumptab.o natutils.o 
 
 VAR_OBJ = a_handling.o n_handling.o l_handling.o i_handling.o u_handling.o
 
 INCLUDE = -I./src/ \
 		  -I../include/ \
 		  -I../libs/varhandle_lib/src/ \
-		  -I../libs/hexdump/src/ \
 		  -I../libs/utils/src/ \
+		  -I../libs/hexdump/src/ \
 		  -I../libs/nat-lda-parser/src/ \
 		  -I../libs/html_parser/src/ \
-		  -I../var2names/src/
+		  -I../var2names/src/ \
+		  -I../libs/json_generator/include/
+
 
 LIBS = -L../libs/varhandle_lib/ -lvars \
-	   -L../libs/hexdump/ -lhexdump \
 	   -L../libs/utils/ -lutils \
 	   -L../libs/nat-lda-parser/ -lldaparser \
 	   -L../libs/html_parser/ -lhtml_parser \
-	   -L../var2names/ -lvar2name
+	   -L../var2names/ -lvar2name \
+	   -L../libs/json_generator/ -lgenjson
 
+#	   -L../libs/hexdump/ -lhexdump \
 
 LFLAGS1 = -G -bsymbolic -bexpall -bnoentry
 LFLAGS2 = -b64 -ldl -blibpath:/usr/lib/threads:/usr/lib:/lib -lc_r
@@ -43,5 +46,5 @@ test:
 
 callnat:
 	export NATUSER=/u/it/a140734/rh4n/realHTML4Natural/natuser_lib/librealHTML4Natural.so \
-		&& natural parm=logiparm etid=$$$$ STACK="(logon tgap0734;callt;fin)"
+		&& natural parm=logiparm etid=$$$$ STACK="(logon tgap0734;testcall;fin)"
 	cat /tmp/TESTLDA.log

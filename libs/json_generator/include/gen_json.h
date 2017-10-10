@@ -7,7 +7,7 @@
 #define DEV_PRINT(x) do {} while(0)
 #endif
 
-int generateJson(vars_t *var_anker, char *output_path, FILE *logfile);
+int startJSONgenerator(vars_t *var_anker, char *output_path, FILE *logfile);
 bool checkGroupArray(vars_t *grp);
 int printGroupArray(vars_t *grp, FILE *output);
 int getGroupArrayLength(vars_t *grp);

@@ -21,6 +21,7 @@
 
 extern long gen_page();
 extern long gen_json();
+extern long gen_json_objs();
 
 
 /*
@@ -34,6 +35,7 @@ extern long gen_json();
 
 TAB_STRUCT n_call_table[] = {
 
+  { "GENJSONO", gen_json_objs},
   { "GENJSON", gen_json},
   { "GENPAGE", gen_page}
 

@@ -6,7 +6,7 @@
 #include "vars.h"
 #include "gen_json.h"
 
-int generateJson(vars_t *var_anker, char *output_path, FILE *logfile)
+int startJSONgenerator(vars_t *var_anker, char *output_path, FILE *logfile)
 {
     FILE *outputfile = NULL;
     vars_t *hptr = NULL;
@@ -94,7 +94,7 @@ int printGroupEntries(vars_t *grp, FILE *output)
 
     while(hptr)
     {
-        fprintf(output, "\"\%s\":", hptr->name);
+        fprintf(output, "\"%s\":", hptr->name);
         printEntry(hptr, -1, -1, -1, output);
 
         if(hptr->next)

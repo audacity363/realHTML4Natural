@@ -1,4 +1,3 @@
-
 TARGET = clean lib
 MAKEFILENAME = -f Makefile_AIX
 
@@ -14,7 +13,7 @@ lda_parser: var_lib
 var2name: var_lib utils lda_parser 
 	cd ./var2names/ && make $(MAKEFILENAME) $(TARGET)
 
-nat: var2name html_parser var_lib utils lda_parser
+nat: var2name html_parser var_lib utils lda_parser json
 	cd ./natuser_lib/ && make $(MAKEFILENAME) $(TARGET)
 
 utils:
@@ -22,6 +21,9 @@ utils:
 
 var_lib:
 	cd ./libs/varhandle_lib/ && make $(MAKEFILENAME) $(TARGET)
+
+json:
+	cd ./libs/json_generator/ && make $(MAKEFILENAME) $(TARGET)
 
 clean:
 	find ./ -name '*.[oa]' -exec rm {} \;
