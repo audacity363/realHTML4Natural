@@ -1,0 +1,11 @@
+*.swp
+*.swo
+*~
+*.o
+*.so
+*.trc
+*.dmp
+javacore*
+*.class
+*.jar
+*.war
