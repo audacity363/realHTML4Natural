@@ -6,7 +6,7 @@
 
 #include "realHTML_tomcat_connector_JNINatural.h"
 #include "natni.h"
-#include "rh4n.h"
+#include "jni_rh4n.h"
 
 #define HTML_ERROR_HEAD "<html><head><title>Natural Error: [%d]</title></head><body>\n"
 

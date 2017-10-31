@@ -5,7 +5,7 @@
 
 #include "realHTML_tomcat_connector_JNINatural.h"
 #include "natni.h"
-#include "rh4n.h"
+#include "jni_rh4n.h"
 
 #define VERSIONSTR "realHTML4Natural Tomcat Connector JNILibrary Version 2.0.1"
 
