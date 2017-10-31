@@ -17,11 +17,13 @@ int main()
 
     initVarAnker(&nat_anker);
 
-    addString(nat_anker, NULL, "var1", L"val1", 5);
+    //addString(nat_anker, NULL, "var1", L"val1", 5);
     addString(nat_anker, NULL, "var2", L"val2", 5);
-    addString(nat_anker, NULL, "var3", L"val3", 5);
+    addInteger(nat_anker, NULL, "var3", 3);
+    addBoolean(nat_anker, NULL, "var4", true);
 
-    if(startvar2name(nat_anker, "./test_src/TESTLDA.NGL", true, stdout, "page", error_buffer) != 0)
+
+    if(startvar2name(nat_anker, "./test_src/TESTLDA.NGL", true, stdout, "platzbelegungen", error_buffer) != 0)
     {
         printf("Error: [%s]\n", error_buffer);
         printAllVars(nat_anker);

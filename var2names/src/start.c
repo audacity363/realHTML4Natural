@@ -113,6 +113,8 @@ vars_t *resolveName(vars_t *nat_set, vars_t *lda_set, vars_t *var_anker)
             cur_nat_set = resolveName(cur_nat_set, cur_lda_set, var_anker);
             if(error != 0)
                 return(NULL);
+            if(cur_nat_set == NULL)
+                return(NULL);
         }
         else if(cur_lda_set->type == REDEFINE)
         {
@@ -151,6 +153,7 @@ vars_t *resolveName(vars_t *nat_set, vars_t *lda_set, vars_t *var_anker)
                 cur_lda_set = cur_lda_set->prev;
             }
             in_grp = false;
+            break;
         }
         cur_lda_set = cur_lda_set->next;
     }
