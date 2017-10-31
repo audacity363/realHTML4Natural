@@ -1,35 +1,55 @@
 #!/bin/bash
 
 function find_bin {
+    progs=()
     for x in ${PATH//://${1} }${1}; do
-        [ -f "$x" ] && echo $x
+        [ -f "$x" ] && progs+=($x)
     done
 }
 
 function find_proc {
     printf "Searching for %s..." $1;
-    procpath=`find_bin $1`;
-    if [ -z $procpath ]; then
+    find_bin $1;
+    if [ ${#progs[@]} -eq 0 ]; then
         printf "...didn't find %s\n" $1
         if [ $2 == 1 ]; then
             exit 1
         fi
     fi
-    printf "...found %s at [%s]\n" $1 $procpath;
+
+    if [ ${#progs[@]} -gt 1 ]; then
+        printf "\n"
+        echo ${progs[*]}
+        i=0;
+        for file in ${progs[@]}; do
+            printf "[%d] %s\n" $i $file
+            i=`expr $i + 1`;
+        done
+    
+        printf "Found multiple. Which one should I use? [0] ";
+        read -r index;
+        if [ -z $index ]; then index=0; fi
+        procpath=${progs[$index]};
+        printf "...found %s at [%s]\n" $1 $procpath;
+
+    else
+        procpath=${progs[0]};
+        printf "...found %s at [%s]\n" $1 $procpath;
+    fi
 }
 
 function check_progs {
     # Checking for a compiler. GCC or XLC are supported
-    find_proc gcc 0
+    find_proc xlc 0
     if [ -z $procpath ]; then
-        find_proc xlc 0
+        find_proc gcc 0
         if [ -z $procpath ]; then
             printf "Can not find any compatible compiler\n",
             exit 1
         fi
-        cc_str="xlc"
-    else
         cc_str="gcc"
+    else
+        cc_str="xlc"
     fi
     
     cc=$procpath
@@ -42,6 +62,10 @@ function check_progs {
     # Check for javac 
     find_proc javac 1
     javacpath=$procpath
+
+    # Check for javac 
+    find_proc perl 1
+    perlpath=$procpath
 
     # Check for jar
     find_proc jar 1
@@ -101,7 +125,7 @@ function find_jdk_includes {
     if [ ${#java_inc_arr[@]} -gt 1 ]; then
         printf "Found %d locations of jni.h. Which one should I use?\n" ${#java_inc_arr[@]}
         i=0
-        for file in $java_inc_arr; do
+        for file in ${java_inc_arr[@]}; do
             printf "[%d] %s\n" $i `dirname ${file}`;
             i=`expr $i + 1`;
         done
@@ -121,6 +145,8 @@ curwd=`pwd`;
 curwd="$curwd/";
 scriptname=$0;
 basedir=`dirname "${scriptname}"`
+
+printf "%s\n" $PATH
 
 #if [ $curwd != $basedir ]; then
 #    printf "Please start the script from %s\n" $basedir
@@ -142,8 +168,9 @@ if [ $cc_str == 'gcc' ]; then
     ldargs1so="-shared";
     ldargs2so="";
 else
-    ccflags1="dummy";
-    ldargsso="-G";
+    ccflags1="-g -c -fpic";
+    ldargs1so="-G -bsymbolic -bexpall -bnoentry";
+    ldargs2so="";
 fi
 
 # Check if a tomcat with the servlet api is installed
@@ -154,17 +181,19 @@ makefilepath=`pwd`/Makefile
 
 cat `pwd`/Makefile.rh4n | grep -v "^#" > $makefilepath
 
-$sedpath -i "s~{{CC}}~$cc~g" $makefilepath
-$sedpath -i "s~{{CLASSPATH}}~$CLASSPATH~g" $makefilepath
-$sedpath -i "s~{{AR}}~$arpath~g" $makefilepath
-$sedpath -i "s~{{CARGS1}}~$ccflags1~g" $makefilepath
-$sedpath -i "s~{{CARGS2}}~$ccflags2~g" $makefilepath
-$sedpath -i "s~{{LDARGS1_SO}}~$ldargs1so~g" $makefilepath
-$sedpath -i "s~{{LDARGS2_SO}}~$ldargs2so~g" $makefilepath
-$sedpath -i "s~{{CURWD}}~$curwd~g" $makefilepath
-$sedpath -i "s~{{JARBIN}}~$jarpath~g" $makefilepath
-$sedpath -i "s~{{JAVAINC}}~$java_inc~g" $makefilepath
-$sedpath -i "s~{{JAVACBIN}}~$javacpath~g" $makefilepath
+$perlpath -pi -e "s~{{CC}}~$cc~g" $makefilepath
+$perlpath -pi -e "s~{{CLASSPATH}}~$CLASSPATH~g" $makefilepath
+$perlpath -pi -e "s~{{AR}}~$arpath~g" $makefilepath
+$perlpath -pi -e "s~{{CARGS1}}~$ccflags1~g" $makefilepath
+$perlpath -pi -e "s~{{CARGS2}}~$ccflags2~g" $makefilepath
+$perlpath -pi -e "s~{{LDARGS1_SO}}~$ldargs1so~g" $makefilepath
+$perlpath -pi -e "s~{{LDARGS2_SO}}~$ldargs2so~g" $makefilepath
+$perlpath -pi -e "s~{{CURWD}}~$curwd~g" $makefilepath
+$perlpath -pi -e "s~{{JARBIN}}~$jarpath~g" $makefilepath
+$perlpath -pi -e "s~{{JAVAINC}}~$java_inc~g" $makefilepath
+$perlpath -pi -e "s~{{JAVACBIN}}~$javacpath~g" $makefilepath
+
+exit
 
 printf "==================================================================\n";
 cat $makefilepath

@@ -135,7 +135,7 @@ int createNaturalProcess(JNIEnv *env, struct naturalparms *parms, int length,
         exit(rc);
     }
     debugFileprint(logfile, "Waiting for PID: [%d]....\n", natpid);
-    ret_pid = waitpid(natpid, &status, NULL);
+    ret_pid = waitpid(natpid, &status, 0);
     debugFileprint(logfile, "...PID [%d] exited\n", ret_pid);
     return(status);
 }
