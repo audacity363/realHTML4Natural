@@ -1,3 +1,9 @@
+/**
+ * @file gen_json.c
+ * @brief Contains the C function of the user exit "GENJSON"
+ *
+ * @author Tom Engemann
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <dlfcn.h>
@@ -19,8 +25,8 @@
 #define DELIVERFILEPOS 2
 #define SETTINGSPOS 3
 
-//Defined in gen_page.c
-extern char *must_set_settings[];
+extern char *must_set_settings[]; //!< is defined in gen_page.c
+extern FILE *logfile; //!< is defined in gen_page.c
 
 void trimSpaces(char*);
 int parseSettings(void *parmhandle, pnni_611_functions nni_funcs,
@@ -29,9 +35,19 @@ int readOutVariable(int index, void *parmhandle, pnni_611_functions nni_funcs,
                     vars_t *anker);
 void signalHandler(int signal);
 
-//Defined in gen_page.c
-extern FILE *logfile;
-
+/**
+ * @brief Function for the "GENJSON" user exit
+ *
+ * This function reads out the given natural variables and saves it in a linked list with a temporary name and all it's attributes (type, length, array size) these     list get matched with a list from a parsed LDA and the name gets taken off to the variable list.
+ * 
+ * From this list JSON get's generated.
+ *
+ * @param nparms number of natural parameters given
+ * @param parmhandle pointer to an array of natural parameters
+ * @param traditional is set when natural didn't call the function with the INTERFACE4 keyword
+ *
+ * @returns long
+ */
 long gen_json(WORD nparms, void *parmhandle, void *traditional)
 {
     int ret = 0, i = 0, var_index = 0;
@@ -204,6 +220,13 @@ cleanup:
     return(ret);
 }
 
+/**
+ * @brief Finally calls the JSON generator
+ *
+ * @param anker anker to the linked link list with natural variables (names included)
+ * @param parms struct with settings for the framework
+ *
+ */
 int generateJSON(vars_t *anker, struct rh4n_parms *parms)
 {
     char *template_path = NULL,

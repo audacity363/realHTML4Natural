@@ -1,3 +1,10 @@
+/**
+ * @file gen_page.c
+ *
+ * @brief Contains the C function of the user exit "GENPAGE"
+ *
+ * @author Tom Engemann
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <dlfcn.h>
@@ -23,7 +30,8 @@ char *must_set_settings[] = {
     "templates",
     "lib",
     "natsrc"
-};
+}; //!< Keys in the settings string that must exist
+FILE *logfile = NULL; //!< when debug is set in settings string this points to /tmp/<LDAname>.log if not to /dev/null
 
 void trimSpaces(char*);
 int parseSettings(void *parmhandle, pnni_611_functions nni_funcs,
@@ -32,7 +40,20 @@ int readOutVariable(int index, void *parmhandle, pnni_611_functions nni_funcs,
                     vars_t *anker);
 void signalHandler(int signal);
 
-FILE *logfile = NULL;
+/**
+ * @brief Function for the "GENPAGE" user exit
+ *
+ * Everything started with this function.
+ * This function reads out the given natural variables and saves it in a linked list with a temporary name and all it's attributes (type, length, array size) these     list get matched with a list from a parsed LDA and the name gets taken off to the variable list.
+ * 
+ * This list get's passed to a HTML parser which parses the given template
+ *
+ * @param nparms number of natural parameters given
+ * @param parmhandle pointer to an array of natural parameters
+ * @param traditional is set when natural didn't call the function with the INTERFACE4 keyword
+ *
+ * @returns long
+ */
 
 long gen_page(WORD nparms, void *parmhandle, void *traditional)
 {
@@ -204,6 +225,16 @@ cleanup:
     return(ret);
 }
 
+/**
+ * @brief saves a natural variable in a linked list
+ *
+ * @param index specifies which natural parameter should get read out
+ * @param parmhandle pointer to an array of natural parameters
+ * @param nni_funcs an instance of loaded libnatural with loaded functions
+ * @param anker points to the first element of the linked list with the variables
+ *
+ * @return int
+ */
 int readOutVariable(int index, void *parmhandle, pnni_611_functions nni_funcs,
                     vars_t *anker)
 {
@@ -260,6 +291,13 @@ int readOutVariable(int index, void *parmhandle, pnni_611_functions nni_funcs,
     return(ret);
 }
 
+/**
+ * @brief Finally calls the HTML parser
+ *
+ * @param anker anker to the linked link list with natural variables (names included)
+ * @param parms struct with settings for the framework
+ *
+ */
 int generatePage(vars_t *anker, struct rh4n_parms *parms)
 {
     char *template_path = NULL,
@@ -285,6 +323,15 @@ int generatePage(vars_t *anker, struct rh4n_parms *parms)
     free(template_path);
 }
 
+/**
+ * @brief calls the function which parses the LDA and matches the names
+ *
+ * @param anker anker to the linked link list with natural variables (names included)
+ * @param parms struct with settings for the framework
+ * @param groupname the name of the group which was hand over from natural
+ *
+ * @return int
+ */
 int getNames(vars_t *anker, struct rh4n_parms *parms, char *groupname)
 {
     char error_buffer[2024],
@@ -324,6 +371,14 @@ int getNames(vars_t *anker, struct rh4n_parms *parms, char *groupname)
     return(0);
 }
 
+/**
+ * @brief Just goes trough the settings struct and searches for the given key and returns it's value
+ *
+ * @param settings the settings struct
+ * @param name name of the key
+ *
+ * @return char* (value of the given key/when nothing was found NULL)
+ */
 char *getSetting(struct settings_s *settings, char *name)
 {
     int i=0;
@@ -339,6 +394,20 @@ char *getSetting(struct settings_s *settings, char *name)
 
 /*
  * Read out a parameter for the framework
+ */
+/**
+ * @brief Reads out parameter for the framework
+ *
+ * This function is for reading out the first four parameter. These are the
+ * parms for the LDA name, template file|root group for JSON, tmpfile, settingsstr.
+ * It checks for the type and length.
+ *
+ * @param parmhandle pointer to an array of natural parameters
+ * @param nni_funcs an instance of loaded libnatural with loaded functions
+ * @param name this is the return value for this function. It gets allocated for the length of the variable
+ * @param pos position of which variable should gets read out
+ *
+ * @return int
  */
 int getSettingParm(void *parmhandle, pnni_611_functions nni_funcs, char **name, int pos)
 {
@@ -370,6 +439,17 @@ int getSettingParm(void *parmhandle, pnni_611_functions nni_funcs, char **name, 
     return(NNI_RC_OK);
 }
 
+/**
+ * @brief Parses the settings string generated from the tomcat servlet
+ *
+ * The string has the following format: key1=value1;key2=value2;...
+ * This function splits first on every ';' and than on every '='
+ * and reserving an char* array for the keys and values in the settings_s struct.
+ *
+ * @param parmhandle pointer to an array of natural parameters
+ * @param nni_funcs an instance of loaded libnatural with loaded functions
+ * @param settings pointer to a instance of a settings struct
+ */
 int parseSettings(void *parmhandle, pnni_611_functions nni_funcs,
     struct settings_s *settings)
 {
@@ -416,6 +496,11 @@ int parseSettings(void *parmhandle, pnni_611_functions nni_funcs,
     return(NNI_RC_OK);
 }
 
+/**
+ * @brief Checks if specific key are set in the settings string
+ *
+ * @param setings pointer to a instance of a settings_s struct
+ */
 int checkSettings(struct settings_s *settings)
 {
     int length_of_settings_arr = sizeof(must_set_settings)/sizeof(char*),
@@ -443,6 +528,11 @@ int checkSettings(struct settings_s *settings)
     return(0);
 }
 
+/**
+ * @brief Prints out a error string for NNI return codes
+ *
+ * @param ret NNI return code
+ */
 int checkNNIReturnCode(int ret)
 {
     if(ret == NNI_RC_OK)

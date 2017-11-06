@@ -1,3 +1,13 @@
+/**
+ * @file jumptab.c
+ *
+ * @brief Lookup table for natural for the user exists in this shared Library
+ *
+ * (I shouldn't edit anything at this position in the file. Upsss....)
+ *
+ * @author SoftwareAG / Tom Engemann
+ */
+
 /***********************************************************************
 **
 ** file    : jumptab.c
