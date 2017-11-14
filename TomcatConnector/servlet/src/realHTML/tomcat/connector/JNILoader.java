@@ -1,5 +1,7 @@
 package realHTML.tomcat.connector;
 
+import realHTML.tomcat.connector.Environ;
+
 public class JNILoader
 {
     static 
@@ -10,9 +12,9 @@ public class JNILoader
         //System.out.println("Lib Loaded");
     }
 
-    public RH4NReturn callNatural(RH4NParams parms)
+    public RH4NReturn callNatural(RH4NParams parms, Environ envvars[])
     {
-        return(new JNINatural()).jni_callNatural(parms);
+        return(new JNINatural()).jni_callNatural(parms, envvars);
     }
     public int printVersion()
     {

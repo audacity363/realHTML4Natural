@@ -2,6 +2,7 @@ package realHTML.tomcat.connector;
 
 import java.io.*;
 import java.util.*;
+import realHTML.tomcat.connector.Environ;
 
 public class RH4NCallParms {
     public Map<String, String> settings;
@@ -15,6 +16,7 @@ public class RH4NCallParms {
 
     public Boolean request_successful = false;
 
+    public Environ enviromentvars[] = {};
 
 }
 

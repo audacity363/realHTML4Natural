@@ -4,6 +4,7 @@ import javax.servlet.http.*;
 import java.util.*;
 import java.nio.charset.Charset;
 
+import realHTML.tomcat.connector.Environ;
 import realHTML.tomcat.connector.JNILoader;
 import realHTML.tomcat.connector.ConfigurationLoader;
 import realHTML.tomcat.connector.Router;
@@ -102,7 +103,7 @@ public class realHTMLServlet extends HttpServlet {
         parms.natparams = call_parms.settings.get("natparms");
         parms.debug = String.valueOf(call_parms.debug);
 
-        returncode = bs.callNatural(parms);
+        returncode = bs.callNatural(parms, call_parms.enviromentvars);
 
         if(returncode.natprocess_ret < 0)
         {
@@ -185,6 +186,8 @@ public class realHTMLServlet extends HttpServlet {
             parms.request_successful = false;
             return(parms);
         }
+
+        parms.enviromentvars = cl.getEnviromentVars();
 
         
         r = new Router(parms.settings.get("routes"));

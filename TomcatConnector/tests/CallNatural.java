@@ -1,6 +1,7 @@
 import realHTML.tomcat.connector.JNILoader;
 import realHTML.tomcat.connector.RH4NParams;
 import realHTML.tomcat.connector.RH4NReturn;
+import realHTML.tomcat.connector.Environ;
 
 public class CallNatural
 {
@@ -8,6 +9,7 @@ public class CallNatural
     {
         RH4NParams parms = new RH4NParams();
         RH4NReturn returncode;
+        Environ envvars[];
 
 
         parms.keys = new String[10];
@@ -29,11 +31,17 @@ public class CallNatural
 
         parms.debug = "false";
 
+        envvars = new Environ[1];
+        envvars[0] = new Environ();
+        envvars[0].name = "PROJECT";
+        envvars[0].value = "bali";
+        envvars[0].append = false;
+
 
 
         JNILoader bs = new JNILoader(); 
 
-        returncode = bs.callNatural(parms);
+        returncode = bs.callNatural(parms, envvars);
         System.out.printf("Natprocess: [%d]\n", returncode.natprocess_ret);
         if(returncode.natprocess_ret != 0) {
             System.out.printf("Error: [%s]\n", returncode.error_msg);

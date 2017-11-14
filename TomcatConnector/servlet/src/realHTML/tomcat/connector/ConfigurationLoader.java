@@ -13,12 +13,16 @@ import org.w3c.dom.Element;
 import java.lang.reflect.Method;
 import org.xml.sax.SAXException;
 
+import realHTML.tomcat.connector.Environ;
+
 public class ConfigurationLoader
 {
     String filepath = null;
     String env = null;
     Map<String, String> results = new HashMap();
     String tags[] = {};
+
+    Environ envvars[] = null;
 
     public ConfigurationLoader(String filepath, String searchtags[])
     {
@@ -47,6 +51,7 @@ public class ConfigurationLoader
             return(false);
         }
         readSettings(env_element);
+        readEnviromentVars(env_element);
         return(true);
         
     }
@@ -86,8 +91,71 @@ public class ConfigurationLoader
         }
     }
 
+    private void readEnviromentVars(Element target) {
+        NodeList envvars, tmp;
+        Node environ_node;
+        Element environ_entry;
+
+        envvars = target.getElementsByTagName("environ");
+        
+        if(envvars.getLength() == 0) {
+            return;
+        }
+
+        this.envvars = new Environ[envvars.getLength()];
+
+        for(int i=0; i < envvars.getLength(); i++) {
+            environ_node = envvars.item(i);
+            environ_entry = (Element)environ_node;
+            this.envvars[i] = new Environ();
+          
+            //Get the name of the enviroment variable
+            tmp = environ_entry.getElementsByTagName("name");
+
+            //When there are no or multiple entries the enviroment config is invalid
+            //and gets ignored
+            if(tmp.getLength() != 1) {
+                continue;
+            }
+
+            this.envvars[i].name = tmp.item(0).getTextContent();
+
+            //Get the value for the enviroment variable
+            tmp = environ_entry.getElementsByTagName("value");
+            if(tmp.getLength() != 1) {
+                continue;
+            }
+            this.envvars[i].value = tmp.item(0).getTextContent();
+
+            //Check if the variable should get appended
+            tmp = environ_entry.getElementsByTagName("append");
+            if(tmp.getLength() == 1) {
+                if(tmp.item(0).getTextContent().equals("true")) {
+                    this.envvars[i].append = true;
+                } else {
+                    this.envvars[i].append = false;
+                }
+
+            }
+            else {
+                this.envvars[i].append = false;
+            }
+            
+        }
+    }
+
     public Map getResult() 
     {
         return(this.results);
+    }
+
+    public Environ[] getEnviromentVars() 
+    {
+        if(this.envvars != null) {
+            return(this.envvars);
+        }
+        Environ[] nothing = {};
+        return(nothing);
+
     }
 }

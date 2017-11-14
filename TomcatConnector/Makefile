@@ -1,5 +1,5 @@
 #JAVACLASSPATH = ${CURDIR}/servlet/web/WEB-INF/lib/realHTMLconnector.jar:/srv/apache-tomcat-8.5.9/lib/servlet-api.jar
-JAVACLASSPATH = /u/it/a140734/rh4n/realHTML_TomcatConnector/servlet/web/WEB-INF/lib/realHTMLconnector.jar:/opt/tomcat/apache-tomcat-8.0.41/lib/servlet-api.jar
+JAVACLASSPATH = /u/it/a140734/rh4n/realHTML4Natural/TomcatConnector/servlet/web/WEB-INF/lib/realHTMLconnector.jar:/opt/tomcat/apache-tomcat-8.0.41/lib/servlet-api.jar
 
 
 #INCLUDES = -I/usr/java/jdk1.8.0_111/include/ \
@@ -23,6 +23,7 @@ all:
 
 jni_connector:
 	mkdir -p ./servlet/web/WEB-INF/lib
+	javac -classpath "./servlet/src/" ./servlet/src/realHTML/tomcat/connector/Environ.java
 	javac -classpath "./servlet/src/" ./servlet/src/realHTML/tomcat/connector/RH4NReturn.java
 	javac -classpath "./servlet/src/" ./servlet/src/realHTML/tomcat/connector/RH4NParams.java
 	javac -classpath "./servlet/src/" ./servlet/src/realHTML/tomcat/connector/JNINatural.java
@@ -42,9 +43,11 @@ warfile:
 	@printf "Created the realHTML4Natural.war file in ./servlet\n"
 
 complete:
+	make clean
 	make jni_connector
 	make tomcat_servlet
 	make warfile
+	make jni_so
 
 deploy_servlet:
 	make tomcat_servlet
@@ -61,7 +64,7 @@ jni_so:
 
 test:
 	javac -cp ./servlet/src/ ./tests/CallNatural.java 
-	java -cp "./servlet/src/:./tests/" -Djava.library.path="/u/it/a140734/rh4n/realHTML_TomcatConnector/" CallNatural
+	java -cp "./servlet/src/:./tests/" -Djava.library.path="/u/it/a140734/rh4n/realHTML4Natural/TomcatConnector/" CallNatural
 
 clean:
 	rm -f ./servlet/realHTMLServlet.class

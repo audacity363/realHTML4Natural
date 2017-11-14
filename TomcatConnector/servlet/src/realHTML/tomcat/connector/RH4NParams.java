@@ -1,5 +1,6 @@
 package realHTML.tomcat.connector;
 
+
 public class RH4NParams {
     //Parameter from the Request
     public String[] keys;
@@ -16,4 +17,5 @@ public class RH4NParams {
     public String settings;
 
     public String debug;
+
 }

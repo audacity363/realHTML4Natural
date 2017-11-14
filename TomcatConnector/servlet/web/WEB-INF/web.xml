@@ -3,8 +3,10 @@
          xsi:schemaLocation="http:/java.sun.com/dtd/web-app_2_3.dtd">
     <display-name>realHTML4Natural</display-name>
     <discription>Tomcat connector for the realHTML4Natural webframework</discription>
+
     <servlet>
         <servlet-name>realHTMLServlet</servlet-name>
+        <servlet-class>realHTMLServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
