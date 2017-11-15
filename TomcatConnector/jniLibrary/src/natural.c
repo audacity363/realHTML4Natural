@@ -146,7 +146,7 @@ int setParmcountParm(pnni_611_functions s_funcs, JNIEnv *env,
 }
 
 int callNatural(JNIEnv *env, struct naturalparms *parms, int length, 
-    char *error, FILE *logfile)
+    char *error, FILE *logfile, char ***envvars, int envvars_len)
 {
     void *shNNILib = NULL;
     pnni_611_functions nnifuncs;
@@ -157,7 +157,7 @@ int callNatural(JNIEnv *env, struct naturalparms *parms, int length,
     struct parameter_description *natNNIparms;
     char *natlibrary = NULL, *natprogram = NULL, *natcliparms = NULL,
          *errormsg, *outfile = NULL;
-    int rc = 0;
+    int rc = 0, i = 0;
 
     target = getParmByName(parms, length, "nat_library");
     natlibrary = target->getter(env, target, 0);
@@ -167,6 +167,10 @@ int callNatural(JNIEnv *env, struct naturalparms *parms, int length,
 
     target = getParmByName(parms, length, "natparams");
     natcliparms = target->getter(env, target, 0);
+
+    for(; i < envvars_len; i++) {
+        putenv((*envvars)[i]);
+    }
 
     if((errormsg = OpenLib(&shNNILib, "libnatural.so")) != NULL)
     {
@@ -187,6 +191,7 @@ int callNatural(JNIEnv *env, struct naturalparms *parms, int length,
     }
     debugFileprint(logfile, "...Done\n");
 
+    // Is this really needed?! This is the only Natural session in the process
     debugFileprint(logfile, "Wait for exclusive access...\n");
     nnifuncs->pf_nni_enter(nnifuncs);
     debugFileprint(logfile, "... I have the session all for myself\n");

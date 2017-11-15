@@ -19,7 +19,8 @@ void printAll(JNIEnv *, struct naturalparms[], int, FILE*);
 void freeAll(JNIEnv *, FILE*, struct naturalparms*, int, char ***, int);
 jobject createReturnObj(JNIEnv *env, int exit_code, char*, FILE*);
 
-int createNaturalProcess(JNIEnv *env, struct naturalparms *parms, int length, char *error, FILE *logfile);
+int createNaturalProcess(JNIEnv *env, struct naturalparms *parms, int length, char *error, FILE *logfile, 
+    char***, int);
 int setEnvVars(JNIEnv *env, jobjectArray envvars_o, int *length, char **vars[], FILE *logfile, char *error_msg);
 
 
@@ -110,7 +111,7 @@ JNIEXPORT jobject JNICALL Java_realHTML_tomcat_connector_JNINatural_jni_1callNat
     printAll(env, params, parm_length, logfile);
     
 
-    createNaturalProcess(env, params, parm_length, error_msg, logfile);
+    createNaturalProcess(env, params, parm_length, error_msg, logfile, &envvars, envvars_len);
 
     debugFileprint(logfile, "Freeing Java res...\n");
     freeAll(env, logfile, params, parm_length, &envvars, envvars_len);
@@ -122,7 +123,7 @@ JNIEXPORT jobject JNICALL Java_realHTML_tomcat_connector_JNINatural_jni_1callNat
 }
 
 int createNaturalProcess(JNIEnv *env, struct naturalparms *parms, int length, 
-    char *error, FILE *logfile)
+    char *error, FILE *logfile, char ***envvars, int envvars_len)
 {
     pid_t natpid = 0, ret_pid = 0;
     int status = 0, rc = 0;
@@ -132,7 +133,7 @@ int createNaturalProcess(JNIEnv *env, struct naturalparms *parms, int length,
     natpid = fork();
     if(natpid == 0)
     {
-        if((rc = callNatural(env, parms, length, error, logfile)) != 0)
+        if((rc = callNatural(env, parms, length, error, logfile, envvars, envvars_len)) != 0)
         {
             //freeAll(env, logfile);
             //return(createReturnObj(env, rc, error_msg, logfile));
@@ -444,7 +445,7 @@ int setEnvVars(JNIEnv *env, jobjectArray envvars_o, int *envvar_len, char **vars
         (*env)->ReleaseStringUTFChars(env, (jstring)value_field, java_string);
 
         //Write the var to the enviroment
-        putenv((*vars)[i]);
+        //putenv((*vars)[i]);
 
         printf("Setting env: [%s]\n", (*vars)[i]);
 

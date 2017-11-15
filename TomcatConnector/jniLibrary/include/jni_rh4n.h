@@ -10,7 +10,7 @@ struct naturalparms {
     void *(*getter)(JNIEnv*, struct naturalparms*, int);
 };
 
-int callNatural(JNIEnv *env, struct naturalparms *parms, int length, char *error, FILE*);
+int callNatural(JNIEnv *env, struct naturalparms *parms, int length, char *error, FILE*, char***, int);
 void debugFileprint(FILE *logfile, char *format, ...);
 char *natErrno2Str(int naterrno);
 struct naturalparms *getParmByName(struct naturalparms *parms, int length, char *searchname);
