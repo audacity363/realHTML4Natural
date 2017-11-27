@@ -11,8 +11,10 @@
 #include "rh4n.h"
 #include "rh4n_utils.h"
 
-vars_t *resolveName(vars_t *cur_var, vars_t *group, vars_t *var_anker);
 vars_t *searchPageStructure(vars_t *lda_anker, char*);
+vars_t *matchNames(vars_t *, vars_t *, vars_t *, char *, bool, FILE*);
+int compareVarCount(vars_t *, vars_t *, bool, FILE *, char *);
+int countVarsinGroup(vars_t *grp, bool debug, FILE *logfile);
 
 int error_num = 0;
 int error = false;
@@ -32,8 +34,8 @@ int startvar2name(vars_t *var_anker, char *lda_path, bool debug, FILE *logfile, 
         return(-1);
     }
 
-    if(debug)
-        printfork(lda_anker, logfile);
+    /*if(debug)
+        printfork(lda_anker, logfile);*/
 
     fflush(logfile);
         
@@ -53,10 +55,18 @@ int startvar2name(vars_t *var_anker, char *lda_path, bool debug, FILE *logfile, 
     }
     fflush(logfile);
 
+    if(compareVarCount(var_anker, page_grp, debug, logfile, error_buff) != 0)
+    {
+        if(debug)
+            fprintf(logfile, "%s\n", error_buff);
+        return(-1);
+    }
+
     fprintf(logfile, "Start Resolve name\n");
     fflush(logfile);
-    tmp = resolveName(var_anker->next, page_grp, var_anker);
-    if(error != 0)
+    //tmp = resolveName(var_anker->next, page_grp, var_anker);
+    matchNames(var_anker->next, page_grp, var_anker, NULL, debug, logfile);
+    /*if(error != 0)
     {
         switch(error)
         {
@@ -72,91 +82,159 @@ int startvar2name(vars_t *var_anker, char *lda_path, bool debug, FILE *logfile, 
                 break;
         }
         return(-3);
-    }
+    }*/
 
     freeLDAAnker(lda_anker);
     return(0);
 }
 
-//Redefines are not supported because the Interface4 API just gives the original value
-//and not the redefines ones. I can redefine the variable values by myself based on the
-//values from the parsed LDA. I must investigate the behavor from the natural redefine further.
-//What happen if a intger or a dynamic variable get redefined?
-vars_t *resolveName(vars_t *nat_set, vars_t *lda_set, vars_t *var_anker)
+/*
+ * Counts how many variables are defined in a group. When it finds a new group
+ * the function calls itself and returns the sum of alle variables in subgroups
+ */
+int countVarsinGroup(vars_t *grp, bool debug, FILE *logfile)
+{
+    if(debug)
+        fprintf(logfile, "Count vars in %s\n", grp->name);
+
+    int var_count = 0;
+    vars_t *hptr = NULL;
+
+    for(hptr=grp->next_lvl; hptr != NULL; hptr=hptr->next)
+    {
+        if(hptr->type == REDEFINE)
+            continue;
+        else if(hptr->type == GROUP)
+            var_count += countVarsinGroup(hptr, debug, logfile);
+        else
+            var_count++;
+    }
+    if(debug)
+        fprintf(logfile, "Found %d vars in %s\n", var_count, grp->name);
+
+    return(var_count);
+}
+
+/*
+ * Reads out how much variables are defined in each group and compares these numbers.
+ *
+ * @param nat_set vars from natural with the real values
+ hptr->type == GROUP* @param lda_set vars freom the lda without value but with the real names
+ * @param debug true = debug output false = no debug output
+ * @param logfile file for the debug output
+ *
+ * @returns < 0 Error
+ * @returns = 0 Variable count are equals
+ * @returns > 0 Variable count are equals
+ */
+int compareVarCount(vars_t *nat_set, vars_t *lda_set, bool debug, FILE *logfile, char *error_buff)
+{
+    int lda_var_count = 0, nat_var_count = 0;
+    vars_t *hptr = NULL;
+
+    //in the original list from natural sould no group be defined
+    for(hptr = nat_set->next; hptr != NULL; hptr=hptr->next)
+    {
+        if(hptr->next_lvl != NULL)
+        {
+            sprintf(error_buff, "variable on position %d has a next level\n", nat_var_count);
+            return(-1);
+        }
+        nat_var_count++;
+    }
+    nat_var_count--;
+
+    //Count variables in the LDA Redefines and Group headers gets ignored
+    for(hptr=lda_set->next; hptr != NULL; hptr=hptr->next) 
+    {
+        if(hptr->type == REDEFINE)
+            continue;
+        else if(hptr->type == GROUP)
+            lda_var_count += countVarsinGroup(hptr, debug, logfile);
+        else
+            lda_var_count++;
+    }
+
+    if(debug)
+        fprintf(logfile, "Found following vars: LDA: %d NAT: %d\n", lda_var_count, nat_var_count);
+
+
+    if(lda_var_count != nat_var_count)
+    {
+        sprintf(error_buff, "Variable count not equals: Nat: %d LDA: %d\n", nat_var_count, lda_var_count);
+        return(1);
+    }
+    return(0);
+}
+
+vars_t *matchNames(vars_t *nat_set, vars_t *lda_set, vars_t *anker, char *grpname, bool debug, FILE *logfile)
 {
     vars_t *cur_lda_set = lda_set,
-           *cur_nat_set = nat_set;
-    bool in_grp = false;
-    char *grp_name = NULL;
-    int ret = 0;
+           *cur_nat_set = nat_set, *tmp;
+    int ret;
 
-    if(cur_lda_set->type == GROUP)
+    if(grpname)
     {
-        if(GrpisDefined(var_anker, cur_lda_set->name) == false)
+        if(GrpisDefined(anker, grpname) == false)
         {
-            if((ret = addGroup(var_anker, cur_lda_set->name, 0,0,0)) != 0)
+            if((ret = addGroup(anker, grpname, 0,0,0)) != 0)
             {
                 error_num = ret;
                 error = RH4N_VAR_LIBRARY_ERR;
                 return(NULL);
             }
         }
-        in_grp = true;
-        grp_name = cur_lda_set->name;
-        cur_lda_set = cur_lda_set->next_lvl;
     }
 
-    while(cur_lda_set && cur_nat_set)
+    for(;cur_lda_set != NULL; cur_lda_set=cur_lda_set->next)
     {
-        if(cur_lda_set->type == GROUP)
+        if(cur_lda_set->type == REDEFINE)
         {
-            cur_nat_set = resolveName(cur_nat_set, cur_lda_set, var_anker);
-            if(error != 0)
-                return(NULL);
-            if(cur_nat_set == NULL)
-                return(NULL);
-        }
-        else if(cur_lda_set->type == REDEFINE)
-        {
-            cur_lda_set = cur_lda_set->next;
+            if(debug)
+                fprintf(logfile, "Ignoring redefine\n");
             continue;
+        }
+        else if(cur_lda_set->type == GROUP)
+        {
+            if(debug)
+                fprintf(logfile, "found Group. forking.... [%s]\n", cur_lda_set->name);
+            cur_nat_set = matchNames(cur_nat_set, cur_lda_set->next_lvl, anker, cur_lda_set->name, debug, logfile);
         }
         else
         {
+            if(debug)
+                fprintf(logfile, "Rename %s to ", cur_nat_set->name);
             free(cur_nat_set->name);
             if((cur_nat_set->name = malloc(strlen(cur_lda_set->name)+1)) == NULL)
             {
                 error = RH4N_NO_MEMORY;
                 return(NULL);
             }
+            if(debug) 
+                fprintf(logfile, "%s\n", cur_lda_set->name);
             strcpy(cur_nat_set->name, cur_lda_set->name);
 
-            if(in_grp == true)
-            {            
-                printf("Move to group [%s]\n", grp_name);
-                if((ret = moveVariableToGroup(var_anker, cur_nat_set->name, grp_name, &cur_nat_set)) != 0)
+            //save next position
+            tmp = cur_nat_set->next;
+
+            //The function is in a recursion call. lda_set points to group fork
+            if(grpname)
+            {
+                if(debug)
+                    fprintf(logfile, "Moving %s to grp %s\n", cur_nat_set->name, grpname);
+                if((ret = moveVariableToGroup(anker, cur_nat_set->name, grpname, &cur_nat_set)) != 0)
                 {
                     error_num = ret;
                     error = RH4N_VAR_LIBRARY_ERR;
                     return(NULL);
                 }
             }
-            else
-            {
-                cur_nat_set = cur_nat_set->next;
-            }
+
+            cur_nat_set = tmp;
         }
-        if(cur_lda_set->next == NULL && in_grp)
-        {
-            while(cur_lda_set->type != GROUP)
-            {
-                cur_lda_set = cur_lda_set->prev;
-            }
-            in_grp = false;
-            break;
-        }
-        cur_lda_set = cur_lda_set->next;
     }
+    if(debug)
+        fprintf(logfile, "going back\n\n");
     return(cur_nat_set);
 }
 

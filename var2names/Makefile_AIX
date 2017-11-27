@@ -1,10 +1,11 @@
-OBJ = start.o
+OBJ = startv2n.o
 
 INCLUDE = -I./src/ \
 		  -I../libs/varhandle_lib/src/ \
 		  -I../libs/nat-lda-parser/src/ \
 		  -I../natuser_lib/src/ \
-		  -I../libs/utils/src/
+		  -I../libs/utils/src/ \
+		  -I../include/
 
 LIBS = -L./ -lvar2name \
 	   -L../libs/varhandle_lib/ -lldaparser\
@@ -18,8 +19,8 @@ $(OBJ):
 	xlc -g -c src/$*.c $(INCLUDE) -o ./bin/$*.o
 
 test:
-	xlc -g ./test_src/main.c $(INCLUDE) $(LIBS) -o ./test_src/main
-	./test_src/main
+	xlc -g ./testprogs/main.c $(INCLUDE) $(LIBS) -o ./testprogs/main
+	./testprogs/main
 
 clean:
 	rm -rf libvar2name.a
