@@ -6,7 +6,7 @@ LIBS = -L../varhandle_lib/ -lvars \
 
 OBJS = start_json.o print_funcs.o
 
-CARGS = -DDEV_OUTPUT
+#CARGS = -DDEV_OUTPUT
 
 lib: $(OBJS)
 	ar -vcru libgenjson.a ./bin/*.o

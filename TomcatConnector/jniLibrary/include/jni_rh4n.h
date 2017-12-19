@@ -14,3 +14,5 @@ int callNatural(JNIEnv *env, struct naturalparms *parms, int length, char *error
 void debugFileprint(FILE *logfile, char *format, ...);
 char *natErrno2Str(int naterrno);
 struct naturalparms *getParmByName(struct naturalparms *parms, int length, char *searchname);
+char *OpenLib(void **shLib, char *name);
+void CloseLib(void **shLib);

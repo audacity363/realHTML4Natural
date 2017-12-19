@@ -10,8 +10,6 @@
 
 #define HTML_ERROR_HEAD "<html><head><title>Natural Error: [%d]</title></head><body>\n"
 
-static char *OpenLib(void **shLib, char *name);
-void CloseLib(void **shLib);
 struct naturalparms *getParmByName(struct naturalparms *parms, int length, char *searchname);
 int setValuelengthParm(pnni_611_functions s_funcs, JNIEnv *env, 
     struct naturalparms *parms, int length, void *natnniparms,

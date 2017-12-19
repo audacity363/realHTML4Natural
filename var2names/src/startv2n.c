@@ -142,10 +142,10 @@ int compareVarCount(vars_t *nat_set, vars_t *lda_set, bool debug, FILE *logfile,
         }
         nat_var_count++;
     }
-    nat_var_count--;
+    //nat_var_count--;
 
     //Count variables in the LDA Redefines and Group headers gets ignored
-    for(hptr=lda_set->next; hptr != NULL; hptr=hptr->next) 
+    for(hptr=lda_set; hptr != NULL; hptr=hptr->next) 
     {
         if(hptr->type == REDEFINE)
             continue;
