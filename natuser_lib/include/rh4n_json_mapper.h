@@ -35,6 +35,7 @@
 #define RH4N_RET_UNICODE_ERR 15
 #define RH4N_RET_USE_F8 16
 #define RH4N_RET_NOT_SUPPORTED 17
+#define RH4N_RET_MALFORMED_FORMAT_STR 18
 
 int json_i_handling(int, struct parameter_description, pnni_611_functions, void*, vars_t*);
 int json_1di_handling(int, struct parameter_description, pnni_611_functions, void*, vars_t*);

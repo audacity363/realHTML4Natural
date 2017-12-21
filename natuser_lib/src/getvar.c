@@ -14,6 +14,7 @@
 
 extern pnni_611_functions getNNIFunctions(void **shlibptr);
 extern vars_t *getVarPtr(pnni_611_functions nnifuncs, void *parmhandle);
+int getGroupandName(char *orig, char **grp, char **name);
 
 //int checkVarcompatibility(vars_t *target, pnni_611_functions nnifuncs, void *parmhandle);
 
@@ -31,7 +32,9 @@ long getVar(WORD nparms, void *parmhandle, void *traditional) {
     pnni_611_functions nnifuncs = NULL;
     struct parameter_description varname_pd;
     int rc = 0;
-    char namebuff[MAX_NAME_LENGTH+1];
+    char namebuff[MAX_NAME_LENGTH+1],
+        *grp = NULL,
+        *varname = NULL;
 
     vars_t *var_anker = NULL, *target = NULL;
 
@@ -62,9 +65,17 @@ long getVar(WORD nparms, void *parmhandle, void *traditional) {
     printf("Nat length_all: [%d]\n", varname_pd.length_all);
     namebuff[varname_pd.length_all] = '\0';
     //trimSpaces(namebuff);
+    
+    if((rc = getGroupandName(namebuff, &grp, &varname)) != RH4N_RET_OK) {
+        return(rc);
+    }
+   
+    if(grp) 
+        printf("returning var: [%s] in grp [%s]\n", varname, grp);
+    else
+        printf("returning var: [%s]\n", varname);
 
-    printf("returning var: [%s]\n", namebuff);
-    if((target = isDefinedGrp(var_anker, NULL, namebuff)) == NULL) {
+    if((target = isDefinedGrp(var_anker, grp, varname)) == NULL) {
         printf("Var [%s] is not defined\n", namebuff);
         return(RH4N_RET_UNKOWN_VAR);
     }
@@ -192,3 +203,32 @@ int checkVarcompatibility(vars_t *target, pnni_611_functions nnifuncs, void *par
     return(RH4N_RET_OK);
 }
 
+
+int getGroupandName(char *orig, char **grp, char **name) {
+    int i = 0, occurrence = 0;
+
+    char *point_pos = NULL;
+
+    for(; i < strlen(orig); i++)
+        if(orig[i] == '.')
+            occurrence++;
+
+
+    if(occurrence == 0) {
+        *grp = NULL;
+        *name = orig;
+        return(RH4N_RET_OK);
+    } else if(occurrence > 1) {
+        return(RH4N_RET_MALFORMED_FORMAT_STR);
+    }
+
+    if((point_pos = strchr(orig, '.')) == NULL) {
+        return(RH4N_RET_MALFORMED_FORMAT_STR);
+    }
+
+    *point_pos = '\0';
+
+    *grp = orig;
+    *name = point_pos+1;
+    return(RH4N_RET_OK);
+}
