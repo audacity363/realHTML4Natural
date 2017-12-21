@@ -10,6 +10,8 @@ INCLUDES = -I/SAG/cjp/v16/include/ \
 		   -I./jniLibrary/include/ \
 		   -I../libs/varhandle_lib/src/
 
+LIBS = -L../libs/varhandle_lib/ -lvars
+
 
 #CC = gcc
 CC = xlc
@@ -37,30 +39,13 @@ JAVA_UTILS_PACKAGE = ./servlet/src/realHTML/tomcat/connector/Environ.java \
 					 ./servlet/src/realHTML/tomcat/connector/ConfigurationLoader.java \
 					 ./servlet/src/realHTML/tomcat/connector/RH4NCallParms.java 
 
-JNI_JSON_HANDLERS = json_utils.o plain_handlers.o 1d_handlers.o \
+JNI_JSON_HANDLERS = json_main.o json_utils.o plain_handlers.o 1d_handlers.o \
 					2d_handlers.o 3d_handlers.o handlers.o callNatural.o
 
 JNI_MEMBER = main.o natural.o
 
 all:
-	@printf "targets:\n"
-	@printf "\tcomplete      : Build the complete connector\n"
-	@printf "\twarfile       : Pack the .war file for deployment\n"
-	@printf "\tjni_connector : Compile the utility library\n"
-	@printf "\ttomcat_servlet: Compile the tomcat servlet\n"
-	@printf "\tjni_so        : Compile the JNI so object\n"
-
-complete:
-	make clean
-	make jni_connector
-	make tomcat_servlet
-	make warfile
-	make jni_so
-
-cleanjava:
-	@make cleanwarfile
-	@make cleanservletclass
-	@make cleanpackage
+	@make warfile
 
 warfile: cleanwarfile servletclass
 	@printf "Copy package\n"
@@ -68,7 +53,7 @@ warfile: cleanwarfile servletclass
 	@printf "Copy servlet class\n"
 	@cp ./servlet/bin/realHTMLconnector.jar ./servlet/web/WEB-INF/lib/
 	@printf "Creating war file\n"
-	@cd ./servlet/web; jar cvf ../../realHTML4Natural.war .
+	@cd ./servlet/web; jar cvf ../realHTML4Natural.war .
 
 cleanwarfile:
 	@printf "Cleaning warfile\n"
@@ -96,13 +81,15 @@ package: cleanpackage
 
 cleanpackage:
 	@printf "Cleaning realHTML.tomcat.JSONMatcher\n"
-	@rm -rf ./bin/realHTMLtomcat/JSONMatcher/*.class
+	@rm -rf ./servlet/bin/realHTMLtomcat/JSONMatcher/*.class
 	@printf "Cleaning realHTML.tomcat.connector\n"
-	@rm -rf ./bin/realHTMLtomcat/connector/*.class
+	@rm -rf ./servlet/bin/realHTMLtomcat/connector/*.class
+	@rm -f ./servlet/bin/realHTMLconnector.jar
 
 
 jnilib: jniclean jniheader $(JNI_MEMBER) $(JNI_JSON_HANDLERS)
-	${CC} -G -o librealHTMLconnector.so ./jniLibrary/bin/*.o
+	@printf "Linking librealHTMLconnector.so\n"
+	@$(CC) -G -o librealHTMLconnector.so $(LIBS) ./jniLibrary/bin/*.o
 
 jniheader: package
 	@printf "Generating JNI header\n"
@@ -123,6 +110,16 @@ jniclean:
 	@printf "Cleaning shared object"
 	@rm -f ./librealHTMLconnector.so
 
+lltest:
+	@printf "Cleaning LLTest object\n"
+	@rm -f ./servlet/bin/LLTest.class
+	@printf "Compiling LLTest.java\n"
+	@javac -cp $(CLASSPATH) -d ./servlet/bin/ ./tests/LLTest.java
+	@printf "Run LLTest\n"
+	@java -cp "./servlet/bin:./servlet/web/WEB-INF/lib/minimal-json-0.9.4.jar" -Djava.library.path="/u/it/a140734/rh4n/realHTML4Natural/TomcatConnector/" LLTest
+
+
+	
 test:
 	javac -cp ./servlet/src/ ./tests/CallNatural.java 
 	java -cp "./servlet/src/:./tests/" -Djava.library.path="/u/it/a140734/rh4n/realHTML4Natural/TomcatConnector/" CallNatural

@@ -6,6 +6,7 @@
 #include "vars.h"
 
 #include <jni.h>
+#include "realHTML_tomcat_connector_JNINatural.h"
 #include "Test.h"
 #include "jsonhandling.h"
 #include "json_utils.h"
@@ -15,7 +16,7 @@ void printFork(JNIEnv*, GeneralInfos*, jobject, const char*, int, vars_t*);
 int getAnker(JNIEnv *env, jobject varlist, GeneralInfos *infos);
 int callNatural_JSON(vars_t *var_anker);
 
-JNIEXPORT jint JNICALL Java_Test_dumpVars
+JNIEXPORT jint JNICALL Java_realHTML_tomcat_connector_JNINatural_jni_1dumpVars
   (JNIEnv *env, jobject in_cls, jobject varlist) {
     jclass llhandlerclass = NULL;    
     jfieldID headID = NULL;

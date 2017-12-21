@@ -1,15 +1,11 @@
 import realHTML.tomcat.JSONMatcher.*;
+import realHTML.tomcat.connector.JNILoader;
 
-public class Test {
-
-    static
-    {
-        System.loadLibrary( "test" );
-    }
-
-    public native int dumpVars(LLHandler varlist);
+public class LLTest {
 
     public static void main(String args[]) {
+        JNILoader bs = new JNILoader();
+        
     	/*LLHandler ll = new LLHandler();
         String test[] = {"test2"};
         String valuetest[] = {"val11", "val22"};
@@ -58,7 +54,6 @@ public class Test {
         try {
         	varlist = parser.run();
         	varlist.printList();
-            new Test().dumpVars(varlist);
         } catch(TypeException e) {
         	System.out.println(e);
         } catch(JSONArrayException e) {
@@ -66,6 +61,7 @@ public class Test {
         } catch (JSONObjectException e) {
         	System.out.println(e);
         }
+        bs.dumpVars(varlist);
 
         
         //System.out.println("\n");

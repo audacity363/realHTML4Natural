@@ -1,6 +1,7 @@
 package realHTML.tomcat.connector;
 
 import realHTML.tomcat.connector.Environ;
+import realHTML.tomcat.JSONMatcher.LLHandler;
 
 public class JNILoader
 {
@@ -19,5 +20,10 @@ public class JNILoader
     public int printVersion()
     {
         return(new JNINatural()).jni_printVersion();
+    }
+
+    public int dumpVars(LLHandler varlist) 
+    {
+        return(new JNINatural()).jni_dumpVars(varlist);
     }
 }

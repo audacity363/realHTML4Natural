@@ -1,8 +1,11 @@
+CC = xlc
+
 OBJ = ncuxinit.o gen_page.o gen_json.o gen_json_objs.o jumptab.o natutils.o 
-
 VAR_OBJ = a_handling.o n_handling.o l_handling.o i_handling.o u_handling.o
+NATUSER_HANDLING_OBJ = json_i_handler.o json_a_handler.o json_aton_handler.o json_l_handler.o json_f_handler.o
 
-INCLUDE = -I./src/ \
+
+INCLUDE = -I./include/ \
 		  -I../include/ \
 		  -I../libs/varhandle_lib/src/ \
 		  -I../libs/utils/src/ \
@@ -25,20 +28,27 @@ LIBS = -L../libs/varhandle_lib/ -lvars \
 LFLAGS1 = -G -bsymbolic -bexpall -bnoentry
 LFLAGS2 = -b64 -ldl -blibpath:/usr/lib/threads:/usr/lib:/lib -lc_r
 
-lib: $(OBJ)
-	#xlc -qmkshrobj -G -o librealHTML4Natural.so ./bin/*.o
-	xlc $(LFLAGS1) ./bin/*.o $(LIBS) $(LFLAGS2) -o librealHTML4Natural.so
-	@echo "Done..."
+lib: clean $(OBJ)
+	@printf "Linking librealHTML4Natural.so\n"
+	@$(CC) $(LFLAGS1) ./bin/*.o $(LIBS) $(LFLAGS2) -o ../bin/librealHTML4Natural.so
 	
-$(OBJ): $(VAR_OBJ);
-	xlc -g -fpic -c -q64 ./src/$*.c $(INCLUDE) -o ./bin/$*.o
+$(OBJ): $(VAR_OBJ) $(NATUSER_HANDLING_OBJ)
+	@printf "CC ./src/$*.c => ./bin/$*.o\n"
+	@$(CC) -g -fpic -c -q64 ./src/$*.c $(INCLUDE) -o ./bin/$*.o
 
 $(VAR_OBJ):
-	xlc -g -fpiic -c -q64 ./src/variablen_handling/$*.c $(INCLUDE) -o ./bin/$*.o
+	@printf "CC ./src/variablen_handling/$*.c => ./bin/$*.o\n"
+	@$(CC) -g -fpic -c -q64 ./src/variablen_handling/$*.c $(INCLUDE) -o ./bin/$*.o
+
+$(NATUSER_HANDLING_OBJ):
+	@printf "CC ./src/json_handlers/$*.c => ./bin/$*.o\n"
+	@$(CC) -g -fpic -c -q64 ./src/json_handlers/$*.c $(INCLUDE) -o ./bin/$*.o
 
 clean:
-	rm -rf ./librealHTML4Natural.so
-	rm -rf ./bin/*.o
+	@printf "Cleaning shared objects\n"
+	@rm -rf ./librealHTML4Natural.so
+	@printf "Cleaning objects\n"
+	@rm -rf ./bin/*.o
 
 test:
 	make lib

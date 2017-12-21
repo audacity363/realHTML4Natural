@@ -23,6 +23,14 @@ JNIEXPORT jobject JNICALL Java_realHTML_tomcat_connector_JNINatural_jni_1callNat
 JNIEXPORT jint JNICALL Java_realHTML_tomcat_connector_JNINatural_jni_1printVersion
   (JNIEnv *, jobject);
 
+/*
+ * Class:     realHTML_tomcat_connector_JNINatural
+ * Method:    jni_dumpVars
+ * Signature: (LrealHTML/tomcat/JSONMatcher/LLHandler;)I
+ */
+JNIEXPORT jint JNICALL Java_realHTML_tomcat_connector_JNINatural_jni_1dumpVars
+  (JNIEnv *, jobject, jobject);
+
 #ifdef __cplusplus
 }
 #endif
