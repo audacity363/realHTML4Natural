@@ -56,7 +56,7 @@ long gen_json(WORD nparms, void *parmhandle, void *traditional)
 
     pnni_611_functions nni_funcs;
     void *shlib = NULL;
-    char *logfilepath = NULL;
+    char *logfilepath = NULL, *errorstr = NULL;
 
     vars_t *var_anker = NULL;
 
@@ -75,10 +75,10 @@ long gen_json(WORD nparms, void *parmhandle, void *traditional)
     }
 
 
-    if(OpenLib(&shlib, NAT_LIB_NAME) < 0)
+    if((errorstr = OpenLib(&shlib, NAT_LIB_NAME)) !=  NULL)
     {
         logfile = fopen("/tmp/rh4n_panic", "w");
-        fprintf(logfile, "Error loading SO for natural NI\n");
+        fprintf(logfile, "Error loading SO for NNI: [%s]\n", errorstr);
         fclose(logfile);
         return(2);
     }

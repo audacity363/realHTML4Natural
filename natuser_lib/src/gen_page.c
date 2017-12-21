@@ -63,7 +63,7 @@ long gen_page(WORD nparms, void *parmhandle, void *traditional)
 
     pnni_611_functions nni_funcs;
     void *shlib = NULL;
-    char *logfilepath = NULL;
+    char *logfilepath = NULL, *errorstr = NULL;
 
     vars_t *var_anker = NULL;
 
@@ -83,7 +83,7 @@ long gen_page(WORD nparms, void *parmhandle, void *traditional)
     }
 
 
-    if(OpenLib(&shlib, NAT_LIB_NAME) < 0)
+    if((errorstr = OpenLib(&shlib, NAT_LIB_NAME)) != NULL)
     {
         /*fprintf(logfile, "Error while loading natural.so\n");
         fflush(logfile);

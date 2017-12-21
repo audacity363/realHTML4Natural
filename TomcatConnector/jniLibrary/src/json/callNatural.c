@@ -51,4 +51,5 @@ int callNatural_JSON(vars_t *var_anker) {
         printNaturalException(&nat_ex, stdout);
     }
 
+    printf("callnat: [%d]\n", rc);
 }

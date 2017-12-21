@@ -32,6 +32,8 @@
 extern long gen_page();
 extern long gen_json();
 extern long gen_json_objs();
+extern long printvars();
+extern long getVar();
 
 
 /*
@@ -47,7 +49,9 @@ TAB_STRUCT n_call_table[] = {
 
   { "GENJSONO", gen_json_objs},
   { "GENJSON", gen_json},
-  { "GENPAGE", gen_page}
+  { "GENPAGE", gen_page},
+  { "GETVAR", getVar},
+  { "PRITVARS", printvars}
 
 };
 

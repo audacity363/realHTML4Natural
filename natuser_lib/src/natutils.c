@@ -35,16 +35,16 @@ pnni_611_functions initNNI(void *lib)
     return(s_funcs);
 }
 
-int OpenLib(void **shLib, char *name)
+char* OpenLib(void **shLib, char *name)
 {
-    char *error;
+    static char error[1024];
 
     *shLib = dlopen(name, RTLD_NOW);
-    if(!*shLib)
-    {
-        return(-1);
+    if(!*shLib) {
+        sprintf(error, "Error while loading Module [%s]: [%s]", name, dlerror());
+        return(error);
     }
-    return(0);
+    return(NULL);
 }
 
 void CloseLib(void **shLib)

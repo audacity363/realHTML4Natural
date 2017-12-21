@@ -116,7 +116,8 @@ lltest:
 	@printf "Compiling LLTest.java\n"
 	@javac -cp $(CLASSPATH) -d ./servlet/bin/ ./tests/LLTest.java
 	@printf "Run LLTest\n"
-	@java -cp "./servlet/bin:./servlet/web/WEB-INF/lib/minimal-json-0.9.4.jar" -Djava.library.path="/u/it/a140734/rh4n/realHTML4Natural/TomcatConnector/" LLTest
+	@export NATUSER=/u/it/a140734/rh4n/realHTML4Natural/bin/librealHTML4Natural.so && \
+	java -cp "./servlet/bin:./servlet/web/WEB-INF/lib/minimal-json-0.9.4.jar" -Djava.library.path="/u/it/a140734/rh4n/realHTML4Natural/TomcatConnector/" LLTest
 
 
 	
