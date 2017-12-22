@@ -17,26 +17,6 @@
 #define GET_VAR_RET_PARM_POS 2
 #define MAX_NAT_N_SIZE 29
 
-#define RH4N_RET_OK 0
-#define RH4N_RET_PARM_MISSMATCH 1
-#define RH4N_RET_SO_ERR 2
-#define RH4N_RET_VAR_PTR_ERR 3
-#define RH4N_RET_NNI_ERR 4
-#define RH4N_RET_PARM_TYPE_MISSMATCH 5
-#define RH4N_RET_UNKOWN_VAR 6
-#define RH4N_RET_BUFFER_OVERFLOW 7
-#define RH4N_RET_VAR_MISSMATCH 8
-#define RH4N_RET_CONST_VAR 9
-#define RH4N_RET_DIM1_TOO_SMALL 10
-#define RH4N_RET_DIM2_TOO_SMALL 11
-#define RH4N_RET_DIM3_TOO_SMALL 12
-#define RH4N_RET_MIXED_XARRAY 13
-#define RH4N_RET_MEMORY_ERR 14
-#define RH4N_RET_UNICODE_ERR 15
-#define RH4N_RET_USE_F8 16
-#define RH4N_RET_NOT_SUPPORTED 17
-#define RH4N_RET_MALFORMED_FORMAT_STR 18
-
 int json_i_handling(int, struct parameter_description, pnni_611_functions, void*, vars_t*);
 int json_1di_handling(int, struct parameter_description, pnni_611_functions, void*, vars_t*);
 int json_2di_handling(int, struct parameter_description, pnni_611_functions, void*, vars_t*);

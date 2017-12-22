@@ -4,6 +4,8 @@
 #include <dlfcn.h>
 #include <errno.h>
 
+#include "standard.h"
+
 #include "jni.h"
 
 #include "vars.h"

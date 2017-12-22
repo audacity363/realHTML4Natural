@@ -8,6 +8,7 @@ CLASSPATH = "/u/it/a140734/rh4n/realHTML4Natural/TomcatConnector/servlet/web/WEB
 
 INCLUDES = -I/SAG/cjp/v16/include/ \
 		   -I./jniLibrary/include/ \
+		   -I../include/ \
 		   -I../libs/varhandle_lib/src/ \
 		   -I../var2names/include/
 

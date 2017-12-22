@@ -3,6 +3,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "standard.h"
+
 #include "vars.h"
 
 #include <jni.h>
