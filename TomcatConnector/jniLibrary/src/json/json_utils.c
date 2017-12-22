@@ -92,7 +92,7 @@ jint getJSONVarType(JNIEnv *env, GeneralInfos *infos, jobject curptr) {
     return(vartype);
 }
 
-void printVarType(jint vartype) {
+void printJSONVarType(jint vartype) {
     switch(vartype) {
         case JVAR_GROUP:
             printf("Group\n");
@@ -151,7 +151,7 @@ void printVarType(jint vartype) {
     }
 }
 
-void printTabs(int level) {
+void _printTabs(int level) {
     int i = 0;
     for(; i < level; i++)
         printf("\t");

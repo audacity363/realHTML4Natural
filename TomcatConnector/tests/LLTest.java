@@ -39,16 +39,16 @@ public class LLTest {
         ll.addVar("test7", valuetest3d);
         ll.printList();*/
         
-        //String input = "{\"key1\": \"val1\", \"key2\":{\"key11\": {\"key111\": \"val111\"}, \"key12\": \"val12\"}, \"key3\": [\"test\"]}";
+        //String input = "{\"KEY1\": \"val1\", \"key2\":{\"key11\": {\"key111\": \"val111\"}, \"key12\": \"val12\"}, \"key3\": [\"test\"]}";
         //String input = "{\"key1\": [[11, 12, 13], [21, 22, 23]]}";
-        String input = "{\"key1\": [[[111, 112, 113], [121, 122, 123]], [[211, 212, 213], [221, 222, 223]]], \"key2\": 410.23,  \"key3\": ["
-        		+ "{\"key1\": \"Hello World1\", \"key2\": [[11], [12]]}, {\"key1\": \"Hello World2\", \"key2\": [[21], [22]]}"
+        String input = "{\"KEY1\": [[[111, 112, 113], [121, 122, 123]], [[211, 212, 213], [221, 222, 223]]], \"KEY2\": 410.23,  \"KEY3\": ["
+        		+ "{\"KEY31\": \"Hello World1\", \"KEY32\": [[11], [12]]}, {\"KEY31\": \"Hello World2\", \"KEY32\": [[21], [22]]}"
         		+ "],"
-        		+ "\"key4\": {\"key1\": \"Hello World\", \"key5\": [\"str1\", \"str2\", \"str3\"]}, \"key5\": [[\"val11\", \"val12\"], [\"val21\", \"val22\"]], \"key6\": [false, false, true], \"key7\": [\"String Numero uno\", \"String Numero duo\"],"
-                + "\"key8\": [[11, 12], [21, 22]], \"key9\": [[[\"val000\", \"val001\"], [\"val010\", \"val011\"]], [[\"val100\", \"val101\"], [\"val110\", \"val111\"]]],"
-                + "\"key10\": 34.8, \"key11\": false}";
+        		+ "\"KEY4\": {\"KEY41\": \"Hello World\", \"KEY42\": [\"str1\", \"str2\", \"str3\"]}, \"KEY5\": [[\"val11\", \"val12\"], [\"val21\", \"val22\"]], \"KEY6\": [false, false, true], \"KEY7\": [\"String Numero uno\", \"String Numero duo\"],"
+                + "\"KEY8\": [[11, 12], [21, 22]], \"KEY9\": [[[\"val000\", \"val001\"], [\"val010\", \"val011\"]], [[\"val100\", \"val101\"], [\"val110\", \"val111\"]]],"
+                + "\"KEY10\": 34.8, \"KEY11\": false}";
         System.out.println(input);
-        //String input = "{\"key1\": [1, 2, 3, 4], \"key2\": [\"5\", \"6\", \"7\", \"8\"]}";
+        //String input = "{\"KEY1\": [1, 2, 3, 4], \"KEY2\": [\"5\", \"6\", \"7\", \"8\"]}";
         JSONParser parser = new JSONParser(input);
         LLHandler varlist = null;
         try {

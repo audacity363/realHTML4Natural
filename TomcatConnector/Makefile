@@ -8,9 +8,13 @@ CLASSPATH = "/u/it/a140734/rh4n/realHTML4Natural/TomcatConnector/servlet/web/WEB
 
 INCLUDES = -I/SAG/cjp/v16/include/ \
 		   -I./jniLibrary/include/ \
-		   -I../libs/varhandle_lib/src/
+		   -I../libs/varhandle_lib/src/ \
+		   -I../var2names/include/
 
-LIBS = -L../libs/varhandle_lib/ -lvars
+LIBS = -L../libs/varhandle_lib/ -lvars \
+	   -L../libs/nat-lda-parser/ -lldaparser \
+	   -L../var2names/ -lvar2name \
+	   -L../libs/utils/ -lutils
 
 
 #CC = gcc

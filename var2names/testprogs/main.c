@@ -11,6 +11,9 @@ vars_t *handleGroup(vars_t *cur_var, vars_t *group);
 
 int main()
 {
+
+    matchPosition(NULL, NULL);
+#if 0
     char error_buffer[2024];
     vars_t *hptr = NULL,
     *nat_anker = NULL;
@@ -63,4 +66,5 @@ int main()
    printAllVars(nat_anker);
    freeVarAnker(nat_anker);
    return(0);
+#endif
 }

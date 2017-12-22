@@ -45,8 +45,9 @@ JNIEXPORT jint JNICALL Java_realHTML_tomcat_connector_JNINatural_jni_1dumpVars
 
     printAllVarsToFile(var_anker, stdout);
 
+    startmatchPosition("/u/it/a140734/rh4n/realHTML4Natural/var2names/test_src/PTRLTEST.NGL", var_anker, "json-data");
 
-    callNatural_JSON(var_anker);
+    //callNatural_JSON(var_anker);
 }
 
 void printFork(JNIEnv *env, GeneralInfos *infos, jobject curptr, const char *group, int level, vars_t *var_anker) {
@@ -75,8 +76,8 @@ void printFork(JNIEnv *env, GeneralInfos *infos, jobject curptr, const char *gro
         printf("Name: [%s]\n", args.varname);
         printTabs(level);
         args.vartype = getJSONVarType(env, infos, nextentry);
-        printTabs(level);
-        printVarType(args.vartype);
+        _printTabs(level);
+        printJSONVarType(args.vartype);
 
         if(args.vartype == JVAR_GROUP) {
             addGroup(var_anker, (char*) args.varname, -1, -1, -1);
