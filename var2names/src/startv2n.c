@@ -4,7 +4,9 @@
 
 #define VAR2NAME
 
+#include "standard.h"
 #include "vars.h"
+
 #include "error_vars.h"
 #include "lda.h"
 #include "var2name.h"
@@ -239,40 +241,48 @@ vars_t *matchNames(vars_t *nat_set, vars_t *lda_set, vars_t *anker, char *grpnam
 }
 
 
-int startmatchPosition(char *ldapath, vars_t *varanker, char *json_group) {
+int startmatchPosition(char *ldapath, vars_t *varanker, char *json_group, positioninfo_t *postab) {
     vars_t *lda_anker = NULL, *json_object_anker = NULL;
     char errorbuff[2048];
     int rc = 0, i = 0;
-
-    positioninfo_t postab = { -1, NULL };
 
     initVarAnker(&lda_anker);
 
     if((rc = startLDAParser(ldapath, lda_anker, stdout, errorbuff)) != LDA_OK)
     {
-        printf("Error: [%s]\n", errorbuff);
-        return(-1);
+        //TODO: Report Error
+       //printf("Error: [%s]\n", errorbuff);
+        return(RH4N_RET_LDA_PARSE_ERR);
     }
 
     if((json_object_anker = searchPageStructure(lda_anker, json_group)) == NULL) {
-        printf("Could not find structure: [%s]\n", json_group);
-        return(-1);
+        //printf("Could not find structure: [%s]\n", json_group);
+        freeLDAAnker(lda_anker);
+        //TODO: Report Error
+        return(RH4N_RET_UNKOWN_VAR);
     }
-    
+#if 0    
     printf("LDA:\n");
     printfork(json_object_anker, stdout);
     printf("Vars: \n");
     printAllVarsToFile(varanker, stdout);
+#endif
 
-    matchPosition(json_object_anker->next_lvl, varanker, NULL, 0, &postab);
+    if((rc = matchPosition(json_object_anker->next_lvl, varanker, NULL, 0, postab)) < 0) {
+        freeLDAAnker(lda_anker);
+        //TODO: Report Error
+        return(rc*-1);
+    }
 
+#if 0
     printf("Found following positions:\n");
     for(; i < postab.length; i++) {
         printf("Pos %d name: [%s]\n", postab.tab[i].parm_position, postab.tab[i].vartarget->name);
     }
+#endif
 
     freeLDAAnker(lda_anker);
-    return(0);
+    return(RH4N_RET_OK);
 }
 
 int matchPosition(vars_t *ldalist, vars_t *varanker, char *group, int position, positioninfo_t *postab) {
@@ -282,26 +292,31 @@ int matchPosition(vars_t *ldalist, vars_t *varanker, char *group, int position, 
         if(hptr->type == REDEFINE)
             continue;
         else if(hptr->type == GROUP) {
-            position = matchPosition(hptr->next_lvl, varanker, hptr->name, position, postab);
+            if((position = matchPosition(hptr->next_lvl, varanker, hptr->name, position, postab)) < 0) {
+                return(position);
+            }
         } else {
-            if((target = isDefinedGrp(varanker, group, hptr->name)) == NULL) {
-                if(group) { printf("Var [%s] [%s] does not exist in json object\n", group, hptr->name); }
-                else { printf("Var [%s] does not exist in json object\n", hptr->name); }
-            } else {
-                printf("Var [%s] on position [%d]\n", hptr->name, position);
+            if((target = isDefinedGrp(varanker, group, hptr->name)) != NULL) {
+                //printf("Var [%s] on position [%d]\n", hptr->name, position);
                 if(postab->length == -1) {
                     if((postab->tab = malloc(sizeof(varposition_t))) == NULL) {
-                        return(-1);
+                        return(RH4N_RET_MEMORY_ERR*-1);
                     }
                     postab->length = 1;
                 } else {
                     if((postab->tab = realloc(postab->tab, sizeof(varposition_t) * (++postab->length))) == NULL) {
-                        return(-1);
+                        return(RH4N_RET_MEMORY_ERR*-1);
                     }
                 }
                 postab->tab[postab->length-1].vartarget = target;
                 postab->tab[postab->length-1].parm_position = position;
+            } 
+#if 0
+            else {
+                if(group) { printf("Var [%s] [%s] does not exist in json object\n", group, hptr->name); }
+                else { printf("Var [%s] does not exist in json object\n", hptr->name); }
             }
+#endif
             position++;
         }
     }
