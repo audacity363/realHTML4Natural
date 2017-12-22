@@ -1,9 +1,9 @@
 OBJ = startv2n.o
 
-INCLUDE = -I./src/ \
+INCLUDE = -I./include/ \
 		  -I../libs/varhandle_lib/src/ \
 		  -I../libs/nat-lda-parser/src/ \
-		  -I../natuser_lib/src/ \
+		  -I../natuser_lib/include/ \
 		  -I../libs/utils/src/ \
 		  -I../include/
 
@@ -12,17 +12,23 @@ LIBS = -L./ -lvar2name \
 	   -L../libs/nat-lda-parser/ -lvars \
 	   -L../libs/utils/ -lutils
 
-lib: $(OBJ)
-	ar -vcru libvar2name.a ./bin/*.o
+CC = xlc
+
+lib: clean $(OBJ)
+	@printf "Linking libvar2name.a\n"
+	@ar -vcru libvar2name.a ./bin/*.o 
 	
 $(OBJ):
-	xlc -g -c src/$*.c $(INCLUDE) -o ./bin/$*.o
+	@printf "CC ./src/$*.c => ./bin/$*.o\n"
+	@$(CC) -g -c src/$*.c $(INCLUDE) -o ./bin/$*.o
 
 test:
 	xlc -g ./testprogs/main.c $(INCLUDE) $(LIBS) -o ./testprogs/main
 	./testprogs/main
 
 clean:
-	rm -rf libvar2name.a
-	rm -rf ./bin/*.o
-	rm -rf ./test_src/main
+	@printf "Cleaning static lib libvar2name.a\n"
+	@rm -rf libvar2name.a
+	@printf "Cleaning objects\n"
+	@rm -rf ./bin/*.o
+	@rm -rf ./test_src/main

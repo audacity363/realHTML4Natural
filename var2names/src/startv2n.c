@@ -238,6 +238,10 @@ vars_t *matchNames(vars_t *nat_set, vars_t *lda_set, vars_t *anker, char *grpnam
     return(cur_nat_set);
 }
 
+int matchPosition(vars_t *ldalist, vars_t *varanker) {
+     
+}
+
 vars_t *searchPageStructure(vars_t *lda_anker, char *groupname)
 {
     vars_t *hptr = lda_anker->next;
