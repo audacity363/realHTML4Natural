@@ -5,6 +5,8 @@
 #include "natuser.h"
 #include "natni.h"
 
+#include "standard.h"
+
 #include "vars.h"
 #include "rh4n_json_mapper.h"
 

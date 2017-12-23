@@ -58,7 +58,7 @@ JNIEXPORT jint JNICALL Java_realHTML_tomcat_connector_JNINatural_jni_1dumpVars
         printf("Parmpos: [%d] name: [%s]\n", postab.tab[i].parm_position, postab.tab[i].vartarget->name);
     }
  
-    //callNatural_JSON(var_anker);
+    callNatural_JSON(var_anker);
 }
 
 void printFork(JNIEnv *env, GeneralInfos *infos, jobject curptr, const char *group, int level, vars_t *var_anker) {

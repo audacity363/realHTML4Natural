@@ -5,6 +5,8 @@
 #include <string.h>
 #include <errno.h>
 
+#include "vars.h"
+
 #include "natuser.h"
 #include "natni.h"
 #include "natutils.h"
@@ -33,6 +35,30 @@ pnni_611_functions initNNI(void *lib)
     }
 
     return(s_funcs);
+}
+
+//Basicly the same as initNNI with the difference that this function opens th shared object
+//by itself 
+//urgent TODO; merge the two functions!
+pnni_611_functions getNNIFunctions(void **shlibptr) {
+    char *errormsg = NULL;
+    pnni_611_functions nnifuncs;  
+    PF_NNI_GET_INTERFACE pf_nni_get_interface = 0;
+
+    if((errormsg = OpenLib(shlibptr, "libnatural.so")) != NULL)
+    {
+        printf("Error: %s\n", errormsg);
+        return(NULL);
+    }
+
+    if((pf_nni_get_interface = (PF_NNI_GET_INTERFACE)dlsym(*shlibptr, "nni_get_interface")) == NULL) {
+        printf("Error: Could not get symbol: nni_get_interface\n");
+        return(NULL);
+    }
+
+    (pf_nni_get_interface)(NNI_VERSION_CURR, (void**)&nnifuncs);
+
+    return(nnifuncs);
 }
 
 char* OpenLib(void **shLib, char *name)
@@ -144,4 +170,37 @@ void logError(int ret, char *outputpath, FILE *logfile)
 
     fclose(outputfile);
     return;
+}
+
+vars_t *getVarPtr(pnni_611_functions nnifuncs, void *parmhandle, int position) {
+    struct parameter_description pd;
+    int rc = 0;
+    vars_t *var_anker = NULL;
+
+    if((rc = nnifuncs->pf_nni_get_parm_info(nnifuncs, position, parmhandle, &pd)) != NNI_RC_OK) {
+        printf("nni get info = ret: [%d]\n", rc);
+        return(NULL);
+    }
+
+    if(pd.format != NNI_TYPE_BIN) {
+        printf("Parm 0 != BIN\n");
+        return(NULL);
+    }
+
+    if(pd.length_all != sizeof(var_anker)) {
+        printf("Parm 0 length does not match. Expexted: [%d] got: [%d]\n", sizeof(var_anker), pd.length_all);
+        return(NULL);
+    }
+    
+    if((rc = nnifuncs->pf_nni_get_parm(nnifuncs, position, parmhandle, sizeof(var_anker), &var_anker)) != NNI_RC_OK) {
+        printf("nni get parm = ret: [%d]\n", rc);
+        return(NULL);
+    }
+
+    if(var_anker == NULL) {
+        printf("var_anker == NULL\n");
+        return(NULL);
+    }
+
+    return(var_anker);
 }

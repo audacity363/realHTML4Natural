@@ -35,7 +35,7 @@ FILE *logfile = NULL; //!< when debug is set in settings string this points to /
 
 void trimSpaces(char*);
 int parseSettings(void *parmhandle, pnni_611_functions nni_funcs,
-    struct settings_s *settings);
+    struct settings_s *settings, int);
 int readOutVariable(int index, void *parmhandle, pnni_611_functions nni_funcs,
                     vars_t *anker);
 void signalHandler(int signal);
@@ -103,7 +103,7 @@ long gen_page(WORD nparms, void *parmhandle, void *traditional)
     }
 
     //First read out the setting so we know if the logging should be enabled or not
-    if((ret = parseSettings(parmhandle, nni_funcs, &parms.settings)) != NNI_RC_OK)
+    if((ret = parseSettings(parmhandle, nni_funcs, &parms.settings, SETTINGSPOS)) != NNI_RC_OK)
         goto cleanup;
 
     for(i=0; i < parms.settings.length; i++)
@@ -451,7 +451,7 @@ int getSettingParm(void *parmhandle, pnni_611_functions nni_funcs, char **name, 
  * @param settings pointer to a instance of a settings struct
  */
 int parseSettings(void *parmhandle, pnni_611_functions nni_funcs,
-    struct settings_s *settings)
+    struct settings_s *settings, int position)
 {
     char *settings_str = NULL, *split_ptr = NULL, *equals_split = NULL,
          *s_ptr_sym = NULL, *s_ptr_eq = NULL;
@@ -461,7 +461,7 @@ int parseSettings(void *parmhandle, pnni_611_functions nni_funcs,
     settings->key = malloc(sizeof(char*));
     settings->value= malloc(sizeof(char*));
 
-    if((ret = getSettingParm(parmhandle, nni_funcs, &settings_str, SETTINGSPOS)) == -1)
+    if((ret = getSettingParm(parmhandle, nni_funcs, &settings_str, position)) == -1)
     {
         free(settings_str);
         return(RH4N_SETTING_FORMAT_ERR);

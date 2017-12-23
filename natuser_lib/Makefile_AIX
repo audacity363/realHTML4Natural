@@ -1,6 +1,6 @@
 CC = xlc
 
-OBJ = ncuxinit.o getvar.o printvars.o gen_page.o gen_json.o gen_json_objs.o jumptab.o natutils.o 
+OBJ = ncuxinit.o getvar.o getjson.o printvars.o gen_page.o gen_json.o gen_json_objs.o jumptab.o natutils.o 
 VAR_OBJ = a_handling.o n_handling.o l_handling.o i_handling.o u_handling.o
 NATUSER_HANDLING_OBJ = json_i_handler.o json_a_handler.o json_aton_handler.o json_l_handler.o json_f_handler.o
 
@@ -12,7 +12,7 @@ INCLUDE = -I./include/ \
 		  -I../libs/hexdump/src/ \
 		  -I../libs/nat-lda-parser/src/ \
 		  -I../libs/html_parser/src/ \
-		  -I../var2names/src/ \
+		  -I../var2names/include/ \
 		  -I../libs/json_generator/include/
 
 

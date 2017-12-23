@@ -30,7 +30,7 @@ extern FILE *logfile; //!< is defined in gen_page.c
 
 void trimSpaces(char*);
 int parseSettings(void *parmhandle, pnni_611_functions nni_funcs,
-    struct settings_s *settings);
+    struct settings_s *settings, int);
 int readOutVariable(int index, void *parmhandle, pnni_611_functions nni_funcs,
                     vars_t *anker);
 void signalHandler(int signal);
@@ -95,7 +95,7 @@ long gen_json(WORD nparms, void *parmhandle, void *traditional)
     }
 
     //First read out the setting so we know if the logging should be enabled or not
-    if((ret = parseSettings(parmhandle, nni_funcs, &parms.settings)) != NNI_RC_OK)
+    if((ret = parseSettings(parmhandle, nni_funcs, &parms.settings, SETTINGSPOS)) != NNI_RC_OK)
         goto cleanup;
 
     /*for(i=0; i < parms.settings.length; i++)
