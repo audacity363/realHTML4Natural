@@ -1,13 +1,16 @@
-OBJ = start.o printLDA.o free.o
+OBJ = startldaparser.o printLDA.o free.o
 
 INCLUDE = -I../varhandle_lib/src/
 
 LIBS = -L../varhandle_lib/ -lvars
 
-CFLAGS = -c -g
+CFLAGS = -c -g -DLOGDEBUG
 
-lib: $(OBJ)
-	ar -vcru libldaparser.a ./bin/*.o
+CC = xlc
+
+lib: clean $(OBJ)
+	@printf "Linking libldaparser.a\n"
+	@ar -vcru libldaparser.a ./bin/*.o
 
 lib_debug:
 	make -f Makefile_AIX clean
@@ -18,12 +21,15 @@ lib_debug:
 
 	
 $(OBJ):
-	xlc $(CFLAGS) ./src/$*.c $(INCLUDE) -o ./bin/$*.o
+	@printf "CC ./src/$*.c => ./bin/$*.o\n"
+	@$(CC) $(CFLAGS) ./src/$*.c $(INCLUDE) -o ./bin/$*.o
 
 clean:
-	rm -rf libldaparser.a
-	rm -rf ./bin/*.o
+	@printf "Clean libldaparser.a"
+	@rm -rf libldaparser.a
+	@printf "Cleaning Objects\n"
+	@rm -rf ./bin/*.o
 
 test:
 	xlc -g ./test_src/main.c $(INCLUDE) -o ./test_src/test -L./ -lldaparser -I./src/ $(LIBS)
-	./test_src/test ./test_files/TEST.NGL
+	./test_src/test ./test_files/PTRLTEST.NGL

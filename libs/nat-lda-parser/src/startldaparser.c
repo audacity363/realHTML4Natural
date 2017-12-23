@@ -254,6 +254,8 @@ int parseLDALine(char *complete_line, int length, vars_t *anker)
         D(fprintf(logfile, "New Group with Index specification\n"));
         if(getArrayType(line, &index_type, index) == NULL)
             return(EXIT);
+        D(fprintf(logfile, "Group has indextype: [%d]. Saving it.\n", index_type));
+        grp_head_index_type = index_type;
         cur->type = GROUP;
         cur->x_length = index[0];
         cur->y_length = index[1];
@@ -294,6 +296,10 @@ int parseLDALine(char *complete_line, int length, vars_t *anker)
     }
 
 save:
+    if(cur->type != GROUP && grp_head_index_type > 0) {
+        D(fprintf(logfile, "In group and group leader is an array. Shifting variable\n"))
+        updateVarType(cur, grp_head_index_type);
+    }
     if(cur->level > cur_pos->level)
     {
         D(fprintf(logfile, "create new level cur: [%d] new: [%d]\n", cur_pos->level, cur->level));
@@ -310,6 +316,8 @@ save:
     }
     else if(cur->level < cur_pos->level)
     {
+        D(fprintf(logfile, "End of group reached. Settings grp index to default\n"));
+        grp_head_index_type = -1;
         D(fprintf(logfile, "Search prev level [%d] cur level [%d]\n", cur->level, cur_pos->level));
         hptr = cur_pos;
         while(hptr->level != cur->level)
