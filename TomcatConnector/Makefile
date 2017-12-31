@@ -1,5 +1,5 @@
 #JAVACLASSPATH = ${CURDIR}/servlet/web/WEB-INF/lib/realHTMLconnector.jar:/srv/apache-tomcat-8.5.9/lib/servlet-api.jar
-CLASSPATH = "/u/it/a140734/rh4n/realHTML4Natural/TomcatConnector/servlet/web/WEB-INF/lib/realHTMLconnector.jar:/opt/tomcat/apache-tomcat-8.0.41/lib/servlet-api.jar:./servlet/bin/:./servlet/web/WEB-INF/lib/minimal-json-0.9.4.jar"
+CLASSPATH = "/u/it/a140734/rh4n/realHTML4Natural/TomcatConnector/servlet/web/WEB-INF/lib/realHTMLconnector.jar:/opt/tomcat/apache-tomcat-8.0.41/lib/servlet-api.jar:./servlet/bin/:./servlet/web/WEB-INF/lib/minimal-json-0.9.4.jar:./servlet/web/WEB-INF/lib/commons-io-2.6.jar"
 
 
 #INCLUDES = -I/usr/java/jdk1.8.0_111/include/ \
@@ -44,6 +44,8 @@ JAVA_UTILS_PACKAGE = ./servlet/src/realHTML/tomcat/connector/Environ.java \
 					 ./servlet/src/realHTML/tomcat/connector/ConfigurationLoader.java \
 					 ./servlet/src/realHTML/tomcat/connector/RH4NCallParms.java 
 
+JAVA_UTILS_EXCEPTIONS = ./servlet/src/realHTML/servlet/exceptions/RouteException.java
+
 JNI_JSON_HANDLERS = json_main.o json_utils.o plain_handlers.o 1d_handlers.o \
 					2d_handlers.o 3d_handlers.o handlers.o callNatural.o
 
@@ -54,7 +56,8 @@ all:
 
 warfile: cleanwarfile servletclass
 	@printf "Copy package\n"
-	@cp ./servlet/bin/realHTMLServlet.class ./servlet/web/WEB-INF/classes/
+	@#cp ./servlet/bin/realHTMLServlet.class ./servlet/web/WEB-INF/classes/
+	@cp ./servlet/bin/realHTMLHandler.class ./servlet/web/WEB-INF/classes/
 	@printf "Copy servlet class\n"
 	@cp ./servlet/bin/realHTMLconnector.jar ./servlet/web/WEB-INF/lib/
 	@printf "Creating war file\n"
@@ -69,7 +72,8 @@ cleanwarfile:
 
 servletclass: cleanservletclass package
 	@printf "Compiling Servlet\n"
-	@javac -d ./servlet/bin -cp $(CLASSPATH) servlet/src/realHTMLServlet.java
+	@#javac -d ./servlet/bin -cp $(CLASSPATH) servlet/src/realHTMLServlet.java
+	@javac -d ./servlet/bin -cp $(CLASSPATH) servlet/src/realHTMLHandler.java
 
 cleanservletclass:
 	@printf "Cleaning servlet class\n"
@@ -79,8 +83,11 @@ package: cleanpackage
 	@printf "Compiling realHTML.tomcat.JSONMatcher\n"
 	@javac -d ./servlet/bin -cp $(CLASSPATH) $(JSON_JAVA_PARSER)
 	@printf "Compiling realHTML.tomcat.connector\n"
-	@rm -rf ./bin/realHTMLtomcat/connector/*.class
+	@rm -rf ./bin/realHTML/tomcat/connector/*.class
 	@javac -d ./servlet/bin -cp $(CLASSPATH) $(JAVA_UTILS_PACKAGE)
+	@printf "Compiling realHTML.servlet.exceptions\n"
+	@rm -rf ./bin/realHTML/servlet/exceptions/*.class
+	@javac -d ./servlet/bin -cp $(CLASSPATH) $(JAVA_UTILS_EXCEPTIONS)
 	@printf "Creating realHTMLconnector.jar\n"
 	@cd ./servlet/bin && jar cf ./realHTMLconnector.jar ./realHTML
 

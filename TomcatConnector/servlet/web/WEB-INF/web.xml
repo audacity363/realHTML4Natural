@@ -6,7 +6,7 @@
 
     <servlet>
         <servlet-name>realHTMLServlet</servlet-name>
-        <servlet-class>realHTMLServlet</servlet-class>
+        <servlet-class>realHTMLHandler</servlet-class>
     </servlet>
 
     <servlet-mapping>

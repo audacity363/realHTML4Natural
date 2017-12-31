@@ -11,7 +11,12 @@
 #include "json_utils.h"
 
 GeneralInfos *getFieldIDs(JNIEnv *env) {
-    static GeneralInfos infos;
+    GeneralInfos *infos;
+
+    if((infos = malloc(sizeof(GeneralInfos))) == NULL) {
+        printf("Could not allocate mem for GeneralInfos\n");
+        return(NULL);
+    }
 
     jclass nodeclass = NULL, typesclass = NULL;
 
@@ -20,27 +25,27 @@ GeneralInfos *getFieldIDs(JNIEnv *env) {
         return(NULL);
     }
 
-    if((infos.nextentry = (*env)->GetFieldID(env, nodeclass, "next", "LrealHTML/tomcat/JSONMatcher/LLNode;")) == NULL) {
+    if((infos->nextentry = (*env)->GetFieldID(env, nodeclass, "next", "LrealHTML/tomcat/JSONMatcher/LLNode;")) == NULL) {
         printf("Couldn't find field \"next\"\n");
         return(NULL);
     }
 
-    if((infos.nextlvl = (*env)->GetFieldID(env, nodeclass, "nextlvl", "LrealHTML/tomcat/JSONMatcher/LLNode;")) == NULL) {
+    if((infos->nextlvl = (*env)->GetFieldID(env, nodeclass, "nextlvl", "LrealHTML/tomcat/JSONMatcher/LLNode;")) == NULL) {
         printf("Couldn't find field \"nextlvl\"\n");
         return(NULL);
     }
 
-    if((infos.type = (*env)->GetFieldID(env, nodeclass, "type", "LrealHTML/tomcat/JSONMatcher/Types;")) == NULL) {
+    if((infos->type = (*env)->GetFieldID(env, nodeclass, "type", "LrealHTML/tomcat/JSONMatcher/Types;")) == NULL) {
         printf("Couldn't find field \"type\"\n");
         return(NULL);
     }
 
-    if((infos.name = (*env)->GetFieldID(env, nodeclass, "name", "Ljava/lang/String;")) == NULL) {
+    if((infos->name = (*env)->GetFieldID(env, nodeclass, "name", "Ljava/lang/String;")) == NULL) {
         printf("Couldn't find field \"name\"\n");
         return(NULL);
     }
 
-    if((infos.value = (*env)->GetFieldID(env, nodeclass, "value", "Ljava/lang/Object;")) == NULL) {
+    if((infos->value = (*env)->GetFieldID(env, nodeclass, "value", "Ljava/lang/Object;")) == NULL) {
         printf("Couldn't find field \"value\"\n");
         return(NULL);
     }
@@ -50,12 +55,12 @@ GeneralInfos *getFieldIDs(JNIEnv *env) {
         return(NULL);
     }
 
-    if((infos.type_method = (*env)->GetMethodID(env, typesclass, "getNumberRep", "()I")) == NULL) {
+    if((infos->type_method = (*env)->GetMethodID(env, typesclass, "getNumberRep", "()I")) == NULL) {
         printf("Could not find method \"getNumberRep\"\n");
         return(NULL);
     }
 
-    return(&infos);
+    return(infos);
 }
 
 int getAnker(JNIEnv *env, jobject varlist, GeneralInfos *infos) {

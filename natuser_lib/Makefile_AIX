@@ -21,9 +21,8 @@ LIBS = -L../libs/varhandle_lib/ -lvars \
 	   -L../libs/nat-lda-parser/ -lldaparser \
 	   -L../libs/html_parser/ -lhtml_parser \
 	   -L../var2names/ -lvar2name \
-	   -L../libs/json_generator/ -lgenjson
-
-#	   -L../libs/hexdump/ -lhexdump \
+	   -L../libs/json_generator/ -lgenjson \
+	   -L../libs/hexdump/ -lhexdump 
 
 LFLAGS1 = -G -bsymbolic -bexpall -bnoentry
 LFLAGS2 = -b64 -ldl -blibpath:/usr/lib/threads:/usr/lib:/lib -lc_r

@@ -10,9 +10,10 @@ struct naturalparms {
     void *(*getter)(JNIEnv*, struct naturalparms*, int);
 };
 
-int callNatural(JNIEnv *env, struct naturalparms *parms, int length, char *error, FILE*, char***, int);
+int callNatural(JNIEnv *env, struct naturalparms *parms, int length, char *error, FILE*, char***, int, vars_t*);
 void debugFileprint(FILE *logfile, char *format, ...);
 char *natErrno2Str(int naterrno);
 struct naturalparms *getParmByName(struct naturalparms *parms, int length, char *searchname);
 char *OpenLib(void **shLib, char *name);
 void CloseLib(void **shLib);
+int getVarlist(JNIEnv *env, jobject varlist, vars_t **target, char *error_msg);

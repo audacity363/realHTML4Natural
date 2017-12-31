@@ -4,6 +4,8 @@
 #include <dlfcn.h>
 #include <errno.h>
 
+#include "vars.h"
+
 #include "realHTML_tomcat_connector_JNINatural.h"
 #include "natni.h"
 #include "jni_rh4n.h"
@@ -25,13 +27,14 @@ char *natparmnames[] = {
     "parm_count",
     "reg_type",
     "tmp_file",
-    "settings"
+    "settings",
+    "bodyvars"
 };
 
 static struct parameter_description* generateNaturalParams(pnni_611_functions s_funcs, 
-    JNIEnv *env, struct naturalparms *parms, int length)
+    JNIEnv *env, struct naturalparms *parms, int length, vars_t *bodyvars)
 {
-    static struct parameter_description nniparams[7];
+    static struct parameter_description nniparams[8];
     struct naturalparms *target;
 
     //Must this freed with nni_delete_parm??? What happens with the parms in nniparams??
@@ -39,7 +42,7 @@ static struct parameter_description* generateNaturalParams(pnni_611_functions s_
     int flags = 0, i,x,
         occ[3] = {0, 0, 0};
 
-    s_funcs->pf_nni_create_parm(s_funcs, NATPARMSCOUNT, &pvnniparms);
+    s_funcs->pf_nni_create_parm(s_funcs, NATPARMSCOUNT+1, &pvnniparms);
 
     flags |= NNI_FLG_UBVAR_0;
     
@@ -55,6 +58,12 @@ static struct parameter_description* generateNaturalParams(pnni_611_functions s_
         else if(strcmp(natparmnames[i], "parm_count") == 0)
         {
             setParmcountParm(s_funcs, env, parms, length, pvnniparms, i);
+            s_funcs->pf_nni_get_parm_info(s_funcs, i, pvnniparms, &nniparams[i]);
+            continue;
+        }
+        else if(strcmp(natparmnames[i], "bodyvars") == 0) {
+            s_funcs->pf_nni_init_parm_s(s_funcs, i, pvnniparms, NNI_TYPE_BIN, sizeof(vars_t*), 0, NULL);
+            s_funcs->pf_nni_put_parm(s_funcs, i, pvnniparms, sizeof(vars_t*), &bodyvars);
             s_funcs->pf_nni_get_parm_info(s_funcs, i, pvnniparms, &nniparams[i]);
             continue;
         }
@@ -144,9 +153,9 @@ int setParmcountParm(pnni_611_functions s_funcs, JNIEnv *env,
 }
 
 int callNatural(JNIEnv *env, struct naturalparms *parms, int length, 
-    char *error, FILE *logfile, char ***envvars, int envvars_len)
+    char *error, FILE *logfile, char ***envvars, int envvars_len, vars_t *bodyvars)
 {
-    void *shNNILib = NULL;
+    void *shNNILib = NULL, *nat_parmhandle = NULL;
     pnni_611_functions nnifuncs;
     PF_NNI_GET_INTERFACE pf_nni_get_interface = 0;
     struct natural_exception nat_ex;
@@ -155,7 +164,7 @@ int callNatural(JNIEnv *env, struct naturalparms *parms, int length,
     struct parameter_description *natNNIparms;
     char *natlibrary = NULL, *natprogram = NULL, *natcliparms = NULL,
          *errormsg, *outfile = NULL;
-    int rc = 0, i = 0;
+    int rc = 0, i = 0, nat_parmhandle_length = 0;
 
     target = getParmByName(parms, length, "nat_library");
     natlibrary = target->getter(env, target, 0);
@@ -195,7 +204,7 @@ int callNatural(JNIEnv *env, struct naturalparms *parms, int length,
     debugFileprint(logfile, "... I have the session all for myself\n");
 
 
-    natNNIparms = generateNaturalParams(nnifuncs, env, parms, length);
+    natNNIparms = generateNaturalParams(nnifuncs, env, parms, length, bodyvars);
     printNaturalParmsStruct(natNNIparms, logfile);
 
     //logon into natural library
@@ -208,9 +217,29 @@ int callNatural(JNIEnv *env, struct naturalparms *parms, int length,
     }
     debugFileprint(logfile, "...Done\n");
 
+    //Check if the last parm (B8) is defined. 
+    //Just hacked in to get backwards compatibility. See TODO
+    //TODO: Write a function which gets the signature of the PDA and creates it dynamiclly
+
+    printf("Getting parm signature...");
+    if((rc = nnifuncs->pf_nni_create_module_parm(nnifuncs, 'N', natprogram, &nat_parmhandle)) != NNI_RC_OK) {
+        strcpy(error, natErrno2Str(rc));
+        debugFileprint(logfile, "...Fail [%s]\n", error);
+        return(-3);
+    }
+    debugFileprint(logfile, "...Done\n");
+
+    printf("Getting nat parm length...");
+    if((rc = nnifuncs->pf_nni_parm_count(nnifuncs, nat_parmhandle, &nat_parmhandle_length)) != NNI_RC_OK) {
+        strcpy(error, natErrno2Str(rc));
+        debugFileprint(logfile, "...Fail [%s]\n", error);
+        return(-3);
+    }
+    debugFileprint(logfile, "...Done\n");
+
     //Call the natural program
     debugFileprint(logfile, "Calling program [%s]...", natprogram);
-    if((rc = nnifuncs->pf_nni_callnat(nnifuncs, natprogram, NATPARMSCOUNT, natNNIparms, 
+    if((rc = nnifuncs->pf_nni_callnat(nnifuncs, natprogram, nat_parmhandle_length, natNNIparms, 
         &nat_ex)) != NNI_RC_OK)
     {
         //Not an NNI error rather a natural error

@@ -61,6 +61,41 @@ JNIEXPORT jint JNICALL Java_realHTML_tomcat_connector_JNINatural_jni_1dumpVars
     callNatural_JSON(var_anker);
 }
 
+int getVarlist(JNIEnv *env, jobject varlist, vars_t **target, char *error_msg) {
+    jclass llhandlerclass = NULL;    
+    jfieldID headID = NULL;
+    jobject anker = NULL;
+    GeneralInfos *infos;
+    vars_t *var_anker = NULL;
+
+    initVarAnker(&var_anker);
+
+    if((infos = getFieldIDs(env)) == NULL) {
+        sprintf(error_msg, "Could not get field IDs\n");
+        return(-1);
+    }
+
+    if(getAnker(env, varlist, infos) < 0) {
+        sprintf(error_msg, "Could not get anker\n");
+        return(-2);
+    }
+
+    printf("Got anker object\n");
+    
+    if((infos->anker = (*env)->GetObjectField(env, infos->anker, infos->nextentry)) == NULL) {
+        sprintf(error_msg, "varlist is empty\n");
+        return(-2);
+    }
+
+    printFork(env, infos, infos->anker, NULL, 0, var_anker);
+
+    printAllVarsToFile(var_anker, stdout);
+
+    free(infos);
+    *target = var_anker;
+    return(0);
+}
+
 void printFork(JNIEnv *env, GeneralInfos *infos, jobject curptr, const char *group, int level, vars_t *var_anker) {
     jobject nextentry = NULL, nextlvl = NULL, name_obj = NULL; 
     jstring j_name = NULL;

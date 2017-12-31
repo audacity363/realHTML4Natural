@@ -10,10 +10,10 @@ extern "C" {
 /*
  * Class:     realHTML_tomcat_connector_JNINatural
  * Method:    jni_callNatural
- * Signature: (LrealHTML/tomcat/connector/RH4NParams;[LrealHTML/tomcat/connector/Environ;)LrealHTML/tomcat/connector/RH4NReturn;
+ * Signature: (LrealHTML/tomcat/connector/RH4NParams;[LrealHTML/tomcat/connector/Environ;LrealHTML/tomcat/JSONMatcher/LLHandler;)LrealHTML/tomcat/connector/RH4NReturn;
  */
 JNIEXPORT jobject JNICALL Java_realHTML_tomcat_connector_JNINatural_jni_1callNatural
-  (JNIEnv *, jobject, jobject, jobjectArray);
+  (JNIEnv *, jobject, jobject, jobjectArray, jobject);
 
 /*
  * Class:     realHTML_tomcat_connector_JNINatural

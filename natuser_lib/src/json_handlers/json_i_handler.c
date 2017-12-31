@@ -20,23 +20,25 @@ int json_i_handling(int natparm_pos, struct parameter_description natvar_pd,
 
     switch(natvar_pd.length) {
         case I1SIZE:
-            if((int)target->data > MAXI1)
+            if(*((int*)target->data) > MAXI1)
                 return(RH4N_RET_BUFFER_OVERFLOW);
-            i1_val = (NATTYP_I1)target->data;
+            i4_val = *((NATTYP_I4*)target->data) << 24;
+            memcpy(&i1_val, &i4_val, sizeof(i1_val));
             if((rc = nnifuncs->pf_nni_put_parm(nnifuncs, natparm_pos, parmhandle, sizeof(NATTYP_I1), &i1_val)) != NNI_RC_OK) 
                 return(RH4N_RET_NNI_ERR);
             break;
         case I2SIZE:
-            if((int)target->data > MAXI2)
+            if(*((int*)target->data) > MAXI2)
                 return(RH4N_RET_BUFFER_OVERFLOW);
-            i2_val = (NATTYP_I2)target->data;
+            i4_val = *((NATTYP_I4*)target->data) << 16;
+            memcpy(&i2_val, &i4_val, sizeof(i2_val));
             if((rc = nnifuncs->pf_nni_put_parm(nnifuncs, natparm_pos, parmhandle, sizeof(NATTYP_I2), &i2_val)) != NNI_RC_OK) 
                 return(RH4N_RET_NNI_ERR);
             break;
         case I4SIZE:
-            if((int)target->data > MAXI4)
+            if(*((int*)target->data) > MAXI4)
                 return(RH4N_RET_BUFFER_OVERFLOW);
-            i4_val = (NATTYP_I4)target->data;
+            i4_val = *((NATTYP_I4*)target->data);
             if((rc = nnifuncs->pf_nni_put_parm(nnifuncs, natparm_pos, parmhandle, sizeof(NATTYP_I4), &i4_val)) != NNI_RC_OK) 
                 return(RH4N_RET_NNI_ERR);
             break;

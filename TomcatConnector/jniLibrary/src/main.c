@@ -3,6 +3,8 @@
 #include <string.h>
 #include <errno.h>
 
+#include "vars.h"
+
 #include "realHTML_tomcat_connector_JNINatural.h"
 #include "natni.h"
 #include "jni_rh4n.h"
@@ -20,7 +22,7 @@ void freeAll(JNIEnv *, FILE*, struct naturalparms*, int, char ***, int);
 jobject createReturnObj(JNIEnv *env, int exit_code, char*, FILE*);
 
 int createNaturalProcess(JNIEnv *env, struct naturalparms *parms, int length, char *error, FILE *logfile, 
-    char***, int);
+    char***, int, vars_t*);
 int setEnvVars(JNIEnv *env, jobjectArray envvars_o, int *length, char **vars[], FILE *logfile, char *error_msg);
 
 
@@ -33,7 +35,7 @@ JNIEXPORT jint JNICALL Java_realHTML_tomcat_connector_JNINatural_jni_1printVersi
 
 
 JNIEXPORT jobject JNICALL Java_realHTML_tomcat_connector_JNINatural_jni_1callNatural
-  (JNIEnv *env, jclass in_cls, jobject jnatparams, jobjectArray envvars_o)
+  (JNIEnv *env, jclass in_cls, jobject jnatparams, jobjectArray envvars_o, jobject bodyvars)
 {
     const char *reg_type;
     jclass jrh4nparams;
@@ -46,6 +48,7 @@ JNIEXPORT jobject JNICALL Java_realHTML_tomcat_connector_JNINatural_jni_1callNat
          filename[10+NNI_LEN_LIBRARY+NNI_LEN_MEMBER],
          *natprogram, *natlibrary;
     char **envvars = NULL;
+    vars_t *var_anker = NULL;
 
     struct naturalparms params[] = 
     {
@@ -64,6 +67,8 @@ JNIEXPORT jobject JNICALL Java_realHTML_tomcat_connector_JNINatural_jni_1callNat
 
 
     FILE *logfile = NULL;
+
+
 
     //Get reference to the RH4NParams Class
     jrh4nparams = (*env)->GetObjectClass(env, jnatparams);
@@ -108,10 +113,14 @@ JNIEXPORT jobject JNICALL Java_realHTML_tomcat_connector_JNINatural_jni_1callNat
         return(createReturnObj(env, -4, error_msg, logfile));
     }
 
+    if(getVarlist(env, bodyvars, &var_anker, error_msg) < 0) {
+        return(createReturnObj(env, -5, error_msg, logfile));
+    }
+
     printAll(env, params, parm_length, logfile);
     
 
-    createNaturalProcess(env, params, parm_length, error_msg, logfile, &envvars, envvars_len);
+    createNaturalProcess(env, params, parm_length, error_msg, logfile, &envvars, envvars_len, var_anker);
 
     debugFileprint(logfile, "Freeing Java res...\n");
     freeAll(env, logfile, params, parm_length, &envvars, envvars_len);
@@ -123,7 +132,7 @@ JNIEXPORT jobject JNICALL Java_realHTML_tomcat_connector_JNINatural_jni_1callNat
 }
 
 int createNaturalProcess(JNIEnv *env, struct naturalparms *parms, int length, 
-    char *error, FILE *logfile, char ***envvars, int envvars_len)
+    char *error, FILE *logfile, char ***envvars, int envvars_len, vars_t *bodyvars)
 {
     pid_t natpid = 0, ret_pid = 0;
     int status = 0, rc = 0;
@@ -133,7 +142,7 @@ int createNaturalProcess(JNIEnv *env, struct naturalparms *parms, int length,
     natpid = fork();
     if(natpid == 0)
     {
-        if((rc = callNatural(env, parms, length, error, logfile, envvars, envvars_len)) != 0)
+        if((rc = callNatural(env, parms, length, error, logfile, envvars, envvars_len, bodyvars)) != 0)
         {
             //freeAll(env, logfile);
             //return(createReturnObj(env, rc, error_msg, logfile));

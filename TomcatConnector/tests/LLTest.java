@@ -61,7 +61,7 @@ public class LLTest {
         } catch (JSONObjectException e) {
         	System.out.println(e);
         }
-        bs.dumpVars(varlist);
+        bs.callNatural(null, null, varlist);
 
         
         //System.out.println("\n");

@@ -7,15 +7,16 @@ public class JNILoader
 {
     static 
     {
+        System.out.println("Using java.library.path: [" + System.getProperty("java.library.path") + "]");
         //System.out.println("Loading sharedlib");
         System.loadLibrary("realHTMLconnector");
         //System.load("/u/it/a140734/C/realHTML_TomcatConnector/librealHTMLconnector.so");
         //System.out.println("Lib Loaded");
     }
 
-    public RH4NReturn callNatural(RH4NParams parms, Environ envvars[])
+    public RH4NReturn callNatural(RH4NParams parms, Environ envvars[], LLHandler varlist)
     {
-        return(new JNINatural()).jni_callNatural(parms, envvars);
+        return(new JNINatural()).jni_callNatural(parms, envvars, varlist);
     }
     public int printVersion()
     {

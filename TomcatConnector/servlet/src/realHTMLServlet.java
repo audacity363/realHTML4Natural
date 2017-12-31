@@ -11,6 +11,8 @@ import realHTML.tomcat.connector.Router;
 import realHTML.tomcat.connector.RH4NReturn;
 import realHTML.tomcat.connector.RH4NParams;
 import realHTML.tomcat.connector.RH4NCallParms;
+import realHTML.tomcat.JSONMatcher.*;
+import com.eclipsesource.json.*;
 
 
 public class realHTMLServlet extends HttpServlet {
@@ -63,6 +65,13 @@ public class realHTMLServlet extends HttpServlet {
         RH4NParams parms = new RH4NParams();
         RH4NReturn returncode;
         RH4NCallParms call_parms = new RH4NCallParms();
+        LLHandler varlist = null;
+        
+        try {
+            varlist = getBodyvars(request, response);
+        } catch(Exception e) {
+            return;
+        }
 
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
@@ -232,8 +241,68 @@ public class realHTMLServlet extends HttpServlet {
         return(true);
     }
 
-    private String generateSettingsString(RH4NCallParms parms)
-    {
+    private LLHandler getBodyvars(HttpServletRequest request, HttpServletResponse response) 
+        throws com.eclipsesource.json.ParseException, IOException, Exception {
+        String content_type = null;
+        BufferedReader br = null;
+        LLHandler varlist = null;
+        JSONParser jsonparser = null;
+        String json = "";
+        int jsonchar;
+
+        content_type = request.getContentType();
+        if(content_type == null) {
+            return(null);
+        } else if(!content_type.equals("application/json")) {
+            return(null);
+        }
+
+        try {
+            br = new BufferedReader(new InputStreamReader(request.getInputStream()));
+            if(br == null) {
+                return(null);
+            }
+
+            for(jsonchar = br.read(); jsonchar != -1; jsonchar = br.read()) {
+                json += ((char)jsonchar);
+            }
+        } catch(IOException e) {
+            System.out.println(e);
+            return(null);
+        }
+
+        if(json.length() == 0) {
+            return(null);
+        }
+
+
+        System.out.printf("found json: [%s]\n", json);
+        jsonparser = new JSONParser(json);
+
+        try {
+            varlist = jsonparser.run();
+            varlist.printList();
+        } catch(com.eclipsesource.json.ParseException json_e) {
+            response.sendError(500);
+            System.out.println("Could not parse json");
+            System.out.println(json_e);
+            throw(json_e);
+        } catch(Exception e) {
+            System.out.println(e);
+            throw(e);
+        }
+
+        varlist.printList();
+        /*} catch(com.eclipsesource.json.ParseException json_e) {
+            System.out.println("Could not parse JSON");
+            System.out.println(json_e);
+        } catch (Exception e) {
+            System.out.println(e);
+        }*/
+        return(varlist);
+    }
+
+    private String generateSettingsString(RH4NCallParms parms) {
         String settings_str;
 
         settings_str = String.format("templates=%s;lib=%s;natsrc=%s;debug=%b", 
