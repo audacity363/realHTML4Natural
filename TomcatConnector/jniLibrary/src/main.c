@@ -113,12 +113,14 @@ JNIEXPORT jobject JNICALL Java_realHTML_tomcat_connector_JNINatural_jni_1callNat
         return(createReturnObj(env, -4, error_msg, logfile));
     }
 
-    if(getVarlist(env, bodyvars, &var_anker, error_msg) < 0) {
-        return(createReturnObj(env, -5, error_msg, logfile));
+    if(bodyvars != NULL) {
+        if(getVarlist(env, bodyvars, &var_anker, error_msg) < 0) {
+            return(createReturnObj(env, -5, error_msg, logfile));
+        }
+        printAll(env, params, parm_length, logfile);
+    } else {
+        var_anker = NULL;
     }
-
-    printAll(env, params, parm_length, logfile);
-    
 
     createNaturalProcess(env, params, parm_length, error_msg, logfile, &envvars, envvars_len, var_anker);
 

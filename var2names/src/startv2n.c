@@ -255,8 +255,8 @@ int startmatchPosition(char *ldapath, vars_t *varanker, char *json_group, positi
         return(RH4N_RET_LDA_PARSE_ERR);
     }
 
-    printf("LDA:\n");
-    printfork(lda_anker, stdout);
+    //printf("LDA:\n");
+    //printfork(lda_anker, stdout);
 
     if((json_object_anker = searchPageStructure(lda_anker, json_group)) == NULL) {
         printf("Could not find structure: [%s]\n", json_group);

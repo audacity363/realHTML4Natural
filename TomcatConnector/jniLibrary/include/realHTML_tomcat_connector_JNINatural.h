@@ -31,6 +31,14 @@ JNIEXPORT jint JNICALL Java_realHTML_tomcat_connector_JNINatural_jni_1printVersi
 JNIEXPORT jint JNICALL Java_realHTML_tomcat_connector_JNINatural_jni_1dumpVars
   (JNIEnv *, jobject, jobject);
 
+/*
+ * Class:     realHTML_tomcat_connector_JNINatural
+ * Method:    jni_passwd
+ * Signature: (Ljava/lang/String;Ljava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL Java_realHTML_tomcat_connector_JNINatural_jni_1passwd
+  (JNIEnv *, jobject, jstring, jstring);
+
 #ifdef __cplusplus
 }
 #endif

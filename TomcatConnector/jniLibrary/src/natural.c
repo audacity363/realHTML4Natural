@@ -205,7 +205,7 @@ int callNatural(JNIEnv *env, struct naturalparms *parms, int length,
 
 
     natNNIparms = generateNaturalParams(nnifuncs, env, parms, length, bodyvars);
-    printNaturalParmsStruct(natNNIparms, logfile);
+    //printNaturalParmsStruct(natNNIparms, logfile);
 
     //logon into natural library
     debugFileprint(logfile, "Logon to [%s]...", natlibrary);

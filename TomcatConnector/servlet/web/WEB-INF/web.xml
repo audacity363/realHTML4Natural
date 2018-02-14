@@ -4,13 +4,34 @@
     <display-name>realHTML4Natural</display-name>
     <discription>Tomcat connector for the realHTML4Natural webframework</discription>
 
+    <!-- Main handler which handles requests to natural -->
     <servlet>
         <servlet-name>realHTMLServlet</servlet-name>
         <servlet-class>realHTMLHandler</servlet-class>
     </servlet>
-
     <servlet-mapping>
         <servlet-name>realHTMLServlet</servlet-name>
-        <url-pattern>/</url-pattern>
+        <url-pattern>/nat/*</url-pattern>
     </servlet-mapping>
+
+    <!-- Login handler. Creates a new session -->
+    <servlet>
+        <servlet-name>realHTMLLogin</servlet-name>
+        <servlet-class>realHTMLLogin</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>realHTMLLogin</servlet-name>
+        <url-pattern>/login</url-pattern>
+    </servlet-mapping>
+
+    <!-- Logout handler. Destroys a existing session -->
+    <servlet>
+        <servlet-name>realHTMLLogout</servlet-name>
+        <servlet-class>realHTMLLogout</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>realHTMLLogout</servlet-name>
+        <url-pattern>/logout</url-pattern>
+    </servlet-mapping>
+
 </web-app>

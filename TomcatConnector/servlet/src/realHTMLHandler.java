@@ -85,6 +85,9 @@ public class realHTMLHandler extends HttpServlet {
 
         try {
             call_parms = getRoute(request, response);
+            if(call_parms == null) {
+                return;
+            }
 
             parms.tmp_file = createTmpFile();
 
@@ -159,8 +162,11 @@ public class realHTMLHandler extends HttpServlet {
         ConfigurationLoader cl;
         RH4NCallParms parms = new RH4NCallParms();
         Router r;
+        Route route = null;
 
-        path = request.getRequestURI().substring(request.getContextPath().length());
+        //System.out.println("RequestURI: " + request.getRequestURI());
+        //System.out.println("ContextPath: " + request.getContextPath());
+        path = request.getRequestURI().substring((request.getContextPath() + "/nat").length());
         if(path.length() == 1) {
             throw(new RouteException("Enviroment and Route is missing"));
         }
@@ -195,12 +201,33 @@ public class realHTMLHandler extends HttpServlet {
             throw(new RouteException(e.getMessage()));
         }
 
-        parms.natinfos[0] = r.getLibrary();
-        parms.natinfos[1] = r.getProgram();
-        parms.debug = r.getDebug();
-        parms.deleteFile = r.getDeleteFile();
+        route = r.getRoute();
+        if(route.login) {
+            if(!checkLogin(request, response)) {
+                return(null);
+            }
+        }
+
+        parms.natinfos[0] = route.library; //r.getLibrary();
+        parms.natinfos[1] = route.program; //r.getProgram();
+        parms.debug = route.debug; //r.getDebug();
+        parms.deleteFile = route.deletefile; //r.getDeleteFile();
 
         return(parms);
+    }
+
+    private Boolean checkLogin(HttpServletRequest request, HttpServletResponse response) {
+       HttpSession session = null;
+
+       session = request.getSession();
+
+       if(!session.isNew()) {
+           return(true);
+       }
+
+       response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+       session.invalidate();
+       return(false);
     }
 
     private RH4NCallParms getQueryParms(HttpServletRequest request) {

@@ -27,4 +27,9 @@ public class JNILoader
     {
         return(new JNINatural()).jni_dumpVars(varlist);
     }
+
+    public int passwd(String user, String passwd) {
+        return(new JNINatural()).jni_passwd(user, passwd);
+    }
+
 }

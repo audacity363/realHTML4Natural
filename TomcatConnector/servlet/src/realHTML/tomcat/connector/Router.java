@@ -1,5 +1,4 @@
-package realHTML.tomcat.connector;
-
+package realHTML.tomcat.connector; 
 import java.io.*;
 import java.util.*;
 import java.io.File;
@@ -13,8 +12,15 @@ import org.w3c.dom.Element;
 import java.lang.reflect.Method;
 import org.xml.sax.SAXException;
 
+import realHTML.servlet.exceptions.*;
+
 public class Router
 {
+    private class TagHandling {
+        public Boolean mustSet;
+        public Runnable callback;
+    }
+
     String filepath = null;
     String program = null;
     String library = null;
@@ -22,12 +28,24 @@ public class Router
     Boolean deletefile = true;
     String error_msg; 
 
+    Route route;
+
+    String[] supportedTags = {
+        "library",
+        "program",
+        "debug", 
+        "deleteFile",
+        "login"
+        };
+
     public Router(String filepath)
     {
         this.filepath = filepath;
+        this.route = new Route();
     }
 
-    public Boolean searchRoute(String route) throws ParserConfigurationException, SAXException, IOException
+    public Boolean searchRoute(String route) 
+        throws ParserConfigurationException, SAXException, IOException, RouteException
     {
         File inputFile = new File(this.filepath);
 
@@ -58,40 +76,9 @@ public class Router
 
             if(eElement.getAttribute("path").equals(route))
             {
-                target = eElement.getElementsByTagName("library");
-                if(target.getLength() == 0)
-                {
-                    this.error_msg = "library tag not found" ;
-                    return(false);
-                }
-                this.library = target.item(0).getTextContent();
-
-                target = eElement.getElementsByTagName("program");
-                if(target.getLength() == 0)
-                {
-                    this.error_msg = "program tag not found" ;
-                    return(false);
-                }
-                this.program = target.item(0).getTextContent();
-
-                target = eElement.getElementsByTagName("debug");
-                if(target.getLength() != 0)
-                {
-                    bool_str = target.item(0).getTextContent();
-                    if(bool_str.equals("true"))
-                    {
-                        this.debug = true;
-                    }
-                }
-
-                target = eElement.getElementsByTagName("deleteFile");
-                if(target.getLength() != 0)
-                {
-                    bool_str = target.item(0).getTextContent();
-                    if(bool_str.equals("false"))
-                    {
-                        this.deletefile = false;
-                    }
+                for(int x = 0; x < this.supportedTags.length; x++) {
+                    target = eElement.getElementsByTagName(this.supportedTags[x]);
+                    handleTag(this.supportedTags[x], target);
                 }
 
                 return(true);
@@ -101,28 +88,84 @@ public class Router
         return(false);
     }
 
-    public String getProgram()
-    {
-        return(this.program);
+    //TODO: Find a nicer way to distribute the handler call (function pointers?!)
+    private void handleTag(String tag, NodeList target) throws RouteException {
+        if(tag.equals("library")) {
+            handleLibrary(target);
+        } else if(tag.equals("program")) {
+                handleProgram(target);
+        } else if(tag.equals("debug")) {
+                handleDebug(target);
+        } else if(tag.equals("deleteFile")) {
+                handleDeleteFile(target);
+        } else if(tag.equals("login")) {
+                handleLogin(target);
+        }
     }
 
-    public String getLibrary()
-    {
-        return(this.library);
+    private void handleLibrary(NodeList target) throws RouteException {
+        if(target.getLength() == 0) {
+            throw(new RouteException("library tag is not set"));
+        }
+        this.route.library = target.item(0).getTextContent();
+        if(this.route.library.length() == 0) {
+            throw(new RouteException("library tag is empty"));
+        }
     }
 
-    public Boolean getDebug()
-    {
-        return(this.debug);
+    private void handleProgram(NodeList target) throws RouteException {
+        if(target.getLength() == 0) {
+            throw(new RouteException("program tag is not set"));
+        }
+        this.route.program = target.item(0).getTextContent();
+        if(this.route.program.length() == 0) {
+            throw(new RouteException("program tag is empty"));
+        }
     }
 
-    public Boolean getDeleteFile()
-    {
-        return(this.deletefile);
+    private void handleDebug(NodeList target) {
+        String bool_str = null;
+
+        if(target.getLength() == 0) {
+            this.route.debug = false;
+            return;
+        }
+
+        bool_str = target.item(0).getTextContent();
+        if(bool_str.equals("true")) {
+            this.route.debug = true;
+        }
     }
 
-    public String getError()
-    {
-        return(this.error_msg);
+    private void handleDeleteFile(NodeList target) {
+        String bool_str = null;
+
+        if(target.getLength() == 0) {
+            this.route.deletefile = false;
+            return;
+        }
+
+        bool_str = target.item(0).getTextContent();
+        if(bool_str.equals("true")) {
+            this.route.deletefile = true;
+        }
+    }
+
+    private void handleLogin(NodeList target) {
+        String bool_str = null;
+
+        if(target.getLength() == 0) {
+            this.route.login = false;
+            return;
+        }
+
+        bool_str = target.item(0).getTextContent();
+        if(bool_str.equals("true")) {
+            this.route.login = true;
+        }
+    }
+
+    public Route getRoute() {
+        return(this.route);
     }
 }
