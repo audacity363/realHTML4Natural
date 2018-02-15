@@ -8,6 +8,7 @@
 #include "realHTML_tomcat_connector_JNINatural.h"
 #include "natni.h"
 #include "jni_rh4n.h"
+#include "standard.h"
 
 #define VERSIONSTR "realHTML4Natural Tomcat Connector JNILibrary Version 2.0.1"
 
@@ -33,7 +34,22 @@ JNIEXPORT jint JNICALL Java_realHTML_tomcat_connector_JNINatural_jni_1printVersi
     return(0);
 }
 
+int readOutParms(JNIEnv *env, jobject jnatparms, RH4nProperties *properties, char *error_str);
 
+JNIEXPORT jobject JNICALL Java_realHTML_tomcat_connector_JNINatural_jni_1callNatural
+  (JNIEnv *env, jclass in_cls, jobject jnatparams, jobjectArray envvars_o, jobject bodyvars) {  
+      char error_str[2048];
+      RH4nProperties props;
+
+      if(readOutParms(env, jnatparams, &props, error_str) != 0) {
+          printf("Error: [%s]\n", error_str);
+      } else {
+          printf("OK\n");
+      }
+      return(NULL);
+  }
+
+#if 0
 JNIEXPORT jobject JNICALL Java_realHTML_tomcat_connector_JNINatural_jni_1callNatural
   (JNIEnv *env, jclass in_cls, jobject jnatparams, jobjectArray envvars_o, jobject bodyvars)
 {
@@ -49,6 +65,9 @@ JNIEXPORT jobject JNICALL Java_realHTML_tomcat_connector_JNINatural_jni_1callNat
          *natprogram, *natlibrary;
     char **envvars = NULL;
     vars_t *var_anker = NULL;
+    
+
+    
 
     struct naturalparms params[] = 
     {
@@ -67,8 +86,6 @@ JNIEXPORT jobject JNICALL Java_realHTML_tomcat_connector_JNINatural_jni_1callNat
 
 
     FILE *logfile = NULL;
-
-
 
     //Get reference to the RH4NParams Class
     jrh4nparams = (*env)->GetObjectClass(env, jnatparams);
@@ -132,6 +149,8 @@ JNIEXPORT jobject JNICALL Java_realHTML_tomcat_connector_JNINatural_jni_1callNat
 
     return(createReturnObj(env, 0, " ", logfile));
 }
+
+#endif
 
 int createNaturalProcess(JNIEnv *env, struct naturalparms *parms, int length, 
     char *error, FILE *logfile, char ***envvars, int envvars_len, vars_t *bodyvars)

@@ -44,14 +44,14 @@ JAVA_UTILS_PACKAGE = ./servlet/src/realHTML/tomcat/connector/Environ.java \
 					 ./servlet/src/realHTML/tomcat/connector/Route.java \
 					 ./servlet/src/realHTML/tomcat/connector/Router.java \
 					 ./servlet/src/realHTML/tomcat/connector/ConfigurationLoader.java \
-					 ./servlet/src/realHTML/tomcat/connector/RH4NCallParms.java 
+					 ./servlet/src/realHTML/tomcat/connector/RH4NCallParms.java \
 
 JAVA_UTILS_EXCEPTIONS = ./servlet/src/realHTML/servlet/exceptions/RouteException.java
 
 JNI_JSON_HANDLERS = json_main.o json_utils.o plain_handlers.o 1d_handlers.o \
 					2d_handlers.o 3d_handlers.o handlers.o callNatural.o
 
-JNI_MEMBER = main.o natural.o passwd.o
+JNI_MEMBER = main.o natural.o passwd.o javaParmReadout.o 
 
 all:
 	@make warfile
@@ -86,14 +86,14 @@ cleanservletclass:
 	@rm -f ./servlet/bin/*.class
 
 package: cleanpackage
+	@rm -rf ./servlet/bin/realHTML/servlet/exceptions/*.class
+	@javac -d ./servlet/bin -cp $(CLASSPATH) $(JAVA_UTILS_EXCEPTIONS)
 	@printf "Compiling realHTML.tomcat.JSONMatcher\n"
 	@javac -d ./servlet/bin -cp $(CLASSPATH) $(JSON_JAVA_PARSER)
 	@printf "Compiling realHTML.tomcat.connector\n"
-	@rm -rf ./bin/realHTML/tomcat/connector/*.class
+	@rm -rf ./servlet/bin/realHTML/tomcat/connector/*.class
 	@javac -d ./servlet/bin -cp $(CLASSPATH) $(JAVA_UTILS_PACKAGE)
 	@printf "Compiling realHTML.servlet.exceptions\n"
-	@rm -rf ./bin/realHTML/servlet/exceptions/*.class
-	@javac -d ./servlet/bin -cp $(CLASSPATH) $(JAVA_UTILS_EXCEPTIONS)
 	@printf "Creating realHTMLconnector.jar\n"
 	@cd ./servlet/bin && jar cf ./realHTMLconnector.jar ./realHTML
 
@@ -128,6 +128,14 @@ jniclean:
 	@printf "Cleaning shared object"
 	@rm -f ./librealHTMLconnector.so
 
+parmtest: jnilib
+	@printf "Cleaning ParmTest object\n"
+	@rm -f ./servlet/bin/ParmTest.class
+	@javac -cp $(CLASSPATH) -d ./servlet/bin/ ./tests/ParmTest.java
+	@printf "Runngin ParmTest\n";
+	@java -cp "./servlet/bin:./servlet/web/WEB-INF/lib/minimal-json-0.9.4.jar" -Djava.library.path="/u/it/a140734/rh4n/realHTML4Natural/TomcatConnector/" ParmTest
+	#@java -cp "./servlet/web/WEB-INF/lib/minimal-json-0.9.4.jar" -Djava.library.path="/u/it/a140734/rh4n/realHTML4Natural/TomcatConnector/" ParmTest
+
 lltest:
 	@printf "Cleaning LLTest object\n"
 	@rm -f ./servlet/bin/LLTest.class
@@ -148,7 +156,7 @@ test:
 
 clean:
 	rm -f ./servlet/realHTMLServlet.class
-	rm -f ./servlet/realHTML/tomcat/connector/*.class
+	rm -f ./servlet/bin/realHTML/tomcat/connector/*.class
 	rm -f ./servlet/realHTML4Natural.war
 	rm -f ./servlet/web/WEBINF/classes/realHTMLServlet.class
 	rm -f ./servlet/web/WEB-INF/lib/realHTMLconnector.jar

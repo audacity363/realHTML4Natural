@@ -1,3 +1,6 @@
+#ifndef RH4N_STD
+#define RH4N_STD
+
 #define RH4N_RET_OK 0
 #define RH4N_RET_PARM_MISSMATCH 1
 #define RH4N_RET_SO_ERR 2
@@ -18,3 +21,19 @@
 #define RH4N_RET_NOT_SUPPORTED 17
 #define RH4N_RET_MALFORMED_FORMAT_STR 18
 #define RH4N_RET_LDA_PARSE_ERR 19
+
+typedef struct {
+    char natlibrary[8];
+    char natprogram[8];
+    char *natparms;
+    char c_loglevel[10];
+    int  i_loglevel;
+    char httpreqtype[10];
+    //vars_t *urlvars;
+    //vars_t *bodyvars;
+    char *natsrcpath;
+    char *outputfile;
+
+} RH4nProperties;
+
+#endif

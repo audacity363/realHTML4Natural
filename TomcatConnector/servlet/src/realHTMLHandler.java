@@ -91,20 +91,29 @@ public class realHTMLHandler extends HttpServlet {
 
             parms.tmp_file = createTmpFile();
 
-            parms.debug = String.valueOf(call_parms.debug);
+            if(call_parms.debug) {
+                parms.loglevel = "DEBUG";
+            } else {
+                parms.loglevel = "ERROR";
+            }
+
             parms.reg_type = request.getMethod();
+
             parms.nat_library = call_parms.natinfos[0];
             parms.nat_program = call_parms.natinfos[1];
+
             parms.natparams = call_parms.settings.get("natparms");
+
             deleteFile = call_parms.deleteFile;
             envvars = call_parms.enviromentvars;
 
-            parms.settings = createSettingsString(call_parms.settings.get("templates"), call_parms.natinfos[0],
-            call_parms.settings.get("natsourcepath"), call_parms.debug);
+            //parms.settings = createSettingsString(call_parms.settings.get("templates"), call_parms.natinfos[0],
+            //call_parms.settings.get("natsourcepath"), call_parms.debug);
+            parms.natsrcpath = call_parms.settings.get("natsourcepath");
 
             call_parms = getQueryParms(request);
-            parms.keys = call_parms.req_keys.toArray(new String[0]);
-            parms.vals = call_parms.req_vals.toArray(new String[0]);
+            parms.urlVarsKey = call_parms.req_keys.toArray(new String[0]);
+            parms.urlVarsValue = call_parms.req_vals.toArray(new String[0]);
 
             contentType = request.getContentType();
             if(contentType != null && contentType.equals("application/json")) {
