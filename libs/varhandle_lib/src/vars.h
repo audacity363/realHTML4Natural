@@ -1,3 +1,6 @@
+#ifndef RH4NVARIABLENHANDLING
+#define RH4NVARIABLENHANDLING
+
 #define true 1
 #define false 0
 
@@ -143,3 +146,5 @@ int copyGroupNewNameWithIndex(vars_t *anker, vars_t *target_ank,
         char *name, char *new_name,
         int index_type, int index_array[3]);
 //----------------------End Utils function-------------------------------------
+
+#endif

@@ -7,8 +7,8 @@
 #include "vars.h"
 
 #include <jni.h>
-#include "jsonhandling.h"
-#include "json_utils.h"
+#include "json/jsonhandling.h"
+#include "json/json_utils.h"
 
 GeneralInfos *getFieldIDs(JNIEnv *env) {
     GeneralInfos *infos;
@@ -94,7 +94,7 @@ jint getJSONVarType(JNIEnv *env, GeneralInfos *infos, jobject curptr) {
     }
 
     vartype = (*env)->CallIntMethod(env, typefield, infos->type_method);
-    printf("Found vartype: [%d]\n", vartype);
+    //printf("Found vartype: [%d]\n", vartype);
     return(vartype);
 }
 

@@ -7,9 +7,9 @@
 #include "vars.h"
 
 #include <jni.h>
-#include "jsonhandling.h"
-#include "json_utils.h"
-#include "handlers.h"
+#include "json/jsonhandling.h"
+#include "json/json_utils.h"
+#include "json/handlers.h"
 
 
 int Handler1D(JNIEnv *env, HandlerArgs args) {
@@ -29,8 +29,8 @@ int Handler1D(JNIEnv *env, HandlerArgs args) {
     }
 
     x_length = (*env)->CallIntMethod(env, arraylist, llclass->sizeID);
-    printTabs(args.level);
-    printf("X_length: [%d]\n", x_length);
+    //printTabs(args.level);
+    //printf("X_length: [%d]\n", x_length);
 
     switch(args.vartype) {
         case JVAR_STRING1D:
@@ -49,7 +49,7 @@ int Handler1D(JNIEnv *env, HandlerArgs args) {
             break;
     }
 
-    printTabs(args.level);
+    //printTabs(args.level);
     for(;i < x_length; i++) {
         if((entry = (*env)->CallObjectMethod(env, arraylist, llclass->getID, i)) == NULL) {
             printf("Element in array is == NULL");

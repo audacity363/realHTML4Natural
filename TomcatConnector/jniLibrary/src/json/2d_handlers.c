@@ -8,9 +8,9 @@
 #include "vars.h"
 
 #include <jni.h>
-#include "jsonhandling.h"
-#include "json_utils.h"
-#include "handlers.h"
+#include "json/jsonhandling.h"
+#include "json/json_utils.h"
+#include "json/handlers.h"
 
 int Handler2D(JNIEnv *env, HandlerArgs args) {
     int x = 0, y = 0, max_strlen = 0, index[3] = {0, 0, 0};
@@ -29,13 +29,13 @@ int Handler2D(JNIEnv *env, HandlerArgs args) {
     }
     
     x_length = (*env)->CallIntMethod(env, arraylist_x, llclass->sizeID);
-    printTabs(args.level);
-    printf("X Length: [%d]\n", x_length);
+    //printTabs(args.level);
+    //printf("X Length: [%d]\n", x_length);
 
     arraylist_y = (*env)->CallObjectMethod(env, arraylist_x, llclass->getID, 0);
     y_length = (*env)->CallIntMethod(env, arraylist_y, llclass->sizeID);
-    printTabs(args.level);
-    printf("Y Length: [%d]\n", y_length);
+    //printTabs(args.level);
+    //printf("Y Length: [%d]\n", y_length);
 
     switch(args.vartype) {
         case JVAR_STRING2D:

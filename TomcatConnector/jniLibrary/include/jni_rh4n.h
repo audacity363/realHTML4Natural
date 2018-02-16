@@ -1,5 +1,7 @@
 #define NATPARMSCOUNT 7
 
+#define RH4N_CLASS_STRING "Ljava/lang/String;"
+
 struct naturalparms {
     char *jname;
     char *jtype;

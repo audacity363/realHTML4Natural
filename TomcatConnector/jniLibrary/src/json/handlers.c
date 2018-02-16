@@ -8,9 +8,9 @@
 #include "vars.h"
 
 #include <jni.h>
-#include "jsonhandling.h"
-#include "json_utils.h"
-#include "handlers.h"
+#include "json/jsonhandling.h"
+#include "json/json_utils.h"
+#include "json/handlers.h"
 
 int singleVarHandler(JNIEnv *env, HandlerArgs args);
 

@@ -8,4 +8,10 @@ public class Environ {
     public Environ() {
         this.append = false;
     }
+
+    public Environ(String name, String value, boolean append) {
+        this.name = name;
+        this.value = value;
+        this.append = append;
+    }
 }

@@ -5,102 +5,249 @@
 
 #include "jni.h"
 
-#include "vars.h"
-
 #include "standard.h"
+#include "javaParmReadout.h"
 
-
-int rh4nParmReqTypeHandler(JNIEnv *env, jobject joreqtype, RH4nProperties *properties, char *error_str);
-int rh4nParmNatLibraryHandler(JNIEnv *env, jobject jonatlib, RH4nProperties *properties, char *error_str);
-int rh4nParmNatProgramHandler(JNIEnv *env, jobject jonatprogram, RH4nProperties *properties, char *error_str);
-int rh4nParmNatParmsHandler(JNIEnv *env, jobject jonatparms, RH4nProperties *properties, char *error_str);
-int rh4nParmOutputfileHandler(JNIEnv *env, jobject jooutputfile, RH4nProperties *properties, char *error_str);
-int rh4nParmLoglevelHandler(JNIEnv *env, jobject jologlevel, RH4nProperties *properties, char *error_str);
-int rh4nParmNatSrcPathHandler(JNIEnv *env, jobject jonatsrc, RH4nProperties *properties, char *error_str);
-
-struct javaParm {
-    char *jname;
-    char *jtype;
-    int (*handler)(JNIEnv*, jobject, RH4nProperties*, char*);
-};
-
-int readOutParms(JNIEnv *env, jobject jnatparams, RH4nProperties *properties, char *error_str) {
+int rh4nReadOutParms(JNIEnv *env, jobject jnatparams, RH4nProperties *properties, char *error_str) {
     struct javaParm parms[] = {
         {"reqType", "Ljava/lang/String;", rh4nParmReqTypeHandler},
-        {"nat_library", "Ljava/lang/String;", rh4nParmNatLibraryHandler},
-        {"nat_program", "Ljava/lang/String;", rh4nParmNatProgramHandler},
+        {"natLibrary", "Ljava/lang/String;", rh4nParmNatLibraryHandler},
+        {"natProgram", "Ljava/lang/String;", rh4nParmNatProgramHandler},
         {"natparms", "Ljava/lang/String;", rh4nParmNatParmsHandler},
-        {"tmp_file", "Ljava/lang/String;", rh4nParmOutputfileHandler},
+        {"outputfile", "Ljava/lang/String;", rh4nParmOutputfileHandler},
         {"loglevel", "Ljava/lang/String;", rh4nParmLoglevelHandler},
-        {"natsrcpath", "Ljava/lang/String;", rh4nParmNatSrcPathHandler}
+        {"natsrcpath", "Ljava/lang/String;", rh4nParmNatSrcPathHandler},
+        {"logpath", "Ljava/lang/String;", rh4nParmLogPathHandler}
     };
-    int i = 0;
+    int i = 0, ret = 0;
     jclass jcrh4nparams;
     jfieldID jfid;
     jobject target;
+    const char *strvalue = NULL;
 
     jcrh4nparams = (*env)->GetObjectClass(env, jnatparams);
     if(jcrh4nparams == NULL) {
         sprintf(error_str, "Could not get Class from parms");
-        return(-1);
+        return(RH4N_RET_JNI_ERR);
     }
 
     for(; i < sizeof(parms)/sizeof(struct javaParm); i++) {
 
-        printf("Search for [%s] type [%s]\n", parms[i].jname, parms[i].jtype);
+        //printf("Search for [%s] type [%s]\n", parms[i].jname, parms[i].jtype);
         jfid = (*env)->GetFieldID(env, jcrh4nparams, parms[i].jname, parms[i].jtype);
 
         if(jfid == NULL) {
             sprintf(error_str, "Could not get field ID from field [%s]", parms[i].jname);
-            return(-1);
+            return(RH4N_RET_JNI_ERR);
         }
 
         if((target = (*env)->GetObjectField(env, jnatparams, jfid)) == NULL) {
             sprintf(error_str, "Could not get field [%s]", parms[i].jname);
-            return(-1);
+            return(RH4N_RET_JNI_ERR);
+        }
+        if((strvalue = (*env)->GetStringUTFChars(env, (jstring)target, NULL)) == NULL) {
+            sprintf(error_str, "Field [%s] == NULL", parms[i].jname);
+            return(RH4N_RET_JNI_ERR);
         }
 
-        if(parms[i].handler(env, target, properties, error_str) != 0) {
-            return(-1);
+        if((ret = parms[i].handler(env, strvalue, properties, error_str)) != RH4N_RET_OK) {
+            (*env)->ReleaseStringUTFChars(env, (jstring)target, strvalue);
+            return(ret);
         }
 
+        (*env)->ReleaseStringUTFChars(env, (jstring)target, strvalue);
+
     }
-    return(0);
+    if((ret = rh4NUrlVariableHandler(env, jcrh4nparams, jnatparams, properties, error_str)) != RH4N_RET_OK) { return(ret); }
+        
+    return(RH4N_RET_OK);
 }
 
-int rh4nParmReqTypeHandler(JNIEnv *env, jobject joreqtype, RH4nProperties *properties, char *error_str) { 
+int rh4NUrlVariableHandler(JNIEnv *env, jclass jcrh4nparms, jobject jorh4nparms, RH4nProperties *properties, char *error_str) {
+    jfieldID jfnames = NULL, jfvalues = NULL;
+    jobject jonames = NULL, jovalues = NULL, joname = NULL, jovalue = NULL;
+    jint jnameslength = 0, jvalueslength = 0;
 
-    const char *creqtype = NULL;
-    if((creqtype = (*env)->GetStringUTFChars(env, (jstring)joreqtype, NULL)) == NULL) {
-        sprintf(error_str, "req_type String == NULL");
-        return(-1);
+    const char *cname = NULL, *cvalue = NULL;
+    wchar_t *wcvalue = NULL;
+    int i = 0;
+
+
+    if((jfnames = (*env)->GetFieldID(env, jcrh4nparms, "urlVarsKey", "[Ljava/lang/String;")) == NULL) {
+        sprintf(error_str, "Could not get field ID from field [urlVarsKey]");
+        return(RH4N_RET_JNI_ERR);
     }
 
-    strcpy(properties->httpreqtype, creqtype);
+    if((jonames = (*env)->GetObjectField(env, jorh4nparms, jfnames)) == NULL) {
+        sprintf(error_str, "Could not get field [urlVarsKey]");
+        return(RH4N_RET_JNI_ERR);
 
-    (*env)->ReleaseStringUTFChars(env, (jstring)joreqtype, creqtype);
-}
-
-int rh4nParmNatLibraryHandler(JNIEnv *env, jobject jonatlib, RH4nProperties *properties, char *error_str) { 
-    const char *creqtype = NULL;
-    printf("in LibraryHandler\n");
-    if((creqtype = (*env)->GetStringUTFChars(env, (jstring)jonatlib, NULL)) == NULL) {
-        sprintf(error_str, "req_type String == NULL");
-        return(-1);
     }
 
-    strcpy(properties->httpreqtype, creqtype);
+    if((jfvalues = (*env)->GetFieldID(env, jcrh4nparms, "urlVarsValue", "[Ljava/lang/String;")) == NULL) {
+        sprintf(error_str, "Could not get field ID from field [urlVarsValue]");
+        return(RH4N_RET_JNI_ERR);
+    }
 
-    (*env)->ReleaseStringUTFChars(env, (jstring)jonatlib, creqtype);
-    return(0);
+    if((jovalues = (*env)->GetObjectField(env, jorh4nparms, jfvalues)) == NULL) {
+        sprintf(error_str, "Could not get field [urlVarsKey]");
+        return(RH4N_RET_JNI_ERR);
+
+    }
+
+    jnameslength = (*env)->GetArrayLength(env, jonames);
+    jvalueslength = (*env)->GetArrayLength(env, jovalues);
+
+    if(jnameslength != jvalueslength) {
+        sprintf(error_str, "URLKey array and URLValue array are not the same length [%d] != [%d]", jnameslength, jvalueslength);
+        return(RH4N_RET_VAR_MISSMATCH);
+    }
+
+    if(properties->urlvars == NULL) {
+        initVarAnker(&properties->urlvars);
+    }
+
+    for(; i < jnameslength; i++) {
+        if((joname = (*env)->GetObjectArrayElement(env, jonames, i)) == NULL) {
+            sprintf(error_str, "Could not get URLKey array element [%d]\n", i);
+            return(RH4N_RET_JNI_ERR);
+        }
+        if((jovalue = (*env)->GetObjectArrayElement(env, jovalues, i)) == NULL) {
+            sprintf(error_str, "Could not get URLValue array element [%d]\n", i);
+            return(RH4N_RET_JNI_ERR);
+        }
+
+        if((cname = (*env)->GetStringUTFChars(env, (jstring)joname, NULL)) == NULL) {
+            sprintf(error_str, "Could not get URLKey string from array element [%d]\n", i);
+            return(RH4N_RET_JNI_ERR);
+        }
+        if((cvalue = (*env)->GetStringUTFChars(env, (jstring)jovalue, NULL)) == NULL) {
+            sprintf(error_str, "Could not get URLValue string from array element [%d]\n", i);
+            return(RH4N_RET_JNI_ERR);
+        } 
+
+        //printf("URLVar: Name: [%s] Value: [%s]\n", cname, cvalue);
+
+        if((wcvalue = malloc((strlen(cvalue)+1)*sizeof(wchar_t))) == NULL) {
+            return(RH4N_RET_MEMORY_ERR);
+        }
+
+        swprintf(wcvalue, strlen(cvalue)+1, L"%hs", cvalue);
+
+        addString(properties->urlvars, NULL, (char*)cname, wcvalue, strlen(cvalue)+1);
+
+        free(wcvalue);
+
+        (*env)->ReleaseStringUTFChars(env, (jstring)joname, cname);
+        (*env)->ReleaseStringUTFChars(env, (jstring)jovalue, cvalue);
+    }
+
+
+    return(RH4N_RET_OK);
+
 }
 
-int rh4nParmNatProgramHandler(JNIEnv *env, jobject jonatprogram, RH4nProperties *properties, char *error_str) { }
+int rh4nParmReqTypeHandler(JNIEnv *env, const char *strvalue, RH4nProperties *properties, char *error_str) { 
 
-int rh4nParmNatParmsHandler(JNIEnv *env, jobject jonatparms, RH4nProperties *properties, char *error_str) { }
+    if(strlen(strvalue) > sizeof(properties->httpreqtype)) {
+        sprintf(error_str, "ReqType to big. (MaxLength = [%d])", sizeof(properties->httpreqtype));
+        return(RH4N_RET_BUFFER_OVERFLOW);
+    }
 
-int rh4nParmOutputfileHandler(JNIEnv *env, jobject jooutputfile, RH4nProperties *properties, char *error_str) { }
+    strcpy(properties->httpreqtype, strvalue);
+    return(RH4N_RET_OK);
+}
 
-int rh4nParmLoglevelHandler(JNIEnv *env, jobject jologlevel, RH4nProperties *properties, char *error_str) { }
+int rh4nParmNatLibraryHandler(JNIEnv *env, const char *strvalue, RH4nProperties *properties, char *error_str) { 
+    if(strlen(strvalue) > sizeof(properties->natlibrary)) {
+        sprintf(error_str, "NatLibrary to big. (MaxLength = [%d])", sizeof(properties->natlibrary));
+        return(RH4N_RET_BUFFER_OVERFLOW);
+    }
+    strcpy(properties->natlibrary, strvalue);
+    return(RH4N_RET_OK);
+}
 
-int rh4nParmNatSrcPathHandler(JNIEnv *env, jobject jonatsrc, RH4nProperties *properties, char *error_str) { }
+int rh4nParmNatProgramHandler(JNIEnv *env, const char *strvalue, RH4nProperties *properties, char *error_str) { 
+    if(strlen(strvalue) > sizeof(properties->natprogram)) {
+        sprintf(error_str, "NatProgram to big. (MaxLength = [%d])", sizeof(properties->natprogram));
+        return(RH4N_RET_BUFFER_OVERFLOW);
+    }
+    strcpy(properties->natprogram, strvalue);
+    return(RH4N_RET_OK);
+}
+
+int rh4nParmNatParmsHandler(JNIEnv *env, const char *strvalue, RH4nProperties *properties, char *error_str) { 
+    if((properties->natparms = malloc(strlen(strvalue)+1)) == NULL) {
+        return(RH4N_RET_MEMORY_ERR);
+    }
+
+    strcpy(properties->natparms, strvalue);
+    return(RH4N_RET_OK);
+}
+
+int rh4nParmOutputfileHandler(JNIEnv *env, const char *strvalue, RH4nProperties *properties, char *error_str) { 
+    if((properties->outputfile = malloc(strlen(strvalue)+1)) == NULL) {
+        return(RH4N_RET_MEMORY_ERR);
+    }
+
+    strcpy(properties->outputfile, strvalue);
+    return(RH4N_RET_OK);
+}
+
+int rh4nParmLoglevelHandler(JNIEnv *env, const char *strvalue, RH4nProperties *properties, char *error_str) { 
+    if(strlen(strvalue) > sizeof(properties->c_loglevel)) {
+        sprintf(error_str, "loglevel to big. (MaxLength = [%d])", sizeof(properties->c_loglevel));
+        return(RH4N_RET_BUFFER_OVERFLOW);
+    }
+
+    strcpy(properties->c_loglevel, strvalue);
+    //TODO: Translate the logstring to a integer level. Beforehand I have to write a logging library
+    return(RH4N_RET_OK);
+}
+
+int rh4nParmNatSrcPathHandler(JNIEnv *env, const char *strvalue, RH4nProperties *properties, char *error_str) { 
+    if((properties->natsrcpath = malloc(strlen(strvalue)+1)) == NULL) {
+        return(RH4N_RET_MEMORY_ERR);
+    }
+
+    strcpy(properties->natsrcpath, strvalue);
+    return(RH4N_RET_OK);
+}
+
+int rh4nParmLogPathHandler(JNIEnv *env, const char *strvalue, RH4nProperties *properties, char *error_str) { 
+    if((properties->logpath = malloc(strlen(strvalue)+1)) == NULL) {
+        return(RH4N_RET_MEMORY_ERR);
+    }
+
+    strcpy(properties->logpath, strvalue);
+    return(RH4N_RET_OK);
+}
+
+void rh4nPrintPropertiesStruct(RH4nProperties *properties) {
+    if(properties == NULL) { return; }
+
+    printf("NatLibrary: [%s]\n", properties->natlibrary);
+    printf("NatProgram: [%s]\n", properties->natprogram);
+    printf("NatSRCPath: [%s]\n", properties->natsrcpath);
+    printf("NatParms:   [%s]\n", properties->natparms);
+    printf("ReqType:    [%s]\n", properties->httpreqtype);
+    printf("Loglevel:   [%s]\n", properties->c_loglevel);
+    printf("Outputfile: [%s]\n", properties->outputfile);
+    printf("Logpath:    [%s]\n", properties->logpath);
+    printf("Url Variables:");
+    printAllVarsToFile(properties->urlvars, stdout);
+    printf("Body Variables:");
+    printAllVarsToFile(properties->bodyvars, stdout);
+}
+
+void rh4nFreePropertiesStruct(RH4nProperties *properties) {
+    if(properties == NULL) { return; }
+
+    free(properties->natparms);
+    free(properties->natsrcpath);
+    free(properties->outputfile);
+}
+
+void rh4nInitPropertiesStruct(RH4nProperties *properties) {
+    memset(properties, NULL, sizeof(RH4nProperties));
+}

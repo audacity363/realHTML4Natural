@@ -8,10 +8,9 @@
 
 #include <jni.h>
 #include "realHTML_tomcat_connector_JNINatural.h"
-#include "Test.h"
-#include "jsonhandling.h"
-#include "json_utils.h"
-#include "handlers.h"
+#include "json/jsonhandling.h"
+#include "json/json_utils.h"
+#include "json/handlers.h"
 
 #include "var2name.h"
 
@@ -80,7 +79,7 @@ int getVarlist(JNIEnv *env, jobject varlist, vars_t **target, char *error_msg) {
         return(-2);
     }
 
-    printf("Got anker object\n");
+    //printf("Got anker object\n");
     
     if((infos->anker = (*env)->GetObjectField(env, infos->anker, infos->nextentry)) == NULL) {
         sprintf(error_msg, "varlist is empty\n");
@@ -89,7 +88,7 @@ int getVarlist(JNIEnv *env, jobject varlist, vars_t **target, char *error_msg) {
 
     printFork(env, infos, infos->anker, NULL, 0, var_anker);
 
-    printAllVarsToFile(var_anker, stdout);
+    //printAllVarsToFile(var_anker, stdout);
 
     free(infos);
     *target = var_anker;
@@ -118,12 +117,12 @@ void printFork(JNIEnv *env, GeneralInfos *infos, jobject curptr, const char *gro
         }
         args.varname = (*env)->GetStringUTFChars(env, (jstring)name_obj, NULL);
 
-        printTabs(level);
-        printf("Name: [%s]\n", args.varname);
-        printTabs(level);
+        //printTabs(level);
+        //printf("Name: [%s]\n", args.varname);
+        //printTabs(level);
         args.vartype = getJSONVarType(env, infos, nextentry);
-        _printTabs(level);
-        printJSONVarType(args.vartype);
+        //_printTabs(level);
+        //printJSONVarType(args.vartype);
 
         if(args.vartype == JVAR_GROUP) {
             addGroup(var_anker, (char*) args.varname, -1, -1, -1);
@@ -140,7 +139,7 @@ void printFork(JNIEnv *env, GeneralInfos *infos, jobject curptr, const char *gro
             }
         }
 
-        printf("\n");
+        //printf("\n");
 
         if((nextlvl = (*env)->GetObjectField(env, nextentry, infos->nextlvl)) != NULL) {
             printFork(env, infos, nextlvl, args.varname, level+1, var_anker);
