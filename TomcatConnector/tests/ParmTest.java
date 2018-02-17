@@ -20,7 +20,7 @@ public class ParmTest {
         parms.natProgram = "TESTPROG";
         parms.natparms = "etid=$$";
         parms.outputfile = "/tmp/output.html";
-        parms.loglevel = "DEBUG";
+        parms.loglevel = "WARNING";
         parms.natsrcpath = "/VAW/nat";
         parms.logpath = "/tmp/";
 

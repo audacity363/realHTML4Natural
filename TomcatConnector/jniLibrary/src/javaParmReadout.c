@@ -201,7 +201,11 @@ int rh4nParmLoglevelHandler(JNIEnv *env, const char *strvalue, RH4nProperties *p
     }
 
     strcpy(properties->c_loglevel, strvalue);
-    //TODO: Translate the logstring to a integer level. Beforehand I have to write a logging library
+    if((properties->i_loglevel = rh4nLoggingConvertStrtoInt(properties->c_loglevel)) < 0) {
+        sprintf(error_str, "Unkown logging level [%s]. Could not init logging.", properties->c_loglevel);
+        return(RH4N_RET_LOGGING_ERR);
+    }
+
     return(RH4N_RET_OK);
 }
 
@@ -215,6 +219,10 @@ int rh4nParmNatSrcPathHandler(JNIEnv *env, const char *strvalue, RH4nProperties 
 }
 
 int rh4nParmLogPathHandler(JNIEnv *env, const char *strvalue, RH4nProperties *properties, char *error_str) { 
+    if(strlen(strvalue) == 0) {
+        sprintf(error_str, "Loggingpath is empty.");
+        return(RH4N_RET_LOGGING_ERR);
+    }
     if((properties->logpath = malloc(strlen(strvalue)+1)) == NULL) {
         return(RH4N_RET_MEMORY_ERR);
     }
@@ -226,18 +234,19 @@ int rh4nParmLogPathHandler(JNIEnv *env, const char *strvalue, RH4nProperties *pr
 void rh4nPrintPropertiesStruct(RH4nProperties *properties) {
     if(properties == NULL) { return; }
 
-    printf("NatLibrary: [%s]\n", properties->natlibrary);
-    printf("NatProgram: [%s]\n", properties->natprogram);
-    printf("NatSRCPath: [%s]\n", properties->natsrcpath);
-    printf("NatParms:   [%s]\n", properties->natparms);
-    printf("ReqType:    [%s]\n", properties->httpreqtype);
-    printf("Loglevel:   [%s]\n", properties->c_loglevel);
-    printf("Outputfile: [%s]\n", properties->outputfile);
-    printf("Logpath:    [%s]\n", properties->logpath);
-    printf("Url Variables:");
-    printAllVarsToFile(properties->urlvars, stdout);
-    printf("Body Variables:");
-    printAllVarsToFile(properties->bodyvars, stdout);
+    rh4n_log_debug(properties->logging, "NatLibrary: [%s]", properties->natlibrary);
+    rh4n_log_debug(properties->logging, "NatProgram: [%s]", properties->natprogram);
+    rh4n_log_debug(properties->logging, "NatSRCPath: [%s]", properties->natsrcpath);
+    rh4n_log_debug(properties->logging, "NatParms:   [%s]", properties->natparms);
+    rh4n_log_debug(properties->logging, "ReqType:    [%s]", properties->httpreqtype);
+    rh4n_log_debug(properties->logging, "Loglevel:   [%s]", properties->c_loglevel);
+    rh4n_log_debug(properties->logging, "Outputfile: [%s]", properties->outputfile);
+    rh4n_log_debug(properties->logging, "Logpath:    [%s]", properties->logpath);
+    //TODO: rewrite the print function fromm the variable lib with the new logging lib
+    //rh4n_log_debug("Url Variables:");
+    //printAllVarsToFile(properties->urlvars, stdout);
+    //rh4n_log_debug("Body Variables:");
+    //printAllVarsToFile(properties->bodyvars, stdout);
 }
 
 void rh4nFreePropertiesStruct(RH4nProperties *properties) {

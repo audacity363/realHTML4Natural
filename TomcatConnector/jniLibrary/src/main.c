@@ -33,11 +33,16 @@ JNIEXPORT jobject JNICALL Java_realHTML_tomcat_connector_JNINatural_jni_1callNat
             rh4nFreePropertiesStruct(&props);
             return(NULL);
         }
+        if((props.logging = rh4nLoggingCreateRule(props.natlibrary, props.natprogram, props.i_loglevel, props.logpath)) == NULL) {
+            rh4nFreePropertiesStruct(&props);
+            printf("Could not create  Loggingrule\n");
+            return(NULL);
+        }
         rh4nPrintPropertiesStruct(&props);
 
         rh4nEnvironInit(&environs);
         if(rh4nEnvironReadout(env, joenvirons, &environs, error_str) != RH4N_RET_OK) {
-            printf("Error: [%s]\n", error_str);
+            rh4n_log_error(props.logging, "%s", error_str);
             return(NULL);
         }
         //rh4nEnvironPrint(&environs);

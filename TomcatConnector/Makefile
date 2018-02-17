@@ -10,12 +10,14 @@ INCLUDES = -I/SAG/cjp/v16/include/ \
 		   -I./jniLibrary/include/ \
 		   -I../include/ \
 		   -I../libs/varhandle_lib/src/ \
-		   -I../var2names/include/
+		   -I../var2names/include/ \
+		   -I../libs/rh4n_logging/include/
 
 LIBS = -L../libs/varhandle_lib/ -lvars \
 	   -L../libs/nat-lda-parser/ -lldaparser \
 	   -L../var2names/ -lvar2name \
 	   -L../libs/utils/ -lutils \
+	   -L../libs/rh4n_logging/ -lrh4nlogging \
 	   -lcrypt
 
 

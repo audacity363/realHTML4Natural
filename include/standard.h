@@ -4,6 +4,7 @@
 #include "natuser.h"
 #include "natni.h"
 #include "vars.h"
+#include "rh4n_logging.h"
 
 #define RH4N_RET_OK 0
 #define RH4N_RET_PARM_MISSMATCH 1
@@ -27,6 +28,7 @@
 #define RH4N_RET_LDA_PARSE_ERR 19
 #define RH4N_RET_FORMAT_ERR 20
 #define RH4N_RET_JNI_ERR 21
+#define RH4N_RET_LOGGING_ERR 22
 
 typedef struct {
     char natlibrary[9];
@@ -40,6 +42,8 @@ typedef struct {
     char *natsrcpath;
     char *outputfile;
     char *logpath;
+
+    RH4nLogrule *logging;
 
 } RH4nProperties;
 
