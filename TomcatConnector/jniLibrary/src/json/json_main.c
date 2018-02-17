@@ -28,7 +28,7 @@ JNIEXPORT jint JNICALL Java_realHTML_tomcat_connector_JNINatural_jni_1dumpVars
 
     initVarAnker(&var_anker);
 
-    if((infos = getFieldIDs(env)) == NULL) {
+    if((infos = getFieldIDs(env, NULL)) == NULL) {
         return(-1);
     }
 
@@ -60,7 +60,7 @@ JNIEXPORT jint JNICALL Java_realHTML_tomcat_connector_JNINatural_jni_1dumpVars
     callNatural_JSON(var_anker);
 }
 
-int getVarlist(JNIEnv *env, jobject varlist, vars_t **target, char *error_msg) {
+int getVarlist(JNIEnv *env, jobject varlist, vars_t **target, char *error_msg, RH4nLogrule *logging) {
     jclass llhandlerclass = NULL;    
     jfieldID headID = NULL;
     jobject anker = NULL;
@@ -69,20 +69,20 @@ int getVarlist(JNIEnv *env, jobject varlist, vars_t **target, char *error_msg) {
 
     initVarAnker(&var_anker);
 
-    if((infos = getFieldIDs(env)) == NULL) {
-        sprintf(error_msg, "Could not get field IDs\n");
+    if((infos = getFieldIDs(env, logging)) == NULL) {
+        sprintf(error_msg, "Could not get field IDs");
         return(-1);
     }
 
     if(getAnker(env, varlist, infos) < 0) {
-        sprintf(error_msg, "Could not get anker\n");
+        sprintf(error_msg, "Could not get anker");
         return(-2);
     }
 
-    //printf("Got anker object\n");
+    rh4n_log_debug(logging, "Got anker object");
     
     if((infos->anker = (*env)->GetObjectField(env, infos->anker, infos->nextentry)) == NULL) {
-        sprintf(error_msg, "varlist is empty\n");
+        sprintf(error_msg, "varlist is empty");
         return(-2);
     }
 
@@ -112,25 +112,22 @@ void printFork(JNIEnv *env, GeneralInfos *infos, jobject curptr, const char *gro
     nextentry = curptr;
     while(1) {
         if((name_obj = (*env)->GetObjectField(env, nextentry, infos->name)) == NULL) {
-            printf("Name field == null\n");
+            rh4n_log_error(infos->logging, "Name field == null");
             return;
         }
         args.varname = (*env)->GetStringUTFChars(env, (jstring)name_obj, NULL);
 
-        //printTabs(level);
-        //printf("Name: [%s]\n", args.varname);
-        //printTabs(level);
+        rh4n_log_debug(infos->logging, "Name: [%s]", args.varname);
         args.vartype = getJSONVarType(env, infos, nextentry);
-        //_printTabs(level);
-        //printJSONVarType(args.vartype);
+        printJSONVarType(args.vartype, infos->logging);
 
         if(args.vartype == JVAR_GROUP) {
             addGroup(var_anker, (char*) args.varname, -1, -1, -1);
-            //printf("Created Group [%s]\n", args.varname);
+            rh4n_log_debug(infos->logging, "Created Group [%s]", args.varname);
         } else {
             if((varhandler = getHandlerFuncton(args.vartype)) == NULL) {
                 printTabs(level);
-                printf("No handler for vartype defined\n");
+                rh4n_log_error(infos->logging, "No handler for vartype defined");
             
             } else {
                 args.level = level;

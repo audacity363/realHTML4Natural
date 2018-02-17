@@ -29,6 +29,7 @@ typedef struct general_infos {
     jfieldID value;
     jmethodID type_method;
     jobject anker;
+    RH4nLogrule *logging;
 } GeneralInfos;
 
 typedef struct handlerargs {

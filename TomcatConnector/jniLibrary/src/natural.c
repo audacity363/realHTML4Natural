@@ -4,8 +4,7 @@
 #include <dlfcn.h>
 #include <errno.h>
 
-#include "vars.h"
-
+#include "standard.h"
 #include "realHTML_tomcat_connector_JNINatural.h"
 #include "natni.h"
 #include "jni_rh4n.h"

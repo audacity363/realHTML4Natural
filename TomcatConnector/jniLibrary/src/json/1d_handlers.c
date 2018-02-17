@@ -20,21 +20,21 @@ int Handler1D(JNIEnv *env, HandlerArgs args) {
     LLClassInfo *llclass = NULL;
 
     if((arraylist = (*env)->GetObjectField(env, args.curptr, args.infos->value)) == NULL) {
-        printf("Couldn't get field value\n");
+        rh4n_log_error(args.infos->logging, "Couldn't get field value");
         return(-1);
     }
 
-    if((llclass = getLLClassInfos(env)) == NULL) {
+    if((llclass = getLLClassInfos(env, args.infos->logging)) == NULL) {
         return(-2);
     }
 
     x_length = (*env)->CallIntMethod(env, arraylist, llclass->sizeID);
     //printTabs(args.level);
-    //printf("X_length: [%d]\n", x_length);
+    rh4n_log_debug(args.infos->logging, "X_length: [%d]", x_length);
 
     switch(args.vartype) {
         case JVAR_STRING1D:
-            //printf("Creating new String array [%s] under [%s]\n", args.varname, args.parent);
+            rh4n_log_debug(args.infos->logging, "Creating new String array [%s] under [%s]", args.varname, args.parent);
             max_strlen = getMaxStrLen1DString(env, args, arraylist, llclass, x_length);
             add1DStringArray(args.var_anker, (char*)args.parent, (char*)args.varname, max_strlen+1, x_length);
             break;
@@ -52,7 +52,7 @@ int Handler1D(JNIEnv *env, HandlerArgs args) {
     //printTabs(args.level);
     for(;i < x_length; i++) {
         if((entry = (*env)->CallObjectMethod(env, arraylist, llclass->getID, i)) == NULL) {
-            printf("Element in array is == NULL");
+            rh4n_log_error(args.infos->logging, "Element in array is == NULL");
             return(-3);
         }
         index[0] = i;
@@ -82,7 +82,7 @@ int getMaxStrLen1DString(JNIEnv *env, HandlerArgs args, jobject target, LLClassI
 
     for(;i < x_length; i++) {
         if((entry = (*env)->CallObjectMethod(env, target, llinfos->getID, i)) == NULL) {
-            printf("Element in array is == NULL");
+            rh4n_log_error(args.infos->logging, "Element in array is == NULL");
             return(-3);
         }
         jlength = (*env)->GetStringLength(env, (jstring)entry);

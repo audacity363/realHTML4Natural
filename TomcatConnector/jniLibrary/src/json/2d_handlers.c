@@ -19,27 +19,25 @@ int Handler2D(JNIEnv *env, HandlerArgs args) {
     jobject arraylist_x = NULL, arraylist_y = NULL, entry = NULL;
     LLClassInfo *llclass = NULL;
 
-    if((llclass = getLLClassInfos(env)) == NULL) {
+    if((llclass = getLLClassInfos(env, args.infos->logging)) == NULL) {
         return(-1);
     }
 
     if((arraylist_x = (*env)->GetObjectField(env, args.curptr, args.infos->value)) == NULL) {
-        printf("Could not get field value\n");
+        rh4n_log_error(args.infos->logging, "Could not get field value");
         return(-2);
     }
     
     x_length = (*env)->CallIntMethod(env, arraylist_x, llclass->sizeID);
-    //printTabs(args.level);
-    //printf("X Length: [%d]\n", x_length);
+    rh4n_log_debug(args.infos->logging, "X Length: [%d]", x_length);
 
     arraylist_y = (*env)->CallObjectMethod(env, arraylist_x, llclass->getID, 0);
     y_length = (*env)->CallIntMethod(env, arraylist_y, llclass->sizeID);
-    //printTabs(args.level);
-    //printf("Y Length: [%d]\n", y_length);
+    rh4n_log_debug(args.infos->logging, "Y Length: [%d]", y_length);
 
     switch(args.vartype) {
         case JVAR_STRING2D:
-            //printf("Creating new String array [%s] under [%s]\n", args.varname, args.parent);
+            rh4n_log_debug(args.infos->logging, "Creating new String array [%s] under [%s]", args.varname, args.parent);
             max_strlen = getMaxStrLen2DString(env, args, arraylist_x, llclass, x_length, y_length);
             add2DStringArray(args.var_anker, (char*)args.parent, (char*)args.varname, max_strlen+1, x_length, y_length);
             break;
@@ -57,13 +55,13 @@ int Handler2D(JNIEnv *env, HandlerArgs args) {
     for(; x < x_length; x++) {
         index[0] = x;
         if((arraylist_y = (*env)->CallObjectMethod(env, arraylist_x, llclass->getID, x)) == NULL) {
-            printf("Index x: [%d] of [%s] is null\n", x, args.varname);
+            rh4n_log_error(args.infos->logging, "Index x: [%d] of [%s] is null", x, args.varname);
             return(-3);
         }
         for(y=0; y < y_length; y++) {
             index[1] = y;
             if((entry = (*env)->CallObjectMethod(env, arraylist_y, llclass->getID, y)) == NULL) {
-                printf("Index x: [%d] y: [%d] of [%s]\n is null\n", x, y, args.varname);
+                rh4n_log_error(args.infos->logging, "Index x: [%d] y: [%d] of [%s] is null", x, y, args.varname);
                 return(-3);
             }
             switch(args.vartype) {
@@ -92,13 +90,13 @@ int getMaxStrLen2DString(JNIEnv *env, HandlerArgs args, jobject target, LLClassI
 
     for(;i < x_length; i++) {
         if((y_arraylist = (*env)->CallObjectMethod(env, target, llinfos->getID, i)) == NULL) {
-            printf("Element in array is == NULL");
+            rh4n_log_error(args.infos->logging, "Element in array is == NULL");
             return(-3);
         }
 
         for(y = 0; y < y_length; y++) {
             if((entry = (*env)->CallObjectMethod(env, y_arraylist, llinfos->getID, y)) == NULL) {
-                printf("Element in array is == NULL");
+                rh4n_log_error(args.infos->logging, "Element in array is == NULL");
                 return(-3);
             }
             jlength = (*env)->GetStringLength(env, (jstring)entry);

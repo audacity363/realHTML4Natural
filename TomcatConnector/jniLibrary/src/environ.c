@@ -15,7 +15,7 @@ void rh4nEnvironInit(RH4NEnvirons *environs) {
     environs->variables = NULL;
 }
 
-int rh4nEnvironNew(RH4NEnvirons *environs, const char *name, const char *value, bool append, char *error_str) {
+int rh4nEnvironNew(RH4NEnvirons *environs, const char *name, const char *value, bool append, char *error_str, RH4nLogrule *logging) {
     int i = 0, completelength = 0, variablesindex = 0;
     char *originalvalue = NULL;
 
@@ -46,6 +46,7 @@ int rh4nEnvironNew(RH4NEnvirons *environs, const char *name, const char *value, 
     if((environs->variables[variablesindex] = malloc(completelength*sizeof(char))) == NULL) {
             return(RH4N_RET_MEMORY_ERR);
     }
+    rh4n_log_info(logging, "Adding Environ. Name = [%s] Value = [%s]", name, value);
     sprintf(environs->variables[variablesindex], "%s=%s", name, value);
 
     if(originalvalue !=  NULL) {
@@ -55,7 +56,7 @@ int rh4nEnvironNew(RH4NEnvirons *environs, const char *name, const char *value, 
     return(RH4N_RET_OK);
 }
 
-int rh4nEnvironReadout(JNIEnv *env, jobject jenviron, RH4NEnvirons *environs, char *error_str) {
+int rh4nEnvironReadout(JNIEnv *env, jobject jenviron, RH4NEnvirons *environs, char *error_str, RH4nLogrule *logging) {
     if(jenviron == NULL) { return(RH4N_RET_OK); }
 
     jint jarraylength = 0;
@@ -120,7 +121,7 @@ int rh4nEnvironReadout(JNIEnv *env, jobject jenviron, RH4NEnvirons *environs, ch
 
         jbappend = (*env)->GetBooleanField(env, jotarget, jfappend);
 
-        if((ret = rh4nEnvironNew(environs, cname, cvalue, (bool)jbappend, error_str)) != RH4N_RET_OK) {
+        if((ret = rh4nEnvironNew(environs, cname, cvalue, (bool)jbappend, error_str, logging)) != RH4N_RET_OK) {
             (*env)->ReleaseStringUTFChars(env, (jstring)joname, cname);
             (*env)->ReleaseStringUTFChars(env, (jstring)jovalue, cvalue);
             return(ret);
@@ -148,13 +149,13 @@ int rh4nEnvironPutAll(RH4NEnvirons *environs) {
     return(RH4N_RET_OK);
 }
 
-void rh4nEnvironPrint(RH4NEnvirons *environs) {
+void rh4nEnvironPrint(RH4NEnvirons *environs, RH4nLogrule *logging) {
     if(environs == NULL) { return; }
 
     int i = 0;
 
     for(; i < environs->length; i++) {
-        printf("Environ [%d]: [%s]\n", i, environs->variables[i]);
+        rh4n_log_debug(logging, "Environ [%d]: [%s]", i, environs->variables[i]);
     }
 }
 

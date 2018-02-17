@@ -10,55 +10,57 @@
 #include "json/jsonhandling.h"
 #include "json/json_utils.h"
 
-GeneralInfos *getFieldIDs(JNIEnv *env) {
+GeneralInfos *getFieldIDs(JNIEnv *env, RH4nLogrule *logging) {
     GeneralInfos *infos;
 
     if((infos = malloc(sizeof(GeneralInfos))) == NULL) {
-        printf("Could not allocate mem for GeneralInfos\n");
+        rh4n_log_error(logging, "Could not allocate mem for GeneralInfos");
         return(NULL);
     }
 
     jclass nodeclass = NULL, typesclass = NULL;
 
     if((nodeclass = (*env)->FindClass(env, "realHTML/tomcat/JSONMatcher/LLNode")) == NULL) {
-        printf("Could not find class LLNode\n");
+        rh4n_log_error(logging, "Could not find class LLNode");
         return(NULL);
     }
 
     if((infos->nextentry = (*env)->GetFieldID(env, nodeclass, "next", "LrealHTML/tomcat/JSONMatcher/LLNode;")) == NULL) {
-        printf("Couldn't find field \"next\"\n");
+        rh4n_log_error(logging, "Couldn't find field \"next\"");
         return(NULL);
     }
 
     if((infos->nextlvl = (*env)->GetFieldID(env, nodeclass, "nextlvl", "LrealHTML/tomcat/JSONMatcher/LLNode;")) == NULL) {
-        printf("Couldn't find field \"nextlvl\"\n");
+        rh4n_log_error(logging, "Couldn't find field \"nextlvl\"");
         return(NULL);
     }
 
     if((infos->type = (*env)->GetFieldID(env, nodeclass, "type", "LrealHTML/tomcat/JSONMatcher/Types;")) == NULL) {
-        printf("Couldn't find field \"type\"\n");
+        rh4n_log_error(logging, "Couldn't find field \"type\"");
         return(NULL);
     }
 
     if((infos->name = (*env)->GetFieldID(env, nodeclass, "name", "Ljava/lang/String;")) == NULL) {
-        printf("Couldn't find field \"name\"\n");
+        rh4n_log_error(logging, "Couldn't find field \"name\"");
         return(NULL);
     }
 
     if((infos->value = (*env)->GetFieldID(env, nodeclass, "value", "Ljava/lang/Object;")) == NULL) {
-        printf("Couldn't find field \"value\"\n");
+        rh4n_log_error(logging, "Couldn't find field \"value\"");
         return(NULL);
     }
 
     if((typesclass = (*env)->FindClass(env, "realHTML/tomcat/JSONMatcher/Types")) == NULL) {
-        printf("Could not find class Types\n");
+        rh4n_log_error(logging, "Could not find class Types");
         return(NULL);
     }
 
     if((infos->type_method = (*env)->GetMethodID(env, typesclass, "getNumberRep", "()I")) == NULL) {
-        printf("Could not find method \"getNumberRep\"\n");
+        rh4n_log_error(logging, "Could not find method \"getNumberRep\"");
         return(NULL);
     }
+
+    infos->logging = logging;
 
     return(infos);
 }
@@ -68,17 +70,17 @@ int getAnker(JNIEnv *env, jobject varlist, GeneralInfos *infos) {
     jfieldID headID = NULL;
 
     if((llhandlerclass = (*env)->FindClass(env, "realHTML/tomcat/JSONMatcher/LLHandler")) == NULL) {
-        printf("Could find class LLHandler\n");
+        rh4n_log_error(infos->logging, "Could find class LLHandler");
         return(-1);
     }
     
     if((headID = (*env)->GetFieldID(env, llhandlerclass, "head", "LrealHTML/tomcat/JSONMatcher/LLNode;")) == NULL) {
-        printf("Couldn't find field \"head\"\n");
+        rh4n_log_error(infos->logging, "Couldn't find field \"head\"");
         return(-2);
     }   
 
     if((infos->anker = (*env)->GetObjectField(env, varlist, headID)) == NULL) {
-        printf("Couldn't get anker field\n");
+        rh4n_log_error(infos->logging, "Couldn't get anker field");
         return(-4);
     }
     return(0);
@@ -89,95 +91,97 @@ jint getJSONVarType(JNIEnv *env, GeneralInfos *infos, jobject curptr) {
     jint vartype;
 
     if((typefield = (*env)->GetObjectField(env, curptr, infos->type)) == NULL) {
-        printf("Couldn't get type field\n");
+        rh4n_log_error(infos->logging, "Couldn't get type field");
         return(-1);
     }
 
     vartype = (*env)->CallIntMethod(env, typefield, infos->type_method);
-    //printf("Found vartype: [%d]\n", vartype);
+    rh4n_log_debug(infos->logging, "Found vartype: [%d]", vartype);
     return(vartype);
 }
 
-void printJSONVarType(jint vartype) {
+void printJSONVarType(jint vartype, RH4nLogrule *logging) {
     switch(vartype) {
         case JVAR_GROUP:
-            printf("Group\n");
+            rh4n_log_debug(logging, "Group");
             break;
         case JVAR_STRING:
-            printf("String\n");
+            rh4n_log_debug(logging, "String");
             break;
         case JVAR_STRING1D:
-            printf("String 1D Array\n");
+            rh4n_log_debug(logging, "String 1D Array");
             break;
         case JVAR_STRING2D:
-            printf("String 2D Array\n");
+            rh4n_log_debug(logging, "String 2D Array");
             break;
         case JVAR_STRING3D:
-            printf("String 3D Array\n");
+            rh4n_log_debug(logging, "String 3D Array");
             break;
         case JVAR_BOOLEAN:
-            printf("Boolean\n");
+            rh4n_log_debug(logging, "Boolean");
             break;
         case JVAR_BOOLEAN1D:
-            printf("Boolean 1D Array\n");
+            rh4n_log_debug(logging, "Boolean 1D Array");
             break;
         case JVAR_BOOLEAN2D:
-            printf("Boolean 2D Array\n");
+            rh4n_log_debug(logging, "Boolean 2D Array");
             break;
         case JVAR_BOOLEAN3D:
-            printf("Boolean 3D Array\n");
+            rh4n_log_debug(logging, "Boolean 3D Array");
             break;
         case JVAR_INT:
-            printf("Integer\n");
+            rh4n_log_debug(logging, "Integer");
             break;
         case JVAR_INT1D:
-            printf("Integer 1D Array\n");
+            rh4n_log_debug(logging, "Integer 1D Array");
             break;
         case JVAR_INT2D:
-            printf("Integer 2D Array\n");
+            rh4n_log_debug(logging, "Integer 2D Array");
             break;
         case JVAR_INT3D:
-            printf("Integer 3D Array\n");
+            rh4n_log_debug(logging, "Integer 3D Array");
             break;
         case JVAR_FLOAT:
-            printf("Float\n");
+            rh4n_log_debug(logging, "Float");
             break;
         case JVAR_FLOAT1D:
-            printf("Float 1D Array\n");
+            rh4n_log_debug(logging, "Float 1D Array");
             break;
         case JVAR_FLOAT2D:
-            printf("Float 2D Array\n");
+            rh4n_log_debug(logging, "Float 2D Array");
             break;
         case JVAR_FLOAT3D:
-            printf("Float 3D Array\n");
+            rh4n_log_debug(logging, "Float 3D Array");
             break;
         case JVAR_UNKNOWN:
-            printf("Unknown\n");
+            rh4n_log_debug(logging, "Unknown");
             break;
     }
 }
 
+#if 0
 void _printTabs(int level) {
     int i = 0;
     for(; i < level; i++)
-        printf("\t");
+        rh4n_log_debug(logging, "\t");
 }
+#endif
 
-LLClassInfo *getLLClassInfos(JNIEnv *env) {
+LLClassInfo *getLLClassInfos(JNIEnv *env, RH4nLogrule *logging) {
     static LLClassInfo infos = { NULL, NULL, NULL };
 
     if((infos.llclass = (*env)->FindClass(env, "java/util/LinkedList")) == NULL) {
-        printf("Could not find LinkedList Class\n");
+        rh4n_log_error(logging, "Could not find LinkedList Class");
         return(NULL);
     }
 
     if((infos.sizeID = (*env)->GetMethodID(env, infos.llclass, "size", "()I")) == NULL) {
-        printf("Could not find site function\n");
+        rh4n_log_error(logging, "Could not find site function");
         return(NULL);
     }
 
     if((infos.getID = (*env)->GetMethodID(env, infos.llclass, "get", "(I)Ljava/lang/Object;")) == NULL) {
-        printf("Could not find get function\n");
+        rh4n_log_error(logging, "Could not find get function");
         return(NULL);
     }
 

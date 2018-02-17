@@ -52,7 +52,7 @@ int singleVarHandler(JNIEnv *env, HandlerArgs args) {
     jobject entry = NULL;    
 
     if((entry = (*env)->GetObjectField(env, args.curptr, args.infos->value)) == NULL) {
-        printf("Value field is == NULL\n");
+        rh4n_log_error(args.infos->logging, "Value field is == NULL");
         return(-1);
     }
 

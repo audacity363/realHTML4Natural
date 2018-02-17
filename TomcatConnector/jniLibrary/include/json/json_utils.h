@@ -7,10 +7,10 @@ typedef struct llclassinfo {
     jmethodID getID;
 } LLClassInfo;
 
-GeneralInfos *getFieldIDs(JNIEnv *env);
+GeneralInfos *getFieldIDs(JNIEnv *env, RH4nLogrule*);
 jint getJSONVarType(JNIEnv *env, GeneralInfos *infos, jobject curptr);
-void printVarType(jint vartype);
+void printVarType(jint vartype, RH4nLogrule*);
 void _printTabs(int level);
-LLClassInfo *getLLClassInfos(JNIEnv *env);
+LLClassInfo *getLLClassInfos(JNIEnv *env, RH4nLogrule*);
 
 #endif

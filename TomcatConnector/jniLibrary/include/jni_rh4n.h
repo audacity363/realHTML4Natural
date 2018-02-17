@@ -18,4 +18,4 @@ char *natErrno2Str(int naterrno);
 struct naturalparms *getParmByName(struct naturalparms *parms, int length, char *searchname);
 char *OpenLib(void **shLib, char *name);
 void CloseLib(void **shLib);
-int getVarlist(JNIEnv *env, jobject varlist, vars_t **target, char *error_msg);
+int getVarlist(JNIEnv *env, jobject varlist, vars_t **target, char *error_msg, RH4nLogrule*);

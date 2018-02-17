@@ -18,12 +18,12 @@ int handleIntEntry(JNIEnv *env, HandlerArgs args, jobject target, int index[3]) 
     int value = 0;
 
     if((integerclass = (*env)->FindClass(env, "java/lang/Integer")) == NULL) {
-        printf("Could not get Integer class\n");
+        rh4n_log_error(args.infos->logging, "Could not get Integer class");
         return(-1);
     }
 
     if((getintID = (*env)->GetMethodID(env, integerclass, "intValue", "()I")) == NULL) {
-        printf("Could not find intValue() method\n");
+        rh4n_log_error(args.infos->logging, "Could not find intValue() method");
         return(-2);
     }
 
@@ -52,12 +52,12 @@ int handleFloatEntry(JNIEnv *env, HandlerArgs args, jobject target, int index[3]
     double value = 0;
 
     if((floatclass = (*env)->FindClass(env, "java/lang/Float")) == NULL) {
-        printf("Could not get Float class\n");
+        rh4n_log_error(args.infos->logging, "Could not get Float class");
         return(-1);
     }
 
     if((doubleValueID = (*env)->GetMethodID(env, floatclass, "doubleValue", "()D")) == NULL) {
-        printf("Could not find doubleValue() method\n");
+        rh4n_log_error(args.infos->logging, "Could not find doubleValue() method");
         return(-2);
     }
 
@@ -86,12 +86,12 @@ int handleBooleanEntry(JNIEnv *env, HandlerArgs args, jobject target, int index[
     jboolean value = 0;
 
     if((booleanclass = (*env)->FindClass(env, "java/lang/Boolean")) == NULL) {
-        printf("Could not get Boolean class\n");
+        rh4n_log_error(args.infos->logging, "Could not get Boolean class");
         return(-1);
     }
 
     if((booleanValueID = (*env)->GetMethodID(env, booleanclass, "booleanValue", "()Z")) == NULL) {
-        printf("Could not find booleanValue() method\n");
+        rh4n_log_error(args.infos->logging, "Could not find booleanValue() method");
         return(-2);
     }
 
@@ -118,12 +118,12 @@ int handleStringEntry(JNIEnv *env, HandlerArgs args, jobject target, int index[3
     wchar_t *w_value = NULL;
 
     if((value = (*env)->GetStringUTFChars(env, (jstring)target, NULL)) == NULL) {
-        printf("String value is == NULL\n");
+        rh4n_log_error(args.infos->logging, "String value is == NULL\n");
         return(-1);
     }
 
     if((w_value = malloc(sizeof(wchar_t)*(strlen(value)+1))) == NULL) {
-        printf("Malloc for wchar failed\n");
+        rh4n_log_error(args.infos->logging, "Malloc for wchar failed\n");
         return(-2);
     }
 

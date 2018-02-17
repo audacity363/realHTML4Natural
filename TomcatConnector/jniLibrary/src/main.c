@@ -40,22 +40,26 @@ JNIEXPORT jobject JNICALL Java_realHTML_tomcat_connector_JNINatural_jni_1callNat
         }
         rh4nPrintPropertiesStruct(&props);
 
+        rh4n_log_info(props.logging, "Starting reading out Envrions");
         rh4nEnvironInit(&environs);
-        if(rh4nEnvironReadout(env, joenvirons, &environs, error_str) != RH4N_RET_OK) {
+        if(rh4nEnvironReadout(env, joenvirons, &environs, error_str, props.logging) != RH4N_RET_OK) {
             rh4n_log_error(props.logging, "%s", error_str);
             return(NULL);
         }
-        //rh4nEnvironPrint(&environs);
+        rh4nEnvironPrint(&environs, props.logging);
+        rh4n_log_info(props.logging, "Finished reading out Envrions");
 
         if(bodyvars != NULL) {
-            if(getVarlist(env, bodyvars, &props.bodyvars, error_str) < 0) {
-                printf("Error: getVarlist()\n");
+            rh4n_log_info(props.logging, "Start parsing body variables");
+            if(getVarlist(env, bodyvars, &props.bodyvars, error_str, props.logging) < 0) {
+                rh4n_log_error(props.logging, "getVarlist() - [%s]", error_str);
                 return(NULL);
             }
-        }
+            rh4n_log_info(props.logging, "Finished parsing body variables");
+        } else { rh4n_log_info(props.logging, "No body variables are provided"); }
 
-        //rh4nFreePropertiesStruct(&props);
-        //rh4nEnvironFree(&environs);
+        rh4nFreePropertiesStruct(&props);
+        rh4nEnvironFree(&environs);
         return(NULL);
   }
 
