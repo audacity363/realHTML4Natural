@@ -17,7 +17,8 @@ int rh4nReadOutParms(JNIEnv *env, jobject jnatparams, RH4nProperties *properties
         {"outputfile", "Ljava/lang/String;", rh4nParmOutputfileHandler},
         {"loglevel", "Ljava/lang/String;", rh4nParmLoglevelHandler},
         {"natsrcpath", "Ljava/lang/String;", rh4nParmNatSrcPathHandler},
-        {"logpath", "Ljava/lang/String;", rh4nParmLogPathHandler}
+        {"logpath", "Ljava/lang/String;", rh4nParmLogPathHandler},
+        {"errorRepresentation", "Ljava/lang/String;", rh4nParmErrorRepresentationHandler}
     };
     int i = 0, ret = 0;
     jclass jcrh4nparams;
@@ -231,17 +232,28 @@ int rh4nParmLogPathHandler(JNIEnv *env, const char *strvalue, RH4nProperties *pr
     return(RH4N_RET_OK);
 }
 
+int rh4nParmErrorRepresentationHandler(JNIEnv *env, const char *strvalue, RH4nProperties *properties, char *error_str) { 
+    if(strlen(strvalue) > sizeof(properties->errorrepresentation)) {
+        sprintf(error_str, "loglevel to big. (MaxLength = [%d])", sizeof(properties->errorrepresentation));
+        return(RH4N_RET_BUFFER_OVERFLOW);
+    }
+
+    strcpy(properties->errorrepresentation, strvalue);
+    return(RH4N_RET_OK);
+}
+
 void rh4nPrintPropertiesStruct(RH4nProperties *properties) {
     if(properties == NULL) { return; }
 
-    rh4n_log_debug(properties->logging, "NatLibrary: [%s]", properties->natlibrary);
-    rh4n_log_debug(properties->logging, "NatProgram: [%s]", properties->natprogram);
-    rh4n_log_debug(properties->logging, "NatSRCPath: [%s]", properties->natsrcpath);
-    rh4n_log_debug(properties->logging, "NatParms:   [%s]", properties->natparms);
-    rh4n_log_debug(properties->logging, "ReqType:    [%s]", properties->httpreqtype);
-    rh4n_log_debug(properties->logging, "Loglevel:   [%s]", properties->c_loglevel);
-    rh4n_log_debug(properties->logging, "Outputfile: [%s]", properties->outputfile);
-    rh4n_log_debug(properties->logging, "Logpath:    [%s]", properties->logpath);
+    rh4n_log_debug(properties->logging, "NatLibrary:          [%s]", properties->natlibrary);
+    rh4n_log_debug(properties->logging, "NatProgram:          [%s]", properties->natprogram);
+    rh4n_log_debug(properties->logging, "NatSRCPath:          [%s]", properties->natsrcpath);
+    rh4n_log_debug(properties->logging, "NatParms:            [%s]", properties->natparms);
+    rh4n_log_debug(properties->logging, "ReqType:             [%s]", properties->httpreqtype);
+    rh4n_log_debug(properties->logging, "Loglevel:            [%s]", properties->c_loglevel);
+    rh4n_log_debug(properties->logging, "Outputfile:          [%s]", properties->outputfile);
+    rh4n_log_debug(properties->logging, "Logpath:             [%s]", properties->logpath);
+    rh4n_log_debug(properties->logging, "ErrorRepresentation: [%s]", properties->errorrepresentation);
     //TODO: rewrite the print function fromm the variable lib with the new logging lib
     //rh4n_log_debug("Url Variables:");
     //printAllVarsToFile(properties->urlvars, stdout);

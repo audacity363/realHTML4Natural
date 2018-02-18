@@ -1,18 +1,27 @@
-OBJ = utils.o
+OBJ = rh4n_utils.o
 
-INCLUDE = 
-
+INCLUDE = -I./include/ \
+		  -I../../include/ \
+		  -I../varhandle_lib/src \
+		  -I../rh4n_logging/include/
+ 
 LIBS = 
 
-lib: $(OBJ)
-	ar -vcru libutils.a ./bin/*.o
+CC = xlc
+
+lib: clean $(OBJ)
+	@printf "Linking Utils library\n"
+	@ar -vcru libutils.a ./bin/*.o
 	
 $(OBJ):
-	xlc -g -c ./src/$*.c $(INCLUDE) -o ./bin/$*.o
+	@printf "CC ./src/$*.c => ./bin/$*.o\n"
+	@$(CC) -g -c ./src/$*.c $(INCLUDE) -o ./bin/$*.o
 
 clean:
-	rm -rf libutils.a
-	rm -rf ./bin/*.o
+	@printf "Cleaning utils library\n"
+	@rm -rf libutils.a
+	@printf "Cleaning utils object\n"
+	@rm -rf ./bin/*.o
 
 test:
 	xlc -g ./test_src/main.c $(INCLUDE) -o ./test_src/test -L./ -lldaparser -I./src/ $(LIBS)

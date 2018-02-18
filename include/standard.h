@@ -29,6 +29,7 @@
 #define RH4N_RET_FORMAT_ERR 20
 #define RH4N_RET_JNI_ERR 21
 #define RH4N_RET_LOGGING_ERR 22
+#define RH4N_RET_INTERNAL_ERR 23
 
 typedef struct {
     char natlibrary[9];
@@ -42,9 +43,12 @@ typedef struct {
     char *natsrcpath;
     char *outputfile;
     char *logpath;
+    char errorrepresentation[20];
 
     RH4nLogrule *logging;
 
 } RH4nProperties;
+
+#define RH4N_SONAME_NATURAL "libnatural.so"
 
 #endif

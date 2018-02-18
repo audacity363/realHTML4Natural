@@ -2,7 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <wchar.h>
+#include <dlfcn.h>
+#include <errno.h>
 
+#include "standard.h"
 #include "rh4n_utils.h"
 
 void RemoveSpaces(char* source)
@@ -158,3 +161,40 @@ char *str_toLower(char *input)
   
 }
 
+int rh4nUtilsloadSharedLibrary(RH4nProperties *props, char *name, void **ppsharedLibrary, char *error_str) {
+    void *psharedLibrary = NULL;
+
+    rh4n_log_debug(props->logging, "Try to open shared object [%s]", name);
+
+    if((psharedLibrary = dlopen(name, RTLD_NOW)) == NULL) {
+        rh4n_log_error(props->logging, "Failed to open library [%s] - %s", name, dlerror());
+        sprintf(error_str,"Failed to open library [%s] - %s", name, dlerror());
+        return(RH4N_RET_INTERNAL_ERR);
+    }
+
+    *ppsharedLibrary = psharedLibrary;
+    return(RH4N_RET_OK);
+}
+
+pnni_611_functions rh4nUtilsgetNNIFunctions(RH4nProperties *props, void *psharedLibrary, char *error_str) {
+    pnni_611_functions nnifuncs = NULL;
+    PF_NNI_GET_INTERFACE pf_nni_get_interface = NULL;
+    int nniret = 0;
+
+    rh4n_log_debug(props->logging, "Try to get nni functions");
+
+    pf_nni_get_interface = (PF_NNI_GET_INTERFACE)dlsym(psharedLibrary, "nni_get_interface");
+    if(pf_nni_get_interface == NULL) {
+        rh4n_log_error(props->logging, "Could not find the symbol \"nni_get_interface\" in given library");
+        sprintf(error_str, "Could not find the symbol \"nni_get_interface\" in given library");
+        return(NULL);
+    }
+
+    if((nniret = (pf_nni_get_interface)(NNI_VERSION_CURR, (void**)&nnifuncs)) != NNI_RC_OK) {
+        rh4n_log_error(props->logging, "Loading nni function struct failed. Ret = %d", nniret);
+        sprintf(error_str, "Loading nni function struct failed. Ret = %d", nniret);
+        return(NULL);
+    }
+
+    return(nnifuncs);
+}

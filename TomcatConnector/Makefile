@@ -11,7 +11,8 @@ INCLUDES = -I/SAG/cjp/v16/include/ \
 		   -I../include/ \
 		   -I../libs/varhandle_lib/src/ \
 		   -I../var2names/include/ \
-		   -I../libs/rh4n_logging/include/
+		   -I../libs/rh4n_logging/include/ \
+		   -I../libs/utils/src/
 
 LIBS = -L../libs/varhandle_lib/ -lvars \
 	   -L../libs/nat-lda-parser/ -lldaparser \
@@ -51,9 +52,11 @@ JAVA_UTILS_PACKAGE = ./servlet/src/realHTML/tomcat/connector/Environ.java \
 JAVA_UTILS_EXCEPTIONS = ./servlet/src/realHTML/servlet/exceptions/RouteException.java
 
 JNI_JSON_HANDLERS = json_utils.o plain_handlers.o 1d_handlers.o \
-					2d_handlers.o 3d_handlers.o handlers.o callNatural.o json_main.o
+					2d_handlers.o 3d_handlers.o handlers.o json_main.o
 
-JNI_MEMBER = main.o natural.o passwd.o javaParmReadout.o environ.o
+JNI_NAT_HANDLERS = rh4n_nat_parmgeneration.o rh4n_natcall_process.o rh4n_nat_errorhandling.o
+
+JNI_MEMBER = main.o passwd.o javaParmReadout.o environ.o
 
 all:
 	@make warfile
@@ -108,7 +111,7 @@ cleanpackage:
 	@rm -f ./servlet/bin/realHTMLconnector.jar
 
 
-jnilib: jniclean jniheader $(JNI_MEMBER) $(JNI_JSON_HANDLERS)
+jnilib: jniclean jniheader $(JNI_MEMBER) $(JNI_JSON_HANDLERS) $(JNI_NAT_HANDLERS)
 	@printf "Linking librealHTMLconnector.so\n"
 	@$(CC) -G -o librealHTMLconnector.so $(LIBS) ./jniLibrary/bin/*.o
 
@@ -124,6 +127,10 @@ $(JNI_MEMBER):
 $(JNI_JSON_HANDLERS):
 	@printf "CC ./jniLibrary/src/json/$*.c => ./jniLibrary/bin/$*.o\n"
 	@$(CC) -g -c -fpic $(INCLUDES) -o ./jniLibrary/bin/$*.o ./jniLibrary/src/json/$*.c
+
+$(JNI_NAT_HANDLERS):
+	@printf "CC ./jniLibrary/src/natural/$*.c => ./jniLibrary/bin/$*.o\n"
+	@$(CC) -g -c -fpic $(INCLUDES) -o ./jniLibrary/bin/$*.o ./jniLibrary/src/natural/$*.c
 
 jniclean:
 	@printf "Cleaning JNI objects\n"

@@ -9,10 +9,11 @@
 #include "jni_rh4n.h"
 #include "javaParmReadout.h"
 #include "environ.h"
+#include "natural/rh4n_natcall.h"
 
 #define VERSIONSTR "realHTML4Natural Tomcat Connector JNILibrary Version 2.0.1"
 
-jobject createReturnObj(JNIEnv *env, int exit_code, char*);
+jobject rh4nJNIcreateReturnObj(JNIEnv *env, int exit_code, char*);
 
 JNIEXPORT jint JNICALL Java_realHTML_tomcat_connector_JNINatural_jni_1printVersion
   (JNIEnv *env, jobject parent)
@@ -26,17 +27,18 @@ JNIEXPORT jobject JNICALL Java_realHTML_tomcat_connector_JNINatural_jni_1callNat
         char error_str[2048];
         RH4nProperties props;
         RH4NEnvirons environs;
+        int naturalret = 0;
 
         rh4nInitPropertiesStruct(&props);
         if(rh4nReadOutParms(env, jnatparams, &props, error_str) != 0) {
             printf("Error: [%s]\n", error_str);
             rh4nFreePropertiesStruct(&props);
-            return(NULL);
+            return(rh4nJNIcreateReturnObj(env, -1, error_str));
         }
         if((props.logging = rh4nLoggingCreateRule(props.natlibrary, props.natprogram, props.i_loglevel, props.logpath)) == NULL) {
             rh4nFreePropertiesStruct(&props);
             printf("Could not create  Loggingrule\n");
-            return(NULL);
+            return(rh4nJNIcreateReturnObj(env, -2, "Could not create Loggingrule"));
         }
         rh4nPrintPropertiesStruct(&props);
 
@@ -44,7 +46,7 @@ JNIEXPORT jobject JNICALL Java_realHTML_tomcat_connector_JNINatural_jni_1callNat
         rh4nEnvironInit(&environs);
         if(rh4nEnvironReadout(env, joenvirons, &environs, error_str, props.logging) != RH4N_RET_OK) {
             rh4n_log_error(props.logging, "%s", error_str);
-            return(NULL);
+            return(rh4nJNIcreateReturnObj(env, -3, error_str));
         }
         rh4nEnvironPrint(&environs, props.logging);
         rh4n_log_info(props.logging, "Finished reading out Envrions");
@@ -53,23 +55,19 @@ JNIEXPORT jobject JNICALL Java_realHTML_tomcat_connector_JNINatural_jni_1callNat
             rh4n_log_info(props.logging, "Start parsing body variables");
             if(getVarlist(env, bodyvars, &props.bodyvars, error_str, props.logging) < 0) {
                 rh4n_log_error(props.logging, "getVarlist() - [%s]", error_str);
-                return(NULL);
+                return(rh4nJNIcreateReturnObj(env, -4, error_str));
             }
             rh4n_log_info(props.logging, "Finished parsing body variables");
         } else { rh4n_log_info(props.logging, "No body variables are provided"); }
 
+        naturalret = rh4nNaturalcreateProcess(&props, &environs, error_str);
+
         rh4nFreePropertiesStruct(&props);
         rh4nEnvironFree(&environs);
-        return(NULL);
+        return(rh4nJNIcreateReturnObj(env, naturalret, ""));
   }
 
-
-//Just dummy function so that every symbol gets found
-void debugFileprint(FILE *logfile, char *format, ...) {
-}
-
-
-jobject createReturnObj(JNIEnv *env, int exit_code, char *error_msg)
+jobject rh4nJNIcreateReturnObj(JNIEnv *env, int exit_code, char *error_msg)
 {
     jclass jrh4nreturn;
     jmethodID jmid;

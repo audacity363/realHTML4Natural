@@ -23,4 +23,5 @@ int rh4nParmLoglevelHandler(JNIEnv*, const char*, RH4nProperties*, char*);
 int rh4nParmNatSrcPathHandler(JNIEnv*, const char*, RH4nProperties*, char*);
 int rh4NUrlVariableHandler(JNIEnv*, jclass, jobject, RH4nProperties*, char*);
 int rh4nParmLogPathHandler(JNIEnv*, const char*, RH4nProperties*, char*);
+int rh4nParmErrorRepresentationHandler(JNIEnv*, const char*, RH4nProperties*, char*);
 #endif

@@ -24,6 +24,7 @@ public class ParmTest {
         parms.loglevel = "DEBUG";
         parms.natsrcpath = "/VAW/nat";
         parms.logpath = "/tmp/";
+        parms.errorRepresentation = "JSON";
 
         parms.urlVarsKey = new String[4];
         parms.urlVarsKey[0] = "URLVar1";
