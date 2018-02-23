@@ -11,7 +11,7 @@ CC = xlc
 
 lib: clean $(OBJ)
 	@printf "Linking Utils library\n"
-	@ar -vcru libutils.a ./bin/*.o
+	@ar -cru librh4nutils.a ./bin/*.o
 	
 $(OBJ):
 	@printf "CC ./src/$*.c => ./bin/$*.o\n"
@@ -19,7 +19,7 @@ $(OBJ):
 
 clean:
 	@printf "Cleaning utils library\n"
-	@rm -rf libutils.a
+	@rm -rf librh4nutils.a
 	@printf "Cleaning utils object\n"
 	@rm -rf ./bin/*.o
 

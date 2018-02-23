@@ -167,7 +167,7 @@ int rh4nUtilsloadSharedLibrary(RH4nProperties *props, char *name, void **ppshare
     rh4n_log_debug(props->logging, "Try to open shared object [%s]", name);
 
     if((psharedLibrary = dlopen(name, RTLD_NOW)) == NULL) {
-        rh4n_log_error(props->logging, "Failed to open library [%s] - %s", name, dlerror());
+        if(props) { rh4n_log_error(props->logging, "Failed to open library [%s] - %s", name, dlerror()); }
         sprintf(error_str,"Failed to open library [%s] - %s", name, dlerror());
         return(RH4N_RET_INTERNAL_ERR);
     }
@@ -176,22 +176,26 @@ int rh4nUtilsloadSharedLibrary(RH4nProperties *props, char *name, void **ppshare
     return(RH4N_RET_OK);
 }
 
+void rh4nUtilscloseSharedLibrary(void *psharedLibrary) {
+    dlclose(psharedLibrary);
+}
+
 pnni_611_functions rh4nUtilsgetNNIFunctions(RH4nProperties *props, void *psharedLibrary, char *error_str) {
     pnni_611_functions nnifuncs = NULL;
     PF_NNI_GET_INTERFACE pf_nni_get_interface = NULL;
     int nniret = 0;
 
-    rh4n_log_debug(props->logging, "Try to get nni functions");
+    if(props) { rh4n_log_debug(props->logging, "Try to get nni functions"); }
 
     pf_nni_get_interface = (PF_NNI_GET_INTERFACE)dlsym(psharedLibrary, "nni_get_interface");
     if(pf_nni_get_interface == NULL) {
-        rh4n_log_error(props->logging, "Could not find the symbol \"nni_get_interface\" in given library");
+        if(props) { rh4n_log_error(props->logging, "Could not find the symbol \"nni_get_interface\" in given library"); }
         sprintf(error_str, "Could not find the symbol \"nni_get_interface\" in given library");
         return(NULL);
     }
 
     if((nniret = (pf_nni_get_interface)(NNI_VERSION_CURR, (void**)&nnifuncs)) != NNI_RC_OK) {
-        rh4n_log_error(props->logging, "Loading nni function struct failed. Ret = %d", nniret);
+        if(props) { rh4n_log_error(props->logging, "Loading nni function struct failed. Ret = %d", nniret); }
         sprintf(error_str, "Loading nni function struct failed. Ret = %d", nniret);
         return(NULL);
     }
