@@ -3,7 +3,7 @@
 
 #include "natuser.h"
 #include "natni.h"
-#include "vars.h"
+#include "rh4n_vars.h"
 #include "rh4n_logging.h"
 
 #define RH4N_RET_OK 0
@@ -30,10 +30,18 @@
 #define RH4N_RET_JNI_ERR 21
 #define RH4N_RET_LOGGING_ERR 22
 #define RH4N_RET_INTERNAL_ERR 23
+#define RH4N_RET_PARM_ERR 24
+#define RH4N_RET_VAR_EXISTS 25
+#define RH4N_RET_VAR_NOT_ARRAY 26
+#define RH4N_RET_VAR_BAD_DIM 27
+#define RH4N_RET_VAR_BAD_LENGTH 28
+#define RH4N_RET_VAR_BAD_INDEX 29
+#define RH4N_RET_TARADITIONAL 27
+
 
 typedef struct {
-    char natlibrary[9];
-    char natprogram[9];
+    char natlibrary[NNI_LEN_LIBRARY+1];
+    char natprogram[NNI_LEN_MEMBER+1];
     char *natparms;
     char c_loglevel[10];
     int  i_loglevel;
@@ -49,6 +57,7 @@ typedef struct {
 
 } RH4nProperties;
 
-#define RH4N_SONAME_NATURAL "libnatural.so"
+#include "rh4n_vars_print.h"
 
+#define RH4N_SONAME_NATURAL "libnatural.so"
 #endif
