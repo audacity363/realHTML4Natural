@@ -16,6 +16,8 @@ RH4nLogrule *rh4nLoggingCreateRule(const char *library, const char *program, con
     RH4nLogrule *a_logLevel = NULL;
 
     if(!(a_logLevel = calloc(1, sizeof(RH4nLogrule)))) {
+        fprintf(stderr, "Could not create logging rule. calloc returned NULL\n");
+        fflush(stderr);
         return(NULL);
     }
 
@@ -24,11 +26,36 @@ RH4nLogrule *rh4nLoggingCreateRule(const char *library, const char *program, con
     strncpy(a_logLevel->nat_library, library, sizeof(a_logLevel->nat_library)-1);
     strncpy(a_logLevel->nat_program, program, sizeof(a_logLevel->nat_program)-1);
     strncpy(a_logLevel->logpath, logpath, sizeof(a_logLevel->logpath)-1);
+    a_logLevel->outputfile = NULL;
 
     return(a_logLevel);
 }
 
+RH4nLogrule *rh4nLoggingCreateStreamingRule(const char *library, const char *program, const int level, const char *logpath) {
+    RH4nLogrule *tmp = NULL;
+    time_t rawtime;
+    struct tm *timeinfo;
+    char *logfile = NULL;
+
+    if((tmp = rh4nLoggingCreateRule(library, program, level, logpath)) == NULL) {
+        return(NULL);
+    }
+
+    time(&rawtime);
+    timeinfo = localtime(&rawtime);
+    logfile = rh4nLoggingCreateLogfilepath(library, program, logpath, timeinfo);
+
+    if((tmp->outputfile = fopen(logfile, "a")) == NULL) {
+        fprintf(stderr, "Could not open logfile [%s]: %s\n", logfile, strerror(errno));
+        fflush(stderr);
+        return(NULL);
+    }
+
+    return(tmp);
+}
+
 void rh4n_del_log_rule(RH4nLogrule *a_rule) {
+    if(a_rule->outputfile) fclose(a_rule->outputfile);
     free(a_rule);
 }
 
@@ -41,9 +68,8 @@ void rh4n_log(RH4nLogrule *rule, int level,
 
     char logprefix[MAX_PREFIX_LEN+1],
          datetime_buff[DATETIME_LEN+1],
-         datebuff[11],
          *endformat = NULL,
-         filepath[3000];
+         *filepath = NULL;
     const char *level_str = NULL;
     int formatlen = 0;
     time_t rawtime;
@@ -75,25 +101,32 @@ void rh4n_log(RH4nLogrule *rule, int level,
             rule->nat_library, rule->nat_program, pid, level_str);
     }
 
-    strftime(datebuff, sizeof(datebuff), "%d.%m.%Y", timeinfo);
-    sprintf(filepath, "%s/rh4n_%s_%s_%s.log", rule->logpath, rule->nat_library, rule->nat_program, datebuff);
-    
+    if(!rule->outputfile)
+        filepath = rh4nLoggingCreateLogfilepath(rule->nat_library, rule->nat_program, rule->logpath, timeinfo);
    
     formatlen = snprintf(NULL, 0, "%s%s\n", logprefix, format);
     if((endformat = calloc(sizeof(char), formatlen+1)) == NULL) {
         fprintf(stderr, "Logging: calloc returned NULL!!\n");
+        fflush(stderr);
         return;
     }
     snprintf(endformat, formatlen+1, "%s%s\n", logprefix, format);
 
-    va_start(args, format);
-    if((output = fopen(filepath, "a")) == NULL) {
-        fprintf(stderr, "Could not open logfile [%s]. Error: [%s]\n", filepath, strerror(errno));
-        return;
+    if(!rule->outputfile) {
+        if((output = fopen(filepath, "a")) == NULL) {
+            fprintf(stderr, "Could not open logfile [%s]. Error: [%s]\n", filepath, strerror(errno));
+            return;
+        }
+        va_start(args, format);
+        vfprintf(output, endformat, args);
+        fclose(output);
+        va_end(args);
+    } else {
+        va_start(args, format);
+        vfprintf(rule->outputfile, endformat, args);
+        fflush(rule->outputfile);
+        va_end(args);
     }
-    vfprintf(output, endformat, args);
-    fclose(output);
-    va_end(args);
 
     free(endformat);
     return;
@@ -131,4 +164,14 @@ int rh4nLoggingConvertStrtoInt(const char* cloglevel) {
     if(strcmp(cloglevel, "FATAL") == 0) 
         return(RH4N_FATAL);
     return(-1);
+}
+
+char *rh4nLoggingCreateLogfilepath(const char* library, const char* program, const char *logpath, struct tm* time) {
+    static char logfilepath[3000];
+    char datebuff[11];
+
+    strftime(datebuff, sizeof(datebuff), "%d.%m.%Y", time);
+
+    sprintf(logfilepath, "%s/rh4n_%s_%s_%s.log", logpath, library, program, datebuff);
+    return(logfilepath);
 }
