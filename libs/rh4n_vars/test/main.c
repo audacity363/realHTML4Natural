@@ -7,8 +7,11 @@
 int main(int argc, char *argv[]) {
     RH4nVarList varlist;
     RH4nVarRef ref;
+    RH4nProperties props;
     int arraylength[3] = { 3, 2, 4}, index[3];
     char testbuff[100];
+
+    props.logging = rh4nLoggingCreateStreamingRule("VARLIB", "TEST", RH4N_DEVELOP, "./logs/");
 
     rh4nvarInitList(&varlist);
 
@@ -32,15 +35,14 @@ int main(int argc, char *argv[]) {
     //rh4nvarPrintList(&varlist);
     //printf("\n");
 
-    //rh4nvarCreateNewGroup(&varlist, "grp1");
-    //rh4nvarCreateNewBool(&varlist, NULL, "bool1", true);
-    //rh4nvarCreateNewBool(&varlist, NULL, "bool2", true);
+    rh4nvarCreateNewGroup(&varlist, "grp1");
+    rh4nvarCreateNewBool(&varlist, NULL, "bool1", true);
+    rh4nvarCreateNewBool(&varlist, NULL, "bool2", true);
     //rh4nvarPrintList(&varlist);
     //printf("\n");
 
-    //rh4nvarMoveVarToGroup(&varlist, "bool1", "grp1");
-    //rh4nvarMoveVarToGroup(&varlist, "strarray1", "grp1");
-    rh4nvarPrintList(&varlist);
+    rh4nvarMoveVarToGroup(&varlist, "bool1", "grp1");
+    rh4nvarMoveVarToGroup(&varlist, "strarray1", "grp1");
+    rh4nvarPrintList(&varlist, &props);
     printf("\n");
-    rh4nvarPrintListToFile(&varlist, "./test.json", NULL);
 }

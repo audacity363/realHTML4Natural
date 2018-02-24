@@ -1,5 +1,8 @@
 CC = xlc
-INCLUDES = -I./include
+
+INCLUDES = -I./include \
+		   -I../../include \
+		   -I../rh4n_logging/include
 
 OBJS = rh4n_vars.o \
 	   rh4n_vars_group.o \
@@ -7,13 +10,17 @@ OBJS = rh4n_vars.o \
 	   rh4n_vars_string.o \
 	   rh4n_vars_array.o \
 	   rh4n_vars_bool.o \
-	   rh4n_vars_integer.c \
-	   rh4n_vars_float.c \
-	   rh4n_vars_ustring.c 
+	   rh4n_vars_integer.o \
+	   rh4n_vars_float.o \
+	   rh4n_vars_ustring.o \
+	   rh4n_vars_printjson.o
+
+LIBS = -L./ -lrh4nvars \
+	   -L../rh4n_logging -lrh4nlogging
 
 lib: clean $(OBJS)
 	@printf "Creating librh4nvars.a\n"
-	@ar -vcru librh4nvars.a
+	@ar -cru librh4nvars.a ./bin/*.o
 	@printf "Done..\n"
 
 $(OBJS):
@@ -21,7 +28,10 @@ $(OBJS):
 	@$(CC) -c -g $(INCLUDES) -o ./bin/$*.o ./src/$*.c
 
 test: lib
-	@$(CC) -g $(INCLUDES) -o ./test/main ./test/main.c ./bin/*.o
+	@$(CC) -g $(INCLUDES) -o ./test/main ./test/main.c $(LIBS)
+	@rm -f ./logs/rh4n_VARLIB_TEST_`date +%d.%m.%Y`.log
+	@./test/main
+	@cat ./logs/rh4n_VARLIB_TEST_`date +%d.%m.%Y`.log
 
 clean:
 	@printf "Cleaning libvar objects\n"

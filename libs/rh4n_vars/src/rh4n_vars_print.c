@@ -5,182 +5,60 @@
 
 #include "standard.h"
 
-void rh4nvarPrintList(RH4nVarList *varlist) {
+#define RH4N_VAR_PRINT_TABS "\t\t\t\t\t\t"
+
+void rh4nvarPrintList(RH4nVarList *varlist, RH4nProperties *props) {
     if(!varlist) { return; }
     
-    rh4nvarPrintFork(varlist->anker, -1, 1, NULL, stdout);
+    rh4nvarPrintFork(varlist->anker, -1, 0, props);
 }
 
-int rh4nvarPrintListToFile(RH4nVarList *varlist, char *filename, RH4nProperties *props) {
-    FILE *outputfile = NULL;
-    
-    if((outputfile = fopen(filename, "w")) == NULL) {
-        return(RH4N_RET_INTERNAL_ERR);
-    }
-
-    rh4nvarPrintFork(varlist->anker, -1, 1, props, outputfile);
-
-    fclose(outputfile);
-}
-
-void rh4nvarPrintFork(RH4nVarEntry_t *forkanker, int mode, int level, RH4nProperties *props, FILE *outputfile) {
+void rh4nvarPrintFork(RH4nVarEntry_t *forkanker, int mode, int level, RH4nProperties *props) {
     if(!forkanker) { return; }
 
     RH4nVarEntry_t *hptr = forkanker;
-    int i = 1;
+    int i = 1, dimensions = 0, length[3];
 
-    if(checkArrayGroup(forkanker)) {
-        rh4nvarPrintGroupArray(forkanker, mode, level, props, outputfile); 
-        return;
-    }
-
-    if(level == 1) fprintf(outputfile, "{");
     for(; hptr != NULL; hptr = hptr->next) {
-        fprintf(outputfile, "\"%s\":", hptr->name);
-        if(hptr->var.type == RH4NVARTYPEARRAY) { rh4nvarPrintArray(&hptr->var, mode, level, props, outputfile); }
-        else { rh4nvarPrintVar(&hptr->var, props, outputfile); }
-        if(hptr->var.type == RH4NVARTYPEGROUP) { 
-            if(checkArrayGroup(hptr->nextlvl)) {
-                rh4nvarPrintGroupArray(hptr->nextlvl, mode, level, props, outputfile); 
+        rh4n_log_debug(props->logging, "%.*sName: %s", level, RH4N_VAR_PRINT_TABS, hptr->name);
+        rh4n_log_debug(props->logging, "%.*sType: %s", level, RH4N_VAR_PRINT_TABS, rh4nvarPrintGetTypeString(hptr->var.type));
+        if(hptr->var.type == RH4NVARTYPEARRAY) {
+            memset(length, NULL, sizeof(length));
+            dimensions = 0;
+            rh4nvarGetArrayDimension(&hptr->var, &dimensions);
+            rh4nvarGetArrayLength(&hptr->var, length);
+            switch(dimensions) {
+                case 1:
+                    rh4n_log_debug(props->logging, "%.*sDims: 1 x: %d", level, RH4N_VAR_PRINT_TABS, length[0]);
+                    break;
+                case 2:
+                    rh4n_log_debug(props->logging, "%.*sDims: 2 x: %d y: %d", level, RH4N_VAR_PRINT_TABS, length[0], length[1]);
+                    break;
+                case 3:
+                    rh4n_log_debug(props->logging, "%.*sDims: 3 x: %d y: %d z: %d", level, RH4N_VAR_PRINT_TABS, length[0], length[1], length[2]);
+                    break;
             }
-            else {
-                fprintf(outputfile, "{");
-                rh4nvarPrintFork(hptr->nextlvl, mode, level+1, props, outputfile); 
-                fprintf(outputfile, "}");
-            }
         }
-
-        if(hptr->next) fprintf(outputfile, ",");
-    }
-    if(level == 1) fprintf(outputfile, "}");
-}
-
-void rh4nvarPrintArray(RH4nVarObj *variable, int mode, int level,RH4nProperties *props, FILE *outputfile) {
-    int x = 0, y = 0, z = 0, i = 0, index[3] = {0, 0, 0};
-    RH4nVarObj *xtarget = NULL, *ytarget = NULL, *ztarget = NULL;
-    
-    rh4nvarPrintArrayDim(variable, mode, level, props, outputfile);
-}
-
-void rh4nvarPrintArrayDim(RH4nVarObj *variable, int mode, int level, RH4nProperties *props, FILE *outputfile) {
-    int i = 0;
-    RH4nVarObj *target = NULL;
-
-    fprintf(outputfile, "[");
-
-    for(; i < variable->length; i++) {
-        target = &((RH4nVarObj*)variable->value)[i];
-        if(target->type == RH4NVARTYPEARRAY) {
-            rh4nvarPrintArrayDim(target, mode, level+1, props, outputfile);
-        } else {
-            rh4nvarPrintVar(target, props, outputfile);
-        }
-        if(i+1 < variable->length) {
-            fprintf(outputfile, ",");
-        }
-    }
-
-    fprintf(outputfile, "]");
-
-}
-
-void rh4nvarPrintGroupArray(RH4nVarEntry_t *variable, int mode, int level, RH4nProperties *props, FILE *outputfile) {
-    int dimension = -1, length[3] = { -1, -1, -1 }, varlibret = 0, index[3] = { 0, 0, 0 };
-    RH4nVarEntry_t *hptr = NULL;
-    RH4nVarObj *target = NULL;
-
-    if((varlibret = rh4nvarGetArrayDimension(&variable->var, &dimension)) != RH4N_RET_OK) { return; }
-    if((varlibret = rh4nvarGetArrayLength(&variable->var, length)) != RH4N_RET_OK) { return; }
-
-    switch(dimension) {
-        case(1):
-            rh4nvarPrintGroup1DArray(variable, mode, level, props, length, outputfile);
-            break;
-        case(2):
-            rh4nvarPrintGroup2DArray(variable, mode, level, props, length, outputfile);
-            break;
-        case(3):
-            rh4nvarPrintGroup3DArray(variable, mode, level, props, length, outputfile);
-            break;
+        rh4n_log_debug(props->logging, "");
+        if(hptr->var.type == RH4NVARTYPEGROUP) rh4nvarPrintFork(hptr->nextlvl, mode, level+1, props);
     }
 }
 
-void rh4nvarPrintGroup1DArray(RH4nVarEntry_t *variable, int mode, int level, RH4nProperties *props, int length[3], FILE *outputfile) {
-    int index[3] = { 0, 0, 0}, varlibret = 0;
-    RH4nVarEntry_t *hptr = NULL;
-    RH4nVarObj *target = NULL;
+char *rh4nvarPrintGetTypeString(int vartype) {
+    static char *typestrs[] = {
+        "String",
+        "Unicode String",
+        "Integer",
+        "Float", 
+        "Boolean",
+        "Group",
+        "Array"
+    };
 
-    index[1] = index[2] = -1;
-    fprintf(outputfile, "[");
-    for(; index[0] < length[0]; index[0]++) {
-        fprintf(outputfile, "{");
-        for(hptr = variable; hptr != NULL; hptr = hptr->next) {
-            if((varlibret = rh4nvarGetArrayEntry(&hptr->var, index, &target)) != RH4N_RET_OK) { return; }
-            fprintf(outputfile, "\"%s\":", hptr->name);
-            rh4nvarPrintVar(target, props, outputfile);
-            if(hptr->next) fprintf(outputfile, ",");
-        }
-        fprintf(outputfile, "}");
-        if(index[0]+1 < length[0]) fprintf(outputfile, ",");
-    }
-    fprintf(outputfile, "]");
+    if(vartype > sizeof(typestrs)/sizeof(char*)) return(NULL);
+    return(typestrs[vartype-1]);
 }
 
-void rh4nvarPrintGroup2DArray(RH4nVarEntry_t *variable, int mode, int level, RH4nProperties *props, int length[3], FILE *outputfile) {
-    int index[3] = { 0, 0, 0}, varlibret = 0;
-    RH4nVarEntry_t *hptr = NULL;
-    RH4nVarObj *target = NULL;
-
-    index[2] = -1;
-    fprintf(outputfile, "[");
-    for(; index[0] < length[0]; index[0]++) {
-        fprintf(outputfile, "[");
-        for(index[1] = 0; index[1] < length[1]; index[1]++) {
-            fprintf(outputfile, "{");
-            for(hptr = variable; hptr != NULL; hptr = hptr->next) {
-                if((varlibret = rh4nvarGetArrayEntry(&hptr->var, index, &target)) != RH4N_RET_OK) { return; }
-                fprintf(outputfile, "\"%s\":", hptr->name);
-                rh4nvarPrintVar(target, props, outputfile);
-                if(hptr->next) fprintf(outputfile, ",");
-            }
-            fprintf(outputfile, "}");
-            if(index[1]+1 < length[1]) fprintf(outputfile, ",");
-        }
-        fprintf(outputfile, "]");
-        if(index[0]+1 < length[0]) fprintf(outputfile, ",");
-    }
-    fprintf(outputfile, "]");
-}
-
-void rh4nvarPrintGroup3DArray(RH4nVarEntry_t *variable, int mode, int level, RH4nProperties *props, int length[3], FILE *outputfile) {
-    int index[3] = { 0, 0, 0}, varlibret = 0;
-    RH4nVarEntry_t *hptr = NULL;
-    RH4nVarObj *target = NULL;
-
-    fprintf(outputfile, "[");
-    for(; index[0] < length[0]; index[0]++) {
-        fprintf(outputfile, "[");
-        for(index[1] = 0; index[1] < length[1]; index[1]++) {
-            fprintf(outputfile, "[");
-            for(index[2] = 0; index[2] < length[2]; index[2]++) {
-                fprintf(outputfile, "{");
-                for(hptr = variable; hptr != NULL; hptr = hptr->next) {
-                    if((varlibret = rh4nvarGetArrayEntry(&hptr->var, index, &target)) != RH4N_RET_OK) { return; }
-                    fprintf(outputfile, "\"%s\":", hptr->name);
-                    rh4nvarPrintVar(target, props, outputfile);
-                    if(hptr->next) fprintf(outputfile, ",");
-                }
-                fprintf(outputfile, "}");
-                if(index[2]+1 < length[2]) fprintf(outputfile, ",");
-            }
-            fprintf(outputfile, "]");
-            if(index[1]+1 < length[1]) fprintf(outputfile, ",");
-        }
-        fprintf(outputfile, "]");
-        if(index[0]+1 < length[0]) fprintf(outputfile, ",");
-    }
-    fprintf(outputfile, "]");
-}
 
 void rh4nvarPrintVar(RH4nVarObj *variable, RH4nProperties *props, FILE *outputfile) {
     RH4nVarPrint printTable[] = {

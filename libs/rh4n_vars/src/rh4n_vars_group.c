@@ -27,7 +27,9 @@ int rh4nvarMoveVarToGroup(RH4nVarList *varlist, char *pvarname, char *pgroupname
     
     targetvar = _varref.var;
 
-    targetvar->prev->next = targetvar->next;
+    if(targetvar->prev == NULL) varlist->anker = targetvar->next;
+    else targetvar->prev->next = targetvar->next;
+
     targetvar->prev = targetvar->next = NULL;
 
     if(_groupref.var->nextlvl == NULL) {
@@ -40,4 +42,12 @@ int rh4nvarMoveVarToGroup(RH4nVarList *varlist, char *pvarname, char *pgroupname
     }
     
     return(RH4N_RET_OK);
+}
+
+int rh4nvarGroupExist(RH4nVarList *varlist, char *pgroupname) {
+    RH4nVarRef _refvar = RH4NVAR_REF_INIT;
+
+    if(rh4nvarGetRef(varlist, NULL, pgroupname, &_refvar) != RH4N_RET_OK) return(0);
+    if(_refvar.var->var.type != RH4NVARTYPEGROUP) return(0);
+    return(1);
 }
