@@ -37,6 +37,8 @@
 #define RH4N_RET_VAR_BAD_LENGTH 28
 #define RH4N_RET_VAR_BAD_INDEX 29
 #define RH4N_RET_TARADITIONAL 27
+#define RH4N_RET_LDA_NAT_MISSMATCH 28
+#define RH4N_RET_STRUCT_ERR 29
 
 
 typedef struct {
@@ -46,8 +48,8 @@ typedef struct {
     char c_loglevel[10];
     int  i_loglevel;
     char httpreqtype[10];
-    vars_t *urlvars;
-    vars_t *bodyvars;
+    RH4nVarList urlvars;
+    RH4nVarList bodyvars;
     char *natsrcpath;
     char *outputfile;
     char *logpath;

@@ -1,0 +1,42 @@
+CC = xlc
+
+INCLUDE = -I./include/ \
+		  -I../../include/ \
+		  -I../rh4n_logging/include/ \
+		  -I../rh4n_vars/include/ \
+		  -I../rh4n_ldaparser/include/
+
+LIBS = -L./ -lrh4nvar2name \
+	   -L../rh4n_logging/ -lrh4nlogging \
+ 	   -L../rh4n_vars/ -lrh4nvars \
+	   -L../rh4n_ldaparser/ -lrh4nldaparser
+
+CFLAGS_LIB = -c -g $(INCLUDE)
+CFLAGS_BIN = -g $(INCLUDE)
+
+LIB_V2N_OBJS = rh4n_v2n.o \
+			   rh4n_v2n_resolvenames.o \
+			   rh4n_v2n_resolveposition.o
+
+lib: clean $(LIB_V2N_OBJS)
+	@printf "Linking librh4nvar2name.a\n"
+	@ar -cru librh4nvar2name.a ./bin/*.o
+
+$(LIB_V2N_OBJS):
+	@printf "CC ./src/$*.c => ./bin/$*.o\n"
+	@$(CC) $(CFLAGS_LIB) -o ./bin/$*.o ./src/$*.c
+
+test: lib
+	@printf "CC ./test/main.c => ./test/main\n"
+	@$(CC) $(CFLAGS_BIN) -o ./test/main ./test/main.c $(LIBS)
+	@rm -f ./logs/rh4n_LDALIB_LDAPARSE_`date +%d.%m.%Y`.log
+	@./test/main
+	@cat ./logs/rh4n_LDALIB_LDAPARSE_`date +%d.%m.%Y`.log
+
+
+clean:
+	@printf "Cleaning librh4nvar2name.a\n"
+	@rm -rf "librh4nvar2name.a\n"
+	@printf "Cleaning var2name objects\n"
+	@rm -rf ./bin/*.o
+
