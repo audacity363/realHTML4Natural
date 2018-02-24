@@ -25,24 +25,24 @@ typedef struct RH4NLDAEntry_s {
     struct RH4NLDAEntry_s *prev;
     struct RH4NLDAEntry_s *next;
     struct RH4NLDAEntry_s *nextlvl;
-} RH4NLDAEntry_t;
+} RH4nLDAEntry_t;
 
 //Public
-int rh4nldaStartParser(char*, RH4NLDAEntry_t**, RH4nProperties*, char*);
-void rh4nldaPrintList(RH4NLDAEntry_t*, RH4nProperties*);
-void rh4nldaFreeList(RH4NLDAEntry_t*);
+int rh4nldaStartParser(char*, RH4nLDAEntry_t**, RH4nProperties*, char*);
+void rh4nldaPrintList(RH4nLDAEntry_t*, RH4nProperties*);
+void rh4nldaFreeList(RH4nLDAEntry_t*);
 
 //Private
 int rh4nldaReadLine(FILE*, char**, RH4nProperties*);
-int rh4nldaParseLine(char*, RH4NLDAEntry_t**, RH4nProperties*, char*);
-int rh4nldaSaveEntry(RH4NLDAEntry_t*, RH4nProperties*); 
-void rh4nldaInitEntry(RH4NLDAEntry_t*);
+int rh4nldaParseLine(char*, RH4nLDAEntry_t**, RH4nProperties*, char*);
+int rh4nldaSaveEntry(RH4nLDAEntry_t*, RH4nProperties*); 
+void rh4nldaInitEntry(RH4nLDAEntry_t*);
 int rh4nldaCheckVartype(int);
 int rh4nldaGetArrayType(char*, int*, int*, RH4nProperties*, char*);
 char *rh4nldastrtok(char*, char);
 int rh4nldaGetVariablenLength(char**, int*, int, char*);
-void rh4nldaPrintFork(RH4NLDAEntry_t*, RH4nProperties*, int);
-void rh4nldaFreeFork(RH4NLDAEntry_t*);
+void rh4nldaPrintFork(RH4nLDAEntry_t*, RH4nProperties*, int);
+void rh4nldaFreeFork(RH4nLDAEntry_t*);
 
 #define RH4N_LDA_HEADERSIZE 72
 #define RH4N_LDA_VARTYPE_UNSUPPORTED -1
@@ -64,6 +64,6 @@ void rh4nldaFreeFork(RH4NLDAEntry_t*);
 #define RH4NLDA_CHECK_IF_CONST(x) strstr(x, RH4NLDA_CONST) != NULL
 #define RH4NLDA_CHECK_IF_INIT(x) strstr(x, RH4NLDA_INIT) != NULL
 
-extern RH4NLDAEntry_t *g_rh4nldaentries, *g_rh4nldacurptr;
+extern RH4nLDAEntry_t *g_rh4nldaentries, *g_rh4nldacurptr;
 
 #endif

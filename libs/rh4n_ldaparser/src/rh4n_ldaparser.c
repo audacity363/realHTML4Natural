@@ -6,8 +6,8 @@
 #include "standard.h"
 #include "rh4n_ldaparser.h"
 
-RH4NLDAEntry_t *g_rh4nldaentries = NULL, *g_rh4nldacurptr = NULL;
-int rh4nldaStartParser(char *ldapath, RH4NLDAEntry_t **ldaentries, RH4nProperties *props, char *errorstr) {
+RH4nLDAEntry_t *g_rh4nldaentries = NULL, *g_rh4nldacurptr = NULL;
+int rh4nldaStartParser(char *ldapath, RH4nLDAEntry_t **ldaentries, RH4nProperties *props, char *errorstr) {
     FILE *fplda = NULL;
     char ldaheader[RH4N_LDA_HEADERSIZE], *ldaline = NULL;
     int fhret = 0, parseret = 0;
@@ -38,8 +38,8 @@ int rh4nldaStartParser(char *ldapath, RH4NLDAEntry_t **ldaentries, RH4nPropertie
 }
 
 
-int rh4nldaParseLine(char *line, RH4NLDAEntry_t **ldaentries, RH4nProperties *props, char *errorstr) {
-    RH4NLDAEntry_t *curentry = NULL;
+int rh4nldaParseLine(char *line, RH4nLDAEntry_t **ldaentries, RH4nProperties *props, char *errorstr) {
+    RH4nLDAEntry_t *curentry = NULL;
     char *_line = line, varname[NNI_LEN_NAME+1];
 
     if(RH4NLDA_CHECK_IF_VIEW(_line)) { 
@@ -49,7 +49,7 @@ int rh4nldaParseLine(char *line, RH4NLDAEntry_t **ldaentries, RH4nProperties *pr
     else if(RH4NLDA_CHECK_IF_CONST(_line)) return(RH4N_RET_OK);
     else if(RH4NLDA_CHECK_IF_INIT(_line)) return(RH4N_RET_OK);
 
-    if((curentry = malloc(sizeof(RH4NLDAEntry_t))) == NULL) return(RH4N_RET_MEMORY_ERR);
+    if((curentry = malloc(sizeof(RH4nLDAEntry_t))) == NULL) return(RH4N_RET_MEMORY_ERR);
     rh4nldaInitEntry(curentry);
     
     _line += 5; //Jump over line number

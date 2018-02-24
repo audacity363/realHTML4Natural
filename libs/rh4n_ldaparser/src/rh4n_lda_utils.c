@@ -6,8 +6,8 @@
 #include "standard.h"
 #include "rh4n_ldaparser.h"
 
-int rh4nldaSaveEntry(RH4NLDAEntry_t *newentry, RH4nProperties *props) {
-    RH4NLDAEntry_t *hptr = NULL;
+int rh4nldaSaveEntry(RH4nLDAEntry_t *newentry, RH4nProperties *props) {
+    RH4nLDAEntry_t *hptr = NULL;
 
     if(g_rh4nldaentries == NULL) {
         rh4n_log_debug(props->logging, "Saving first entry");
@@ -75,7 +75,7 @@ char *rh4nldastrtok(char *str, char delmiter)
     return(tmp);
 }
 
-void rh4nldaInitEntry(RH4NLDAEntry_t *entry) {
+void rh4nldaInitEntry(RH4nLDAEntry_t *entry) {
     entry->level = -1;
     entry->type = -1;
     memset(entry->name, NULL, sizeof(entry->name));

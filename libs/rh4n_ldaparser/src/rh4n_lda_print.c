@@ -8,15 +8,16 @@
 
 #define RH4NLDA_PRINTTABS "\t\t\t\t\t\t\t\t\t\t"
 
-void rh4nldaPrintList(RH4NLDAEntry_t *pldaentries, RH4nProperties *props) {
+void rh4nldaPrintList(RH4nLDAEntry_t *pldaentries, RH4nProperties *props) {
     rh4nldaPrintFork(pldaentries, props, 0);
 }
 
-void rh4nldaPrintFork(RH4NLDAEntry_t *anker, RH4nProperties *props, int level) {
-    RH4NLDAEntry_t *hptr = NULL;
+void rh4nldaPrintFork(RH4nLDAEntry_t *anker, RH4nProperties *props, int level) {
+    RH4nLDAEntry_t *hptr = NULL;
 
     for(hptr = anker; hptr != NULL; hptr=hptr->next) {
         rh4n_log_debug(props->logging, "%.*sLevel: %d", level, RH4NLDA_PRINTTABS, hptr->level);
+        rh4n_log_debug(props->logging, "%.*sName: %s", level, RH4NLDA_PRINTTABS, hptr->name);
 
         if(hptr->type == RH4NLDA_SAG_GROUP_HEAD) rh4n_log_debug(props->logging, "%.*sType: Group", level, RH4NLDA_PRINTTABS);
         else if(hptr->type == RH4NLDA_SAG_REDEFINE) rh4n_log_debug(props->logging, "%.*sType: Redefine", level, RH4NLDA_PRINTTABS);

@@ -7,12 +7,12 @@
 #include "rh4n_ldaparser.h"
 
 
-void rh4nldaFreeList(RH4NLDAEntry_t *pldaentries) {
+void rh4nldaFreeList(RH4nLDAEntry_t *pldaentries) {
     rh4nldaFreeFork(pldaentries);
 }
 
-void rh4nldaFreeFork(RH4NLDAEntry_t *anker) {
-    RH4NLDAEntry_t *hptr = NULL, *next = NULL;
+void rh4nldaFreeFork(RH4nLDAEntry_t *anker) {
+    RH4nLDAEntry_t *hptr = NULL, *next = NULL;
 
     hptr = anker;
     while(hptr) {

@@ -2,7 +2,7 @@ CC = xlc
 
 INCLUDE = -I./include \
 		  -I../../include/ \
-		  -I../varhandle_lib/src/ \
+		  -I../rh4n_vars/include/ \
 		  -I../rh4n_logging/include/
 
 LIBS = -L../rh4n_logging -lrh4nlogging \
