@@ -105,15 +105,15 @@ void rh4nvarPrintUString(RH4nVarObj *variable, RH4nProperties *props, FILE *outp
 }
 
 void rh4nvarPrintBool(RH4nVarObj *variable, RH4nProperties *props, FILE *outputfile) {
-    fprintf(outputfile, "%s", ((bool)variable->value) == 1 ? "true" : "false");
+    fprintf(outputfile, "%s", *((bool*)variable->value) == 1 ? "true" : "false");
 }
 
 void rh4nvarPrintInt(RH4nVarObj *variable, RH4nProperties *props, FILE *outputfile) {
-    fprintf(outputfile, "%d", (int)variable->value);
+    fprintf(outputfile, "%d", *((int*)variable->value));
 }
 
 void rh4nvarPrintFloat(RH4nVarObj *variable, RH4nProperties *props, FILE *outputfile) {
-    fprintf(outputfile, "%f", (double)variable->value);
+    fprintf(outputfile, "%f", *((double*)variable->value));
 }
 
 void rh4nvarPrintTabs(int level, RH4nProperties *props) {

@@ -24,7 +24,7 @@ void rh4nvarPrintJSONFork(RH4nVarEntry_t *forkanker, int mode, int level, RH4nPr
     int i = 1;
 
     if(checkArrayGroup(forkanker)) {
-        rh4nvarPrintGroupArray(forkanker, mode, level, props, outputfile); 
+        rh4nvarPrintGroupJSONArray(forkanker, mode, level, props, outputfile); 
         return;
     }
 
@@ -49,7 +49,7 @@ void rh4nvarPrintJSONFork(RH4nVarEntry_t *forkanker, int mode, int level, RH4nPr
     if(level == 1) fprintf(outputfile, "}");
 }
 
-void rh4nvarPrintJOSNArray(RH4nVarObj *variable, int mode, int level,RH4nProperties *props, FILE *outputfile) {
+void rh4nvarPrintJSONArray(RH4nVarObj *variable, int mode, int level,RH4nProperties *props, FILE *outputfile) {
     int x = 0, y = 0, z = 0, i = 0, index[3] = {0, 0, 0};
     RH4nVarObj *xtarget = NULL, *ytarget = NULL, *ztarget = NULL;
     
