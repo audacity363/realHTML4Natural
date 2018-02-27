@@ -27,8 +27,13 @@ int rh4nvarMoveVarToGroup(RH4nVarList *varlist, char *pvarname, char *pgroupname
     
     targetvar = _varref.var;
 
-    if(targetvar->prev == NULL) varlist->anker = targetvar->next;
-    else targetvar->prev->next = targetvar->next;
+    if(targetvar->prev == NULL) { 
+        varlist->anker = targetvar->next;
+        targetvar->prev = NULL;
+    } else {
+        targetvar->prev->next = targetvar->next;
+        targetvar->next->prev = targetvar->prev;
+    }
 
     targetvar->prev = targetvar->next = NULL;
 
