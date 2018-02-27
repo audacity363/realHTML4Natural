@@ -71,7 +71,7 @@ void char_strcat(char *str, char character)
     strcat(str, tmp_str);
 }
 
-void trimSpaces(char *input)
+void rh4nUtilsTrimSpaces(char *input)
 {
     int length = strlen(input);
 
@@ -85,22 +85,7 @@ void trimSpaces(char *input)
     }
 }
 
-void trimleadingSpaces(char *input)
-{
-    int length = strlen(input), i;
-
-    for(i=0; i < length; i++)
-    {
-        if(input[i] != 0x20)
-            break;
-    }
-
-    length++;
-
-    memmove(input, input+i, length-i);
-}
-
-void trimSpaces4B(wchar_t *input)
+void rh4nUtilsTrimSpaces4B(wchar_t *input)
 {
     int byte_length = wcslen(input)*sizeof(wchar_t);
 
