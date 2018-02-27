@@ -24,7 +24,7 @@ int rh4nv2nStart(RH4nVarList *natanker, RH4nLDAEntry_t *ldaanker, char *structna
     rh4n_log_debug(props->logging, "Start resolving names");
     rh4nv2nMatchNames(natanker->anker, targetstruct->nextlvl, natanker, NULL, props, &v2nerror);
     if(v2nerror != RH4N_RET_OK) {
-        rh4n_log_error(props->logging, "Error while resolving names: %d");
+        rh4n_log_error(props->logging, "Error while resolving names: %d", v2nerror);
         return(v2nerror);
     }
     

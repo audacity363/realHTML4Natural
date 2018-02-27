@@ -13,7 +13,12 @@ RH4nVarEntry_t *rh4nv2nMatchNames(RH4nVarEntry_t *nat_set, RH4nLDAEntry_t *lda_s
     
     if(groupname) {
         if(rh4nvarGroupExist(varanker, groupname) == 0) {
-            if((varlibret = rh4nvarCreateNewGroup(varanker, groupname)) != RH4N_RET_OK) { *error = varlibret; return(NULL); }
+        rh4n_log_debug(props->logging, "Creating group [%s]", groupname);
+            if((varlibret = rh4nvarCreateNewGroup(varanker, groupname)) != RH4N_RET_OK) { 
+                rh4n_log_error(props->logging, "Could not create group %s. Varlib error: %d", groupname, varlibret);
+                *error = varlibret; 
+                return(NULL); 
+            }
         }
     }
 
@@ -38,6 +43,7 @@ RH4nVarEntry_t *rh4nv2nMatchNames(RH4nVarEntry_t *nat_set, RH4nLDAEntry_t *lda_s
             if(groupname) {
                 rh4n_log_debug(props->logging, "Moving [%s] to group [%s]", cur_nat_set->name, groupname);
                 if((varlibret = rh4nvarMoveVarToGroup(varanker, cur_nat_set->name, groupname)) != RH4N_RET_OK) { 
+                    rh4n_log_error(props->logging, "Error while moving %s to group %s", cur_nat_set->name, groupname);
                     *error = varlibret; 
                     return(NULL); 
                 }
