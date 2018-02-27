@@ -1,0 +1,105 @@
+27.02.2018 - 11:03:29.632608 [TGAP0734->RH4NTEST@42598446] DEBUG   (main@./test/rh4n_nat_test_genjson.c:39) - Hello World
+27.02.2018 - 11:03:29.672026 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatGenJSON@./src/rh4n_nat_genjson.c:22) - Sucessfully got default parms:
+27.02.2018 - 11:03:29.672049 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatGenJSON@./src/rh4n_nat_genjson.c:23) - formatstr: [test@LDA]
+27.02.2018 - 11:03:29.672062 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatGenJSON@./src/rh4n_nat_genjson.c:25) - Start parsing formatstr
+27.02.2018 - 11:03:29.672076 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatParseFormatStr@./src/rh4n_nat_utils.c:112) - json-struct: [test]
+27.02.2018 - 11:03:29.672088 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatParseFormatStr@./src/rh4n_nat_utils.c:113) - lib: [TGAP0734]
+27.02.2018 - 11:03:29.672100 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatParseFormatStr@./src/rh4n_nat_utils.c:114) - lda: [LDA]
+27.02.2018 - 11:03:29.672113 [TGAP0734->RH4NTEST@42598446] INFO    (rh4nnatGenJSON@./src/rh4n_nat_genjson.c:31) - Got following LDA infos:
+27.02.2018 - 11:03:29.672125 [TGAP0734->RH4NTEST@42598446] INFO    (rh4nnatGenJSON@./src/rh4n_nat_genjson.c:32) - Struct name: [test]
+27.02.2018 - 11:03:29.672137 [TGAP0734->RH4NTEST@42598446] INFO    (rh4nnatGenJSON@./src/rh4n_nat_genjson.c:33) - Library: [TGAP0734]
+27.02.2018 - 11:03:29.672149 [TGAP0734->RH4NTEST@42598446] INFO    (rh4nnatGenJSON@./src/rh4n_nat_genjson.c:34) - LDA: [LDA]
+27.02.2018 - 11:03:29.672162 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:52) - Got parameter infos:
+27.02.2018 - 11:03:29.672174 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:53) - Vartype: A
+27.02.2018 - 11:03:29.672187 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:54) - Length: 20
+27.02.2018 - 11:03:29.672199 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:55) - Dimensions: 1
+27.02.2018 - 11:03:29.672211 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:56) - 
+27.02.2018 - 11:03:29.672224 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatSaveStringArrayEntry@./src/var_parm_handling/rh4n_nat_a_handling.c:91) - Got strlen [20] for index x: 0 y: 0 z: 0
+27.02.2018 - 11:03:29.672247 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatSaveStringArrayEntry@./src/var_parm_handling/rh4n_nat_a_handling.c:91) - Got strlen [20] for index x: 1 y: 0 z: 0
+27.02.2018 - 11:03:29.672261 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatSaveStringArrayEntry@./src/var_parm_handling/rh4n_nat_a_handling.c:91) - Got strlen [20] for index x: 2 y: 0 z: 0
+27.02.2018 - 11:03:29.672275 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatSaveStringArrayEntry@./src/var_parm_handling/rh4n_nat_a_handling.c:91) - Got strlen [20] for index x: 3 y: 0 z: 0
+27.02.2018 - 11:03:29.672288 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatSaveStringArrayEntry@./src/var_parm_handling/rh4n_nat_a_handling.c:91) - Got strlen [20] for index x: 4 y: 0 z: 0
+27.02.2018 - 11:03:29.672302 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:52) - Got parameter infos:
+27.02.2018 - 11:03:29.672314 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:53) - Vartype: A
+27.02.2018 - 11:03:29.672327 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:54) - Length: 8
+27.02.2018 - 11:03:29.672339 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:55) - Dimensions: 0
+27.02.2018 - 11:03:29.672351 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:56) - 
+27.02.2018 - 11:03:29.672365 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:52) - Got parameter infos:
+27.02.2018 - 11:03:29.672377 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:53) - Vartype: I
+27.02.2018 - 11:03:29.672596 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:54) - Length: 1
+27.02.2018 - 11:03:29.672610 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:55) - Dimensions: 0
+27.02.2018 - 11:03:29.672622 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:56) - 
+27.02.2018 - 11:03:29.672635 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatIntegerHandler@./src/var_parm_handling/rh4n_nat_i_handling.c:32) - Got int: 5
+27.02.2018 - 11:03:29.672648 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:52) - Got parameter infos:
+27.02.2018 - 11:03:29.672661 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:53) - Vartype: L
+27.02.2018 - 11:03:29.672673 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:54) - Length: 1
+27.02.2018 - 11:03:29.672685 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:55) - Dimensions: 0
+27.02.2018 - 11:03:29.672697 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:56) - 
+27.02.2018 - 11:03:29.672711 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:52) - Got parameter infos:
+27.02.2018 - 11:03:29.672723 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:53) - Vartype: F
+27.02.2018 - 11:03:29.672735 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:54) - Length: 8
+27.02.2018 - 11:03:29.672747 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:55) - Dimensions: 1
+27.02.2018 - 11:03:29.672759 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:56) - 
+27.02.2018 - 11:03:29.672772 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatSaveFloatArrayEntry@./src/var_parm_handling/rh4n_nat_f_handling.c:114) - Got double: 4.300000
+27.02.2018 - 11:03:29.672795 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatSaveFloatArrayEntry@./src/var_parm_handling/rh4n_nat_f_handling.c:114) - Got double: 5.200000
+27.02.2018 - 11:03:29.672809 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatSaveFloatArrayEntry@./src/var_parm_handling/rh4n_nat_f_handling.c:114) - Got double: 6.100000
+27.02.2018 - 11:03:29.672823 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:52) - Got parameter infos:
+27.02.2018 - 11:03:29.672835 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:53) - Vartype: D
+27.02.2018 - 11:03:29.672847 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:54) - Length: 6
+27.02.2018 - 11:03:29.672859 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:55) - Dimensions: 1
+27.02.2018 - 11:03:29.672871 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:56) - 
+27.02.2018 - 11:03:29.672890 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:52) - Got parameter infos:
+27.02.2018 - 11:03:29.672903 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:53) - Vartype: T
+27.02.2018 - 11:03:29.672915 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:54) - Length: 12
+27.02.2018 - 11:03:29.672927 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:55) - Dimensions: 0
+27.02.2018 - 11:03:29.672939 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:56) - 
+27.02.2018 - 11:03:29.672993 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:52) - Got parameter infos:
+27.02.2018 - 11:03:29.673006 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:53) - Vartype: N
+27.02.2018 - 11:03:29.673018 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:54) - Length: 2
+27.02.2018 - 11:03:29.673030 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:55) - Dimensions: 0
+27.02.2018 - 11:03:29.673043 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:56) - 
+27.02.2018 - 11:03:29.673056 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatNumericPackedHandler@./src/var_parm_handling/rh4n_nat_np_handling.c:38) - God converted string: [  3.400]
+27.02.2018 - 11:03:29.673070 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:52) - Got parameter infos:
+27.02.2018 - 11:03:29.673082 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:53) - Vartype: P
+27.02.2018 - 11:03:29.673094 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:54) - Length: 3
+27.02.2018 - 11:03:29.673106 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:55) - Dimensions: 0
+27.02.2018 - 11:03:29.673118 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:56) - 
+27.02.2018 - 11:03:29.673131 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:52) - Got parameter infos:
+27.02.2018 - 11:03:29.673143 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:53) - Vartype: U
+27.02.2018 - 11:03:29.673155 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:54) - Length: 20
+27.02.2018 - 11:03:29.673167 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:55) - Dimensions: 1
+27.02.2018 - 11:03:29.673179 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatStartVariableReadout@./src/rh4n_nat_variablereadout.c:56) - 
+27.02.2018 - 11:03:29.673192 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatSaveUnicodeArrayEntry@./src/var_parm_handling/rh4n_nat_u_handling.c:103) - Got strlen [20] for index x: 0 y: 0 z: 0
+27.02.2018 - 11:03:29.673207 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatSaveUnicodeArrayEntry@./src/var_parm_handling/rh4n_nat_u_handling.c:103) - Got strlen [20] for index x: 1 y: 0 z: 0
+27.02.2018 - 11:03:29.673223 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nnatSaveUnicodeArrayEntry@./src/var_parm_handling/rh4n_nat_u_handling.c:103) - Got strlen [20] for index x: 2 y: 0 z: 0
+27.02.2018 - 11:03:29.673237 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nvarPrintFork@./src/rh4n_vars_print.c:23) - Name: var2
+27.02.2018 - 11:03:29.673250 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nvarPrintFork@./src/rh4n_vars_print.c:24) - Type: Array
+27.02.2018 - 11:03:29.673262 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nvarPrintFork@./src/rh4n_vars_print.c:32) - Dims: 1 x: 5
+27.02.2018 - 11:03:29.673275 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nvarPrintFork@./src/rh4n_vars_print.c:42) - 
+27.02.2018 - 11:03:29.673286 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nvarPrintFork@./src/rh4n_vars_print.c:23) - Name: var3
+27.02.2018 - 11:03:29.673299 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nvarPrintFork@./src/rh4n_vars_print.c:24) - Type: String
+27.02.2018 - 11:03:29.673311 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nvarPrintFork@./src/rh4n_vars_print.c:42) - 
+27.02.2018 - 11:03:29.673323 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nvarPrintFork@./src/rh4n_vars_print.c:23) - Name: var4
+27.02.2018 - 11:03:29.673335 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nvarPrintFork@./src/rh4n_vars_print.c:24) - Type: Integer
+27.02.2018 - 11:03:29.673347 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nvarPrintFork@./src/rh4n_vars_print.c:42) - 
+27.02.2018 - 11:03:29.673385 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nvarPrintFork@./src/rh4n_vars_print.c:23) - Name: var5
+27.02.2018 - 11:03:29.673398 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nvarPrintFork@./src/rh4n_vars_print.c:24) - Type: Boolean
+27.02.2018 - 11:03:29.673411 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nvarPrintFork@./src/rh4n_vars_print.c:42) - 
+27.02.2018 - 11:03:29.673423 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nvarPrintFork@./src/rh4n_vars_print.c:23) - Name: var6
+27.02.2018 - 11:03:29.673435 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nvarPrintFork@./src/rh4n_vars_print.c:24) - Type: Array
+27.02.2018 - 11:03:29.673447 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nvarPrintFork@./src/rh4n_vars_print.c:32) - Dims: 1 x: 3
+27.02.2018 - 11:03:29.673459 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nvarPrintFork@./src/rh4n_vars_print.c:42) - 
+27.02.2018 - 11:03:29.673471 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nvarPrintFork@./src/rh4n_vars_print.c:23) - Name: var7
+27.02.2018 - 11:03:29.673483 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nvarPrintFork@./src/rh4n_vars_print.c:24) - Type: Array
+27.02.2018 - 11:03:29.673495 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nvarPrintFork@./src/rh4n_vars_print.c:32) - Dims: 1 x: 2
+27.02.2018 - 11:03:29.673508 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nvarPrintFork@./src/rh4n_vars_print.c:42) - 
+27.02.2018 - 11:03:29.673519 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nvarPrintFork@./src/rh4n_vars_print.c:23) - Name: var8
+27.02.2018 - 11:03:29.673532 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nvarPrintFork@./src/rh4n_vars_print.c:24) - Type: String
+27.02.2018 - 11:03:29.673544 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nvarPrintFork@./src/rh4n_vars_print.c:42) - 
+27.02.2018 - 11:03:29.673556 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nvarPrintFork@./src/rh4n_vars_print.c:23) - Name: var9
+27.02.2018 - 11:03:29.673568 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nvarPrintFork@./src/rh4n_vars_print.c:24) - Type: String
+27.02.2018 - 11:03:29.673580 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nvarPrintFork@./src/rh4n_vars_print.c:42) - 
+27.02.2018 - 11:03:29.673592 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nvarPrintFork@./src/rh4n_vars_print.c:23) - Name: var11
+27.02.2018 - 11:03:29.673604 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nvarPrintFork@./src/rh4n_vars_print.c:24) - Type: Array
+27.02.2018 - 11:03:29.673616 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nvarPrintFork@./src/rh4n_vars_print.c:32) - Dims: 1 x: 3
+27.02.2018 - 11:03:29.673628 [TGAP0734->RH4NTEST@42598446] DEBUG   (rh4nvarPrintFork@./src/rh4n_vars_print.c:42) - 

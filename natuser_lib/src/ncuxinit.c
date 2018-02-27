@@ -20,7 +20,7 @@
 ** possibility to avoid different sources for dynamic and static 
 ** linked user exits.
 */
-#include "jumptab.c"
+#include "rh4n_nat_jumptab.c"
 
 int ncsy_dyuxinit(table, size)
 NC_TAB_STRUCT **table;

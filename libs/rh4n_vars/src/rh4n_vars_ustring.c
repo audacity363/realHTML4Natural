@@ -44,7 +44,7 @@ int rh4nvarGetUStringLength(RH4nVarList *varlist, char *pgroupname, char *pname,
 
     if((varlibret = rh4nvarGetRef(varlist, pgroupname, pname, &_refvar)) != RH4N_RET_OK) { return(varlibret); }
     if(_refvar.var->var.type != RH4NVARTYPEUSTRING) { return(RH4N_RET_FORMAT_ERR); }
-    *length = wclen((wchar_t*)_refvar.var->var.value);
+    *length = wcslen((wchar_t*)_refvar.var->var.value);
     return(RH4N_RET_OK);
 }
 
@@ -90,14 +90,14 @@ int rh4nvarGetUStringLengthArrayEntry(RH4nVarList *varlist, char *pgroupname, ch
     if((varlibret = rh4nvarGetArrayEntry(&_refvar.var->var, index, &arrayentry)) != RH4N_RET_OK) { return(varlibret); }
     if(arrayentry->type != RH4NVARTYPEUSTRING) { return(RH4N_RET_FORMAT_ERR); }
 
-    *length = wclen((wchar_t*)arrayentry->value);
+    *length = wcslen((wchar_t*)arrayentry->value);
     return(RH4N_RET_OK);
 }
 
 int rh4nvarSetUString(RH4nVarObj *target, wchar_t *value) {
     int varsize = 0;
 
-    varsize = (wclen(value)+1)*sizeof(wchar_t);
+    varsize = (wcslen(value)+1)*sizeof(wchar_t);
     if(target->value != NULL) { free(target->value); }
 
     if((target->value = malloc(varsize)) == NULL) { return(RH4N_RET_MEMORY_ERR); }
