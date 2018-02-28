@@ -34,6 +34,7 @@ int rh4nldaStartParser(char *ldapath, RH4nLDAEntry_t **ldaentries, RH4nPropertie
     fclose(fplda);
 
     *ldaentries = g_rh4nldaentries;
+    g_rh4nldacurptr = g_rh4nldaentries = NULL; 
     return(parseret);
 }
 
