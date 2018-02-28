@@ -131,3 +131,26 @@ int rh4nvarGetArrayDimension(RH4nVarObj *target, int *dimensions) {
 
     return(RH4N_RET_OK);
 }
+
+int rh4nvarGetArrayVarType(RH4nVarList *varlist, char *pgroupname, char *pname, int *vartype) {
+    RH4nVarRef _refvar = RH4NVAR_REF_INIT;
+    RH4nVarObj *arrayentry = NULL;
+    int rc = 0, dimensions = 0, index[3] = { -1, -1, -1 };
+
+    if((rc = rh4nvarGetRef(varlist, pgroupname, pname, &_refvar)) != RH4N_RET_OK) return(rc);
+    if((rc = rh4nvarGetArrayDimension(&_refvar.var->var, &dimensions)) != RH4N_RET_OK) return(rc);
+
+    switch(dimensions) {
+        case 3:
+            index[2] = 0;
+        case 2:
+            index[1] = 0;
+        case 1:
+            index[0] = 0;
+            break;
+    }
+
+    if((rc = rh4nvarGetArrayEntry(&_refvar.var->var, index, &arrayentry)) != RH4N_RET_OK) return(rc);
+    *vartype = arrayentry->type;
+    return(RH4N_RET_OK);
+}

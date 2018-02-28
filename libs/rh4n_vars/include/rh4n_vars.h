@@ -58,6 +58,7 @@ int rh4nvarInitList(RH4nVarList*);
 int rh4nvarGetRef(RH4nVarList*, char*, char*, RH4nVarRef*);
 int rh4nvarExist(RH4nVarList*, char*, char*);
 int rh4nvarGroupExist(RH4nVarList*, char*);
+int rh4nvarGetVarType(RH4nVarList*, char*, char*, int*);
 //String
 int rh4nvarCreateNewString(RH4nVarList*, char*, char*, char*);
 int rh4nvarGetString(RH4nVarList*, char*, char*, int, char*);
@@ -100,7 +101,8 @@ int rh4nvarGetDoubleArrayEntry(RH4nVarList*, char*, char*, int*, double*);
 //Group
 int rh4nvarCreateNewGroup(RH4nVarList*, char*);
 int rh4nvarMoveVarToGroup(RH4nVarList*, char*, char*);
-//Print
+//Array
+int rh4nvarGetArrayVarType(RH4nVarList*, char*, char*, int*);
 
 //Private
 //Utils

@@ -116,3 +116,11 @@ int rh4nvarExist(RH4nVarList *varlist, char *pgroupname, char *pname) {
     }
     return(1);
 }
+
+int rh4nvarGetVarType(RH4nVarList *varlist, char *pgroupname, char *pname, int *vartype) {
+    RH4nVarRef _refvar = RH4NVAR_REF_INIT;
+    int rc = 0;
+
+    if((rc = rh4nvarGetRef(varlist, pgroupname, pname, &_refvar)) != RH4N_RET_OK) return(rc);
+    return(_refvar.var->var.type); 
+}
