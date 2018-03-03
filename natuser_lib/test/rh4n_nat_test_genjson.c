@@ -15,13 +15,14 @@ int main(int argc, char *argv[]) {
     struct parameter_description *naturalparms = NULL;
     RH4nProperties props;
     struct natural_exception naturalex;
+    RH4nVarList urlvars;
 
     strcpy(props.natlibrary, "TGAP0734");
     strcpy(props.natprogram, "RH4NTEST");
     props.natparms = "etid=$$";
     strcpy(props.c_loglevel, "DEVELOP");
     strcpy(props.httpreqtype, "GET");
-    props.natsrcpath = "/tmp/";
+    props.natsrcpath = "/VAW/natural/bonn/fuser63/";
     props.outputfile = "./output.html";
     props.logpath =  "./logs/";
 
@@ -37,6 +38,15 @@ int main(int argc, char *argv[]) {
     }
 
     rh4n_log_debug(props.logging, "Hello World");
+
+    rh4nvarInitList(&props.urlvars);
+
+    printf("new String: %d\n", rh4nvarCreateNewString(&props.urlvars, NULL, "INFIELD1", "Hello from C"));
+    printf("new Int: %d\n", rh4nvarCreateNewInt(&props.urlvars, NULL, "INFIELD2", 6));
+    printf("new Float: %d\n",rh4nvarCreateNewFloat(&props.urlvars, NULL, "INFIELD3", 72.982));
+
+    rh4nvarPrintList(&props.urlvars, &props);
+
 
     if((utilsret = rh4nUtilsloadSharedLibrary(NULL, RH4N_SONAME_NATURAL, &shnatlib, errorstr)) != RH4N_RET_OK) { 
         fprintf(stderr, "Loading [%s] failed: [%s]\n", RH4N_SONAME_NATURAL, errorstr); fflush(stderr);

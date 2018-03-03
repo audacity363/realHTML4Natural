@@ -21,5 +21,8 @@ int rh4nnatInit(void*, RH4nNatInit_t*, char*);
 int rh4nnatGetParameter(pnni_611_functions, void*, RH4nProperties**, char**, char*);
 int rh4nnatParseFormatStr(char*, struct RH4nNatLDAInfos*, RH4nProperties*);
 int rh4nnatStartVariableReadout(WORD, void*, pnni_611_functions, RH4nVarList*, RH4nProperties*, char*);
+#ifdef RH4NVAR2NAME
+int rh4nnatPutParms(RH4nVarList*, WORD, void*, RH4nVarPositions_t, RH4nNatInit_t*, char*);
+#endif
 
 #endif

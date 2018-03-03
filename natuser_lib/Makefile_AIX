@@ -6,6 +6,8 @@ NATUSER_OBJS = rh4n_nat_jumptab.o \
 			   rh4n_nat_init.o \
 			   rh4n_nat_utils.o \
 			   rh4n_nat_variablereadout.o \
+			   rh4n_nat_geturlobj.o \
+			   rh4n_nat_variableallocation.o
 			   
 NATUSER_READOUT_OBJS = rh4n_nat_a_handling.o \
 					   rh4n_nat_i_handling.o \
@@ -14,6 +16,12 @@ NATUSER_READOUT_OBJS = rh4n_nat_a_handling.o \
 					   rh4n_nat_dt_handling.o \
 					   rh4n_nat_np_handling.o \
 					   rh4n_nat_u_handling.o
+
+NATUSER_PUTVAR_OBJS = rh4n_nat_put_a.o \
+					  rh4n_nat_put_i.o \
+					  rh4n_nat_put_l.o \
+					  rh4n_nat_put_f.o \
+					  rh4n_nat_put_aton.o
 
 
 
@@ -33,12 +41,14 @@ LIBS = -L../libs/rh4n_logging/ -lrh4nlogging \
 
 LFLAGS1 = -G -bsymbolic -bexpall -bnoentry
 LFLAGS2 = -b64 -ldl -blibpath:/usr/lib/threads:/usr/lib:/lib -lc_r
-SO_CFLAGS = -c -g -q64 -fpic $(INCLUDE)
+WARNING_FLAGS = -qinfo=all:nocmp:nogen:nolan:noppc:noppt:notru:notrx:nouni:noupg:nozea
+SO_CFLAGS = $(WARNING_FLAGS) -c -g -q64 -fpic $(INCLUDE)
 
-lib: clean $(NATUSER_OBJS) $(NATUSER_READOUT_OBJS)
+lib: clean $(NATUSER_OBJS) $(NATUSER_READOUT_OBJS) $(NATUSER_PUTVAR_OBJS)
 	@printf "Linking realHTML4Natural.so\n"
 	@$(CC) $(LFLAGS1) ./bin/*.o $(LIBS) $(LFLAGS2) -o ./realHTML4Natural.so
 	@printf "Done....\n"
+	#@dump -Tv realHTML4Natural.so | grep undef | grep "\.\." 
 
 $(NATUSER_OBJS): 
 	@printf "CC ./src/$*.c => ./bin/$*.o\n"
@@ -47,6 +57,10 @@ $(NATUSER_OBJS):
 $(NATUSER_READOUT_OBJS): 
 	@printf "CC ./src/var_parm_handling/$*.c => ./bin/$*.o\n"
 	@$(CC) $(SO_CFLAGS) -o ./bin/$*.o ./src/var_parm_handling/$*.c
+
+$(NATUSER_PUTVAR_OBJS):
+	@printf "CC ./src/put_var_handling/$*.c => ./bin/$*.o\n"
+	@$(CC) $(SO_CFLAGS) -o ./bin/$*.o ./src/put_var_handling/$*.c
 
 genjsontest: lib
 	@printf "CC ./test/rh4n_nat_test_genjson.c => ./test/rh4n_nat_test_genjson\n"

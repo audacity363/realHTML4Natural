@@ -2,7 +2,7 @@ OBJ = rh4n_utils.o
 
 INCLUDE = -I./include/ \
 		  -I../../include/ \
-		  -I../varhandle_lib/src \
+		  -I../rh4n_vars/include \
 		  -I../rh4n_logging/include/
  
 LIBS = 

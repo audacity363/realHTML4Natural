@@ -30,7 +30,7 @@
 */
 
 extern long rh4nnatGenJSON();
-
+extern long rh4nnatGetURLObj();
 /*
 ** section 3: initialize the jumptable
 **
@@ -42,7 +42,8 @@ extern long rh4nnatGenJSON();
 
 TAB_STRUCT n_call_table[] = {
 
-  { "GENJSON", rh4nnatGenJSON}
+  { "GENJSON", rh4nnatGenJSON},
+  { "GETURLO", rh4nnatGetURLObj}
 
 };
 
