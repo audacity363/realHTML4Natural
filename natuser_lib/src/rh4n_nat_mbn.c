@@ -19,7 +19,11 @@ int rh4nnatPutParms(RH4nVarList *varlist, WORD nparms, void *parmhandle, RH4nVar
     char *groupname = NULL;
 
     struct RH4nPositionMatchingCallbacks callbacks[] = {
-        {NNI_TYPE_ALPHA, rh4nnatputString}
+        {NNI_TYPE_ALPHA, rh4nnatputString},
+        {NNI_TYPE_FLOAT, rh4nnatputFloat},
+        {NNI_TYPE_INT, rh4nnatputInteger},
+        {NNI_TYPE_LOG, rh4nnatputBool},
+        {NNI_TYPE_NUM, rh4nnatputAtoN}
     };
     struct parameter_description desc;
     RH4nNatVarHandleParms args = {
@@ -36,7 +40,7 @@ int rh4nnatPutParms(RH4nVarList *varlist, WORD nparms, void *parmhandle, RH4nVar
     callbacksize = sizeof(callbacks)/sizeof(struct RH4nPositionMatchingCallbacks);
 
     for(; i < pos.length; i++) {
-        if((rc = parms->nnifuncs->pf_nni_get_parm_info(parms->nnifuncs, pos.parm_positions[i].position,
+        if((rc = parms->nnifuncs->pf_nni_get_parm_info(parms->nnifuncs, pos.parm_positions[i].position+2,
             parmhandle, &desc)) != NNI_RC_OK) {
             sprintf(errorstr, "Could not get parm description on parms %d. NNI return: %d", pos.parm_positions[i].position, rc);
             return(RH4N_RET_NNI_ERR);
@@ -44,6 +48,9 @@ int rh4nnatPutParms(RH4nVarList *varlist, WORD nparms, void *parmhandle, RH4nVar
 
         args.parmindex = pos.parm_positions[i].position+2;
         args.desc = &desc;
+
+        rh4n_log_debug(parms->props->logging, "Natural var type: [%c]", desc.format);
+        rh4n_log_debug(parms->props->logging, "Natural var size: [%d]", desc.length);
         
         for(x=0; x < callbacksize; x++)  {
             if(callbacks[x].vartype == desc.format) {

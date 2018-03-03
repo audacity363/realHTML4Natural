@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <wchar.h>
+#include <string.h>
 
 #include "natuser.h"
 #include "natni.h"
@@ -15,7 +15,7 @@ int rh4nnatputString(RH4nNatVarHandleParms *args, char *groupname, char *varname
     if(args->desc->dimensions > 0) return(rh4nnatputStringArray(args, groupname, varname));
     
     if((rc = rh4nvarGetStringLength(args->varlist, groupname, varname, &strlength)) != RH4N_RET_OK) {
-        sprintf(args->errorstr, "Could not get strlength for %s.%s. Varlib return:", groupname, varname, rc);
+        sprintf(args->errorstr, "Could not get strlength for %s.%s. Varlib return: %d", groupname, varname, rc);
         return(rc);
     }
 
@@ -34,11 +34,10 @@ int rh4nnatputString(RH4nNatVarHandleParms *args, char *groupname, char *varname
         return(rc);
     }
     
-    if((rc = args->nnifuncs->pf_nni_put_parm(args->nnifuncs, args->parmindex, args->parmhandle, strlen(buff), buff)) != NNI_RC_OK) {
-        if(rc < 0) {
-            free(buff);
-            return(RH4N_RET_NNI_ERR);
-        }
+    if((rc = args->nnifuncs->pf_nni_put_parm(args->nnifuncs, args->parmindex, args->parmhandle, strlength+1, buff)) != NNI_RC_OK) {
+        free(buff);
+        sprintf(args->errorstr, "Could not set parm %d. NNI return: %d", args->parmindex, rc);
+        return(rc);
     }
     free(buff);
 

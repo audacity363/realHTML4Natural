@@ -7,7 +7,7 @@ NATUSER_OBJS = rh4n_nat_jumptab.o \
 			   rh4n_nat_utils.o \
 			   rh4n_nat_variablereadout.o \
 			   rh4n_nat_geturlobj.o \
-			   rh4n_nat_variableallocation.o
+			   rh4n_nat_mbn.o
 			   
 NATUSER_READOUT_OBJS = rh4n_nat_a_handling.o \
 					   rh4n_nat_i_handling.o \
@@ -42,7 +42,7 @@ LIBS = -L../libs/rh4n_logging/ -lrh4nlogging \
 LFLAGS1 = -G -bsymbolic -bexpall -bnoentry
 LFLAGS2 = -b64 -ldl -blibpath:/usr/lib/threads:/usr/lib:/lib -lc_r
 WARNING_FLAGS = -qinfo=all:nocmp:nogen:nolan:noppc:noppt:notru:notrx:nouni:noupg:nozea
-SO_CFLAGS = $(WARNING_FLAGS) -c -g -q64 -fpic $(INCLUDE)
+SO_CFLAGS = -c -g -q64 -fpic $(INCLUDE)
 
 lib: clean $(NATUSER_OBJS) $(NATUSER_READOUT_OBJS) $(NATUSER_PUTVAR_OBJS)
 	@printf "Linking realHTML4Natural.so\n"

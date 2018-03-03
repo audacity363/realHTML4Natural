@@ -14,7 +14,7 @@ int rh4nnatputFloat(RH4nNatVarHandleParms *args, char *groupname, char *varname)
     double val = 0;
     int rc = 0;
 
-    if(args->desc->length) {
+    if(args->desc->length == 4) {
         sprintf(args->errorstr, "F4 is too small. Use F8. Ignoring variable");
         return(RH4N_RET_USE_F8);
     }
@@ -25,6 +25,8 @@ int rh4nnatputFloat(RH4nNatVarHandleParms *args, char *groupname, char *varname)
         sprintf(args->errorstr, "Could not get float %s.%s. Varlib return: %d", groupname, varname, rc);
         return(rc);
     }
+
+    rh4n_log_debug(args->props->logging, "Got float %f", val);
 
     if((rc = args->nnifuncs->pf_nni_put_parm(args->nnifuncs, args->parmindex, args->parmhandle, sizeof(double), &val)) != NNI_RC_OK) {
         sprintf(args->errorstr, "Could not set float NNI ret: %d", rc);

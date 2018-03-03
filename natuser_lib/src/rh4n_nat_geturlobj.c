@@ -57,7 +57,7 @@ long rh4nnatGetURLObj(WORD nparms, void *parmhandle, void *traditional) {
     }
 
 
-    if((utilsret = rh4nnatPutParms(initparms.props->urlvars, nparms, parmhandle, pos, &initparms, errorstr)) != RH4N_RET_OK) {
+    if((utilsret = rh4nnatPutParms(&initparms.props->urlvars, nparms, parmhandle, pos, &initparms, errorstr)) != RH4N_RET_OK) {
         rh4n_log_error(initparms.props->logging, "Could not set vars: %d %s", utilsret, errorstr);
         rh4nUtilscloseSharedLibrary(initparms.sharedlibrary);
         rh4nldaFreeList(ldavars);

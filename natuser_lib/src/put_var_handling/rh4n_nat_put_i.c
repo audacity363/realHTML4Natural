@@ -19,7 +19,9 @@ int rh4nnatputInteger(RH4nNatVarHandleParms *args, char *groupname, char *varnam
     if((rc = rh4nvarGetInt(args->varlist, groupname, varname, &i4_val)) != RH4N_RET_OK) {
         sprintf(args->errorstr, "Could not get integer from %s.%s. Varlib return: %d", groupname, varname, rc);
         return(rc);
-   }
+    }
+
+    rh4n_log_debug(args->props->logging, "Got Integer: %d", i4_val);
 
     switch(args->desc->length) {
         case I1SIZE:
@@ -40,6 +42,9 @@ int rh4nnatputInteger(RH4nNatVarHandleParms *args, char *groupname, char *varnam
             varsize = sizeof(NATTYP_I4);
             break;
     }
+
+    rh4n_log_debug(args->props->logging, "Got varsize: %d", varsize);
+
 
     if((rc = args->nnifuncs->pf_nni_put_parm(args->nnifuncs, args->parmindex, args->parmhandle, 
             varsize, &i4_val)) != NNI_RC_OK) 
