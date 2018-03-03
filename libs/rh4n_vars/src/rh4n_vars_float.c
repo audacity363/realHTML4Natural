@@ -33,7 +33,7 @@ int rh4nvarGetFloat(RH4nVarList *varlist, char *pgroupname, char *pname, double 
 
     if((varlibret = rh4nvarGetRef(varlist, pgroupname, pname, &_refvar)) != RH4N_RET_OK) { return(varlibret); }
     if(_refvar.var->var.type != RH4NVARTYPEFLOAT) { return(RH4N_RET_FORMAT_ERR); }
-    *outbuff = (double)_refvar.var->var.value;
+    *outbuff = *((double*)_refvar.var->var.value);
     return(RH4N_RET_OK);
 }
 
@@ -65,7 +65,7 @@ int rh4nvarGetFloatArrayEntry(RH4nVarList *varlist, char *pgroupname, char *pnam
     if((varlibret = rh4nvarGetArrayEntry(&_refvar.var->var, index, &arrayentry)) != RH4N_RET_OK) { return(varlibret); }
 
     if(arrayentry->type != RH4NVARTYPEFLOAT) { return(RH4N_RET_FORMAT_ERR); }
-    *outbuff = (double)arrayentry->value;
+    *outbuff = *((double*)arrayentry->value);
     return(RH4N_RET_OK);
 }
 
@@ -77,7 +77,7 @@ int rh4nvarSetFloat(RH4nVarObj *target, double value) {
         if((target->value = malloc(varsize)) == NULL) { return(RH4N_RET_MEMORY_ERR); }
     }
 
-    *((double*)target->value) = value;
+    memcpy(target->value, &value, varsize);
     target->length = varsize;
     return(RH4N_RET_OK);
 }

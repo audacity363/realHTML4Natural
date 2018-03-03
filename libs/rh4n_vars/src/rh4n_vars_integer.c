@@ -33,7 +33,7 @@ int rh4nvarGetInt(RH4nVarList *varlist, char *pgroupname, char *pname, int *outb
 
     if((varlibret = rh4nvarGetRef(varlist, pgroupname, pname, &_refvar)) != RH4N_RET_OK) { return(varlibret); }
     if(_refvar.var->var.type != RH4NVARTYPEINTEGER) { return(RH4N_RET_FORMAT_ERR); }
-    *outbuff = (int)_refvar.var->var.value;
+    *outbuff = *((int*)_refvar.var->var.value);
     return(RH4N_RET_OK);
 }
 
@@ -65,7 +65,7 @@ int rh4nvarGetIntArrayEntry(RH4nVarList *varlist, char *pgroupname, char *pname,
     if((varlibret = rh4nvarGetArrayEntry(&_refvar.var->var, index, &arrayentry)) != RH4N_RET_OK) { return(varlibret); }
 
     if(arrayentry->type != RH4NVARTYPEINTEGER) { return(RH4N_RET_FORMAT_ERR); }
-    *outbuff = (int)arrayentry->value;
+    *outbuff = *((int*)arrayentry->value);
     return(RH4N_RET_OK);
 }
 
