@@ -5,8 +5,8 @@
 #include "jni.h"
 
 #include "standard.h"
-#include "jni_rh4n.h"
-#include "environ.h"
+#include "rh4n_jni.h"
+#include "rh4n_jni_environ.h"
 
 void rh4nEnvironInit(RH4NEnvirons *environs) {
     if(environs == NULL) { return; }

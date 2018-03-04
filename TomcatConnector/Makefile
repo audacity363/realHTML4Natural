@@ -9,17 +9,18 @@ CLASSPATH = "/u/it/a140734/rh4n/realHTML4Natural/TomcatConnector/servlet/web/WEB
 INCLUDES = -I/SAG/cjp/v16/include/ \
 		   -I./jniLibrary/include/ \
 		   -I../include/ \
-		   -I../libs/varhandle_lib/src/ \
-		   -I../var2names/include/ \
+		   -I../libs/rh4n_vars/include/ \
+		   -I../libs/rh4n_var2name/include/ \
 		   -I../libs/rh4n_logging/include/ \
-		   -I../libs/utils/src/
+		   -I../libs/rh4n_utils/include/
 
-LIBS = -L../libs/varhandle_lib/ -lvars \
-	   -L../libs/nat-lda-parser/ -lldaparser \
-	   -L../var2names/ -lvar2name \
-	   -L../libs/utils/ -lutils \
-	   -L../libs/rh4n_logging/ -lrh4nlogging \
+LIBS = -L../libs/rh4n_logging/ -lrh4nlogging \
+       -L../libs/rh4n_utils/ -lrh4nutils \
+	   -L../libs/rh4n_vars/ -lrh4nvars \
+	   -L../libs/rh4n_var2name/ -lrh4nvar2name \
+	   -L../libs/rh4n_ldaparser/ -lrh4nldaparser \
 	   -lcrypt
+
 
 
 #CC = gcc
@@ -56,7 +57,7 @@ JNI_JSON_HANDLERS = json_utils.o plain_handlers.o 1d_handlers.o \
 
 JNI_NAT_HANDLERS = rh4n_nat_parmgeneration.o rh4n_natcall_process.o rh4n_nat_errorhandling.o
 
-JNI_MEMBER = main.o passwd.o javaParmReadout.o environ.o
+JNI_MEMBER = rh4n_jni_main.o rh4n_jni_passwd.o rh4n_jni_javaParmReadout.o rh4n_jni_environ.o
 
 all:
 	@make warfile

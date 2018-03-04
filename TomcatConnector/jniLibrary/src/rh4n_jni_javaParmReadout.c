@@ -6,7 +6,7 @@
 #include "jni.h"
 
 #include "standard.h"
-#include "javaParmReadout.h"
+#include "rh4n_jni_javaParmReadout.h"
 
 int rh4nReadOutParms(JNIEnv *env, jobject jnatparams, RH4nProperties *properties, char *error_str) {
     struct javaParm parms[] = {
@@ -70,8 +70,7 @@ int rh4NUrlVariableHandler(JNIEnv *env, jclass jcrh4nparms, jobject jorh4nparms,
     jint jnameslength = 0, jvalueslength = 0;
 
     const char *cname = NULL, *cvalue = NULL;
-    wchar_t *wcvalue = NULL;
-    int i = 0;
+    int i = 0, rc = 0;
 
 
     if((jfnames = (*env)->GetFieldID(env, jcrh4nparms, "urlVarsKey", "[Ljava/lang/String;")) == NULL) {
@@ -104,9 +103,7 @@ int rh4NUrlVariableHandler(JNIEnv *env, jclass jcrh4nparms, jobject jorh4nparms,
         return(RH4N_RET_VAR_MISSMATCH);
     }
 
-    if(properties->urlvars == NULL) {
-        initVarAnker(&properties->urlvars);
-    }
+    rh4nvarInitList(&properties->urlvars);
 
     for(; i < jnameslength; i++) {
         if((joname = (*env)->GetObjectArrayElement(env, jonames, i)) == NULL) {
@@ -127,17 +124,15 @@ int rh4NUrlVariableHandler(JNIEnv *env, jclass jcrh4nparms, jobject jorh4nparms,
             return(RH4N_RET_JNI_ERR);
         } 
 
-        //printf("URLVar: Name: [%s] Value: [%s]\n", cname, cvalue);
+        rh4n_log_debug(properties->logging, "URLVar: Name: [%s] Value: [%s]\n", cname, cvalue);
 
-        if((wcvalue = malloc((strlen(cvalue)+1)*sizeof(wchar_t))) == NULL) {
-            return(RH4N_RET_MEMORY_ERR);
+        if((rc = rh4nvarCreateNewString(&properties->urlvars, NULL, (char*)cname, (char*)cvalue)) != RH4N_RET_OK) {
+            sprintf(error_str, "Could not create new String [%s]. Varlib return: %d", cname, rc);
+            rh4n_log_error(properties->logging, "%s", error_str);
+            (*env)->ReleaseStringUTFChars(env, (jstring)joname, cname);
+            (*env)->ReleaseStringUTFChars(env, (jstring)jovalue, cvalue);
+            return(rc);
         }
-
-        swprintf(wcvalue, strlen(cvalue)+1, L"%hs", cvalue);
-
-        addString(properties->urlvars, NULL, (char*)cname, wcvalue, strlen(cvalue)+1);
-
-        free(wcvalue);
 
         (*env)->ReleaseStringUTFChars(env, (jstring)joname, cname);
         (*env)->ReleaseStringUTFChars(env, (jstring)jovalue, cvalue);

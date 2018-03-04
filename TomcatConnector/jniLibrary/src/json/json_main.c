@@ -4,7 +4,6 @@
 #include <unistd.h>
 
 #include "standard.h"
-#include "vars.h"
 
 #include <jni.h>
 #include "realHTML_tomcat_connector_JNINatural.h"
@@ -12,27 +11,22 @@
 #include "json/json_utils.h"
 #include "json/handlers.h"
 
-#include "var2name.h"
-
-void printFork(JNIEnv*, GeneralInfos*, jobject, const char*, int, vars_t*);
+int printFork(JNIEnv*, GeneralInfos*, jobject, const char*, int, RH4nVarList*);
 int getAnker(JNIEnv *env, jobject varlist, GeneralInfos *infos);
-int callNatural_JSON(vars_t *var_anker);
 
-int getVarlist(JNIEnv *env, jobject varlist, vars_t **target, char *error_msg, RH4nLogrule *logging) {
+int getVarlist(JNIEnv *env, jobject jvarlist, RH4nVarList *varlist, char *error_msg, RH4nLogrule *logging) {
     jclass llhandlerclass = NULL;    
     jfieldID headID = NULL;
     jobject anker = NULL;
-    GeneralInfos *infos;
-    vars_t *var_anker = NULL;
-
-    initVarAnker(&var_anker);
+    GeneralInfos *infos = NULL;
+    int rc = 0;
 
     if((infos = getFieldIDs(env, logging)) == NULL) {
         sprintf(error_msg, "Could not get field IDs");
         return(-1);
     }
 
-    if(getAnker(env, varlist, infos) < 0) {
+    if(getAnker(env, jvarlist, infos) < 0) {
         sprintf(error_msg, "Could not get anker");
         return(-2);
     }
@@ -44,20 +38,19 @@ int getVarlist(JNIEnv *env, jobject varlist, vars_t **target, char *error_msg, R
         return(-2);
     }
 
-    printFork(env, infos, infos->anker, NULL, 0, var_anker);
+    rc = printFork(env, infos, infos->anker, NULL, 0, varlist);
 
     //printAllVarsToFile(var_anker, stdout);
 
     free(infos);
-    *target = var_anker;
-    return(0);
+    return(rc);
 }
 
-void printFork(JNIEnv *env, GeneralInfos *infos, jobject curptr, const char *group, int level, vars_t *var_anker) {
+int printFork(JNIEnv *env, GeneralInfos *infos, jobject curptr, const char *group, int level, RH4nVarList *varlist) {
     jobject nextentry = NULL, nextlvl = NULL, name_obj = NULL; 
     jstring j_name = NULL;
     const char *c_name;
-    int i = 0;
+    int i = 0, rc = 0;
     jint vartype;
 
     int (*varhandler)(JNIEnv*, HandlerArgs) = NULL;
@@ -65,13 +58,13 @@ void printFork(JNIEnv *env, GeneralInfos *infos, jobject curptr, const char *gro
 
     args.infos = infos;
     args.parent = group;
-    args.var_anker = var_anker;
+    args.var_anker = varlist;
 
     nextentry = curptr;
     while(1) {
         if((name_obj = (*env)->GetObjectField(env, nextentry, infos->name)) == NULL) {
             rh4n_log_error(infos->logging, "Name field == null");
-            return;
+            return(RH4N_RET_JNI_ERR);
         }
         args.varname = (*env)->GetStringUTFChars(env, (jstring)name_obj, NULL);
 
@@ -80,32 +73,35 @@ void printFork(JNIEnv *env, GeneralInfos *infos, jobject curptr, const char *gro
         printJSONVarType(args.vartype, infos->logging);
 
         if(args.vartype == JVAR_GROUP) {
-            addGroup(var_anker, (char*) args.varname, -1, -1, -1);
+            if((rc = rh4nvarCreateNewGroup(varlist, (char*)args.varname)) != RH4N_RET_OK) {
+                rh4n_log_error(infos->logging, "Could not create group [%s]. Varlib return: %d", args.varname, rc);
+                return(rc);
+            }
             rh4n_log_debug(infos->logging, "Created Group [%s]", args.varname);
         } else {
             if((varhandler = getHandlerFuncton(args.vartype)) == NULL) {
-                printTabs(level);
+                //printTabs(level);
                 rh4n_log_error(infos->logging, "No handler for vartype defined");
-            
             } else {
                 args.level = level;
                 args.curptr = nextentry;
-                varhandler(env, args);
+                if((rc = varhandler(env, args)) != RH4N_RET_OK) return(rc);
             }
         }
 
         //printf("\n");
 
         if((nextlvl = (*env)->GetObjectField(env, nextentry, infos->nextlvl)) != NULL) {
-            printFork(env, infos, nextlvl, args.varname, level+1, var_anker);
+            if((rc = printFork(env, infos, nextlvl, args.varname, level+1, varlist)) != RH4N_RET_OK) return(rc);
         }
 
         (*env)->ReleaseStringUTFChars(env, (jstring)j_name, args.varname);
 
         if((nextentry = (*env)->GetObjectField(env, nextentry, infos->nextentry)) == NULL) {
-            return;
+            return(RH4N_RET_OK);
         }
     }
+    return(RH4N_RET_OK);
 }
 
 

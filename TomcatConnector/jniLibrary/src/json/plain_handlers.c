@@ -4,7 +4,6 @@
 #include <unistd.h>
 
 #include "standard.h"
-#include "vars.h"
 
 #include <jni.h>
 #include "json/jsonhandling.h"
@@ -15,7 +14,7 @@ int handleIntEntry(JNIEnv *env, HandlerArgs args, jobject target, int index[3]) 
     jclass integerclass = NULL;
     jmethodID getintID = NULL;
 
-    int value = 0;
+    int value = 0, rc = 0;
 
     if((integerclass = (*env)->FindClass(env, "java/lang/Integer")) == NULL) {
         rh4n_log_error(args.infos->logging, "Could not get Integer class");
@@ -29,25 +28,34 @@ int handleIntEntry(JNIEnv *env, HandlerArgs args, jobject target, int index[3]) 
 
     value = (*env)->CallIntMethod(env, target, getintID);
 
+
     switch(args.vartype) {
         case JVAR_INT:
-            addInteger(args.var_anker, (char*)args.parent, (char*)args.varname, value);
+            if((rc = rh4nvarCreateNewInt(args.var_anker, (char*)args.parent, (char*)args.varname, value)) != RH4N_RET_OK) {
+                rh4n_log_error(args.infos->logging, "Could not create integer [%s].[%s]. Varlib return: %d", args.parent, 
+                    args.varname, rc);
+                return(rc);
+            }
             break;
         case JVAR_INT1D:
-            edit1DIntegerArray(args.var_anker, (char*)args.parent, (char*)args.varname, value, index[0]);
-            break;
         case JVAR_INT2D:
-            edit2DIntegerArray(args.var_anker, (char*)args.parent, (char*)args.varname, value, index[0], index[1]);
-            break;
         case JVAR_INT3D:
-            edit3DIntegerArray(args.var_anker, (char*)args.parent, (char*)args.varname, value, index[0], index[1], index[2]);
+            if((rc = rh4nvarSetIntArrayEntry(args.var_anker, (char*)args.parent, (char*)args.varname, 
+                    index, value)) != RH4N_RET_OK) {
+                rh4n_log_error(args.infos->logging, 
+                    "Could not set set Integer array entry [%s].[%s] X: %d Y: %d Z: %d. Varlib return: %d", args.parent, 
+                    args.varname, index[0], index[1], index[2], index[3], rc);
+                return(rc);
+            }
             break;
     }
+    return(RH4N_RET_OK);
 }
 
 int handleFloatEntry(JNIEnv *env, HandlerArgs args, jobject target, int index[3]) {
     jclass floatclass = NULL;
     jmethodID doubleValueID = NULL;
+    int rc = 0;
 
     double value = 0;
 
@@ -65,23 +73,31 @@ int handleFloatEntry(JNIEnv *env, HandlerArgs args, jobject target, int index[3]
    
     switch(args.vartype) {
         case JVAR_FLOAT:
-            addFloat(args.var_anker, (char*)args.parent, (char*)args.varname, value);
+            if((rc = rh4nvarCreateNewFloat(args.var_anker, (char*)args.parent, (char*)args.varname, value)) != RH4N_RET_OK) {
+                rh4n_log_error(args.infos->logging, "Could not create Float [%s].[%s]. Varlib return: %d", args.parent, 
+                    args.varname, rc);
+                return(rc);
+            }
             break;
         case JVAR_FLOAT1D:
-            edit1DFloatArray(args.var_anker, (char*)args.parent, (char*)args.varname, value, index[0]);
-            break;
         case JVAR_FLOAT2D:
-            edit2DFloatArray(args.var_anker, (char*)args.parent, (char*)args.varname, value, index[0], index[1]);
-            break;
         case JVAR_FLOAT3D:
-            edit3DFloatArray(args.var_anker, (char*)args.parent, (char*)args.varname, value, index[0], index[1], index[2]);
-            break;
+            if((rc = rh4nvarSetFloatArrayEntry(args.var_anker, (char*)args.parent, (char*)args.varname, 
+                    index, value)) != RH4N_RET_OK) {
+                rh4n_log_error(args.infos->logging, 
+                    "Could not set set Integer array entry [%s].[%s] X: %d Y: %d Z: %d. Varlib return: %d", args.parent, 
+                    args.varname, index[0], index[1], index[2], index[3], rc);
+                return(rc);
+            }
     }
+
+    return(RH4N_RET_OK);
 }
 
 int handleBooleanEntry(JNIEnv *env, HandlerArgs args, jobject target, int index[3]) {
     jclass booleanclass = NULL;
     jmethodID booleanValueID = NULL;
+    int rc = 0;
 
     jboolean value = 0;
 
@@ -99,51 +115,58 @@ int handleBooleanEntry(JNIEnv *env, HandlerArgs args, jobject target, int index[
 
     switch(args.vartype) {
         case JVAR_BOOLEAN:
-            addBoolean(args.var_anker, (char*)args.parent, (char*)args.varname, value);
+            if((rc = rh4nvarCreateNewBool(args.var_anker, (char*)args.parent, (char*)args.varname, value)) != RH4N_RET_OK) {
+                rh4n_log_error(args.infos->logging, "Could not create Bool [%s].[%s]. Varlib return: %d", args.parent, 
+                    args.varname, rc);
+                return(rc);
+            }
             break;
         case JVAR_BOOLEAN1D:
-            edit1DBooleanArray(args.var_anker, (char*)args.parent, (char*)args.varname, value, index[0]);
-            break;
         case JVAR_BOOLEAN2D:
-            edit2DBooleanArray(args.var_anker, (char*)args.parent, (char*)args.varname, value, index[0], index[1]);
-            break;
         case JVAR_BOOLEAN3D:
-            edit3DBooleanArray(args.var_anker, (char*)args.parent, (char*)args.varname, value, index[0], index[1], index[2]);
-            break;
+            if((rc = rh4nvarSetBoolArrayEntry(args.var_anker, (char*)args.parent, (char*)args.varname, 
+                    index, value)) != RH4N_RET_OK) {
+                rh4n_log_error(args.infos->logging, 
+                    "Could not set set Bool array entry [%s].[%s] X: %d Y: %d Z: %d. Varlib return: %d", args.parent, 
+                    args.varname, index[0], index[1], index[2], index[3], rc);
+                return(rc);
+            }
     }
+    return(RH4N_RET_OK);
 }
 
 int handleStringEntry(JNIEnv *env, HandlerArgs args, jobject target, int index[3]) {
     const char *value = NULL;
-    wchar_t *w_value = NULL;
+    int rc = 0;
 
     if((value = (*env)->GetStringUTFChars(env, (jstring)target, NULL)) == NULL) {
         rh4n_log_error(args.infos->logging, "String value is == NULL\n");
         return(-1);
     }
 
-    if((w_value = malloc(sizeof(wchar_t)*(strlen(value)+1))) == NULL) {
-        rh4n_log_error(args.infos->logging, "Malloc for wchar failed\n");
-        return(-2);
-    }
-
-    swprintf(w_value, strlen(value)+1, L"%hs", value);
-
     switch(args.vartype) {
         case JVAR_STRING:
-            addString(args.var_anker, (char*)args.parent, (char*)args.varname, w_value, strlen(value)+1);
+            if((rc = rh4nvarCreateNewString(args.var_anker, (char*)args.parent, (char*)args.varname, (char*)value)) != RH4N_RET_OK) {
+                rh4n_log_error(args.infos->logging, "Could not create String [%s].[%s]. Varlib return: %d", args.parent, 
+                    args.varname, rc);
+                (*env)->ReleaseStringUTFChars(env, (jstring)target, value);
+                return(rc);
+            }
             break;
         case JVAR_STRING1D:
-            edit1DStringArray(args.var_anker, (char*)args.parent, (char*)args.varname, w_value, index[0]);
-            break;
         case JVAR_STRING2D:
-            edit2DStringArray(args.var_anker, (char*)args.parent, (char*)args.varname, w_value, index[0], index[1]);
-            break;
         case JVAR_STRING3D:
-            edit3DStringArray(args.var_anker, (char*)args.parent, (char*)args.varname, w_value, index[0], index[1], index[2]);
-            break;
+            if((rc = rh4nvarSetStringArrayEntry(args.var_anker, (char*)args.parent, (char*)args.varname, 
+                    index, (char*)value)) != RH4N_RET_OK) {
+                rh4n_log_error(args.infos->logging, 
+                    "Could not set set String array entry [%s].[%s] X: %d Y: %d Z: %d. Varlib return: %d", args.parent, 
+                    args.varname, index[0], index[1], index[2], index[3], rc);
+                (*env)->ReleaseStringUTFChars(env, (jstring)target, value);
+                return(rc);
+            }
+            
     }
 
-    free(w_value);
     (*env)->ReleaseStringUTFChars(env, (jstring)target, value);
+    return(RH4N_RET_OK);
 }

@@ -66,7 +66,7 @@ long rh4nnatGenJSON(WORD nparms, void *parmhandle, void *traditional) {
     }
     rh4n_log_info(initparms.props->logging, "Successfully matched names");
 
-    rh4nvarPrintJSONToFile(&varlist, "./out.json", initparms.props);
+    rh4nvarPrintJSONToFile(&varlist, initparms.props->outputfile, initparms.props);
 
     rh4nUtilscloseSharedLibrary(initparms.sharedlibrary);
     rh4nldaFreeList(ldavars);

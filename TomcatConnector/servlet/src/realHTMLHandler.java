@@ -17,12 +17,14 @@ public class realHTMLHandler extends HttpServlet {
     String configurationfile = "";
     static String default_tags[] = {"routes", "templates", "debug", "naterror", "ldaerror", "natparms", "natsourcepath"};
     private JNILoader bs;
+    String loggingpath = "";
 
     public void init() throws ServletException {
         this.configurationfile = System.getenv("realHTMLconfiguration");
         if(this.configurationfile == null) {
             throw(new ServletException("Enviroment variable \"realHTMLconfiguration\" is missing"));
         }
+        this.loggingpath = System.getenv("RH4N_LOG");
 
         bs = new JNILoader();
         bs.printVersion();
@@ -89,7 +91,7 @@ public class realHTMLHandler extends HttpServlet {
                 return;
             }
 
-            parms.tmp_file = createTmpFile();
+            parms.outputfile = createTmpFile();
 
             if(call_parms.debug) {
                 parms.loglevel = "DEBUG";
@@ -97,12 +99,15 @@ public class realHTMLHandler extends HttpServlet {
                 parms.loglevel = "ERROR";
             }
 
-            parms.reg_type = request.getMethod();
+            parms.reqType = request.getMethod();
 
-            parms.nat_library = call_parms.natinfos[0];
-            parms.nat_program = call_parms.natinfos[1];
+            parms.natLibrary = call_parms.natinfos[0];
+            parms.natProgram = call_parms.natinfos[1];
 
-            parms.natparams = call_parms.settings.get("natparms");
+            parms.natparms = call_parms.settings.get("natparms");
+            parms.logpath = this.loggingpath;
+            parms.loglevel = "DEVELOP";
+            parms.errorRepresentation = "JSON";
 
             deleteFile = call_parms.deleteFile;
             envvars = call_parms.enviromentvars;
@@ -119,13 +124,15 @@ public class realHTMLHandler extends HttpServlet {
             if(contentType != null && contentType.equals("application/json")) {
                 bodyvars = getBodyParms(request);
             }
-
+            
+            System.out.println("Calling natural");
             natret = bs.callNatural(parms, envvars, bodyvars);
             if(natret.natprocess_ret < 0) {
                 sendErrorMessage(response, natret.error_msg);
                 return;
             }
-            deliverFile(response, parms.tmp_file, deleteFile);
+            System.out.println("Deliver File");
+            deliverFile(response, parms.outputfile , deleteFile);
 
         } catch(ServletException e) {
             throw(e);

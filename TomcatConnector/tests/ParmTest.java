@@ -17,7 +17,7 @@ public class ParmTest {
 
         parms.reqType = new String("GET");
         parms.natLibrary = "TGAP0734";
-        parms.natProgram = "TESTPROG";
+        parms.natProgram = "RH4NTEST";
         parms.natparms = "etid=$$";
         parms.outputfile = "/tmp/output.html";
         //parms.loglevel = "DEVELOP";

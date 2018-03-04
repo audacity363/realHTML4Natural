@@ -6,9 +6,9 @@
 #include "standard.h"
 
 #include "realHTML_tomcat_connector_JNINatural.h"
-#include "jni_rh4n.h"
-#include "javaParmReadout.h"
-#include "environ.h"
+#include "rh4n_jni.h"
+#include "rh4n_jni_javaParmReadout.h"
+#include "rh4n_jni_environ.h"
 #include "natural/rh4n_natcall.h"
 
 #define VERSIONSTR "realHTML4Natural Tomcat Connector JNILibrary Version 2.0.1"

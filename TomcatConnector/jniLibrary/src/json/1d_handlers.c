@@ -4,7 +4,6 @@
 #include <unistd.h>
 
 #include "standard.h"
-#include "vars.h"
 
 #include <jni.h>
 #include "json/jsonhandling.h"
@@ -13,9 +12,8 @@
 
 
 int Handler1D(JNIEnv *env, HandlerArgs args) {
-    int x = 0, i = 0, max_strlen = 0, index[3] = {0, 0, 0};
+    int x = 0, i = 0, max_strlen = 0, index[3] = {0, 0, 0}, arrlength[3] = { 0, 0, 0 }, rc = 0;
     jobject arraylist = NULL, entry = NULL;
-    jint x_length = 0;
 
     LLClassInfo *llclass = NULL;
 
@@ -28,67 +26,68 @@ int Handler1D(JNIEnv *env, HandlerArgs args) {
         return(-2);
     }
 
-    x_length = (*env)->CallIntMethod(env, arraylist, llclass->sizeID);
-    //printTabs(args.level);
-    rh4n_log_debug(args.infos->logging, "X_length: [%d]", x_length);
+    arrlength[0] = (*env)->CallIntMethod(env, arraylist, llclass->sizeID);
+
+    rh4n_log_debug(args.infos->logging, "X_length: [%d]", arrlength[0]);
+    rh4n_log_debug(args.infos->logging, "Creating new array [%s] under [%s]", args.varname, args.parent);
 
     switch(args.vartype) {
         case JVAR_STRING1D:
-            rh4n_log_debug(args.infos->logging, "Creating new String array [%s] under [%s]", args.varname, args.parent);
-            max_strlen = getMaxStrLen1DString(env, args, arraylist, llclass, x_length);
-            add1DStringArray(args.var_anker, (char*)args.parent, (char*)args.varname, max_strlen+1, x_length);
+            if((rc = rh4nvarCreateNewStringArray(args.var_anker, (char*)args.parent, (char*)args.varname, 
+                    1, arrlength)) != RH4N_RET_OK) {
+                rh4n_log_error(args.infos->logging, "Could not create String array [%s].[%s]. Varlib rc: %d", args.parent,
+                    args.varname, rc);
+                return(rc);
+            }
             break;
         case JVAR_INT1D:
-            add1DIntegerArray(args.var_anker, (char*)args.parent, (char*)args.varname, x_length);
+            if((rc = rh4nvarCreateNewIntArray(args.var_anker, (char*)args.parent, (char*)args.varname, 
+                    1, arrlength)) != RH4N_RET_OK) {
+                rh4n_log_error(args.infos->logging, "Could not create Integer array [%s].[%s]. Varlib rc: %d", args.parent,
+                    args.varname, rc);
+                return(rc);
+            }
             break;
         case JVAR_BOOLEAN1D:
-            add1DBooleanArray(args.var_anker, (char*)args.parent, (char*)args.varname, x_length);
+            if((rc = rh4nvarCreateNewBoolArray(args.var_anker, (char*)args.parent, (char*)args.varname, 
+                1, arrlength)) != RH4N_RET_OK) {
+                rh4n_log_error(args.infos->logging, "Could not create Bool array [%s].[%s]. Varlib rc: %d", args.parent,
+                    args.varname, rc);
+                return(rc);
+            }
             break;
         case JVAR_FLOAT1D:
-            add1DFloatArray(args.var_anker, (char*)args.parent, (char*)args.varname, x_length);
+            if((rc = rh4nvarCreateNewFloatArray(args.var_anker, (char*)args.parent, (char*)args.varname, 
+                1, arrlength)) != RH4N_RET_OK) {
+                rh4n_log_error(args.infos->logging, "Could not create Float array [%s].[%s]. Varlib rc: %d", args.parent,
+                    args.varname, rc);
+                return(rc);
+            }
             break;
     }
 
-    //printTabs(args.level);
-    for(;i < x_length; i++) {
+    for(;i < arrlength[0]; i++) {
         if((entry = (*env)->CallObjectMethod(env, arraylist, llclass->getID, i)) == NULL) {
-            rh4n_log_error(args.infos->logging, "Element in array is == NULL");
+            rh4n_log_error(args.infos->logging, "Element [%d] in array is == NULL", i);
             return(-3);
         }
+        index[1] = index[2] = -1;
         index[0] = i;
         switch(args.vartype) {
             case JVAR_INT1D:
-                handleIntEntry(env, args, entry, index);
+                if((rc = handleIntEntry(env, args, entry, index)) != RH4N_RET_OK) return(rc);
                 break;
             case JVAR_FLOAT1D:
-                handleFloatEntry(env, args, entry, index);
+                if((rc = handleFloatEntry(env, args, entry, index)) != RH4N_RET_OK) return(rc);
                 break;
             case JVAR_BOOLEAN1D:
-                handleBooleanEntry(env, args, entry, index);
+                if((rc = handleBooleanEntry(env, args, entry, index)) != RH4N_RET_OK) return(rc);
                 break;
             case JVAR_STRING1D:
-                handleStringEntry(env, args, entry, index);
+                if((rc = handleStringEntry(env, args, entry, index)) != RH4N_RET_OK) return(rc);
                 break;
         }
     }
 
-    return(0);
-}
-
-int getMaxStrLen1DString(JNIEnv *env, HandlerArgs args, jobject target, LLClassInfo *llinfos, int x_length) {
-    jobject entry = NULL;
-    int i = 0, length = 0;
-    jsize jlength = 0;
-
-    for(;i < x_length; i++) {
-        if((entry = (*env)->CallObjectMethod(env, target, llinfos->getID, i)) == NULL) {
-            rh4n_log_error(args.infos->logging, "Element in array is == NULL");
-            return(-3);
-        }
-        jlength = (*env)->GetStringLength(env, (jstring)entry);
-        if(jlength > length)
-            length = jlength;
-    }
-
-    return(length);
+    return(RH4N_RET_OK);
 }

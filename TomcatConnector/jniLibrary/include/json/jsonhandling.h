@@ -39,7 +39,7 @@ typedef struct handlerargs {
     int level;
     jint vartype;
     const char *parent;
-    vars_t *var_anker;
+    RH4nVarList *var_anker;
 } HandlerArgs;
 
 

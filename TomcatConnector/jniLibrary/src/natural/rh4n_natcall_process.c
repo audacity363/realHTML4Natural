@@ -6,7 +6,7 @@
 #include <sys/wait.h>
 
 #include "standard.h"
-#include "environ.h"
+#include "rh4n_jni_environ.h"
 #include "natural/rh4n_natcall.h"
 #include "rh4n_utils.h"
 

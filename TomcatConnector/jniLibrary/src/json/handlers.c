@@ -5,8 +5,6 @@
 
 #include "standard.h"
 
-#include "vars.h"
-
 #include <jni.h>
 #include "json/jsonhandling.h"
 #include "json/json_utils.h"
@@ -49,6 +47,7 @@ int (*getHandlerFuncton(jint vartype))(JNIEnv*, HandlerArgs) {
 
 
 int singleVarHandler(JNIEnv *env, HandlerArgs args) {
+    int rc = 0;
     jobject entry = NULL;    
 
     if((entry = (*env)->GetObjectField(env, args.curptr, args.infos->value)) == NULL) {
@@ -58,19 +57,19 @@ int singleVarHandler(JNIEnv *env, HandlerArgs args) {
 
     switch(args.vartype) {
         case JVAR_STRING:
-            handleStringEntry(env, args, entry, NULL);
+            if((rc = handleStringEntry(env, args, entry, NULL)) != RH4N_RET_OK) return(rc);
             break;
         case JVAR_INT:
-            handleIntEntry(env, args, entry, NULL);
+            if((rc = handleIntEntry(env, args, entry, NULL)) != RH4N_RET_OK) return(rc);
             break;
         case JVAR_FLOAT:
-            handleFloatEntry(env, args, entry, NULL);
+            if((rc = handleFloatEntry(env, args, entry, NULL)) != RH4N_RET_OK) return(rc);
             break;
         case JVAR_BOOLEAN:
-            handleBooleanEntry(env, args, entry, NULL);
+            if((rc = handleBooleanEntry(env, args, entry, NULL)) != RH4N_RET_OK) return(rc);
             break;
             
     }
 
-    return(0);
+    return(RH4N_RET_OK);
 }
