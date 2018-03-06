@@ -45,7 +45,7 @@ int rh4nv2nSavePosition(char *name, char *group, int position, RH4nVarPositions_
             sizeof(RH4nVarPosition_t)*(++pos->length))) == NULL) return(RH4N_RET_MEMORY_ERR);
     }
    
-    if(group) {
+    if(!group) {
         memset(pos->parm_positions[pos->length-1].groupname, NULL, 
             sizeof(pos->parm_positions[pos->length-1].groupname));
     } else {
