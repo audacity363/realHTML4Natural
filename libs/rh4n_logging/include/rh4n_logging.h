@@ -1,6 +1,8 @@
 #ifndef RH4NLIBLOGGING
 #define RH4NLIBLOGGING
 
+#include <time.h>
+
 typedef enum {
     RH4N_DEVELOP = 0,
     RH4N_DEBUG = 1,

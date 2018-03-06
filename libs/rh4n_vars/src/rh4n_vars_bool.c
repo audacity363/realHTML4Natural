@@ -5,7 +5,7 @@
 #include "standard.h"
 
 int rh4nvarCreateNewBool(RH4nVarList *varlist, char *pgroupname, char *pname, bool value) {
-    int varlibret = 0, varsize = 0;
+    int varlibret = 0;
     RH4nVarRef _refvar = RH4NVAR_REF_INIT;
 
     if((varlibret = rh4nvarCreatenewVariable(varlist, pgroupname, pname, RH4NVARTYPEBOOLEAN, &_refvar)) != RH4N_RET_OK) { 
@@ -33,7 +33,7 @@ int rh4nvarGetBool(RH4nVarList *varlist, char *pgroupname, char *pname, bool *ou
 
     if((varlibret = rh4nvarGetRef(varlist, pgroupname, pname, &_refvar)) != RH4N_RET_OK) { return(varlibret); }
     if(_refvar.var->var.type != RH4NVARTYPEBOOLEAN) { return(RH4N_RET_FORMAT_ERR); }
-    *outbuff = (bool)_refvar.var->var.value;
+    *outbuff = *((bool*)_refvar.var->var.value);
     return(RH4N_RET_OK);
 }
 
@@ -44,7 +44,7 @@ int rh4nvarCreateNewBoolArray(RH4nVarList *varlist, char *pgroupname, char *pnam
 int rh4nvarSetBoolArrayEntry(RH4nVarList *varlist, char *pgroupname, char *pname, int index[3], bool value) {
     RH4nVarRef _refvar = RH4NVAR_REF_INIT;
     RH4nVarObj *arrayentry = NULL;
-    int varlibret = 0, varsize = 0;
+    int varlibret = 0;
 
     if((varlibret = rh4nvarGetRef(varlist, pgroupname, pname, &_refvar)) != RH4N_RET_OK) { return(varlibret); }
     if(_refvar.var->var.type != RH4NVARTYPEARRAY) { return(RH4N_RET_VAR_NOT_ARRAY); }
@@ -58,14 +58,14 @@ int rh4nvarSetBoolArrayEntry(RH4nVarList *varlist, char *pgroupname, char *pname
 int rh4nvarGetBoolArrayEntry(RH4nVarList *varlist, char *pgroupname, char *pname, int index[3], bool *outbuff) {
     RH4nVarRef _refvar = RH4NVAR_REF_INIT;
     RH4nVarObj *arrayentry = NULL;
-    int varlibret = 0, varsize = 0;
+    int varlibret = 0;
 
     if((varlibret = rh4nvarGetRef(varlist, pgroupname, pname, &_refvar)) != RH4N_RET_OK) { return(varlibret); }
     if(_refvar.var->var.type != RH4NVARTYPEARRAY) { return(RH4N_RET_VAR_NOT_ARRAY); }
     if((varlibret = rh4nvarGetArrayEntry(&_refvar.var->var, index, &arrayentry)) != RH4N_RET_OK) { return(varlibret); }
 
     if(arrayentry->type != RH4NVARTYPEBOOLEAN) { return(RH4N_RET_FORMAT_ERR); }
-    *outbuff = (bool)arrayentry->value;
+    *outbuff = *((bool*)arrayentry->value);
     return(RH4N_RET_OK);
 }
 

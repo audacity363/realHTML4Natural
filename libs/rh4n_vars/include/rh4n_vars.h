@@ -124,6 +124,7 @@ int rh4nvarInitArray(RH4nVarObj*, int, int);
 int rh4nvarCreateNewArray(RH4nVarList*, char*, char*, int, int*, int);
 int rh4nvarGetArrayLength(RH4nVarObj*, int*);
 int rh4nvarGetArrayDimension(RH4nVarObj*, int*);
+int rh4nvarGetArrayEntry(RH4nVarObj*, int[3], RH4nVarObj**);
 //Print
 #endif
 

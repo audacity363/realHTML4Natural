@@ -53,9 +53,7 @@ int rh4nvarCreateNewArray(RH4nVarList *varlist, char *pgroupname, char *pname, i
 }
 
 int rh4nvarInitArray(RH4nVarObj *target, int length, int vartype) {
-    int i = 0, varsize = 0;
-
-    varsize = sizeof(RH4nVarObj)*length;
+    int i = 0;
 
     if((target->value = malloc(sizeof(RH4nVarObj)*length)) == NULL) { return(RH4N_RET_MEMORY_ERR); }
 

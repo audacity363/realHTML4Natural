@@ -5,7 +5,7 @@
 #include "standard.h"
 
 int rh4nvarCreateNewFloat(RH4nVarList *varlist, char *pgroupname, char *pname, double value) {
-    int varlibret = 0, varsize = 0;
+    int varlibret = 0;
     RH4nVarRef _refvar = RH4NVAR_REF_INIT;
 
     if((varlibret = rh4nvarCreatenewVariable(varlist, pgroupname, pname, RH4NVARTYPEFLOAT, &_refvar)) != RH4N_RET_OK) { 
@@ -44,7 +44,7 @@ int rh4nvarCreateNewFloatArray(RH4nVarList *varlist, char *pgroupname, char *pna
 int rh4nvarSetFloatArrayEntry(RH4nVarList *varlist, char *pgroupname, char *pname, int index[3], double value) {
     RH4nVarRef _refvar = RH4NVAR_REF_INIT;
     RH4nVarObj *arrayentry = NULL;
-    int varlibret = 0, varsize = 0;
+    int varlibret = 0;
 
     if((varlibret = rh4nvarGetRef(varlist, pgroupname, pname, &_refvar)) != RH4N_RET_OK) { return(varlibret); }
     if(_refvar.var->var.type != RH4NVARTYPEARRAY) { return(RH4N_RET_VAR_NOT_ARRAY); }
@@ -58,7 +58,7 @@ int rh4nvarSetFloatArrayEntry(RH4nVarList *varlist, char *pgroupname, char *pnam
 int rh4nvarGetFloatArrayEntry(RH4nVarList *varlist, char *pgroupname, char *pname, int index[3], double *outbuff) {
     RH4nVarRef _refvar = RH4NVAR_REF_INIT;
     RH4nVarObj *arrayentry = NULL;
-    int varlibret = 0, varsize = 0;
+    int varlibret = 0;
 
     if((varlibret = rh4nvarGetRef(varlist, pgroupname, pname, &_refvar)) != RH4N_RET_OK) { return(varlibret); }
     if(_refvar.var->var.type != RH4NVARTYPEARRAY) { return(RH4N_RET_VAR_NOT_ARRAY); }

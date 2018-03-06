@@ -17,13 +17,13 @@ void rh4nvarPrintFork(RH4nVarEntry_t *forkanker, int mode, int level, RH4nProper
     if(!forkanker) { return; }
 
     RH4nVarEntry_t *hptr = forkanker;
-    int i = 1, dimensions = 0, length[3];
+    int dimensions = 0, length[3];
 
     for(; hptr != NULL; hptr = hptr->next) {
         rh4n_log_debug(props->logging, "%.*sName: %s", level, RH4N_VAR_PRINT_TABS, hptr->name);
         rh4n_log_debug(props->logging, "%.*sType: %s", level, RH4N_VAR_PRINT_TABS, rh4nvarPrintGetTypeString(hptr->var.type));
         if(hptr->var.type == RH4NVARTYPEARRAY) {
-            memset(length, NULL, sizeof(length));
+            memset(length, 0x00, sizeof(length));
             dimensions = 0;
             rh4nvarGetArrayDimension(&hptr->var, &dimensions);
             rh4nvarGetArrayLength(&hptr->var, length);

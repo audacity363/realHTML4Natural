@@ -5,7 +5,7 @@
 #include "standard.h"
 
 int rh4nvarCreateNewString(RH4nVarList *varlist, char *pgroupname, char *pname, char *value) {
-    int varlibret = 0, varsize = 0;
+    int varlibret = 0;
     RH4nVarRef _refvar = RH4NVAR_REF_INIT;
 
     if((varlibret = rh4nvarCreatenewVariable(varlist, pgroupname, pname, RH4NVARTYPESTRING, &_refvar)) != RH4N_RET_OK) { 
@@ -54,7 +54,7 @@ int rh4nvarCreateNewStringArray(RH4nVarList *varlist, char *pgroupname, char *pn
 int rh4nvarSetStringArrayEntry(RH4nVarList *varlist, char *pgroupname, char *pname, int index[3], char *value) {
     RH4nVarRef _refvar = RH4NVAR_REF_INIT;
     RH4nVarObj *arrayentry = NULL;
-    int varlibret = 0, varsize = 0;
+    int varlibret = 0;
 
     if((varlibret = rh4nvarGetRef(varlist, pgroupname, pname, &_refvar)) != RH4N_RET_OK) { return(varlibret); }
     if(_refvar.var->var.type != RH4NVARTYPEARRAY) { return(RH4N_RET_VAR_NOT_ARRAY); }
@@ -68,7 +68,7 @@ int rh4nvarSetStringArrayEntry(RH4nVarList *varlist, char *pgroupname, char *pna
 int rh4nvarGetStringArrayEntry(RH4nVarList *varlist, char *pgroupname, char *pname, int index[3], int bufflength, char *outbuff) {
     RH4nVarRef _refvar = RH4NVAR_REF_INIT;
     RH4nVarObj *arrayentry = NULL;
-    int varlibret = 0, varsize = 0;
+    int varlibret = 0;
 
     if((varlibret = rh4nvarGetRef(varlist, pgroupname, pname, &_refvar)) != RH4N_RET_OK) { return(varlibret); }
     if(_refvar.var->var.type != RH4NVARTYPEARRAY) { return(RH4N_RET_VAR_NOT_ARRAY); }
@@ -82,7 +82,7 @@ int rh4nvarGetStringArrayEntry(RH4nVarList *varlist, char *pgroupname, char *pna
 int rh4nvarGetStringLengthArrayEntry(RH4nVarList *varlist, char *pgroupname, char *pname, int index[3], int *length) {
     RH4nVarRef _refvar = RH4NVAR_REF_INIT;
     RH4nVarObj *arrayentry = NULL;
-    int varlibret = 0, varsize = 0;
+    int varlibret = 0;
 
     if((varlibret = rh4nvarGetRef(varlist, pgroupname, pname, &_refvar)) != RH4N_RET_OK) { return(varlibret); }
     if(_refvar.var->var.type != RH4NVARTYPEARRAY) { return(RH4N_RET_VAR_NOT_ARRAY); }

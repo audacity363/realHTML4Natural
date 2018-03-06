@@ -7,6 +7,7 @@
 int rh4nvarInitList(RH4nVarList *varlist) {
     RH4NVAR_CHECKVARLIST(varlist);
     varlist->anker = NULL;
+    return(RH4N_RET_OK);
 }
 
 int rh4nvarCreatenewVariable(RH4nVarList *varlist, char *pgroupname, char *pname, int type, RH4nVarRef *pnewvar) {
@@ -17,7 +18,7 @@ int rh4nvarCreatenewVariable(RH4nVarList *varlist, char *pgroupname, char *pname
 
     RH4nVarRef _refvar = RH4NVAR_REF_INIT;
     RH4nVarEntry_t *forkanker = NULL, *newvarEntry = NULL, *hptr = NULL;
-    int searchret = 0, varcreated = 0;
+    int searchret = 0;
 
     if(pgroupname) {
         if((searchret = rh4nvarGetRef(varlist, NULL, pgroupname, &_refvar)) != RH4N_RET_OK) {

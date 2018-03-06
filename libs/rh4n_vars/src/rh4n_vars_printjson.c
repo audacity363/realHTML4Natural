@@ -15,13 +15,13 @@ int rh4nvarPrintJSONToFile(RH4nVarList *varlist, char *filename, RH4nProperties 
     rh4nvarPrintJSONFork(varlist->anker, -1, 1, props, outputfile);
 
     fclose(outputfile);
+    return(RH4N_RET_OK);
 }
 
 void rh4nvarPrintJSONFork(RH4nVarEntry_t *forkanker, int mode, int level, RH4nProperties *props, FILE *outputfile) {
     if(!forkanker) { return; }
 
     RH4nVarEntry_t *hptr = forkanker;
-    int i = 1;
 
     if(checkArrayGroup(forkanker)) {
         rh4nvarPrintGroupJSONArray(forkanker, mode, level, props, outputfile); 
@@ -50,9 +50,6 @@ void rh4nvarPrintJSONFork(RH4nVarEntry_t *forkanker, int mode, int level, RH4nPr
 }
 
 void rh4nvarPrintJSONArray(RH4nVarObj *variable, int mode, int level,RH4nProperties *props, FILE *outputfile) {
-    int x = 0, y = 0, z = 0, i = 0, index[3] = {0, 0, 0};
-    RH4nVarObj *xtarget = NULL, *ytarget = NULL, *ztarget = NULL;
-    
     rh4nvarPrintJSONArrayDim(variable, mode, level, props, outputfile);
 }
 
@@ -79,9 +76,7 @@ void rh4nvarPrintJSONArrayDim(RH4nVarObj *variable, int mode, int level, RH4nPro
 }
 
 void rh4nvarPrintGroupJSONArray(RH4nVarEntry_t *variable, int mode, int level, RH4nProperties *props, FILE *outputfile) {
-    int dimension = -1, length[3] = { -1, -1, -1 }, varlibret = 0, index[3] = { 0, 0, 0 };
-    RH4nVarEntry_t *hptr = NULL;
-    RH4nVarObj *target = NULL;
+    int dimension = -1, length[3] = { -1, -1, -1 }, varlibret = 0;
 
     if((varlibret = rh4nvarGetArrayDimension(&variable->var, &dimension)) != RH4N_RET_OK) { return; }
     if((varlibret = rh4nvarGetArrayLength(&variable->var, length)) != RH4N_RET_OK) { return; }
