@@ -35,7 +35,8 @@ public class Router
         "program",
         "debug", 
         "deleteFile",
-        "login"
+        "login",
+        "logging"
         };
 
     public Router(String filepath)
@@ -100,6 +101,8 @@ public class Router
                 handleDeleteFile(target);
         } else if(tag.equals("login")) {
                 handleLogin(target);
+        } else if(tag.equals("logging")) {
+            handleLogging(target);
         }
     }
 
@@ -163,6 +166,14 @@ public class Router
         if(bool_str.equals("true")) {
             this.route.login = true;
         }
+    }
+
+    private void handleLogging(NodeList target) {
+        if(target.getLength() == 0) {
+            this.route.loglevel = "ERROR";
+            return;
+        }
+        this.route.loglevel = target.item(0).getTextContent();
     }
 
     public Route getRoute() {

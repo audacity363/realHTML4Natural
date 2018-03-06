@@ -6,4 +6,5 @@ public class Route {
     public Boolean debug = false;
     public Boolean deletefile = false;
     public Boolean login = false;
+    public String loglevel = "";
 }

@@ -106,7 +106,7 @@ public class realHTMLHandler extends HttpServlet {
 
             parms.natparms = call_parms.settings.get("natparms");
             parms.logpath = this.loggingpath;
-            parms.loglevel = "WARNING";
+            parms.loglevel = call_parms.loglevel;
             parms.errorRepresentation = "JSON";
 
             deleteFile = call_parms.deleteFile;
@@ -228,6 +228,7 @@ public class realHTMLHandler extends HttpServlet {
         parms.natinfos[1] = route.program; //r.getProgram();
         parms.debug = route.debug; //r.getDebug();
         parms.deleteFile = route.deletefile; //r.getDeleteFile();
+        parms.loglevel = route.loglevel;
 
         return(parms);
     }
