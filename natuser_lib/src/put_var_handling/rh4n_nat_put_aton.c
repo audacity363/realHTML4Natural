@@ -29,12 +29,16 @@ int rh4nnatputAtoN(RH4nNatVarHandleParms *args, char *groupname, char *varname) 
         return(rc);
     }
 
+    rh4n_log_debug(args->props->logging, "Trying to convert string: [%s] to numeric", buff);
+
     if((rc = args->nnifuncs->pf_nni_from_string(args->nnifuncs, buff, NNI_TYPE_NUM, args->desc->length_all,
             args->desc->precision, sizeof(natbuff), (void*)natbuff)) != NNI_RC_OK) {
         printf("NNI from string: [%d]\n", rc);
         free(buff);
         return(RH4N_RET_NNI_ERR);
     }
+
+    rh4n_log_debug(args->props->logging, "Converted string to [%s]", natbuff);
     
     if((rc = args->nnifuncs->pf_nni_put_parm(args->nnifuncs, args->parmindex, args->parmhandle, args->desc->length_all,
             natbuff)) != NNI_RC_OK) {
@@ -126,19 +130,24 @@ int rh4nnatputAtoNArrayEntry(RH4nNatVarHandleParms *args, char* groupname, char*
         return(rc);
     }
 
-    if((rc = args->nnifuncs->pf_nni_from_string(args->nnifuncs, buff, NNI_TYPE_NUM, args->desc->length_all,
+    rh4n_log_debug(args->props->logging, "Trying to convert string: [%s] to numeric", buff);
+
+    if((rc = args->nnifuncs->pf_nni_from_string(args->nnifuncs, buff, NNI_TYPE_NUM, 
+            args->desc->length+args->desc->precision,
             args->desc->precision, sizeof(natbuff), (void*)natbuff)) != NNI_RC_OK) {
         printf("NNI from string: [%d]\n", rc);
         free(buff);
         return(RH4N_RET_NNI_ERR);
     }
+
+    rh4n_log_debug(args->props->logging, "Converted string to [%s]", natbuff);
     
-    if((rc = args->nnifuncs->pf_nni_put_parm(args->nnifuncs, args->parmindex, args->parmhandle, args->desc->length_all,
-            natbuff)) != NNI_RC_OK) {
-        if(rc < 0) {
+    if((rc = args->nnifuncs->pf_nni_put_parm_array(args->nnifuncs, args->parmindex, args->parmhandle, 
+        args->desc->length+args->desc->precision,
+        natbuff, index)) != NNI_RC_OK && rc < 0) {
+            rh4n_log_error(args->props->logging, "Could not put parm %d. NNI return: %d", args->parmindex, rc);
             free(buff);
             return(RH4N_RET_NNI_ERR);
-        }
     }
 
     free(buff);

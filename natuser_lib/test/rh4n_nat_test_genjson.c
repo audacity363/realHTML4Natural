@@ -11,7 +11,7 @@ int main(int argc, char *argv[]) {
     void *shnatlib = NULL;
     pnni_611_functions nnifuncs = NULL;
     char errorstr[2048];
-    int utilsret = 0, nniret = 0;
+    int utilsret = 0, nniret = 0, length[3] = { 3, -1, -1 };
     struct parameter_description *naturalparms = NULL;
     RH4nProperties props;
     struct natural_exception naturalex;
@@ -39,13 +39,17 @@ int main(int argc, char *argv[]) {
 
     rh4n_log_debug(props.logging, "Hello World");
 
-    rh4nvarInitList(&props.urlvars);
+    rh4nvarInitList(&props.bodyvars);
 
-    printf("new String: %d\n", rh4nvarCreateNewString(&props.urlvars, NULL, "INFIELD1", "Hello from C"));
-    printf("new Int: %d\n", rh4nvarCreateNewInt(&props.urlvars, NULL, "INFIELD2", 6));
-    printf("new Float: %d\n",rh4nvarCreateNewFloat(&props.urlvars, NULL, "INFIELD3", 72.982));
+    int index[3] = { 0, -1, -1};
+    rh4nvarCreateNewStringArray(&props.bodyvars, NULL, "INFIELD44", 1, length);
+    rh4nvarSetStringArrayEntry(&props.bodyvars, NULL, "INFIELD44", index, "1.1");
+    index[0] = 1;
+    rh4nvarSetStringArrayEntry(&props.bodyvars, NULL, "INFIELD44", index, "1.2");
+    index[0] = 2;
+    rh4nvarSetStringArrayEntry(&props.bodyvars, NULL, "INFIELD44", index, "1.3");
 
-    rh4nvarPrintList(&props.urlvars, &props);
+    rh4nvarPrintList(&props.bodyvars, &props);
 
 
     if((utilsret = rh4nUtilsloadSharedLibrary(NULL, RH4N_SONAME_NATURAL, &shnatlib, errorstr)) != RH4N_RET_OK) { 

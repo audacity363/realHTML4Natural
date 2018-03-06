@@ -71,6 +71,10 @@ int rh4nvarInitArray(RH4nVarObj *target, int length, int vartype) {
 }
 
 int rh4nvarCheckDimLength(int dimensions, int length[3]) {
+    if(dimensions == 3 && (length[2] == 0 && length[1] == 0 && length[0] == 0)) return(RH4N_RET_OK);
+    if(dimensions == 2 && (length[1] == 0 && length[0] == 0)) return(RH4N_RET_OK);
+    if(dimensions == 1 && length[0] == 0) return(RH4N_RET_OK);
+
     if(dimensions == 1 && (length[0] < 0)) { return(RH4N_RET_VAR_BAD_LENGTH); }
     if(dimensions == 2 && (length[0] <= 0 || length[1] < 0)) { return(RH4N_RET_VAR_BAD_LENGTH); }
     if(dimensions == 3 && (length[0] <= 0 || length[1] <= 0 || length[2] < 0)) { return(RH4N_RET_VAR_BAD_LENGTH); }

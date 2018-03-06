@@ -17,6 +17,7 @@ int rh4nnatPutParms(RH4nVarList *varlist, WORD nparms, void *parmhandle, RH4nVar
         char *errorstr) {
     int i = 0, rc = 0, x = 0, callbacksize = 0;
     char *groupname = NULL;
+    RH4nVarRef _refvar = RH4NVAR_REF_INIT;
 
     struct RH4nPositionMatchingCallbacks callbacks[] = {
         {NNI_TYPE_ALPHA, rh4nnatputString},
@@ -46,17 +47,23 @@ int rh4nnatPutParms(RH4nVarList *varlist, WORD nparms, void *parmhandle, RH4nVar
             return(RH4N_RET_NNI_ERR);
         }
 
+        if(strlen(pos.parm_positions[i].groupname) == 0) groupname = NULL;
+        else groupname = pos.parm_positions[i].groupname;
+
         args.parmindex = pos.parm_positions[i].position+2;
         args.desc = &desc;
 
         rh4n_log_debug(parms->props->logging, "Natural var type: [%c]", desc.format);
         rh4n_log_debug(parms->props->logging, "Natural var size: [%d]", desc.length);
+
+        if((rc = rh4nvarGetRef(varlist, groupname, pos.parm_positions[i].varname, &_refvar)) != RH4N_RET_OK) {
+            rh4n_log_warn(parms->props->logging, "Could not get Variable: %s.%s. Varlib return: %d", groupname, 
+                pos.parm_positions[i].varname, rc);
+            continue;
+        }
         
         for(x=0; x < callbacksize; x++)  {
             if(callbacks[x].vartype == desc.format) {
-                if(strlen(pos.parm_positions[i].groupname) == 0) groupname = NULL;
-                else groupname = pos.parm_positions[i].groupname;
-
                 if(((rc = callbacks[x].callback(&args, groupname,
                         pos.parm_positions[i].varname)) != RH4N_RET_OK) && rc != RH4N_RET_USE_F8) {
                     return(rc);

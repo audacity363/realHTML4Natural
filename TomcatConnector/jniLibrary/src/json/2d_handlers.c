@@ -76,7 +76,7 @@ int Handler2D(JNIEnv *env, HandlerArgs args) {
             return(-3);
         }
         for(y=0; y < arrlength[1]; y++) {
-            index[2] = -2;
+            index[2] = -1;
             index[1] = y;
 
             if((entry = (*env)->CallObjectMethod(env, arraylist_y, llclass->getID, y)) == NULL) {

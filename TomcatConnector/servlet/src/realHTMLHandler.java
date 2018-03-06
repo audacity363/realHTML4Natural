@@ -28,7 +28,7 @@ public class realHTMLHandler extends HttpServlet {
 
         bs = new JNILoader();
         bs.printVersion();
-        System.out.println("Loaded jni Library");
+        //System.out.println("Loaded jni Library");
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) 
@@ -106,7 +106,7 @@ public class realHTMLHandler extends HttpServlet {
 
             parms.natparms = call_parms.settings.get("natparms");
             parms.logpath = this.loggingpath;
-            parms.loglevel = "DEVELOP";
+            parms.loglevel = "WARNING";
             parms.errorRepresentation = "JSON";
 
             deleteFile = call_parms.deleteFile;
@@ -125,13 +125,13 @@ public class realHTMLHandler extends HttpServlet {
                 bodyvars = getBodyParms(request);
             }
             
-            System.out.println("Calling natural");
+            //System.out.println("Calling natural");
             natret = bs.callNatural(parms, envvars, bodyvars);
             if(natret.natprocess_ret < 0) {
                 sendErrorMessage(response, natret.error_msg);
                 return;
             }
-            System.out.println("Deliver File");
+            //System.out.println("Deliver File");
             deliverFile(response, parms.outputfile , deleteFile);
 
         } catch(ServletException e) {
@@ -293,7 +293,7 @@ public class realHTMLHandler extends HttpServlet {
         jsonparser = new JSONParser(jsonString);
         try {
             varlist = jsonparser.run();
-            varlist.printList();
+            //varlist.printList();
         } catch(Exception e) {
             throw(e);
         }

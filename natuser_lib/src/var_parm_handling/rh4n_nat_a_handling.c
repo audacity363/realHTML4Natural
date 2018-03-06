@@ -50,12 +50,12 @@ int rh4nnatStringArrayHandler(RH4nNatVarHandleParms *args) {
     }
 
     for(; x < args->desc->occurrences[0]; x++) {
-        arrindex[0] = x; arrindex[1] = arrindex[2] = 0;
+        arrindex[0] = x; arrindex[1] = arrindex[2] = -1;
         if(args->desc->dimensions == 1) {
             if((varlibret = rh4nnatSaveStringArrayEntry(args, arrindex)) != RH4N_RET_OK) return(varlibret);
         } else {
             for(y = 0; y < args->desc->occurrences[1]; y++) {
-                arrindex[1] = y; arrindex[2] = 0;
+                arrindex[1] = y; arrindex[2] = -1;
                 if(args->desc->dimensions == 2) {
                     if((varlibret = rh4nnatSaveStringArrayEntry(args, arrindex)) != RH4N_RET_OK) return(varlibret);
                 } else {
