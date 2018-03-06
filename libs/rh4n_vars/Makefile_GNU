@@ -13,7 +13,8 @@ OBJS = rh4n_vars.o \
 	   rh4n_vars_integer.o \
 	   rh4n_vars_float.o \
 	   rh4n_vars_ustring.o \
-	   rh4n_vars_printjson.o
+	   rh4n_vars_printjson.o \
+	   rh4n_vars_free.o
 
 LIBS = -L./ -lrh4nvars \
 	   -L../rh4n_logging -lrh4nlogging

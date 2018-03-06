@@ -4,12 +4,12 @@
 
 #include "standard.h"
 
-int rh4nvarFreeList(RH4nVarList *varlist) {
+void rh4nvarFreeList(RH4nVarList *varlist) {
     rh4nvarFreeFork(varlist->anker);
 }
 
-int rh4nvarFreeFork(RH4nVarEntry_t *forkanker) {
-    RH4nVarEntry_t *hptr = NULL, *prev = NULL *start = NULL;
+void rh4nvarFreeFork(RH4nVarEntry_t *forkanker) {
+    RH4nVarEntry_t *hptr = NULL, *prev = NULL;
     
     for(hptr = forkanker; hptr->next != NULL; hptr = hptr->next);
     
@@ -24,11 +24,12 @@ int rh4nvarFreeFork(RH4nVarEntry_t *forkanker) {
 
         hptr = prev;
     }
-
+    free(forkanker->name);
+    if(forkanker->var.value) free(forkanker->var.value);
     free(forkanker);
 }
 
-int rh4nvarFreeArray(RH4nVarEntry_t *var) {
+void rh4nvarFreeArray(RH4nVarEntry_t *var) {
     int dimension = 0, index[3] = { -1, -1, -1 }, length[3] = { -1, -1, -1 };
     RH4nVarObj *entry[3] = {NULL, NULL, NULL };
 
@@ -38,11 +39,11 @@ int rh4nvarFreeArray(RH4nVarEntry_t *var) {
     for(index[0] = 0;index[0] < length[0]; index[0]++) {
         index[1] = index[2] = -1;
         rh4nvarGetArrayEntry(&var->var, index, &entry[0]);
-        if(dimension == 2) {
+        if(dimension > 1) {
             for(index[1] = 0; index[1] < length[1]; index[1]++) {
                 index[2] = -1;
                 rh4nvarGetArrayEntry(&var->var, index, &entry[1]);
-                if(dimension == 3) {
+                if(dimension > 2) {
                     for(index[2] = 0; index[2] < length[2]; index[2]++) {
                         rh4nvarGetArrayEntry(&var->var, index, &entry[2]);
                         if(entry[2]->value) free(entry[2]->value);

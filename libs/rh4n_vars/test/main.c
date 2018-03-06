@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
 
     //arraylength[0] = 5;
     //arraylength[1] = 3;
-    memset(arraylength, NULL, sizeof(arraylength));
+    memset(arraylength, 0x00, sizeof(arraylength));
     rh4nvarCreateNewStringArray(&varlist, NULL, "strarray2", 1, arraylength);
 
     //rh4nvarPrintList(&varlist);
@@ -45,4 +45,7 @@ int main(int argc, char *argv[]) {
     rh4nvarMoveVarToGroup(&varlist, "strarray1", "grp1");
     rh4nvarPrintList(&varlist, &props);
     printf("\n");
+    rh4nvarFreeList(&varlist);
+    rh4n_del_log_rule(props.logging);
+    return(0);
 }
