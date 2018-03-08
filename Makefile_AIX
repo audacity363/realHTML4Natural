@@ -1,7 +1,7 @@
 CC = xlc
 AR = ar
 JAR = jar
-JAVA = java 
+JAVAC = javac
 JAVAH = javah
 
 LFLAGS1_SO = -G -bsymbolic -bexpall -bnoentry
@@ -32,6 +32,45 @@ CARGS2 =
 CARGS_SO = -c -g -q64 -fpic $(INCLUDE)
 
 LIBOUTPUT = ./bin/libs/
+
+help:
+	@printf "Targets:\n"
+	@printf "\t+----------------------------CORE:---------------------------+\n"
+	@printf "\t| utils                                                      |\n"
+	@printf "\t|   Utils library (./libs/rh4n_utils)                        |\n"
+	@printf "\t|                                                            |\n"
+	@printf "\t| logging                                                    |\n"
+	@printf "\t|   Logging library (./libs/rh4n_logging)                    |\n"
+	@printf "\t|                                                            |\n"
+	@printf "\t| vars                                                       |\n"
+	@printf "\t|   Vars library (./libs/rh4n_vars)                          |\n"
+	@printf "\t|                                                            |\n"
+	@printf "\t| ldaparser                                                  |\n"
+	@printf "\t|   LDA parser library (./libs/rh4n_ldaparser)               |\n"
+	@printf "\t|                                                            |\n"
+	@printf "\t| var2name                                                   |\n"
+	@printf "\t|   Name and Postion matching library (./libs/rh4n_var2name) |\n"
+	@printf "\t|                                                            |\n"
+	@printf "\t| natuserlib                                                 |\n"
+	@printf "\t|   Shared library for natural (./natuser_lib)               |\n"
+	@printf "\t+------------------------------------------------------------+\n\n"
+	@printf "\t+--------------------------Tomcat:---------------------------+\n"
+	@printf "\t| tomcatconnector_package                                    |\n"
+	@printf "\t|   Utils for the servlet                                    |\n"
+	@printf "\t|                                                            |\n"
+	@printf "\t| tomcatconnector_servlet                                    |\n"
+	@printf "\t|   Servlet which handels requests                           |\n"
+	@printf "\t|                                                            |\n"
+	@printf "\t| tomcatconnector_warfile                                    |\n"
+	@printf "\t|   Creates a deployable warfile                             |\n"
+	@printf "\t+------------------------------------------------------------+\n"
+	@printf "\t| jnilibrary                                                 |\n"
+	@printf "\t|   JNI library required by the servlet                      |\n"
+	@printf "\t|                                                            |\n"
+	@printf "\t| jniheader                                                  |\n"
+	@printf "\t|   Generates JNI header file required by the JNI Library    |\n"
+	@printf "\t+------------------------------------------------------------+\n\n"
+	@printf "\tall: Compiles everything\n"
 
 all: utils logging vars var2name ldaparser natuserlib jnilibrary tomcatconnector_warfile
 	@printf "You find the binarys under ./bin\n"
@@ -304,11 +343,11 @@ WARFILE_PREFIX = ./TomcatConnector/servlet/web
 
 tomcatconnector_package: tomcatconnector_package_clean tomcatconnector_package_pre
 	@printf "Compiling realHTML.servlet.exceptions\n"
-	@javac -d $(TOMCONNECTOR_LIB_BIN) -cp $(CLASSPATH) $(JAVA_UTILS_EXCEPTIONS)
+	@$(JAVAC) -d $(TOMCONNECTOR_LIB_BIN) -cp $(CLASSPATH) $(JAVA_UTILS_EXCEPTIONS)
 	@printf "Compiling realHTML.tomcat.JSONMatcher\n"
-	@javac -d $(TOMCONNECTOR_LIB_BIN) -cp $(CLASSPATH) $(JAVA_JSON_PARSER)
+	@$(JAVAC) -d $(TOMCONNECTOR_LIB_BIN) -cp $(CLASSPATH) $(JAVA_JSON_PARSER)
 	@printf "Compiling realHTML.tomcat.connector\n"
-	@javac -d $(TOMCONNECTOR_LIB_BIN) -cp $(CLASSPATH) $(JAVA_UTILS_PACKAGE)
+	@$(JAVAC) -d $(TOMCONNECTOR_LIB_BIN) -cp $(CLASSPATH) $(JAVA_UTILS_PACKAGE)
 	@printf "Creating realHTMLconnector.jar\n"
 	@cd $(TOMCONNECTOR_LIB_BIN) && jar cf ../../../TomcatConnector/servlet/web/WEB-INF/realHTMLconnector.jar ./realHTML
 	
@@ -324,7 +363,7 @@ tomcatconnector_package_clean:
 
 tomcatconnector_servlet: tomcatconnector_package tomcatconnector_servlet_clean tomcatconnector_servlet_pre
 	@printf "Compiling servlets\n"
-	@javac -d $(TOMCAT_SERVLETS_BIN) -cp $(CLASSPATH) $(TOMCAT_SERVLETS)
+	@$(JAVAC) -d $(TOMCAT_SERVLETS_BIN) -cp $(CLASSPATH) $(TOMCAT_SERVLETS)
 	@printf "Copying servlet classes into warfile\n"
 	@cp $(TOMCAT_SERVLETS_BIN)/*.class $(WARFILE_PREFIX)/WEB-INF/classes/
 
