@@ -6,3 +6,6 @@ core
 *.so
 .nfs*
 *logs*
+*.war
+bin
+natuser_lib_old

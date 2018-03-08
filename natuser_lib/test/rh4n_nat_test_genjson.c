@@ -49,6 +49,9 @@ int main(int argc, char *argv[]) {
     index[0] = 2;
     rh4nvarSetStringArrayEntry(&props.bodyvars, NULL, "INFIELD44", index, "1.3");
 
+    rh4nvarCreateNewGroup(&props.bodyvars, "GRP1");
+    rh4nvarCreateNewString(&props.bodyvars, "GRP1", "GRPFIELD1", "Hello Group");
+
     rh4nvarPrintList(&props.bodyvars, &props);
 
 

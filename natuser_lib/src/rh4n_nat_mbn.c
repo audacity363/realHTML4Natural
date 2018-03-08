@@ -47,6 +47,7 @@ int rh4nnatPutParms(RH4nVarList *varlist, WORD nparms, void *parmhandle, RH4nVar
             return(RH4N_RET_NNI_ERR);
         }
 
+    
         if(strlen(pos.parm_positions[i].groupname) == 0) groupname = NULL;
         else groupname = pos.parm_positions[i].groupname;
 
