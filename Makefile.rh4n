@@ -252,7 +252,9 @@ NATUSER_OBJS = rh4n_nat_jumptab.o \
 			   rh4n_nat_variablereadout.o \
 			   rh4n_nat_geturlobj.o \
 			   rh4n_nat_mbn.o \
-			   rh4n_nat_getbodyobj.o
+			   rh4n_nat_getbodyobj.o \
+			   rh4n_nat_getbodyvar.o \
+			   rh4n_nat_geturlvar.o
 			   
 NATUSER_READOUT_OBJS = rh4n_nat_a_handling.o \
 					   rh4n_nat_i_handling.o \

@@ -43,7 +43,7 @@ int rh4nnatPutParms(RH4nVarList *varlist, WORD nparms, void *parmhandle, RH4nVar
     for(; i < pos.length; i++) {
         if((rc = parms->nnifuncs->pf_nni_get_parm_info(parms->nnifuncs, pos.parm_positions[i].position+2,
             parmhandle, &desc)) != NNI_RC_OK) {
-            sprintf(errorstr, "Could not get parm description on parms %d. NNI return: %d", pos.parm_positions[i].position, rc);
+            sprintf(errorstr, "Could not get parm description on parms %d. NNI return: %d", pos.parm_positions[i].position+2, rc);
             return(RH4N_RET_NNI_ERR);
         }
 

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "standard.h"
 #include "rh4n_nat.h"
@@ -112,6 +113,24 @@ int rh4nnatParseFormatStr(char *formatstr, struct RH4nNatLDAInfos *pldainfos, RH
     rh4n_log_debug(props->logging, "json-struct: [%s]", pldainfos->struct_name);
     rh4n_log_debug(props->logging, "lib: [%s]", pldainfos->library);
     rh4n_log_debug(props->logging, "lda: [%s]", pldainfos->ldaname);
+    return(RH4N_RET_OK);
+}
+
+int parseVariableFormatStr(char *formatstr, RH4nProperties *props, char *groupname, char *varname) {
+    char *pointpos = NULL;
+
+    if((pointpos = strchr(formatstr, '.')) == NULL) {
+        strcpy(varname, formatstr);
+        *groupname = '\0';
+    } else {
+        *pointpos = '\0';
+        strcpy(groupname, formatstr);
+        strcpy(varname, pointpos+1);
+    }
+
+    rh4n_log_debug(props->logging, "Found group: [%s]", groupname);
+    rh4n_log_debug(props->logging, "Found varname [%s]", varname);
+
     return(RH4N_RET_OK);
 }
 

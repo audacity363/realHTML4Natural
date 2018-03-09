@@ -31,7 +31,9 @@
 
 extern long rh4nnatGenJSON();
 extern long rh4nnatGetURLObj();
+extern long rh4nnatGetURLVar();
 extern long rh4nnatGetBodyObj();
+extern long rh4nnatGetBodyVar();
 /*
 ** section 3: initialize the jumptable
 **
@@ -43,10 +45,12 @@ extern long rh4nnatGetBodyObj();
 
 TAB_STRUCT n_call_table[] = {
 
-  { "GENJSON", rh4nnatGenJSON},
-  { "GETURLO", rh4nnatGetURLObj},
-  { "GETBODO", rh4nnatGetBodyObj}
-
+  { "RHGENJS", rh4nnatGenJSON},      //Generate JSON
+  { "RHGETUO", rh4nnatGetURLObj },   //Match by name (URL)
+  { "RHGETUV", rh4nnatGetURLVar },   //Get URL variable
+  { "RHGETBO", rh4nnatGetBodyObj },  //Match by name (BODY)
+  { "RHGETBV", rh4nnatGetBodyVar },  //Get BODY variable
+  { "RHDEBUG", 0x00 }                //Placeholder for framework init (debugging in NATOne)
 };
 
 

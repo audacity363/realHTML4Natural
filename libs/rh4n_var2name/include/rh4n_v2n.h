@@ -12,7 +12,7 @@ typedef struct {
     RH4nVarPosition_t *parm_positions;
 } RH4nVarPositions_t;
 
-
+#ifdef RH4NLDAPARSER
 int rh4nv2nStart(RH4nVarList*, RH4nLDAEntry_t*, char*, RH4nProperties*, char*);
 int rh4nv2nStartPosition(RH4nLDAEntry_t*, char*, RH4nVarPositions_t*, RH4nProperties*, char*);
 int rh4nv2ncmpVarNumbers(RH4nVarList*, RH4nLDAEntry_t*, RH4nProperties*, char*);
@@ -20,4 +20,5 @@ int rh4nv2ncountVarsinLDAGroup(RH4nLDAEntry_t*);
 int rh4nv2nSearchTargetStruct(RH4nLDAEntry_t*, char*, RH4nLDAEntry_t**, char*);
 int rh4nv2nSavePosition(char*, char*, int, RH4nVarPositions_t*, RH4nProperties*);
 int rh4nv2nMatchPosition(RH4nLDAEntry_t *, char*, int*, RH4nVarPositions_t*, RH4nProperties*); 
+#endif
 #endif
