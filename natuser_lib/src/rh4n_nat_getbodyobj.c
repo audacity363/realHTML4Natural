@@ -19,7 +19,7 @@ long rh4nnatGetBodyObj(WORD nparms, void *parmhandle, void *traditional) {
     RH4nLDAEntry_t *ldavars = NULL;
     RH4nVarPositions_t pos = {-1, NULL };
 
-    if((utilsret = rh4nnatInit(parmhandle, &initparms, errorstr)) != RH4N_RET_OK) {
+    if((utilsret = rh4nnatInit(parmhandle, &initparms, errorstr, true)) != RH4N_RET_OK) {
         return(utilsret);
     }
 

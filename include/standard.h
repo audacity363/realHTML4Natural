@@ -39,6 +39,7 @@
 #define RH4N_RET_TARADITIONAL 30
 #define RH4N_RET_LDA_NAT_MISSMATCH 31
 #define RH4N_RET_STRUCT_ERR 32
+#define RH4N_RET_NO_USER 33
 
 
 typedef struct {
@@ -56,6 +57,8 @@ typedef struct {
     char errorrepresentation[20];
 
     RH4nLogrule *logging;
+
+    char username[1000];
 
 } RH4nProperties;
 

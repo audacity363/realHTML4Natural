@@ -14,4 +14,5 @@ public class RH4NParams {
     public String natsrcpath;
     public String logpath;
     public String errorRepresentation;
+    public String username;
 }

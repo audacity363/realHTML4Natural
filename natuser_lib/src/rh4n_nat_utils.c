@@ -5,7 +5,7 @@
 #include "standard.h"
 #include "rh4n_nat.h"
 
-int rh4nnatGetParameter(pnni_611_functions nnifuncs, void *parmhandle, RH4nProperties **props, char **formatstr, char *errorstr) {
+int rh4nnatGetParameter(pnni_611_functions nnifuncs, void *parmhandle, RH4nProperties **props, char **formatstr, char *errorstr, bool checkformat) {
     struct parameter_description pdprop, pdformat;
     int nniret = 0;
 
@@ -22,7 +22,8 @@ int rh4nnatGetParameter(pnni_611_functions nnifuncs, void *parmhandle, RH4nPrope
     }
     if(*props == NULL) return(RH4N_RET_PARM_MISSMATCH);
 
-    
+    if(!checkformat) return(RH4N_RET_OK);
+
     if((nniret = nnifuncs->pf_nni_get_parm_info(nnifuncs, RH4NNATFORMATPOS, parmhandle, &pdformat)) != NNI_RC_OK) 
         return(RH4N_RET_NNI_ERR);
     if(pdformat.format != NNI_TYPE_ALPHA || pdformat.dimensions != 0 || pdformat.length_all == 0) {

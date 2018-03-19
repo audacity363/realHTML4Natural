@@ -17,8 +17,8 @@ struct RH4nNatLDAInfos{
     char ldaname[NNI_LEN_MEMBER+1];
 };
 
-int rh4nnatInit(void*, RH4nNatInit_t*, char*);
-int rh4nnatGetParameter(pnni_611_functions, void*, RH4nProperties**, char**, char*);
+int rh4nnatInit(void*, RH4nNatInit_t*, char*, bool);
+int rh4nnatGetParameter(pnni_611_functions, void*, RH4nProperties**, char**, char*, bool);
 int rh4nnatParseFormatStr(char*, struct RH4nNatLDAInfos*, RH4nProperties*);
 int parseVariableFormatStr(char*, RH4nProperties*, char*, char*);
 int rh4nnatStartVariableReadout(WORD, void*, pnni_611_functions, RH4nVarList*, RH4nProperties*, char*);

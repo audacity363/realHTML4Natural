@@ -14,6 +14,7 @@ public class RH4NCallParms {
     public Boolean debug = false;
     public Boolean deleteFile = false;
     public String loglevel = "";
+    public String username = "";
 
     public Boolean request_successful = false;
 

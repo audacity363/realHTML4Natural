@@ -6,7 +6,7 @@
 #include "rh4n_nat.h"
 #include "rh4n_utils.h"
 
-int rh4nnatInit(void *parmhandle, RH4nNatInit_t *initparms, char *errorstr) {
+int rh4nnatInit(void *parmhandle, RH4nNatInit_t *initparms, char *errorstr, bool checkformat) {
     int utilsret = 0;
 
     if((utilsret = rh4nUtilsloadSharedLibrary(NULL, RH4N_SONAME_NATURAL, &initparms->sharedlibrary, 
@@ -22,7 +22,7 @@ int rh4nnatInit(void *parmhandle, RH4nNatInit_t *initparms, char *errorstr) {
     }
 
     if((utilsret = rh4nnatGetParameter(initparms->nnifuncs, parmhandle, &initparms->props, 
-                                       &initparms->formatstr, errorstr)) != RH4N_RET_OK) {
+                                       &initparms->formatstr, errorstr, checkformat)) != RH4N_RET_OK) {
         fprintf(stderr, "Could not get parms: %d\n", utilsret); fflush(stderr);
         return(utilsret);
     }

@@ -18,7 +18,8 @@ int rh4nReadOutParms(JNIEnv *env, jobject jnatparams, RH4nProperties *properties
         {"loglevel", "Ljava/lang/String;", rh4nParmLoglevelHandler},
         {"natsrcpath", "Ljava/lang/String;", rh4nParmNatSrcPathHandler},
         {"logpath", "Ljava/lang/String;", rh4nParmLogPathHandler},
-        {"errorRepresentation", "Ljava/lang/String;", rh4nParmErrorRepresentationHandler}
+        {"errorRepresentation", "Ljava/lang/String;", rh4nParmErrorRepresentationHandler},
+        {"username", "Ljava/lang/String;", rh4nParmUsernameHandler}
     };
     int i = 0, ret = 0;
     jclass jcrh4nparams;
@@ -229,11 +230,25 @@ int rh4nParmLogPathHandler(JNIEnv *env, const char *strvalue, RH4nProperties *pr
 
 int rh4nParmErrorRepresentationHandler(JNIEnv *env, const char *strvalue, RH4nProperties *properties, char *error_str) { 
     if(strlen(strvalue) > sizeof(properties->errorrepresentation)) {
-        sprintf(error_str, "loglevel to big. (MaxLength = [%d])", sizeof(properties->errorrepresentation));
+        sprintf(error_str, "errorrepresentation to big. (MaxLength = [%d])", sizeof(properties->errorrepresentation));
         return(RH4N_RET_BUFFER_OVERFLOW);
     }
 
     strcpy(properties->errorrepresentation, strvalue);
+    return(RH4N_RET_OK);
+}
+
+int rh4nParmUsernameHandler(JNIEnv *env, const char *strvalue, RH4nProperties *properties, char *error_str) { 
+    if(strlen(strvalue) > sizeof(properties->username)) {
+        sprintf(error_str, "username to big. (MaxLength = [%d])", sizeof(properties->username));
+        return(RH4N_RET_BUFFER_OVERFLOW);
+    }
+    if(strlen(strvalue) == 0) {
+        memset(properties->username, 0x00, sizeof(properties->username));
+        return(RH4N_RET_OK);
+    }
+
+    strcpy(properties->username, strvalue);
     return(RH4N_RET_OK);
 }
 
@@ -249,6 +264,7 @@ void rh4nPrintPropertiesStruct(RH4nProperties *properties) {
     rh4n_log_debug(properties->logging, "Outputfile:          [%s]", properties->outputfile);
     rh4n_log_debug(properties->logging, "Logpath:             [%s]", properties->logpath);
     rh4n_log_debug(properties->logging, "ErrorRepresentation: [%s]", properties->errorrepresentation);
+    rh4n_log_debug(properties->logging, "Username:            [%s]", properties->username);
     //TODO: rewrite the print function fromm the variable lib with the new logging lib
     //rh4n_log_debug("Url Variables:");
     //printAllVarsToFile(properties->urlvars, stdout);

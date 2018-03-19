@@ -108,6 +108,7 @@ public class realHTMLHandler extends HttpServlet {
             parms.logpath = this.loggingpath;
             parms.loglevel = call_parms.loglevel;
             parms.errorRepresentation = "JSON";
+            parms.username = call_parms.username;
 
             deleteFile = call_parms.deleteFile;
             envvars = call_parms.enviromentvars;
@@ -179,6 +180,7 @@ public class realHTMLHandler extends HttpServlet {
         RH4NCallParms parms = new RH4NCallParms();
         Router r;
         Route route = null;
+        HttpSession session = null;
 
         //System.out.println("RequestURI: " + request.getRequestURI());
         //System.out.println("ContextPath: " + request.getContextPath());
@@ -222,7 +224,13 @@ public class realHTMLHandler extends HttpServlet {
             if(!checkLogin(request, response)) {
                 return(null);
             }
+            session = request.getSession();
+            parms.username = (String)session.getAttribute("username");
+        } else {
+            parms.username = "";
         }
+
+        System.out.printf("Username: [%s]\n", parms.username);
 
         parms.natinfos[0] = route.library; //r.getLibrary();
         parms.natinfos[1] = route.program; //r.getProgram();

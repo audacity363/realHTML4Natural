@@ -18,7 +18,7 @@ long rh4nnatGenJSON(WORD nparms, void *parmhandle, void *traditional) {
     RH4nVarList varlist;
     RH4nLDAEntry_t *ldavars = NULL;
 
-    if((utilsret = rh4nnatInit(parmhandle, &initparms, errorstr)) != RH4N_RET_OK) {
+    if((utilsret = rh4nnatInit(parmhandle, &initparms, errorstr, true)) != RH4N_RET_OK) {
         return(utilsret);
     }
 
