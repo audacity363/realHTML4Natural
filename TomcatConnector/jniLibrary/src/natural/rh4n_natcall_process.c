@@ -92,7 +92,21 @@ int rh4nCallNatural(RH4nProperties *props, RH4NEnvirons *environs) {
         return(RH4N_RET_INTERNAL_ERR);
     }
 
+    rh4n_log_info(props->logging, "Uninitialize NNI");
+    if((nniret = nnifuncs->pf_nni_uninitialize(nnifuncs)) != NNI_RC_OK) {
+        rh4n_log_error(props->logging, "Error while uninitialize NNI. NNI err: [%d]", nniret);
+        return(RH4N_RET_INTERNAL_ERR);
+    }
+
+    rh4n_log_info(props->logging, "Freeing NNI");
+    if((nniret = nnifuncs->pf_nni_free_interface(nnifuncs)) != NNI_RC_OK) {
+        rh4n_log_error(props->logging, "Error while freeing NNI. NNI err: [%d]", nniret);
+        return(RH4N_RET_INTERNAL_ERR);
+    }
+
     rh4n_log_debug(props->logging, "Everyting went fine exiting natural process");
+
+    rh4nUtilscloseSharedLibrary(nnisharedlib);
 
     return(RH4N_RET_OK);
 }
