@@ -34,7 +34,7 @@ int rh4nnatputString(RH4nNatVarHandleParms *args, char *groupname, char *varname
         return(rc);
     }
     
-    if((rc = args->nnifuncs->pf_nni_put_parm(args->nnifuncs, args->parmindex, args->parmhandle, strlength+1, buff)) != NNI_RC_OK) {
+    if((rc = args->nnifuncs->pf_nni_put_parm(args->nnifuncs, args->parmindex, args->parmhandle, strlength, buff)) != NNI_RC_OK) {
         free(buff);
         sprintf(args->errorstr, "Could not set parm %d. NNI return: %d", args->parmindex, rc);
         return(rc);
