@@ -1,6 +1,6 @@
 use Getopt::Long;
 use File::Basename;
- use File::Copy;
+use File::Copy;
 
 sub printUsage {
     print "Usage: $0\n";
@@ -29,6 +29,11 @@ sub searchBin {
 }
 
 my $cc = "";
+my $cc_lf1_so = "";
+my $cc_lf2_so = "";
+my $cc_cargs1 = "";
+my $cc_cargs2 = "";
+my $cc_cargs_so = "";
 my $ar = "";
 my $javac = "";
 my $javah = "";
@@ -119,6 +124,20 @@ if(!$jnipath) {
     }
 }
 
+if($cc == "gcc") {
+    $cc_lf1_so = "-shared -Wl,--no-undefined";
+    $cc_lf2_so = "";
+    $cc_cargs1 = "-g -c -fPIC";
+    $cc_cargs2 = "";
+    $cc_cargs_so = "-c -g -fPIC";
+} else {
+    $cc_lf1_so = "-G -bsymbolic -bexpall -bnoentry";
+    $cc_lf2_so = "-b64 -ldl -blibpath:/usr/lib/threads:/usr/lib:/lib -lc_r";
+    $cc_cargs1 = "-g -c";
+    $cc_cargs2 = "";
+    $cc_cargs_so = "-c -g -q64 -fpic";
+}
+
 print "Summary:\n";
 print "\tCC:           $cc\n";
 print "\tar:           $ar\n";
@@ -139,6 +158,8 @@ if($yesno eq "n" || $yesno eq "N") {
 print "Building Makefile\n";
 copy("Makefile.rh4n","Makefile") or die "Copy failed: $!";
 
+$jnipath = "-I".$jnipath." -I".$jnipath."/linux/";
+
 `perl -pi -e "s~{{CC}}~$cc~g" ./Makefile`;
 `perl -pi -e "s~{{AR}}~$ar~g" ./Makefile`;
 `perl -pi -e "s~{{JAR}}~$jar~g" ./Makefile`;
@@ -146,3 +167,9 @@ copy("Makefile.rh4n","Makefile") or die "Copy failed: $!";
 `perl -pi -e "s~{{JAVAH}}~$javah~g" ./Makefile`;
 `perl -pi -e "s~{{SERVLETPATH}}~$tomcatpath~g" ./Makefile`;
 `perl -pi -e "s~{{JNIPATH}}~$jnipath~g" ./Makefile`;
+`perl -pi -e "s~{{CCLF1SO}}~$cc_lf1_so~g" ./Makefile`;
+`perl -pi -e "s~{{CCLF2SO}}~$cc_lf2_so~g" ./Makefile`;
+`perl -pi -e "s~{{CCCARGS1}}~$cc_cargs1~g" ./Makefile`;
+`perl -pi -e "s~{{CCCARGS2}}~$cc_cargs2~g" ./Makefile`;
+`perl -pi -e "s~{{CCCARGSSO}}~$cc_cargs_so~g" ./Makefile`;
+
