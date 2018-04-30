@@ -42,7 +42,7 @@ int rh4nCallNatural(RH4nProperties *props, RH4NEnvirons *environs) {
     void *nnisharedlib = NULL;
     pnni_611_functions nnifuncs = NULL;
     char error_str[2048];
-    int nniret = 0;
+    int nniret = 0, natret = RH4N_RET_OK;
     struct natural_exception naturalex;
 
     if(rh4nUtilsloadSharedLibrary(props, RH4N_SONAME_NATURAL, &nnisharedlib, error_str) != RH4N_RET_OK) {
@@ -89,7 +89,7 @@ int rh4nCallNatural(RH4nProperties *props, RH4NEnvirons *environs) {
     rh4n_log_info(props->logging, "Calling natural program [%s]", props->natprogram);
     if((nniret = nnifuncs->pf_nni_callnat(nnifuncs, props->natprogram, 2, naturalparms, &naturalex)) != NNI_RC_OK) {
         rh4nHandleNaturalError(props, nniret, naturalex);
-        return(RH4N_RET_INTERNAL_ERR);
+        natret = RH4N_RET_INTERNAL_ERR;
     }
 
     rh4n_log_info(props->logging, "Uninitialize NNI");
@@ -108,5 +108,5 @@ int rh4nCallNatural(RH4nProperties *props, RH4NEnvirons *environs) {
 
     rh4nUtilscloseSharedLibrary(nnisharedlib);
 
-    return(RH4N_RET_OK);
+    return(natret);
 }

@@ -59,9 +59,11 @@ int rh4nnatputFloatArray(RH4nNatVarHandleParms *args, char* groupname, char* var
         return(RH4N_RET_DIM3_TOO_SMALL);
     }
     
-    rh4n_log_debug(args->props->logging, "Resize array to [%d,%d,%d]", arrlength[0], arrlength[1], arrlength[2]);
-    if((rc = args->nnifuncs->pf_nni_resize_parm_array(args->nnifuncs, args->parmindex, args->parmhandle, arrlength)) != NNI_RC_OK) {
-        return(RH4N_RET_NNI_ERR);
+    if(args->desc->flags & NNI_FLG_XARRAY) {
+        rh4n_log_debug(args->props->logging, "Resize array to [%d,%d,%d]", arrlength[0], arrlength[1], arrlength[2]);
+        if((rc = args->nnifuncs->pf_nni_resize_parm_array(args->nnifuncs, args->parmindex, args->parmhandle, arrlength)) != NNI_RC_OK) {
+            return(RH4N_RET_NNI_ERR);
+        }
     }
 
     for(; x < arrlength[0]; x++) {
