@@ -35,7 +35,7 @@ int rh4nldaGetVariablenLength(char **line, int *length, int type, char *errorstr
     {
         //Only Unicode and Alphanumeric can have a length of Dynamic
         //just trust on Natural that the Syntax is right
-        if(type == NNI_TYPE_ALPHA || type == NNI_TYPE_UNICODE)
+        if(type == NNI_TYPE_ALPHA || type == NNI_TYPE_UNICODE || type == NNI_TYPE_LOG)
         {
             *length = -1;
             return(RH4N_RET_OK);
