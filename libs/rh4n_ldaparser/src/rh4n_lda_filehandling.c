@@ -15,7 +15,7 @@ int rh4nldaReadLine(FILE *fplda, char **ppline, RH4nProperties *props) {
 
     while((curchar = fgetc(fplda)) != EOF) {
         switch(curchar) {
-            case NULL:
+            case 0x00:
                 line[length] = NULL;
                 *ppline = line;
                 return(RH4N_RET_OK);

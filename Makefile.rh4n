@@ -1,17 +1,17 @@
-CC = xlc
-AR = ar
-JAR = jar
-JAVAC = javac
-JAVAH = javah
+CC = {{CC}}
+AR = {{AR}}
+JAR = {{JAR}}
+JAVAC = {{JAVAC}}
+JAVAH = {{JAVAH}}
 
-LFLAGS1_SO = -G -bsymbolic -bexpall -bnoentry
-LFLAGS2_SO = -b64 -ldl -blibpath:/usr/lib/threads:/usr/lib:/lib -lc_r
+LFLAGS1_SO = {{CCLF1SO}}
+LFLAGS2_SO = {{CCLF2SO}}
 
-TOMCATCLASSPATH = /opt/tomcat/tomcat-rh4n/lib/servlet-api.jar
-RH4NCLASSPATH = ./TomcatConnector/servlet/web/WEB-INF/realHTMLconnector.jar:./TomcatConnector/servlet/web/WEB-INF/lib/minimal-json-0.9.4.jar:./TomcatConnector/servlet/web/WEB-INF/lib/commons-io-2.6.jar:./bin/servlet/lib
+TOMCATCLASSPATH = {{SERVLETPATH}}
+RH4NCLASSPATH = ./TomcatConnector/servlet/web/WEB-INF/lib/realHTMLconnector.jar:./TomcatConnector/servlet/web/WEB-INF/lib/minimal-json-0.9.5.jar:./TomcatConnector/servlet/web/WEB-INF/lib/commons-io-1.3.2.jar:./bin/servlet/lib
 CLASSPATH = "$(TOMCATCLASSPATH):$(RH4NCLASSPATH)"
 
-JNIINCLUDE = /SAG/cjp/v16/include/
+JNIINCLUDE = {{JNIPATH}}
 
 
 INCLUDE = -I./include/ \
@@ -22,14 +22,14 @@ INCLUDE = -I./include/ \
 		  -I./libs/rh4n_var2name/include/ \
 		  -I./natuser_lib/include/ \
 		  -I./TomcatConnector/jniLibrary/include/ \
-		  -I$(JNIINCLUDE)
+		  $(JNIINCLUDE)
 
 LIBS = -L./bin/libs \
-	   -lrh4nlogging -lrh4nutils -lrh4nvars -lrh4nvar2name -lrh4nldaparser -lcrypt
+	   -ldl -lrh4nutils -lrh4nlogging -lrh4nvar2name -lrh4nvars -lrh4nldaparser -lcrypt
 
-CARGS1 = -g -c $(INCLUDE)
-CARGS2 = 
-CARGS_SO = -c -g -q64 -fpic $(INCLUDE)
+CARGS1 = {{CCCARGS1}} $(INCLUDE)
+CARGS2 = {{CCCARGS2}}
+CARGS_SO = {{CCCARGSSO}} $(INCLUDE)
 
 LIBOUTPUT = ./bin/libs/
 
@@ -408,7 +408,7 @@ JNI_SRC = ./TomcatConnector/jniLibrary/src
 
 jnilibrary: utils logging vars jniheader jnilibrary_clean jnilibrary_pre $(JNI_JSON_HANDLERS) $(JNI_NAT_HANDLERS) $(JNI_MEMBER)
 	@printf "Linking librealHTMLconnector.so\n"
-	@$(CC) -G -o ./bin/librealHTMLconnector.so $(LIBS) $(JNI_BIN)/*.o
+	@$(CC) $(LFLAGS1_SO) $(JNI_BIN)/*.o $(LIBS) -o ./bin/librealHTMLconnector.so
 
 $(JNI_MEMBER):
 	@printf "CC $(JNI_SRC)/$*.c => $(JNI_BIN)/$*.o\n"
