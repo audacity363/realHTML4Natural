@@ -31,7 +31,7 @@ int rh4nnatGetParameter(pnni_611_functions nnifuncs, void *parmhandle, RH4nPrope
         return(RH4N_RET_PARM_MISSMATCH);
     }
     if((*formatstr = malloc(sizeof(char)*(pdformat.length_all+1))) == NULL) return(RH4N_RET_MEMORY_ERR);
-    memset(*formatstr, NULL, sizeof(char)*(pdformat.length_all+1));
+    memset(*formatstr, 0x00, sizeof(char)*(pdformat.length_all+1));
     if((nniret = nnifuncs->pf_nni_get_parm(nnifuncs, RH4NNATFORMATPOS, parmhandle, pdformat.length_all, *formatstr)) != NNI_RC_OK) {
         free(*formatstr);
         return(RH4N_RET_NNI_ERR);

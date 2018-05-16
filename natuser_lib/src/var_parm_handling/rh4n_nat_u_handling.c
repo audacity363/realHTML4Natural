@@ -20,14 +20,14 @@ int rh4nnatUnicodeHandler(RH4nNatVarHandleParms *args) {
     buffsize = args->desc->byte_length;
     
     if((tmpbuff = malloc(buffsize)) == NULL) return(RH4N_RET_MEMORY_ERR);
-    memset(tmpbuff, NULL, buffsize);
+    memset(tmpbuff, 0x00, buffsize);
 
     if((wctmpbuff = malloc(sizeof(wchar_t)*strlength)) == NULL) {
         sprintf(args->errorstr, "Could not allocate memory for wchar buffer");
         free(tmpbuff);
         return(RH4N_RET_MEMORY_ERR);
     }
-    memset(wctmpbuff, NULL, sizeof(wchar_t)*strlength);
+    memset(wctmpbuff, 0x00, sizeof(wchar_t)*strlength);
 
     if(strlength > 1) {
         if((nniret = args->nnifuncs->pf_nni_get_parm(args->nnifuncs, args->parmindex, args->parmhandle, 
@@ -111,14 +111,14 @@ int rh4nnatSaveUnicodeArrayEntry(RH4nNatVarHandleParms *args, int index[3]) {
         sprintf(args->errorstr, "Could not allocate memory for tmp buffer.");
         return(RH4N_RET_MEMORY_ERR);
     }
-    memset(tmpbuff, NULL, buffsize);
+    memset(tmpbuff, 0x00, buffsize);
 
     if((wctmpbuff = malloc(sizeof(wchar_t)*(strlength+1))) == NULL) {
         free(tmpbuff);
         sprintf(args->errorstr, "Could not allocate memory for wc tmp buffer.");
         return(RH4N_RET_MEMORY_ERR);
     }
-    memset(wctmpbuff, NULL, sizeof(wchar_t)*(strlength+1));
+    memset(wctmpbuff, 0x00, sizeof(wchar_t)*(strlength+1));
 
     if((nniret = args->nnifuncs->pf_nni_get_parm_array(args->nnifuncs, args->parmindex, args->parmhandle, buffsize, 
             tmpbuff, index)) != NNI_RC_OK) {

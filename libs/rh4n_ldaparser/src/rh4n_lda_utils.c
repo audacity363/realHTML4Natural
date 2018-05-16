@@ -78,10 +78,10 @@ char *rh4nldastrtok(char *str, char delmiter)
 void rh4nldaInitEntry(RH4nLDAEntry_t *entry) {
     entry->level = -1;
     entry->type = -1;
-    memset(entry->name, NULL, sizeof(entry->name));
+    memset(entry->name, 0x00, sizeof(entry->name));
     entry->dimensions = 0;
     entry->length = -1;
-    memset(entry->arraylength, NULL, sizeof(entry->length));
+    memset(entry->arraylength, 0x00, sizeof(entry->length));
     entry->prev = NULL;
     entry->next = NULL;
     entry->nextlvl = NULL;

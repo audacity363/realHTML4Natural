@@ -16,7 +16,7 @@ int rh4nldaReadLine(FILE *fplda, char **ppline, RH4nProperties *props) {
     while((curchar = fgetc(fplda)) != EOF) {
         switch(curchar) {
             case 0x00:
-                line[length] = NULL;
+                line[length] = 0x00;
                 *ppline = line;
                 return(RH4N_RET_OK);
             case 0x1E: //Last char in File before EOF

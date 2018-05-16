@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <wchar.h>
 
 #include "standard.h"
@@ -11,7 +12,7 @@ int rh4nnatputAtoN(RH4nNatVarHandleParms *args, char *groupname, char *varname) 
 
     if(args->desc->dimensions > 0) return(rh4nnatputAtoNArray(args, groupname, varname));
 
-    memset(natbuff, NULL, sizeof(natbuff));
+    memset(natbuff, 0x00, sizeof(natbuff));
 
     if((rc = rh4nvarGetStringLength(args->varlist, groupname, varname, &strlength)) !=  RH4N_RET_OK) {
         sprintf(args->errorstr, "Could not get strlen from %s.%s. Varlibret: %d", groupname, varname, rc);
@@ -22,7 +23,7 @@ int rh4nnatputAtoN(RH4nNatVarHandleParms *args, char *groupname, char *varname) 
         return(RH4N_RET_MEMORY_ERR);
     }
 
-    memset(buff, NULL, sizeof(char)*(strlength+1));
+    memset(buff, 0x00, sizeof(char)*(strlength+1));
     if((rc = rh4nvarGetString(args->varlist, groupname, varname, strlength+1, buff)) != RH4N_RET_OK) {
         sprintf(args->errorstr, "Could not get string from %s.%s. Varlib return: %d", groupname, varname, rc);
         free(buff);
@@ -114,7 +115,7 @@ int rh4nnatputAtoNArrayEntry(RH4nNatVarHandleParms *args, char* groupname, char*
     char *buff = NULL, natbuff[MAX_NAT_N_SIZE], *tmp = NULL;
     int rc = 0, strlength = 0;
     
-    memset(natbuff, NULL, sizeof(natbuff));
+    memset(natbuff, 0x00, sizeof(natbuff));
 
     if((rc = rh4nvarGetStringLengthArrayEntry(args->varlist, groupname, varname, index, &strlength)) !=  RH4N_RET_OK) {
         sprintf(args->errorstr, "Could not get strlen from %s.%s. Varlibret: %d", groupname, varname, rc);
@@ -125,7 +126,7 @@ int rh4nnatputAtoNArrayEntry(RH4nNatVarHandleParms *args, char* groupname, char*
         return(RH4N_RET_MEMORY_ERR);
     }
 
-    memset(buff, NULL, sizeof(char)*(strlength+1));
+    memset(buff, 0x00, sizeof(char)*(strlength+1));
     if((rc = rh4nvarGetStringArrayEntry(args->varlist, groupname, varname, index, strlength+1, buff)) != RH4N_RET_OK) {
         sprintf(args->errorstr, "Could not get string from %s.%s. Varlib return: %d", groupname, varname, rc);
         free(buff);

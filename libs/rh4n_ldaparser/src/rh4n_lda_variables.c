@@ -13,7 +13,7 @@ int rh4nldaGetVarname(char **line, char *varname) {
         varname[varnamelength++] = (*line)[0];
         (*line)++;
     }
-    varname[varnamelength] = NULL;
+    varname[varnamelength] = 0x00;
     return(RH4N_RET_OK);
 }
 

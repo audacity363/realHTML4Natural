@@ -36,8 +36,8 @@ int rh4nnatStartVariableReadout(WORD nparms, void *parmhandle, pnni_611_function
     callbacktabsize = sizeof(callbacks)/sizeof(struct RH4nNatVarHandling);
 
     for(i = 2; i < nparms; i++) {
-        memset(tmpvarname, NULL, sizeof(tmpvarname));
-        memset(&var_description, NULL, sizeof(struct parameter_description));
+        memset(tmpvarname, 0x00, sizeof(tmpvarname));
+        memset(&var_description, 0x00, sizeof(struct parameter_description));
         sprintf(tmpvarname, "var%d", i);
         
         if((nniret = nnifuncs->pf_nni_get_parm_info(nnifuncs, i, parmhandle, &var_description)) != NNI_RC_OK) {

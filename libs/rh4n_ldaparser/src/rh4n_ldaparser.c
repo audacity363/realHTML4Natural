@@ -86,7 +86,7 @@ int rh4nldaParseLine(char *line, RH4nLDAEntry_t **ldaentries, RH4nProperties *pr
         return(RH4N_RET_OK);
     } else if(RH4NLDA_COMPARE_REDEFINE_STR(varname)) {
         rh4n_log_debug(props->logging, "Found a redefine");
-        memset(varname, NULL, sizeof(varname));
+        memset(varname, 0x00, sizeof(varname));
 
         rh4nldaGetVarname(&_line, varname);
         rh4n_log_debug(props->logging, "Name of redefined variable: [%s]", varname);

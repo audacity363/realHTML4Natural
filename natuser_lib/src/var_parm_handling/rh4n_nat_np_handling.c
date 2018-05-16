@@ -18,7 +18,7 @@ int rh4nnatNumericPackedHandler(RH4nNatVarHandleParms *args) {
     bufflength = args->desc->byte_length;
     
     if((tmpbuff = malloc(bufflength)) == NULL) return(RH4N_RET_MEMORY_ERR);
-    memset(tmpbuff, NULL, bufflength);
+    memset(tmpbuff, 0x00, bufflength);
 
     if((nniret = args->nnifuncs->pf_nni_get_parm(args->nnifuncs, args->parmindex, args->parmhandle, 
         bufflength, tmpbuff)) != NNI_RC_OK) {
@@ -26,7 +26,7 @@ int rh4nnatNumericPackedHandler(RH4nNatVarHandleParms *args) {
         sprintf(args->errorstr, "Could not get parm %d. NNI ret: %d", args->parmindex, nniret);
         return(RH4N_RET_NNI_ERR);
     }
-    memset(strbuff, NULL, sizeof(strbuff));
+    memset(strbuff, 0x00, sizeof(strbuff));
     
     if((nniret = args->nnifuncs->pf_nni_to_string(args->nnifuncs, bufflength, tmpbuff, args->desc->format,
         args->desc->length_all, args->desc->precision, sizeof(strbuff)-1, strbuff)) != NNI_RC_OK) {
@@ -90,8 +90,8 @@ int rh4nnatSaveNumericPackedArrayEntry(RH4nNatVarHandleParms *args, int index[3]
         return(RH4N_RET_MEMORY_ERR);
     }*/
 
-    memset(tmpbuff, NULL, sizeof(tmpbuff));
-    memset(strbuff, NULL, sizeof(strbuff));
+    memset(tmpbuff, 0x00, sizeof(tmpbuff));
+    memset(strbuff, 0x00, sizeof(strbuff));
 
     if((nniret = args->nnifuncs->pf_nni_get_parm_array(args->nnifuncs, args->parmindex, args->parmhandle, sizeof(tmpbuff), 
             tmpbuff, index)) != NNI_RC_OK && nniret < 0) {

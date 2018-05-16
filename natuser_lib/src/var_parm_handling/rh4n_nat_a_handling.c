@@ -17,7 +17,7 @@ int rh4nnatStringHandler(RH4nNatVarHandleParms *args) {
     strlength = args->desc->length + 1;
     
     if((tmpbuff = malloc(sizeof(char)*strlength)) == NULL) return(RH4N_RET_MEMORY_ERR);
-    memset(tmpbuff, NULL, sizeof(char)*strlength);
+    memset(tmpbuff, 0x00, sizeof(char)*strlength);
 
     if(strlength > 1) {
         if((nniret = args->nnifuncs->pf_nni_get_parm(args->nnifuncs, args->parmindex, args->parmhandle, 
@@ -98,7 +98,7 @@ int rh4nnatSaveStringArrayEntry(RH4nNatVarHandleParms *args, int index[3]) {
         sprintf(args->errorstr, "Could not allocate memory for tmp buffer.");
         return(RH4N_RET_MEMORY_ERR);
     }
-    memset(tmpbuff, NULL, sizeof(char)*(strlength+1));
+    memset(tmpbuff, 0x00, sizeof(char)*(strlength+1));
 
     if((nniret = args->nnifuncs->pf_nni_get_parm_array(args->nnifuncs, args->parmindex, args->parmhandle, strlength, 
             tmpbuff, index)) != NNI_RC_OK) {
