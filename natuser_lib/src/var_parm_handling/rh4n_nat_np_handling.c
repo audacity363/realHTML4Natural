@@ -6,6 +6,8 @@
 #include "rh4n_nat.h"
 #include "rh4n_nat_varhandling.h"
 
+void rh4nnatStripSpaces(char *target);
+
 int rh4nnatNumericPackedHandler(RH4nNatVarHandleParms *args) {
     int ret = 0, varlibret = 0, nniret = 0, bufflength = 0;
     void *tmpbuff = NULL;
@@ -36,6 +38,9 @@ int rh4nnatNumericPackedHandler(RH4nNatVarHandleParms *args) {
     }
     rh4nUtilsTrimSpaces(strbuff);
     rh4n_log_debug(args->props->logging, "God converted string: [%s]", strbuff);
+
+    rh4nnatStripSpaces(strbuff);
+    rh4n_log_debug(args->props->logging, "God striped string: [%s]", strbuff);
 
     if((varlibret = rh4nvarCreateNewString(args->varlist, NULL, args->tmpname, strbuff)) != RH4N_RET_OK) {
         sprintf(args->errorstr, "Could not create new string: %d", varlibret);
@@ -112,6 +117,8 @@ int rh4nnatSaveNumericPackedArrayEntry(RH4nNatVarHandleParms *args, int index[3]
         return(RH4N_RET_NNI_ERR);
     }
 
+    rh4nnatStripSpaces(strbuff);
+
     if(args->desc->dimensions == 1) varlibindex[0] = index[0];
     else if(args->desc->dimensions == 2) { varlibindex[0] = index[0]; varlibindex[1] = index[1]; }
     else if(args->desc->dimensions == 3) { varlibindex[0] = index[0]; varlibindex[1] = index[1]; varlibindex[2] = index[2]; }
@@ -126,4 +133,15 @@ int rh4nnatSaveNumericPackedArrayEntry(RH4nNatVarHandleParms *args, int index[3]
     //free(tmpbuff);
 
     return(RH4N_RET_OK);
+}
+
+
+void rh4nnatStripSpaces(char *target) {
+    int i = 0;
+
+    for(; i < strlen(target); i++) {
+        if(target[i] != ' ') break;
+    }
+
+    memmove(target, target+i, strlen(target)-(i-1));
 }
