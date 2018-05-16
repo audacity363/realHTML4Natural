@@ -1,5 +1,5 @@
 #ifndef RH4NVAR2NAME
-#define Rh4NVAR2NAME
+#define R4NVAR2NAME
 
 typedef struct {
     char groupname[NNI_LEN_NAME];
@@ -20,5 +20,6 @@ int rh4nv2ncountVarsinLDAGroup(RH4nLDAEntry_t*);
 int rh4nv2nSearchTargetStruct(RH4nLDAEntry_t*, char*, RH4nLDAEntry_t**, char*);
 int rh4nv2nSavePosition(char*, char*, int, RH4nVarPositions_t*, RH4nProperties*);
 int rh4nv2nMatchPosition(RH4nLDAEntry_t *, char*, int*, RH4nVarPositions_t*, RH4nProperties*); 
+RH4nVarEntry_t *rh4nv2nMatchNames(RH4nVarEntry_t*, RH4nLDAEntry_t*, RH4nVarList*, char*, RH4nProperties*, int*);
 #endif
 #endif

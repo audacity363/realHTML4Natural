@@ -4,6 +4,7 @@
 #include <time.h>
 #include <string.h>
 #include <errno.h>
+#include <unistd.h>
 
 #include "rh4n_logging.h"
 

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "standard.h"
 #include "rh4n_ldaparser.h"

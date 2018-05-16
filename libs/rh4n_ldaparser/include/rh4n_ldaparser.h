@@ -43,6 +43,7 @@ char *rh4nldastrtok(char*, char);
 int rh4nldaGetVariablenLength(char**, int*, int, char*);
 void rh4nldaPrintFork(RH4nLDAEntry_t*, RH4nProperties*, int);
 void rh4nldaFreeFork(RH4nLDAEntry_t*);
+int rh4nldaGetVarname(char **line, char *varname);
 
 #define RH4N_LDA_HEADERSIZE 72
 #define RH4N_LDA_VARTYPE_UNSUPPORTED -1

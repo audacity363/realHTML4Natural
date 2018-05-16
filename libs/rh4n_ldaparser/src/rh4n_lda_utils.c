@@ -36,6 +36,7 @@ int rh4nldaSaveEntry(RH4nLDAEntry_t *newentry, RH4nProperties *props) {
         g_rh4nldacurptr = newentry;
         return(RH4N_RET_OK);
     }
+    return(RH4N_RET_OK);
 }
 
 char *savptr = NULL;

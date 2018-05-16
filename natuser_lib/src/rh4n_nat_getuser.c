@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "standard.h"
+#include "rh4n_utils.h"
 #include "rh4n_nat.h"
 
 long rh4nnatGetUser(WORD nparms, void *parmhandle, void *traditional) {

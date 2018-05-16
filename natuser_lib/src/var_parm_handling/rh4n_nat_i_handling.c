@@ -7,7 +7,7 @@
 #include "rh4n_nat_varhandling.h"
 
 int rh4nnatIntegerHandler(RH4nNatVarHandleParms *args) {
-    int ret = 0, varlibret = 0, nniret = 0;
+    int varlibret = 0, nniret = 0;
     int tmpbuff = 0;
 
     if(args->desc->dimensions > 0) {
@@ -71,7 +71,7 @@ int rh4nnatIntegerArrayHandler(RH4nNatVarHandleParms *args) {
 }
 
 int rh4nnatSaveIntegerArrayEntry(RH4nNatVarHandleParms *args, int index[3]) {
-    int strlength = 0, nniret = 0, varlibret = 0, varlibindex[3] = { -1, -1, -1};
+    int nniret = 0, varlibret = 0, varlibindex[3] = { -1, -1, -1};
     int tmpbuff = 0;
 
 

@@ -10,8 +10,6 @@
 
 int rh4nnatputInteger(RH4nNatVarHandleParms *args, char *groupname, char *varname) {
     int rc = 0, varsize = 0;
-    NATTYP_I1 i1_val = 0;
-    NATTYP_I2 i2_val = 0;
     NATTYP_I4 i4_val = 0;
 
     if(args->desc->dimensions > 0) return(rh4nnatputIntegerArray(args, groupname, varname));
@@ -54,7 +52,6 @@ int rh4nnatputInteger(RH4nNatVarHandleParms *args, char *groupname, char *varnam
 }
 
 int rh4nnatputIntegerArray(RH4nNatVarHandleParms *args, char* groupname, char* varname) {
-    char *buff = NULL;
     int rc = 0, x = 0, y = 0, z = 0, arrlength[3] = { 0, 0, 0}, arrindex[3] = { -1, -1, -1 };
     RH4nVarRef _refvar = RH4NVAR_REF_INIT;
 
@@ -112,7 +109,7 @@ int rh4nnatputIntegerArray(RH4nNatVarHandleParms *args, char* groupname, char* v
 }
 
 int rh4nnatputIntegerArrayEntry(RH4nNatVarHandleParms *args, char* groupname, char* varname, int index[3]) {
-    int strlength = 0, rc = 0, varsize = 0;
+    int rc = 0, varsize = 0;
     NATTYP_I4 i4_val = 0;
 
     if((rc = rh4nvarGetIntArrayEntry(args->varlist, groupname, varname, index, &i4_val)) != RH4N_RET_OK) {

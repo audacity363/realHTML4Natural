@@ -7,7 +7,7 @@
 #include "rh4n_nat_varhandling.h"
 
 int rh4nnatputAtoN(RH4nNatVarHandleParms *args, char *groupname, char *varname) {
-    char *buff = NULL, natbuff[MAX_NAT_N_SIZE], *tmp = NULL;
+    char *buff = NULL, natbuff[MAX_NAT_N_SIZE];
     int rc = 0, strlength = 0;
 
     if(args->desc->dimensions > 0) return(rh4nnatputAtoNArray(args, groupname, varname));
@@ -54,7 +54,6 @@ int rh4nnatputAtoN(RH4nNatVarHandleParms *args, char *groupname, char *varname) 
 }
 
 int rh4nnatputAtoNArray(RH4nNatVarHandleParms *args, char* groupname, char* varname) {
-    char *buff = NULL;
     int rc = 0, x = 0, y = 0, z = 0, arrlength[3] = { 0, 0, 0}, arrindex[3] = { -1, -1, -1 };
     RH4nVarRef _refvar = RH4NVAR_REF_INIT;
 
@@ -112,7 +111,7 @@ int rh4nnatputAtoNArray(RH4nNatVarHandleParms *args, char* groupname, char* varn
 }
 
 int rh4nnatputAtoNArrayEntry(RH4nNatVarHandleParms *args, char* groupname, char* varname, int index[3]) {
-    char *buff = NULL, natbuff[MAX_NAT_N_SIZE], *tmp = NULL;
+    char *buff = NULL, natbuff[MAX_NAT_N_SIZE];
     int rc = 0, strlength = 0;
     
     memset(natbuff, 0x00, sizeof(natbuff));

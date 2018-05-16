@@ -3,11 +3,12 @@
 #include <string.h>
 
 #include "standard.h"
+#include "rh4n_utils.h"
 #include "rh4n_nat.h"
 #include "rh4n_nat_varhandling.h"
 
 int rh4nnatStringHandler(RH4nNatVarHandleParms *args) {
-    int ret = 0, strlength = 0, varlibret = 0, nniret = 0;
+    int strlength = 0, varlibret = 0, nniret = 0;
     char *tmpbuff = NULL;
 
     if(args->desc->dimensions > 0) {

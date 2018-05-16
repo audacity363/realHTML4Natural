@@ -3,11 +3,12 @@
 #include <string.h>
 
 #include "standard.h"
+#include "rh4n_utils.h"
 #include "rh4n_nat.h"
 #include "rh4n_nat_varhandling.h"
 
 int rh4nnatDateTimeHandler(RH4nNatVarHandleParms *args) {
-    int ret = 0, varlibret = 0, nniret = 0, bufflength = 0;
+    int varlibret = 0, nniret = 0, bufflength = 0;
     void *tmpbuff = NULL;
     char strbuff[100];
 

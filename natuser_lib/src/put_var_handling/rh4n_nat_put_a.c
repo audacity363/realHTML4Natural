@@ -9,8 +9,8 @@
 #include "rh4n_nat_varhandling.h"
 
 int rh4nnatputString(RH4nNatVarHandleParms *args, char *groupname, char *varname) {
-    char *buff = NULL;
     int rc = 0, strlength = 0;
+    char *buff = NULL;
 
     if(args->desc->dimensions > 0) return(rh4nnatputStringArray(args, groupname, varname));
     
@@ -45,7 +45,6 @@ int rh4nnatputString(RH4nNatVarHandleParms *args, char *groupname, char *varname
 }
 
 int rh4nnatputStringArray(RH4nNatVarHandleParms *args, char* groupname, char* varname) {
-    char *buff = NULL;
     int rc = 0, x = 0, y = 0, z = 0, arrlength[3] = { 0, 0, 0}, arrindex[3] = { -1, -1, -1 };
     RH4nVarRef _refvar = RH4NVAR_REF_INIT;
 

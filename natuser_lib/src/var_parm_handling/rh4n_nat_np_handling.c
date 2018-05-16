@@ -3,13 +3,14 @@
 #include <string.h>
 
 #include "standard.h"
+#include "rh4n_utils.h"
 #include "rh4n_nat.h"
 #include "rh4n_nat_varhandling.h"
 
 void rh4nnatStripSpaces(char *target);
 
 int rh4nnatNumericPackedHandler(RH4nNatVarHandleParms *args) {
-    int ret = 0, varlibret = 0, nniret = 0, bufflength = 0;
+    int varlibret = 0, nniret = 0, bufflength = 0;
     void *tmpbuff = NULL;
     char strbuff[100];
 
@@ -84,16 +85,8 @@ int rh4nnatNumericPackedArrayHandler(RH4nNatVarHandleParms *args) {
 }
 
 int rh4nnatSaveNumericPackedArrayEntry(RH4nNatVarHandleParms *args, int index[3]) {
-    int nniret = 0, varlibret = 0, varlibindex[3] = { -1, -1, -1}, bufflength = 0;
-    //void *tmpbuff = NULL;
+    int nniret = 0, varlibret = 0, varlibindex[3] = { -1, -1, -1};
     char strbuff[100], tmpbuff[MAX_NAT_N_SIZE];
-
-    bufflength = MAX_NAT_N_SIZE+1;
-
-    /*if((tmpbuff = malloc(bufflength)) == NULL) {
-        sprintf(args->errorstr, "Could not allocate memory for tmp buffer.");
-        return(RH4N_RET_MEMORY_ERR);
-    }*/
 
     memset(tmpbuff, 0x00, sizeof(tmpbuff));
     memset(strbuff, 0x00, sizeof(strbuff));
@@ -103,7 +96,6 @@ int rh4nnatSaveNumericPackedArrayEntry(RH4nNatVarHandleParms *args, int index[3]
         sprintf(args->errorstr, "Could not get array entry from parm %d (x: %d, y:%d, z: %d) NNI err: %d", 
             args->parmindex, index[0], index[1], index[2], nniret);
         rh4n_log_error(args->props->logging, "%s", args->errorstr);
-        //free(tmpbuff);
         return(RH4N_RET_NNI_ERR);
 
     }
@@ -112,7 +104,6 @@ int rh4nnatSaveNumericPackedArrayEntry(RH4nNatVarHandleParms *args, int index[3]
 
     if((nniret = args->nnifuncs->pf_nni_to_string(args->nnifuncs, sizeof(tmpbuff), tmpbuff, args->desc->format,
         args->desc->length+args->desc->precision, args->desc->precision, sizeof(strbuff), strbuff)) != NNI_RC_OK) {
-        //free(tmpbuff);
         sprintf(args->errorstr, "Could not convert %c to String. NNI ret: %d", args->desc->format, nniret);
         return(RH4N_RET_NNI_ERR);
     }
@@ -126,11 +117,8 @@ int rh4nnatSaveNumericPackedArrayEntry(RH4nNatVarHandleParms *args, int index[3]
     rh4nUtilsTrimSpaces(strbuff);
     if((varlibret = rh4nvarSetStringArrayEntry(args->varlist, NULL, args->tmpname, varlibindex, strbuff)) != RH4N_RET_OK) {
         sprintf(args->errorstr, "Could not set Array Entry x: %d y: %d z: %d", varlibindex[0], varlibindex[1], varlibindex[2]);
-        //free(tmpbuff);
         return(varlibret);
     }
-
-    //free(tmpbuff);
 
     return(RH4N_RET_OK);
 }

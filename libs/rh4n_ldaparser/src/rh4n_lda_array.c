@@ -9,7 +9,6 @@
 int rh4nldaGetArrayType(char *line, int *dimensions, int length[3], RH4nProperties *props, char *errorstr)
 {
     *dimensions= 0;
-    int upperbound = -1, lowerbound = -1;
 
     char *end_var_params = NULL, *comma = NULL,
          *double_collon = NULL;

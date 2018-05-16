@@ -27,7 +27,6 @@ int rh4nnatputBool(RH4nNatVarHandleParms *args, char *groupname, char *varname) 
 }
 
 int rh4nnatputBoolArray(RH4nNatVarHandleParms *args, char* groupname, char* varname) {
-    char *buff = NULL;
     int rc = 0, x = 0, y = 0, z = 0, arrlength[3] = { 0, 0, 0}, arrindex[3] = { -1, -1, -1 };
     RH4nVarRef _refvar = RH4NVAR_REF_INIT;
 
@@ -85,7 +84,7 @@ int rh4nnatputBoolArray(RH4nNatVarHandleParms *args, char* groupname, char* varn
 }
 
 int rh4nnatputBoolArrayEntry(RH4nNatVarHandleParms *args, char* groupname, char* varname, int index[3]) {
-    int strlength = 0, rc = 0, varsize = 0;
+    int rc = 0;
     char val = 0;
 
     if((rc = rh4nvarGetBoolArrayEntry(args->varlist, groupname, varname, index, &val)) != RH4N_RET_OK) {

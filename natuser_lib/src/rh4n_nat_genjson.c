@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "standard.h"
+#include "rh4n_utils.h"
 #include "rh4n_nat.h"
 #include "rh4n_ldaparser.h"
 #include "rh4n_v2n.h"

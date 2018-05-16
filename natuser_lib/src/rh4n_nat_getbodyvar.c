@@ -3,8 +3,9 @@
 #include <string.h>
 
 #include "standard.h"
-#include "rh4n_nat.h"
+#include "rh4n_utils.h"
 #include "rh4n_v2n.h"
+#include "rh4n_nat.h"
 #include "rh4n_nat_varhandling.h"
 
 long rh4nnatGetBodyVar(WORD nparms, void *parmhandle, void *traditional) {

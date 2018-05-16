@@ -92,12 +92,12 @@ int rh4nvarCreateNewIntArray(RH4nVarList*, char*, char*, int, int*);
 int rh4nvarSetIntArrayEntry(RH4nVarList*, char*, char*, int*, int);
 int rh4nvarGetIntArrayEntry(RH4nVarList*, char*, char*, int*, int*);
 //Float
-int rh4nvarCreateNewDouble(RH4nVarList*, char*, char*, double);
-int rh4nvarEditDouble(RH4nVarList*, char*, char*, double);
-int rh4nvarGetDouble(RH4nVarList*, char*, char*, double*);
-int rh4nvarCreateNewDoubleArray(RH4nVarList*, char*, char*, int, int*);
-int rh4nvarSetDoubleArrayEntry(RH4nVarList*, char*, char*, int*, double);
-int rh4nvarGetDoubleArrayEntry(RH4nVarList*, char*, char*, int*, double*);
+int rh4nvarCreateNewFloat(RH4nVarList*, char*, char*, double);
+int rh4nvarEditFloat(RH4nVarList*, char*, char*, double);
+int rh4nvarGetFloat(RH4nVarList*, char*, char*, double*);
+int rh4nvarCreateNewFloatArray(RH4nVarList*, char*, char*, int, int*);
+int rh4nvarSetFloatArrayEntry(RH4nVarList*, char*, char*, int*, double);
+int rh4nvarGetFloatArrayEntry(RH4nVarList*, char*, char*, int*, double*);
 //Group
 int rh4nvarCreateNewGroup(RH4nVarList*, char*);
 int rh4nvarMoveVarToGroup(RH4nVarList*, char*, char*);

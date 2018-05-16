@@ -51,7 +51,6 @@ int rh4nv2nStartPosition(RH4nLDAEntry_t *ldaanker, char *structname, RH4nVarPosi
 
 int rh4nv2ncmpVarNumbers(RH4nVarList *natanker, RH4nLDAEntry_t *ldaanker, RH4nProperties *props, char *errorstr)  {
     RH4nVarEntry_t *nathptr = NULL;
-    RH4nLDAEntry_t *ldahptr = NULL;
     int natvarnumber = 0, ldavarnumber = 0;
 
     //Count variables from natural

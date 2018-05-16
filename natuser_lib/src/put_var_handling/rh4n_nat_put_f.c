@@ -37,7 +37,6 @@ int rh4nnatputFloat(RH4nNatVarHandleParms *args, char *groupname, char *varname)
 }
 
 int rh4nnatputFloatArray(RH4nNatVarHandleParms *args, char* groupname, char* varname) {
-    char *buff = NULL;
     int rc = 0, x = 0, y = 0, z = 0, arrlength[3] = { 0, 0, 0}, arrindex[3] = { -1, -1, -1 };
     RH4nVarRef _refvar = RH4NVAR_REF_INIT;
 
@@ -95,7 +94,7 @@ int rh4nnatputFloatArray(RH4nNatVarHandleParms *args, char* groupname, char* var
 }
 
 int rh4nnatputFloatArrayEntry(RH4nNatVarHandleParms *args, char* groupname, char* varname, int index[3]) {
-    int strlength = 0, rc = 0, varsize = 0;
+    int rc = 0;
     double val = 0;
 
     if((rc = rh4nvarGetFloatArrayEntry(args->varlist, groupname, varname, index, &val)) != RH4N_RET_OK) {

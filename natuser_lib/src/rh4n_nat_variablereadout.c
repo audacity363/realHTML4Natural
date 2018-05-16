@@ -41,7 +41,7 @@ int rh4nnatStartVariableReadout(WORD nparms, void *parmhandle, pnni_611_function
         sprintf(tmpvarname, "var%d", i);
         
         if((nniret = nnifuncs->pf_nni_get_parm_info(nnifuncs, i, parmhandle, &var_description)) != NNI_RC_OK) {
-            sprintf(errorstr, "Could not get parm %s. NNI error: %d", i, nniret);
+            sprintf(errorstr, "Could not get parm %d. NNI error: %d", i, nniret);
             return(RH4N_RET_NNI_ERR);
         }
 
