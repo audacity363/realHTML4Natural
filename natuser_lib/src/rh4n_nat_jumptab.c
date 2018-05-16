@@ -35,6 +35,7 @@ extern long rh4nnatGetURLVar();
 extern long rh4nnatGetBodyObj();
 extern long rh4nnatGetBodyVar();
 extern long rh4nnatGetUser();
+extern long rh4nnatDebugInit();
 /*
 ** section 3: initialize the jumptable
 **
@@ -52,7 +53,8 @@ TAB_STRUCT n_call_table[] = {
   { "RHGETBO", rh4nnatGetBodyObj },  //Match by name (BODY)
   { "RHGETBV", rh4nnatGetBodyVar },  //Get BODY variable
   { "RHGETUS", rh4nnatGetUser },     //Get the current user
-  { "RHDEBUG", 0x00 }                //Placeholder for framework init (debugging in NATOne)
+  { "RHDBGINI", rh4nnatDebugInit},               //Placeholder for framework init (debugging in NATOne)
+  { "RHSETRC", 0x00 }                //call interface4 'RHSETRC' rh4n-internals 204
 };
 
 

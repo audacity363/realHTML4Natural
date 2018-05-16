@@ -255,7 +255,8 @@ NATUSER_OBJS = rh4n_nat_jumptab.o \
 			   rh4n_nat_getbodyobj.o \
 			   rh4n_nat_getbodyvar.o \
 			   rh4n_nat_geturlvar.o \
-			   rh4n_nat_getuser.o
+			   rh4n_nat_getuser.o \
+			   rh4n_nat_debug_init.o
 			   
 NATUSER_READOUT_OBJS = rh4n_nat_a_handling.o \
 					   rh4n_nat_i_handling.o \

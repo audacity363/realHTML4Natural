@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <wchar.h>
+#include <errno.h>
 
 #include "standard.h"
 
@@ -9,6 +10,7 @@ int rh4nvarPrintJSONToFile(RH4nVarList *varlist, char *filename, RH4nProperties 
     FILE *outputfile = NULL;
     
     if((outputfile = fopen(filename, "w")) == NULL) {
+        rh4n_log_fatal(props->logging, "Error while opening file [%s]: %s", filename, strerror(errno));
         return(RH4N_RET_INTERNAL_ERR);
     }
 

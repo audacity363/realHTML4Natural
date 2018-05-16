@@ -60,6 +60,22 @@ if(!$cc) {
 }
 die "Could not find gcc or xlc. Please make sure a C compiler is installed" unless($cc);
 
+if($cc =~ /.*gcc/ != 0) {
+    print "Using gcc\n";
+    $cc_lf1_so = "-shared -Wl,--no-undefined";
+    $cc_lf2_so = "";
+    $cc_cargs1 = "-g -c -fPIC";
+    $cc_cargs2 = "";
+    $cc_cargs_so = "-c -g -fPIC";
+} else {
+    print "Using xlc\n";
+    $cc_lf1_so = "-G -bsymbolic -bexpall -bnoentry";
+    $cc_lf2_so = "-b64 -ldl -blibpath:/usr/lib/threads:/usr/lib:/lib -lc_r";
+    $cc_cargs1 = "-g -c";
+    $cc_cargs2 = "";
+    $cc_cargs_so = "-c -g -q64 -fpic";
+}
+
 if(!$ar) { $ar = searchBin("ar"); }
 die "Could not find ar. Please make sure ar is installed" unless($ar);
 
@@ -124,19 +140,7 @@ if(!$jnipath) {
     }
 }
 
-if($cc == "gcc") {
-    $cc_lf1_so = "-shared -Wl,--no-undefined";
-    $cc_lf2_so = "";
-    $cc_cargs1 = "-g -c -fPIC";
-    $cc_cargs2 = "";
-    $cc_cargs_so = "-c -g -fPIC";
-} else {
-    $cc_lf1_so = "-G -bsymbolic -bexpall -bnoentry";
-    $cc_lf2_so = "-b64 -ldl -blibpath:/usr/lib/threads:/usr/lib:/lib -lc_r";
-    $cc_cargs1 = "-g -c";
-    $cc_cargs2 = "";
-    $cc_cargs_so = "-c -g -q64 -fpic";
-}
+
 
 print "Summary:\n";
 print "\tCC:           $cc\n";
