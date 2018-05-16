@@ -3,7 +3,7 @@
 #include <string.h>
 #include <wchar.h>
 
-#include "standard.h"
+#include "rh4n.h"
 
 #define RH4N_VAR_PRINT_TABS "\t\t\t\t\t\t"
 

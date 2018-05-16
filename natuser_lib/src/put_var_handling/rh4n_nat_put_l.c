@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <wchar.h>
 
-#include "standard.h"
+#include "rh4n.h"
 #include "rh4n_nat_varhandling.h"
 
 int rh4nnatputBool(RH4nNatVarHandleParms *args, char *groupname, char *varname) {

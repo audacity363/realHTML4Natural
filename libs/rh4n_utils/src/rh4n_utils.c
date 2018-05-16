@@ -6,7 +6,7 @@
 #include <errno.h>
 #include <ctype.h>
 
-#include "standard.h"
+#include "rh4n.h"
 #include "rh4n_utils.h"
 
 void RemoveSpaces(char* source)

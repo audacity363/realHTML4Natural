@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "standard.h"
+#include "rh4n.h"
 
 int main(int argc, char *argv[]) {
     RH4nVarList varlist;

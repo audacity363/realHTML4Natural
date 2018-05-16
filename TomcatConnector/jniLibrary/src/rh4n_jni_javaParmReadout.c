@@ -5,7 +5,7 @@
 
 #include "jni.h"
 
-#include "standard.h"
+#include "rh4n.h"
 #include "rh4n_jni_javaParmReadout.h"
 
 int rh4nReadOutParms(JNIEnv *env, jobject jnatparams, RH4nProperties *properties, char *error_str) {

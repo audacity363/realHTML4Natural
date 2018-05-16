@@ -5,7 +5,7 @@
 #include "natuser.h"
 #include "natni.h"
 
-#include "standard.h"
+#include "rh4n.h"
 #include "rh4n_nat_varhandling.h"
 
 int rh4nnatputString(RH4nNatVarHandleParms *args, char *groupname, char *varname) {

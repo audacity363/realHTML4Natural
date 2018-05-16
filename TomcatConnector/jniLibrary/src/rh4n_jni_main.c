@@ -3,7 +3,7 @@
 #include <string.h>
 #include <errno.h>
 
-#include "standard.h"
+#include "rh4n.h"
 
 #include "realHTML_tomcat_connector_JNINatural.h"
 #include "rh4n_jni.h"

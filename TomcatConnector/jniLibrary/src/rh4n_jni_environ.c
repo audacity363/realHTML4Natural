@@ -4,7 +4,7 @@
 
 #include "jni.h"
 
-#include "standard.h"
+#include "rh4n.h"
 #include "rh4n_jni.h"
 #include "rh4n_jni_environ.h"
 

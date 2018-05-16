@@ -1,5 +1,5 @@
 #ifndef RH4NVAR2NAME
-#define R4NVAR2NAME
+#define RH4NVAR2NAME
 
 typedef struct {
     char groupname[NNI_LEN_NAME];

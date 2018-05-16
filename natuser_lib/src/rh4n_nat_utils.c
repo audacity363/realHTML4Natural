@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "standard.h"
+#include "rh4n.h"
 #include "rh4n_nat.h"
 
 int rh4nnatGetParameter(pnni_611_functions nnifuncs, void *parmhandle, RH4nProperties **props, char **formatstr, char *errorstr, bool checkformat) {

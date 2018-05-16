@@ -4,7 +4,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "standard.h"
+#include "rh4n.h"
 #include "rh4n_ldaparser.h"
 
 RH4nLDAEntry_t *g_rh4nldaentries = NULL, *g_rh4nldacurptr = NULL;

@@ -5,7 +5,7 @@
 #include "natuser.h"
 #include "natni.h"
 
-#include "standard.h"
+#include "rh4n.h"
 #include "rh4n_nat_varhandling.h"
 
 //Not sure if this works. Can't test the return value in natural beacuse, for some reason, 

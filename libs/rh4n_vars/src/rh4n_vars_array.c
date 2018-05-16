@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "standard.h"
+#include "rh4n.h"
 
 int rh4nvarCreateNewArray(RH4nVarList *varlist, char *pgroupname, char *pname, int dimensions, int length[3], int vartype) {
     int createret = 0, i = 0, x = 0;

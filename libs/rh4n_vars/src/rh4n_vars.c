@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "standard.h"
+#include "rh4n.h"
 
 int rh4nvarInitList(RH4nVarList *varlist) {
     RH4NVAR_CHECKVARLIST(varlist);

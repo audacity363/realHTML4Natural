@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "standard.h"
+#include "rh4n.h"
 #include "natural/rh4n_natcall.h"
 
 struct parameter_description* rh4nNaturalParamsGeneration(pnni_611_functions nnifuncs, RH4nProperties *properties, int *pnnierr) {

@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <errno.h>
 
-#include "standard.h"
+#include "rh4n.h"
 #include "natural/rh4n_natcall.h"
 
 void rh4nlogInternalError(RH4nProperties *props, char *error_str) {

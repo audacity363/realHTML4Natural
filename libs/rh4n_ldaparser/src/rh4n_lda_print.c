@@ -3,7 +3,7 @@
 #include <errno.h>
 #include <string.h>
 
-#include "standard.h"
+#include "rh4n.h"
 #include "rh4n_ldaparser.h"
 
 #define RH4NLDA_PRINTTABS "\t\t\t\t\t\t\t\t\t\t"

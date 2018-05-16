@@ -4,7 +4,7 @@
 #include <wchar.h>
 #include <errno.h>
 
-#include "standard.h"
+#include "rh4n.h"
 
 int rh4nvarPrintJSONToFile(RH4nVarList *varlist, char *filename, RH4nProperties *props) {
     FILE *outputfile = NULL;

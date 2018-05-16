@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "standard.h"
+#include "rh4n.h"
 #include "rh4n_utils.h"
 
 struct parameter_description* genjsontestParmGen(pnni_611_functions, RH4nProperties*);

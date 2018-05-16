@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "standard.h"
+#include "rh4n.h"
 
 int rh4nvarCreateNewGroup(RH4nVarList *varlist, char *pgroupname) {
     RH4nVarRef _refvar = RH4NVAR_REF_INIT;

@@ -3,7 +3,7 @@
 #include <errno.h>
 #include <string.h>
 
-#include "standard.h"
+#include "rh4n.h"
 #include "rh4n_ldaparser.h"
 
 int rh4nldaSaveEntry(RH4nLDAEntry_t *newentry, RH4nProperties *props) {

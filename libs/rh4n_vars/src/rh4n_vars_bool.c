@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "standard.h"
+#include "rh4n.h"
 
 int rh4nvarCreateNewBool(RH4nVarList *varlist, char *pgroupname, char *pname, bool value) {
     int varlibret = 0;
