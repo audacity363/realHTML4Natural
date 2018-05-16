@@ -147,7 +147,7 @@ int rh4NUrlVariableHandler(JNIEnv *env, jclass jcrh4nparms, jobject jorh4nparms,
 int rh4nParmReqTypeHandler(JNIEnv *env, const char *strvalue, RH4nProperties *properties, char *error_str) { 
 
     if(strlen(strvalue) > sizeof(properties->httpreqtype)) {
-        sprintf(error_str, "ReqType to big. (MaxLength = [%d])", sizeof(properties->httpreqtype));
+        sprintf(error_str, "ReqType to big. (MaxLength = [%lu])", sizeof(properties->httpreqtype));
         return(RH4N_RET_BUFFER_OVERFLOW);
     }
 
@@ -157,7 +157,7 @@ int rh4nParmReqTypeHandler(JNIEnv *env, const char *strvalue, RH4nProperties *pr
 
 int rh4nParmNatLibraryHandler(JNIEnv *env, const char *strvalue, RH4nProperties *properties, char *error_str) { 
     if(strlen(strvalue) > sizeof(properties->natlibrary)) {
-        sprintf(error_str, "NatLibrary to big. (MaxLength = [%d])", sizeof(properties->natlibrary));
+        sprintf(error_str, "NatLibrary to big. (MaxLength = [%lu])", sizeof(properties->natlibrary));
         return(RH4N_RET_BUFFER_OVERFLOW);
     }
     strcpy(properties->natlibrary, strvalue);
@@ -166,7 +166,7 @@ int rh4nParmNatLibraryHandler(JNIEnv *env, const char *strvalue, RH4nProperties 
 
 int rh4nParmNatProgramHandler(JNIEnv *env, const char *strvalue, RH4nProperties *properties, char *error_str) { 
     if(strlen(strvalue) > sizeof(properties->natprogram)) {
-        sprintf(error_str, "NatProgram to big. (MaxLength = [%d])", sizeof(properties->natprogram));
+        sprintf(error_str, "NatProgram to big. (MaxLength = [%lu])", sizeof(properties->natprogram));
         return(RH4N_RET_BUFFER_OVERFLOW);
     }
     strcpy(properties->natprogram, strvalue);
@@ -193,7 +193,7 @@ int rh4nParmOutputfileHandler(JNIEnv *env, const char *strvalue, RH4nProperties 
 
 int rh4nParmLoglevelHandler(JNIEnv *env, const char *strvalue, RH4nProperties *properties, char *error_str) { 
     if(strlen(strvalue) > sizeof(properties->c_loglevel)) {
-        sprintf(error_str, "loglevel to big. (MaxLength = [%d])", sizeof(properties->c_loglevel));
+        sprintf(error_str, "loglevel to big. (MaxLength = [%lu])", sizeof(properties->c_loglevel));
         return(RH4N_RET_BUFFER_OVERFLOW);
     }
 
@@ -230,7 +230,7 @@ int rh4nParmLogPathHandler(JNIEnv *env, const char *strvalue, RH4nProperties *pr
 
 int rh4nParmErrorRepresentationHandler(JNIEnv *env, const char *strvalue, RH4nProperties *properties, char *error_str) { 
     if(strlen(strvalue) > sizeof(properties->errorrepresentation)) {
-        sprintf(error_str, "errorrepresentation to big. (MaxLength = [%d])", sizeof(properties->errorrepresentation));
+        sprintf(error_str, "errorrepresentation to big. (MaxLength = [%lu])", sizeof(properties->errorrepresentation));
         return(RH4N_RET_BUFFER_OVERFLOW);
     }
 
@@ -240,7 +240,7 @@ int rh4nParmErrorRepresentationHandler(JNIEnv *env, const char *strvalue, RH4nPr
 
 int rh4nParmUsernameHandler(JNIEnv *env, const char *strvalue, RH4nProperties *properties, char *error_str) { 
     if(strlen(strvalue) > sizeof(properties->username)) {
-        sprintf(error_str, "username to big. (MaxLength = [%d])", sizeof(properties->username));
+        sprintf(error_str, "username to big. (MaxLength = [%lu])", sizeof(properties->username));
         return(RH4N_RET_BUFFER_OVERFLOW);
     }
     if(strlen(strvalue) == 0) {
@@ -281,5 +281,5 @@ void rh4nFreePropertiesStruct(RH4nProperties *properties) {
 }
 
 void rh4nInitPropertiesStruct(RH4nProperties *properties) {
-    memset(properties, NULL, sizeof(RH4nProperties));
+    memset(properties, 0x00, sizeof(RH4nProperties));
 }

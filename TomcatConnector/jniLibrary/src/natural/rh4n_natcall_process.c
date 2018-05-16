@@ -29,7 +29,7 @@ int rh4nNaturalcreateProcess(RH4nProperties *props, RH4NEnvirons *environs, char
     }
 
     rh4n_log_info(props->logging, "Waiting for Natural process. PID: [%d]", naturalpid);
-    receivedpid = waitpid(naturalpid, &processret, NULL);
+    receivedpid = waitpid(naturalpid, &processret, 0x00);
     processret = WEXITSTATUS(processret);
     rh4n_log_info(props->logging, "PID [%d] exited with state [%d]", receivedpid, processret);
 

@@ -12,5 +12,6 @@ jint getJSONVarType(JNIEnv *env, GeneralInfos *infos, jobject curptr);
 void printVarType(jint vartype, RH4nLogrule*);
 void _printTabs(int level);
 LLClassInfo *getLLClassInfos(JNIEnv *env, RH4nLogrule*);
+void printJSONVarType(jint, RH4nLogrule*);
 
 #endif

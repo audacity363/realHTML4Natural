@@ -15,9 +15,6 @@ int printFork(JNIEnv*, GeneralInfos*, jobject, const char*, int, RH4nVarList*);
 int getAnker(JNIEnv *env, jobject varlist, GeneralInfos *infos);
 
 int getVarlist(JNIEnv *env, jobject jvarlist, RH4nVarList *varlist, char *error_msg, RH4nLogrule *logging) {
-    jclass llhandlerclass = NULL;    
-    jfieldID headID = NULL;
-    jobject anker = NULL;
     GeneralInfos *infos = NULL;
     int rc = 0;
 
@@ -49,9 +46,7 @@ int getVarlist(JNIEnv *env, jobject jvarlist, RH4nVarList *varlist, char *error_
 int printFork(JNIEnv *env, GeneralInfos *infos, jobject curptr, const char *group, int level, RH4nVarList *varlist) {
     jobject nextentry = NULL, nextlvl = NULL, name_obj = NULL; 
     jstring j_name = NULL;
-    const char *c_name;
-    int i = 0, rc = 0;
-    jint vartype;
+    int rc = 0;
 
     int (*varhandler)(JNIEnv*, HandlerArgs) = NULL;
     HandlerArgs args = {NULL, NULL, NULL, 0, 0 };

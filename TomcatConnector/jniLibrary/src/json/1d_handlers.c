@@ -12,7 +12,7 @@
 
 
 int Handler1D(JNIEnv *env, HandlerArgs args) {
-    int x = 0, i = 0, max_strlen = 0, index[3] = {0, 0, 0}, arrlength[3] = { 0, 0, 0 }, rc = 0;
+    int i = 0, index[3] = {0, 0, 0}, arrlength[3] = { 0, 0, 0 }, rc = 0;
     jobject arraylist = NULL, entry = NULL;
 
     LLClassInfo *llclass = NULL;

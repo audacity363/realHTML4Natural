@@ -16,7 +16,7 @@ void rh4nEnvironInit(RH4NEnvirons *environs) {
 }
 
 int rh4nEnvironNew(RH4NEnvirons *environs, const char *name, const char *value, bool append, char *error_str, RH4nLogrule *logging) {
-    int i = 0, completelength = 0, variablesindex = 0;
+    int completelength = 0, variablesindex = 0;
     char *originalvalue = NULL;
 
     if(environs->length == 0) {
@@ -62,7 +62,7 @@ int rh4nEnvironReadout(JNIEnv *env, jobject jenviron, RH4NEnvirons *environs, ch
     jint jarraylength = 0;
     jclass jcenviron = NULL;
     jfieldID jfname = NULL, jfvalue = NULL, jfappend;
-    jobject joname = NULL, jovalue = NULL, joappend = NULL, jotarget = NULL;
+    jobject joname = NULL, jovalue = NULL, jotarget = NULL;
     jboolean jbappend = false;
 
     int i = 0, ret = 0;
