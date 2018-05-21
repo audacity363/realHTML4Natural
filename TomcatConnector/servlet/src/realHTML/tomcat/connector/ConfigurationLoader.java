@@ -10,7 +10,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
-import java.lang.reflect.Method;
 import org.xml.sax.SAXException;
 
 import realHTML.tomcat.connector.Environ;
@@ -19,7 +18,7 @@ public class ConfigurationLoader
 {
     String filepath = null;
     String env = null;
-    Map<String, String> results = new HashMap();
+    Map<String, String> results = new Map();
     String tags[] = {};
 
     Environ envvars[] = null;
@@ -144,7 +143,7 @@ public class ConfigurationLoader
         }
     }
 
-    public Map getResult() 
+    public Map<String, String> getResult() 
     {
         return(this.results);
     }

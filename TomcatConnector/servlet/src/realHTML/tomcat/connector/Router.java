@@ -1,6 +1,6 @@
 package realHTML.tomcat.connector; 
+
 import java.io.*;
-import java.util.*;
 import java.io.File;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
@@ -9,18 +9,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
-import java.lang.reflect.Method;
 import org.xml.sax.SAXException;
 
 import realHTML.servlet.exceptions.*;
 
 public class Router
 {
-    private class TagHandling {
-        public Boolean mustSet;
-        public Runnable callback;
-    }
-
     String filepath = null;
     String program = null;
     String library = null;
@@ -56,10 +50,6 @@ public class Router
         NodeList nList, target;
         Node nNode;
         Element eElement;
-        String bool_str = null;
-
-        Boolean found = false;
-
         
         dbFactory = DocumentBuilderFactory.newInstance();
         dBuilder = dbFactory.newDocumentBuilder();
