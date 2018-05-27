@@ -4,7 +4,7 @@ import javax.servlet.http.*;
 
 import realHTML.tomcat.connector.*;
 
-public class realHTMLLogin extends HttpServlet {
+public class RealHTMLLogin extends HttpServlet {
     private JNILoader bs;
 
     public void init() {

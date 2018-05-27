@@ -7,7 +7,7 @@
     <!-- Main handler which handles requests to natural -->
     <servlet>
         <servlet-name>realHTMLServlet</servlet-name>
-        <servlet-class>realHTMLHandler</servlet-class>
+        <servlet-class>RealHTMLHandler</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>realHTMLServlet</servlet-name>
@@ -17,7 +17,7 @@
     <!-- Login handler. Creates a new session -->
     <servlet>
         <servlet-name>realHTMLLogin</servlet-name>
-        <servlet-class>realHTMLLogin</servlet-class>
+        <servlet-class>RealHTMLLogin</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>realHTMLLogin</servlet-name>
@@ -27,12 +27,58 @@
     <!-- Logout handler. Destroys a existing session -->
     <servlet>
         <servlet-name>realHTMLLogout</servlet-name>
-        <servlet-class>realHTMLLogout</servlet-class>
+        <servlet-class>RealHTMLLogout</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>realHTMLLogout</servlet-name>
         <url-pattern>/logout</url-pattern>
     </servlet-mapping>
+    
+    
+    <servlet>
+		<servlet-name>LoadConfig</servlet-name>
+		<servlet-class>RealHTMLLoadConfig</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>LoadConfig</servlet-name>
+		<url-pattern>/config/import</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>SaveConfig</servlet-name>
+		<servlet-class>RealHTMLSaveConfig</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>SaveConfig</servlet-name>
+		<url-pattern>/config/save</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>ManageEnvironmentVars</servlet-name>
+		<servlet-class>RealHTMLManageEnvironmentVars</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ManageEnvironmentVars</servlet-name>
+		<url-pattern>/config/environmentvar</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>ManageEnvironment</servlet-name>
+		<servlet-class>RealHTMLManageEnvironment</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ManageEnvironment</servlet-name>
+		<url-pattern>/config/environment</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>ManageRoute</servlet-name>
+		<servlet-class>RealHTMLManageRoute</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ManageRoute</servlet-name>
+		<url-pattern>/config/routes</url-pattern>
+	</servlet-mapping>
 
     <filter>
         <filter-name>CorsFilter</filter-name>

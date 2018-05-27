@@ -4,9 +4,8 @@ import java.io.*;
 import java.util.*;
 import realHTML.tomcat.connector.Environ;
 
+//TODO: Clean up this class
 public class RH4NCallParms {
-    public Map<String, String> settings;
-
     public String natinfos[] = new String[2];
     public List<String> req_keys;
     public List<String> req_vals;
@@ -15,6 +14,8 @@ public class RH4NCallParms {
     public Boolean deleteFile = false;
     public String loglevel = "";
     public String username = "";
+    public String natparms = "";
+    public String natsrcpath = "";
 
     public Boolean request_successful = false;
 

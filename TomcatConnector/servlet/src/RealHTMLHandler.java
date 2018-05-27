@@ -7,28 +7,22 @@ import java.util.logging.FileHandler;
 import java.nio.charset.Charset;
 
 import realHTML.servlet.exceptions.*;
-import realHTML.tomcat.connector.*;
+import realHTML.tomcat.connector.RH4NCallParms;
+import realHTML.tomcat.connector.RH4NParams;
+import realHTML.tomcat.connector.RH4NReturn;
+import realHTML.tomcat.connector.Environ;
+
 import realHTML.tomcat.JSONMatcher.*;
+import realHTML.tomcat.routing.PathTemplate;
+import realHTML.tomcat.environment.Environment;
+import realHTML.tomcat.environment.EnvironmentBuffer;
 
 import org.apache.commons.io.*;
 
-public class realHTMLHandler extends HttpServlet {
+public class RealHTMLHandler extends RealHTMLInit {
 
-    String configurationfile = "";
-    static String default_tags[] = {"routes", "templates", "debug", "naterror", "ldaerror", "natparms", "natsourcepath"};
-    private JNILoader bs;
-    String loggingpath = "";
-
-    public void init() throws ServletException {
-        this.configurationfile = System.getenv("realHTMLconfiguration");
-        if(this.configurationfile == null) {
-            throw(new ServletException("Enviroment variable \"realHTMLconfiguration\" is missing"));
-        }
-        this.loggingpath = System.getenv("RH4N_LOG");
-
-        bs = new JNILoader();
-        bs.printVersion();
-        //System.out.println("Loaded jni Library");
+    public RealHTMLHandler() {
+        super();
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) 
@@ -87,25 +81,20 @@ public class realHTMLHandler extends HttpServlet {
 
         try {
             call_parms = getRoute(request, response);
-            if(call_parms == null) {
-                return;
-            }
+        } catch(ServletException e) {
+            throw(e);
+        }
 
+        try {
             parms.outputfile = createTmpFile();
-
-            if(call_parms.debug) {
-                parms.loglevel = "DEBUG";
-            } else {
-                parms.loglevel = "ERROR";
-            }
 
             parms.reqType = request.getMethod();
 
             parms.natLibrary = call_parms.natinfos[0];
             parms.natProgram = call_parms.natinfos[1];
 
-            parms.natparms = call_parms.settings.get("natparms");
-            parms.logpath = this.loggingpath;
+            parms.natparms = call_parms.natparms;
+            parms.logpath = this.logpath;
             parms.loglevel = call_parms.loglevel;
             parms.errorRepresentation = "JSON";
             parms.username = call_parms.username;
@@ -113,9 +102,7 @@ public class realHTMLHandler extends HttpServlet {
             deleteFile = call_parms.deleteFile;
             envvars = call_parms.enviromentvars;
 
-            //parms.settings = createSettingsString(call_parms.settings.get("templates"), call_parms.natinfos[0],
-            //call_parms.settings.get("natsourcepath"), call_parms.debug);
-            parms.natsrcpath = call_parms.settings.get("natsourcepath");
+            parms.natsrcpath = call_parms.natsrcpath;
 
             call_parms = getQueryParms(request);
             parms.urlVarsKey = call_parms.req_keys.toArray(new String[0]);
@@ -126,13 +113,11 @@ public class realHTMLHandler extends HttpServlet {
                 bodyvars = getBodyParms(request);
             }
             
-            //System.out.println("Calling natural");
             natret = bs.callNatural(parms, envvars, bodyvars);
             if(natret.natprocess_ret < 0) {
                 sendErrorMessage(response, natret.error_msg);
                 return;
             }
-            //System.out.println("Deliver File");
             deliverFile(response, parms.outputfile , deleteFile);
 
         } catch(ServletException e) {
@@ -173,70 +158,55 @@ public class realHTMLHandler extends HttpServlet {
     }
     
     private RH4NCallParms getRoute(HttpServletRequest request, HttpServletResponse response) 
-        throws ServletException, RouteException {
-        String enviroment, path;
+        throws ServletException {
+        String environment, path;
         int index = 0;
-        ConfigurationLoader cl;
         RH4NCallParms parms = new RH4NCallParms();
-        Router r;
-        Route route = null;
         HttpSession session = null;
+        EnvironmentBuffer envs;
+        Environment env;
+        PathTemplate route;
 
-        //System.out.println("RequestURI: " + request.getRequestURI());
-        //System.out.println("ContextPath: " + request.getContextPath());
         path = request.getRequestURI().substring((request.getContextPath() + "/nat").length());
         if(path.length() == 1) {
-            throw(new RouteException("Enviroment and Route is missing"));
+            throw(new ServletException(new RouteException("Enviroment and Route is missing")));
         }
 
         index = path.indexOf("/", 1);
         if(index == -1) {
-            throw(new RouteException("No Route was given"));
+            throw(new ServletException(new RouteException("No Route was given")));
         }
 
-        enviroment = path.substring(1, index);
-        path = path.replace("/" + enviroment, "");
+        environment = path.substring(1, index);
+        path = path.replace("/" + environment, "");
 
-        cl = new ConfigurationLoader(this.configurationfile, default_tags);
-
+        envs = EnvironmentBuffer.getEnvironmentsfromContext(getServletContext());
         try {
-            if(!cl.readConfiguration(enviroment)) {
-                throw(new RouteException("Enviroment " + enviroment + " was not found"));
-            }
+            env = envs.getEnvironment(environment);
         } catch(Exception e) {
-            throw(new RouteException(e.getMessage()));
+            throw(new ServletException(e));
         }
 
-        parms.enviromentvars = cl.getEnviromentVars();
-        parms.settings = cl.getResult();
-
-        r = new Router(parms.settings.get("routes"));
-        try {
-            if(!r.searchRoute(path)) {
-                throw(new RouteException("Route " + path + " was not found"));
-            }
-        } catch (Exception e) {
-            throw(new RouteException(e.getMessage()));
+        route = env.routing.getRoute(path);
+        if(route == null) {
+            throw(new ServletException("Unkown Route"));
         }
 
-        route = r.getRoute();
-        if(route.login) {
-            if(!checkLogin(request, response)) {
-                return(null);
-            }
+        if(route.route.login) {
+            if(!checkLogin(request, response)) { return(null); }
             session = request.getSession();
             parms.username = (String)session.getAttribute("username");
         } else {
             parms.username = "";
         }
 
-        System.out.printf("Username: [%s]\n", parms.username);
-
-        parms.natinfos[0] = route.library; //r.getLibrary();
-        parms.natinfos[1] = route.program; //r.getProgram();
-        parms.debug = route.debug; //r.getDebug();
-        parms.deleteFile = route.deletefile; //r.getDeleteFile();
-        parms.loglevel = route.loglevel;
+        parms.natinfos[0] = route.route.natLibrary;
+        parms.natinfos[1] = route.route.natProgram;
+        parms.deleteFile = true;
+        parms.loglevel = route.route.loglevel;
+        parms.debug = true;
+        parms.natparms = env.natparms;
+        parms.natsrcpath = env.natsourcepath;
 
         return(parms);
     }

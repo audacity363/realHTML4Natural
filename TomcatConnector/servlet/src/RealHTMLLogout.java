@@ -2,7 +2,7 @@ import java.io.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
-public class realHTMLLogout extends HttpServlet {
+public class RealHTMLLogout extends HttpServlet {
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) 
         throws ServletException {
