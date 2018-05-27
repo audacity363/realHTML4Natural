@@ -108,7 +108,7 @@ public class Export {
 	
 	private Element routestoString(Document doc, Routing routing) {
 		Element routesElement, routeElement, natlibrary, natprogram,
-			loginElement, loglevelElement;
+			loginElement, loglevelElement, activeElement;
 		
 		PathTemplate[] routes = routing.getRoutes();
 		
@@ -133,11 +133,19 @@ public class Export {
 			
 			loglevelElement = doc.createElement("loglevel");
 			loglevelElement.setTextContent(routes[i].route.loglevel);
+
+            activeElement = doc.createElement("active");
+            if(routes[i].route.active) {
+                activeElement.setTextContent("true");
+            } else {
+                activeElement.setTextContent("false");
+            }
 			
 			routeElement.appendChild(natlibrary);
 			routeElement.appendChild(natprogram);
 			routeElement.appendChild(loginElement);
 			routeElement.appendChild(loglevelElement);
+            routeElement.appendChild(activeElement);
 			
 			routesElement.appendChild(routeElement);
 		}

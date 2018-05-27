@@ -20,7 +20,6 @@ public class RealHTMLInit extends HttpServlet {
 	private final String version = "2.0";
 	public String configurationfile;
     public String logpath;
-    public JNILoader bs;
 	
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
@@ -58,9 +57,6 @@ public class RealHTMLInit extends HttpServlet {
 			EnvironmentBuffer.setEnvironmentsforContext(getServletContext(), envs);
 		}
     
-        this.bs = new JNILoader();
-        this.bs.printVersion();
-		
 		getServletContext().setAttribute("isinitialised", true);
 		
 		System.out.println("Successfully initialised realHTML4Natural Tomcat Connector");

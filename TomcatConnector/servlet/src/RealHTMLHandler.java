@@ -11,6 +11,7 @@ import realHTML.tomcat.connector.RH4NCallParms;
 import realHTML.tomcat.connector.RH4NParams;
 import realHTML.tomcat.connector.RH4NReturn;
 import realHTML.tomcat.connector.Environ;
+import realHTML.tomcat.connector.JNILoader;
 
 import realHTML.tomcat.JSONMatcher.*;
 import realHTML.tomcat.routing.PathTemplate;
@@ -20,9 +21,13 @@ import realHTML.tomcat.environment.EnvironmentBuffer;
 import org.apache.commons.io.*;
 
 public class RealHTMLHandler extends RealHTMLInit {
+    private JNILoader bs;
 
-    public RealHTMLHandler() {
-        super();
+    public void init() throws ServletException {
+        super.init();
+
+        this.bs = new JNILoader();
+        this.bs.printVersion();
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) 
