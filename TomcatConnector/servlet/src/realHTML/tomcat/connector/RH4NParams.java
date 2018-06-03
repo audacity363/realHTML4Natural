@@ -1,5 +1,7 @@
 package realHTML.tomcat.connector;
 
+import realHTML.tomcat.environment.EnvironmentVar;
+
 
 public class RH4NParams {
 
@@ -15,4 +17,6 @@ public class RH4NParams {
     public String logpath;
     public String errorRepresentation;
     public String username;
+
+    public EnvironmentVar[] environs;
 }

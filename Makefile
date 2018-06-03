@@ -3,14 +3,14 @@
 
 CC = /usr/bin/gcc
 AR = /usr/bin/ar
-JAR = /SAG/cjp/v16/bin/jar
-JAVAC = /SAG/cjp/v16/bin/javac
-JAVAH = /SAG/cjp/v16/bin/javah
+JAR = /usr/java8_64/bin/jar
+JAVAC = /usr/java8_64/bin/javac
+JAVAH = /usr/java8_64/bin/javah
 
 LFLAGS1_SO = -shared -maix64
 LFLAGS2_SO = 
 
-TOMCATCLASSPATH = /opt/tomcat/tomcat-rh4n/lib/servlet-api.jar
+TOMCATCLASSPATH = /opt/tomcat/tomcat-rh4n/lib/*
 RH4NCLASSPATH = ./TomcatConnector/servlet/web/WEB-INF/lib/realHTMLconnector.jar:./TomcatConnector/servlet/web/WEB-INF/lib/minimal-json-0.9.5.jar:./TomcatConnector/servlet/web/WEB-INF/lib/commons-io-1.3.2.jar:./bin/servlet/lib
 CLASSPATH = "$(TOMCATCLASSPATH):$(RH4NCLASSPATH)"
 
@@ -357,6 +357,10 @@ JAVA_XML_PACKAGE_SRC = $(TOMCONNECTOR_SRC)/realHTML/tomcat/xml
 JAVA_XML_PACKAGE = $(JAVA_XML_PACKAGE_SRC)/Export.java \
 				   $(JAVA_XML_PACKAGE_SRC)/Import.java
 
+JAVA_GUI_PACKAGE_SRC = $(TOMCONNECTOR_SRC)/realHTML/tomcat/gui
+JAVA_GUI_PACKAGE = $(JAVA_GUI_PACKAGE_SRC)/RouteTree.java \
+				   $(JAVA_GUI_PACKAGE_SRC)/RouteSorting.java
+
 TOMCAT_SERVLETS = $(TOMCONNECTOR_SRC)/RealHTMLInit.java \
 				  $(TOMCONNECTOR_SRC)/RealHTMLHandler.java \
 				  $(TOMCONNECTOR_SRC)/RealHTMLLogin.java \
@@ -377,14 +381,16 @@ tomcatconnector_package: tomcatconnector_package_clean tomcatconnector_package_p
 	@$(JAVAC) -d $(TOMCONNECTOR_LIB_BIN) -cp $(CLASSPATH) $(JAVA_UTILS_EXCEPTIONS)
 	@printf "Compiling realHTML.tomcat.JSONMatcher\n"
 	@$(JAVAC) -d $(TOMCONNECTOR_LIB_BIN) -cp $(CLASSPATH) $(JAVA_JSON_PARSER)
-	@printf "Compiling realHTML.tomcat.connector\n"
-	@$(JAVAC) -d $(TOMCONNECTOR_LIB_BIN) -cp $(CLASSPATH) $(JAVA_UTILS_PACKAGE)
 	@printf "Compiling realHTML.tomcat.routing\n"
 	@$(JAVAC) -d $(TOMCONNECTOR_LIB_BIN) -cp $(CLASSPATH) $(JAVA_ROUTING_PACKAGE)
 	@printf "Compiling realHTML.tomcat.environment\n"
 	@$(JAVAC) -d $(TOMCONNECTOR_LIB_BIN) -cp $(CLASSPATH) $(JAVA_ENVIRONMENT_PACKAGE)
 	@printf "Compiling realHTML.tomcat.xml\n"
 	@$(JAVAC) -d $(TOMCONNECTOR_LIB_BIN) -cp $(CLASSPATH) $(JAVA_XML_PACKAGE)
+	@printf "Compiling realHTML.tomcat.gui\n"
+	@$(JAVAC) -d $(TOMCONNECTOR_LIB_BIN) -cp $(CLASSPATH) $(JAVA_GUI_PACKAGE)
+	@printf "Compiling realHTML.tomcat.connector\n"
+	@$(JAVAC) -d $(TOMCONNECTOR_LIB_BIN) -cp $(CLASSPATH) $(JAVA_UTILS_PACKAGE)
 	@printf "Creating realHTMLconnector.jar\n"
 	@cd $(TOMCONNECTOR_LIB_BIN) && jar cf ../../../TomcatConnector/servlet/web/WEB-INF/lib/realHTMLconnector.jar ./realHTML
 	
@@ -417,7 +423,7 @@ tomcatconnector_servlet_clean:
 tomcatconnector_warfile: jnilibrary tomcatconnector_package tomcatconnector_servlet \
 						 tomcatconnector_warfile_pre tomcatconnector_warfile_clean
 	@printf "Creating realHTML4Natural.war\n"
-	@cd $(WARFILE_PREFIX); $(JAR) cvf ../../../bin/realHTML4Naturaldev.war .
+	@cd $(WARFILE_PREFIX); $(JAR) cvf ../../../bin/realHTML4Natural.war .
 
 tomcatconnector_warfile_pre:
 	@printf "Creating warfile output folder\n"
@@ -425,7 +431,7 @@ tomcatconnector_warfile_pre:
 	
 tomcatconnector_warfile_clean:
 	@printf "Cleaning warfile\n"
-	@rm -f ./bin/realHTML4Naturaldev.war
+	@rm -f ./bin/realHTML4Natural.war
 
 #                         +-----------------+
 #-------------------------|   JNI library   |----------------------------------

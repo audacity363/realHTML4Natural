@@ -17,7 +17,7 @@ void rh4nEnvironPrint(RH4NEnvirons*, RH4nLogrule*);
 void rh4nEnvironFree(RH4NEnvirons *environs);
 
 //Private
-#define RH4N_CLASS_ENVIRON "realHTML/tomcat/connector/Environ"
+#define RH4N_CLASS_ENVIRON "realHTML/tomcat/environment/EnvironmentVar"
 
 
 #endif

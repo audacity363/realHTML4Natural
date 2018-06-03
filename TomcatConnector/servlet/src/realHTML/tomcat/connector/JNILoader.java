@@ -1,6 +1,6 @@
 package realHTML.tomcat.connector;
 
-import realHTML.tomcat.connector.Environ;
+import realHTML.tomcat.environment.EnvironmentVar;
 import realHTML.tomcat.JSONMatcher.LLHandler;
 
 public class JNILoader
@@ -14,7 +14,7 @@ public class JNILoader
         //System.out.println("Lib Loaded");
     }
 
-    public RH4NReturn callNatural(RH4NParams parms, Environ envvars[], LLHandler varlist)
+    public RH4NReturn callNatural(RH4NParams parms, EnvironmentVar envvars[], LLHandler varlist)
     {
         return(new JNINatural()).jni_callNatural(parms, envvars, varlist);
     }

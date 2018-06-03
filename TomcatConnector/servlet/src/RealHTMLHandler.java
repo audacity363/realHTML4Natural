@@ -17,6 +17,7 @@ import realHTML.tomcat.JSONMatcher.*;
 import realHTML.tomcat.routing.PathTemplate;
 import realHTML.tomcat.environment.Environment;
 import realHTML.tomcat.environment.EnvironmentBuffer;
+import realHTML.tomcat.environment.EnvironmentVar;
 
 import org.apache.commons.io.*;
 
@@ -66,7 +67,7 @@ public class RealHTMLHandler extends RealHTMLInit {
     public void doDelete(HttpServletRequest request, HttpServletResponse response) 
         throws ServletException {
         try {
-            handleRequest(request, response);
+            handleRequest(request, response);;
         } catch(ServletException e) {
             throw(e);
         } catch(Exception e) {
@@ -105,7 +106,7 @@ public class RealHTMLHandler extends RealHTMLInit {
         }
             
         try {
-            natret = bs.callNatural(parms, envvars, bodyvars);
+            natret = bs.callNatural(parms, parms.environs, bodyvars);
             if(natret.natprocess_ret < 0) {
                 sendErrorMessage(response, natret.error_msg);
                 return;
@@ -184,6 +185,7 @@ public class RealHTMLHandler extends RealHTMLInit {
         parms.loglevel = route.route.loglevel;
         parms.natparms = env.natparms;
         parms.natsrcpath = env.natsourcepath;
+        parms.environs = env.environvars.toArray(new EnvironmentVar[env.environvars.size()]);
 
         HashMap<String, String> routeparms = route.getParms();
         if(routeparms.size() != 0) {
