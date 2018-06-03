@@ -3,7 +3,7 @@ package realHTML.tomcat.routing;
 import java.util.ArrayList;
 
 public class Routing {
-	ArrayList<PathTemplate> templates;
+	public ArrayList<PathTemplate> templates;
 	
 	public Routing() {
 		this.templates = new ArrayList<PathTemplate>();

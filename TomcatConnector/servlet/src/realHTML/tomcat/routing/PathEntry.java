@@ -65,6 +65,10 @@ public class PathEntry {
 	public PathType getType() {
 		return(this.type);
 	}
+
+    public String[] getOptions() {
+        return(this.options);
+    }
 	
 	public Boolean containsOption(String option) {
 		return(Arrays.asList(this.options).contains(option));

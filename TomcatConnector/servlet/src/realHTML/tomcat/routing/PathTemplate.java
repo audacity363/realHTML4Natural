@@ -6,7 +6,7 @@ import java.util.HashMap;
 public class PathTemplate {
 	public String template;
 	public Route route;
-	PathEntry[] entries;
+	public PathEntry[] entries;
 	
 	public PathTemplate(String template, Route route) {
 		this.template = template;

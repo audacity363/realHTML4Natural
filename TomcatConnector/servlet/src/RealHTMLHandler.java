@@ -3,11 +3,11 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.logging.FileHandler;
 import java.nio.charset.Charset;
 
 import realHTML.servlet.exceptions.*;
-import realHTML.tomcat.connector.RH4NCallParms;
 import realHTML.tomcat.connector.RH4NParams;
 import realHTML.tomcat.connector.RH4NReturn;
 import realHTML.tomcat.connector.Environ;
@@ -74,63 +74,46 @@ public class RealHTMLHandler extends RealHTMLInit {
         }
     }
 
-    private void handleRequest(HttpServletRequest request, HttpServletResponse response) 
-        throws ServletException, IOException, RouteException, Exception {
-        RH4NCallParms call_parms;
+    private void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException {
         RH4NParams parms = new RH4NParams();
         LLHandler bodyvars = null;
         String contentType;
-        Boolean deleteFile = false;
         Environ envvars[] = null;
         RH4NReturn natret = null;
 
         try {
-            call_parms = getRoute(request, response);
-        } catch(ServletException e) {
-            throw(e);
+            parms = getRoute(request, response);
+            parms.outputfile = createTmpFile();
+        } catch(Exception e) {
+            throw(new ServletException(e));
         }
 
+        parms.reqType = request.getMethod();
+        parms.logpath = this.logpath;
+        parms.errorRepresentation = "JSON";
+        //envvars = call_parms.enviromentvars;
+
+        parms = getQueryParms(request, parms);
+
         try {
-            parms.outputfile = createTmpFile();
-
-            parms.reqType = request.getMethod();
-
-            parms.natLibrary = call_parms.natinfos[0];
-            parms.natProgram = call_parms.natinfos[1];
-
-            parms.natparms = call_parms.natparms;
-            parms.logpath = this.logpath;
-            parms.loglevel = call_parms.loglevel;
-            parms.errorRepresentation = "JSON";
-            parms.username = call_parms.username;
-
-            deleteFile = call_parms.deleteFile;
-            envvars = call_parms.enviromentvars;
-
-            parms.natsrcpath = call_parms.natsrcpath;
-
-            call_parms = getQueryParms(request);
-            parms.urlVarsKey = call_parms.req_keys.toArray(new String[0]);
-            parms.urlVarsValue = call_parms.req_vals.toArray(new String[0]);
-
             contentType = request.getContentType();
             if(contentType != null && contentType.equals("application/json")) {
                 bodyvars = getBodyParms(request);
             }
+        } catch(Exception e) {
+            throw(new ServletException(e));
+        }
             
+        try {
             natret = bs.callNatural(parms, envvars, bodyvars);
             if(natret.natprocess_ret < 0) {
                 sendErrorMessage(response, natret.error_msg);
                 return;
             }
-            deliverFile(response, parms.outputfile , deleteFile);
+            deliverFile(response, parms.outputfile, true);
 
-        } catch(ServletException e) {
-            throw(e);
-        } catch(RouteException e) {
-            throw(e);
         } catch(Exception e) {
-            throw(e);
+            throw(new ServletException(e));
         }
     }
 
@@ -153,20 +136,11 @@ public class RealHTMLHandler extends RealHTMLInit {
         }
     }
 
-    private String createSettingsString(String templatepath, String natlib, String fuserpath, Boolean debug) {
-        String settings;
-
-        settings = String.format("templates=%s;lib=%s;natsrc=%s;debug=%b",
-            templatepath, natlib, fuserpath, debug);
-
-        return(settings);
-    }
-    
-    private RH4NCallParms getRoute(HttpServletRequest request, HttpServletResponse response) 
+    private RH4NParams getRoute(HttpServletRequest request, HttpServletResponse response) 
         throws ServletException {
         String environment, path;
         int index = 0;
-        RH4NCallParms parms = new RH4NCallParms();
+        RH4NParams parms = new RH4NParams();
         HttpSession session = null;
         EnvironmentBuffer envs;
         Environment env;
@@ -205,13 +179,27 @@ public class RealHTMLHandler extends RealHTMLInit {
             parms.username = "";
         }
 
-        parms.natinfos[0] = route.route.natLibrary;
-        parms.natinfos[1] = route.route.natProgram;
-        parms.deleteFile = true;
+        parms.natLibrary = route.route.natLibrary;
+        parms.natProgram = route.route.natProgram;
         parms.loglevel = route.route.loglevel;
-        parms.debug = true;
         parms.natparms = env.natparms;
         parms.natsrcpath = env.natsourcepath;
+
+        HashMap<String, String> routeparms = route.getParms();
+        if(routeparms.size() != 0) {
+            parms.urlVarsKey = new String[routeparms.size()];
+            parms.urlVarsValue = new String[routeparms.size()];
+
+            int i = 0;
+            for(String key: routeparms.keySet()) {
+                parms.urlVarsKey[i] = key;
+                parms.urlVarsValue[i++] = routeparms.get(key);
+            }
+
+        } else {
+            parms.urlVarsKey = null;
+            parms.urlVarsValue = null;
+        }
 
         return(parms);
     }
@@ -230,21 +218,40 @@ public class RealHTMLHandler extends RealHTMLInit {
        return(false);
     }
 
-    private RH4NCallParms getQueryParms(HttpServletRequest request) {
-        RH4NCallParms parms = new RH4NCallParms();
-        Iterator parmiterator;
-        Map.Entry<String, String[]> entry;
+    private RH4NParams getQueryParms(HttpServletRequest request, RH4NParams parms) {
+        Map urlparms;
+        int offset = 0, parmsize = 0;
+        String tmpkeys[], tmpvalues[];
 
-        parms.req_keys = new ArrayList<String>();
-        parms.req_vals = new ArrayList<String>();
-
-        parmiterator = request.getParameterMap().entrySet().iterator();
-
-        while(parmiterator.hasNext()) {
-            entry = (Map.Entry<String, String[]>)parmiterator.next();
-            parms.req_keys.add(entry.getKey());
-            parms.req_vals.add(entry.getValue()[0]);
+        urlparms = request.getParameterMap();
+        if(urlparms.size() == 0) {
+            if(parms.urlVarsKey == null) {
+                parms.urlVarsKey = new String[0];
+                parms.urlVarsValue = new String[0];
+            }
+            return(parms);
         }
+
+        // Bullshit!!! offset it die länge des Arrays in parms
+        parmsize = urlparms.size();
+        if(parms.urlVarsKey != null) {
+            offset = parms.urlVarsKey.length;
+            tmpkeys = new String[offset+parmsize];
+            tmpvalues = new String[offset+parmsize];
+            System.arraycopy(parms.urlVarsKey, 0, tmpkeys, 0, offset);
+            System.arraycopy(parms.urlVarsValue, 0, tmpvalues, 0, offset);
+        } else {
+            tmpkeys = new String[parmsize];
+            tmpvalues = new String[parmsize];
+        }
+
+        for(String key: (Set<String>)urlparms.keySet()) {
+            tmpkeys[offset] = key;
+            tmpvalues[offset++] = ((String[])urlparms.get(key))[0];
+        }
+
+        parms.urlVarsKey = tmpkeys;
+        parms.urlVarsValue = tmpvalues;
 
         return(parms);
     }
