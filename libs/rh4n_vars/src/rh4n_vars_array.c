@@ -16,6 +16,8 @@ int rh4nvarCreateNewArray(RH4nVarList *varlist, char *pgroupname, char *pname, i
         return(createret); 
     }
 
+    _refvar.var->array_type = vartype;
+
     if(length[0] == 0) {
         _refvar.var->var.length = 0;
         _refvar.var->var.value = NULL;
@@ -140,19 +142,8 @@ int rh4nvarGetArrayVarType(RH4nVarList *varlist, char *pgroupname, char *pname, 
     int rc = 0, dimensions = 0, index[3] = { -1, -1, -1 };
 
     if((rc = rh4nvarGetRef(varlist, pgroupname, pname, &_refvar)) != RH4N_RET_OK) return(rc);
-    if((rc = rh4nvarGetArrayDimension(&_refvar.var->var, &dimensions)) != RH4N_RET_OK) return(rc);
-
-    switch(dimensions) {
-        case 3:
-            index[2] = 0;
-        case 2:
-            index[1] = 0;
-        case 1:
-            index[0] = 0;
-            break;
-    }
-
-    if((rc = rh4nvarGetArrayEntry(&_refvar.var->var, index, &arrayentry)) != RH4N_RET_OK) return(rc);
-    *vartype = arrayentry->type;
+    *vartype = _refvar.var->array_type;
     return(RH4N_RET_OK);
 }
+
+

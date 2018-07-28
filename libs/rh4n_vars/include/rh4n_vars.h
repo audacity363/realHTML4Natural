@@ -2,6 +2,7 @@
 #define RH4NLIBVARS
 typedef struct {
     int type;
+    int array_type;
     int length; 
     void *value;
 } RH4nVarObj;
