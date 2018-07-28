@@ -97,22 +97,42 @@ bool checkArrayGroup(RH4nVarEntry_t *variable) {
 }
 
 void rh4nvarPrintString(RH4nVarObj *variable, RH4nProperties *props, FILE *outputfile) {
+    if(variable->value == NULL) {
+        fprintf(outputfile, "\"\"");
+        return;
+    }
     fprintf(outputfile, "\"%s\"", (char*)variable->value);
 }
 
 void rh4nvarPrintUString(RH4nVarObj *variable, RH4nProperties *props, FILE *outputfile) {
+    if(variable->value == NULL) {
+        fprintf(outputfile, "\"\"");
+        return;
+    }
     fprintf(outputfile, "\"%S\"", (wchar_t*)variable->value);
 }
 
 void rh4nvarPrintBool(RH4nVarObj *variable, RH4nProperties *props, FILE *outputfile) {
+    if(variable->value == NULL) {
+        fprintf(outputfile, "false");
+        return;
+    }
     fprintf(outputfile, "%s", *((bool*)variable->value) == 1 ? "true" : "false");
 }
 
 void rh4nvarPrintInt(RH4nVarObj *variable, RH4nProperties *props, FILE *outputfile) {
+    if(variable->value == NULL) {
+        fprintf(outputfile, "0");
+        return;
+    }
     fprintf(outputfile, "%d", *((int*)variable->value));
 }
 
 void rh4nvarPrintFloat(RH4nVarObj *variable, RH4nProperties *props, FILE *outputfile) {
+    if(variable->value == NULL) {
+        fprintf(outputfile, "0");
+        return;
+    }
     fprintf(outputfile, "%f", *((double*)variable->value));
 }
 
