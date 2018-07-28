@@ -7,7 +7,7 @@ JAR = /usr/java8_64/bin/jar
 JAVAC = /usr/java8_64/bin/javac
 JAVAH = /usr/java8_64/bin/javah
 
-LFLAGS1_SO = -shared -maix64
+LFLAGS1_SO = -shared 
 LFLAGS2_SO = 
 
 TOMCATCLASSPATH = /opt/tomcat/tomcat-rh4n/lib/*
@@ -30,9 +30,9 @@ INCLUDE = -I./include/ \
 LIBS = -L./bin/libs \
 	   -ldl -lrh4nutils -lrh4nlogging -lrh4nvar2name -lrh4nvars -lrh4nldaparser -lcrypt
 
-CARGS1 = -g -c -fPIC -maix64 $(INCLUDE)
+CARGS1 = -g -c -fPIC $(INCLUDE)
 CARGS2 = 
-CARGS_SO = -c -g -fPIC -maix64 $(INCLUDE)
+CARGS_SO = -c -g -fPIC $(INCLUDE)
 
 LIBOUTPUT = ./bin/libs/
 
@@ -175,6 +175,10 @@ vars_clean:
 	@rm -f $(LIBOUTPUT)/$(UTILS_BIN)
 	@printf "Cleaning vars objects\n"
 	@rm -f $(VARS_BIN)/*.o
+
+vars_test: vars
+	@$(CC) -g ./libs/rh4n_vars/test/main.c $(INCLUDE) -o ./libs/rh4n_vars/test/main $(LIBS)
+	@./libs/rh4n_vars/test/main
 
 #                         +-----------------+
 #-------------------------|    LDA parser   |----------------------------------

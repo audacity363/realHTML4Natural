@@ -16,7 +16,7 @@ int rh4nvarCreateNewArray(RH4nVarList *varlist, char *pgroupname, char *pname, i
         return(createret); 
     }
 
-    _refvar.var->array_type = vartype;
+    _refvar.var->var.array_type = vartype;
 
     if(length[0] == 0) {
         _refvar.var->var.length = 0;
@@ -55,13 +55,20 @@ int rh4nvarCreateNewArray(RH4nVarList *varlist, char *pgroupname, char *pname, i
 }
 
 int rh4nvarInitArray(RH4nVarObj *target, int length, int vartype) {
-    int i = 0;
+    int i = 0, old_length = 0;
 
-    if((target->value = malloc(sizeof(RH4nVarObj)*length)) == NULL) { return(RH4N_RET_MEMORY_ERR); }
+    if(target->length == -1) { old_length = 0; }
+    else { old_length = target->length; }
+
+    if(target->value == NULL) {
+        if((target->value = malloc(sizeof(RH4nVarObj)*length)) == NULL) { return(RH4N_RET_MEMORY_ERR); }
+    } else {
+        if((target->value = realloc(target->value, sizeof(RH4nVarObj)*length)) == NULL) { return(RH4N_RET_MEMORY_ERR); }
+    }
 
     target->length = length;
 
-    for(; i < length; i++) {
+    for(i = old_length; i < length; i++) {
         ((RH4nVarObj*)target->value)[i].type = vartype;
         ((RH4nVarObj*)target->value)[i].value = NULL;
         ((RH4nVarObj*)target->value)[i].length = -1;
@@ -142,8 +149,34 @@ int rh4nvarGetArrayVarType(RH4nVarList *varlist, char *pgroupname, char *pname, 
     int rc = 0, dimensions = 0, index[3] = { -1, -1, -1 };
 
     if((rc = rh4nvarGetRef(varlist, pgroupname, pname, &_refvar)) != RH4N_RET_OK) return(rc);
-    *vartype = _refvar.var->array_type;
+    *vartype = _refvar.var->var.array_type;
     return(RH4N_RET_OK);
 }
 
+int rh4nvarExpandArray(RH4nVarList *varlist, char *pgroupname, char *pname, int dimensions, int length[3]) {
+    int varlibret = 0, i = 0, x = 0, current_dimensions = 0, index[3] = {-1, -1, -1},
+        current_length[3] = {-1, -1, -1};
+    RH4nVarRef _refvar = RH4NVAR_REF_INIT;
+    RH4nVarObj *ytarget = NULL, *ztarget = NULL;
+
+    if(dimensions < 1 && dimensions > 3) { return(RH4N_RET_VAR_BAD_DIM); }
+    if((varlibret = rh4nvarCheckDimLength(dimensions, length)) != RH4N_RET_OK) { return(varlibret); }
+    if((varlibret = rh4nvarGetRef(varlist, pgroupname, pname, &_refvar)) != RH4N_RET_OK) { return(varlibret); }
+    if(_refvar.var->var.type != RH4NVARTYPEARRAY) { return(RH4N_RET_VAR_NOT_ARRAY); }
+
+    if((varlibret = rh4nvarGetArrayDimension(&_refvar.var->var, &current_dimensions)) != RH4N_RET_OK) { return(varlibret); }
+    if(dimensions < current_dimensions) { return(RH4N_RET_VAR_BAD_DIM); }
+    if((varlibret = rh4nvarGetArrayLength(&_refvar.var->var, &current_length)) != RH4N_RET_OK) { return(varlibret); }
+
+    for(; i < dimensions; i++) {
+//TODO: implement this. I have no idea how to do it properly
+    }
+
+    if(current_dimensions == 1) {
+        if((varlibret = rh4nvarInitArray(&_refvar.var->var, length[0], 
+            RH4NVAR_ARRAY_INIT_TYPE(dimensions, 1, _refvar.var->var.array_type))) != RH4N_RET_OK) { return(varlibret); }
+    }
+
+    return(RH4N_RET_OK);
+}
 

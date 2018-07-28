@@ -15,36 +15,20 @@ int main(int argc, char *argv[]) {
 
     rh4nvarInitList(&varlist);
 
-    //rh4nvarCreateNewString(&varlist, NULL, "str1", "Hello World");
-    //rh4nvarGetString(&varlist, NULL, "str1", sizeof(testbuff), testbuff);
-    //printf("Testbuff: [%s]\n", testbuff);
-    //memset(testbuff, NULL, sizeof(testbuff));
+    rh4nvarCreateNewString(&varlist, NULL, "newstr", "value");
 
-    rh4nvarCreateNewStringArray(&varlist, NULL, "strarray1", 3, arraylength);
-    index[0] = index[1] = 1;
-    index[2] = 2;
-    printf("setArray: %d\n", rh4nvarSetStringArrayEntry(&varlist, NULL, "strarray1", index, "Hello World Array"));
-    rh4nvarGetStringArrayEntry(&varlist, NULL, "strarray1", index, sizeof(testbuff), testbuff);
-    printf("Testbuff Array: [%s]\n", testbuff);
-
-    //arraylength[0] = 5;
-    //arraylength[1] = 3;
     memset(arraylength, 0x00, sizeof(arraylength));
-    rh4nvarCreateNewStringArray(&varlist, NULL, "strarray2", 1, arraylength);
-
-    //rh4nvarPrintList(&varlist);
-    //printf("\n");
-
-    rh4nvarCreateNewGroup(&varlist, "grp1");
-    rh4nvarCreateNewBool(&varlist, NULL, "bool1", true);
-    rh4nvarCreateNewBool(&varlist, NULL, "bool2", true);
-    //rh4nvarPrintList(&varlist);
-    //printf("\n");
-
-    rh4nvarMoveVarToGroup(&varlist, "bool1", "grp1");
-    rh4nvarMoveVarToGroup(&varlist, "strarray1", "grp1");
-    rh4nvarPrintList(&varlist, &props);
+    arraylength[0] = 2;
+    rh4nvarCreateNewStringArray(&varlist, NULL, "strarray", 1, arraylength);
+    rh4nvarPrintJSONFork(varlist.anker, 0, 1, &props, stdout);
     printf("\n");
+
+    arraylength[0] = 4;
+    printf("Expand: [%d]\n", rh4nvarExpandArray(&varlist, NULL, "strarray", 1, arraylength));
+
+    rh4nvarPrintList(&varlist, &props);
+    rh4nvarPrintJSONFork(varlist.anker, 0, 1, &props, stdout);
+
     rh4nvarFreeList(&varlist);
     rh4n_del_log_rule(props.logging);
     return(0);
