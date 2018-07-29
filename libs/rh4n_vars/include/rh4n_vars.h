@@ -104,6 +104,7 @@ int rh4nvarCreateNewGroup(RH4nVarList*, char*);
 int rh4nvarMoveVarToGroup(RH4nVarList*, char*, char*);
 //Array
 int rh4nvarGetArrayVarType(RH4nVarList*, char*, char*, int*);
+int rh4nvarExpandArray(RH4nVarList*, char*, char*, int, int*);
 //Free
 void rh4nvarFreeList(RH4nVarList*);
 
@@ -128,6 +129,7 @@ int rh4nvarCreateNewArray(RH4nVarList*, char*, char*, int, int*, int);
 int rh4nvarGetArrayLength(RH4nVarObj*, int*);
 int rh4nvarGetArrayDimension(RH4nVarObj*, int*);
 int rh4nvarGetArrayEntry(RH4nVarObj*, int[3], RH4nVarObj**);
+int _rh4nvarExpandArray(RH4nVarObj*, int, int, int*, int);
 //Free
 void rh4nvarFreeArray(RH4nVarEntry_t*);
 void rh4nvarFreeFork(RH4nVarEntry_t*);

@@ -166,17 +166,28 @@ int rh4nvarExpandArray(RH4nVarList *varlist, char *pgroupname, char *pname, int 
 
     if((varlibret = rh4nvarGetArrayDimension(&_refvar.var->var, &current_dimensions)) != RH4N_RET_OK) { return(varlibret); }
     if(dimensions < current_dimensions) { return(RH4N_RET_VAR_BAD_DIM); }
-    if((varlibret = rh4nvarGetArrayLength(&_refvar.var->var, &current_length)) != RH4N_RET_OK) { return(varlibret); }
 
-    for(; i < dimensions; i++) {
-//TODO: implement this. I have no idea how to do it properly
-    }
-
-    if(current_dimensions == 1) {
-        if((varlibret = rh4nvarInitArray(&_refvar.var->var, length[0], 
-            RH4NVAR_ARRAY_INIT_TYPE(dimensions, 1, _refvar.var->var.array_type))) != RH4N_RET_OK) { return(varlibret); }
-    }
-
-    return(RH4N_RET_OK);
+    return(_rh4nvarExpandArray(&_refvar.var->var, 1, dimensions, length, _refvar.var->var.array_type));
 }
 
+int _rh4nvarExpandArray(RH4nVarObj *target, int cur_dimension, int target_dimension, int target_length[3], int vartype) {
+    int i = 0, varlibret = 0;
+
+    if(target->length > target_length[cur_dimension-1]) { return(RH4N_RET_VAR_BAD_LENGTH); }
+
+    if(target->length != target_length[cur_dimension-1]) {
+        if((varlibret = rh4nvarInitArray(target, target_length[cur_dimension-1], 
+            RH4NVAR_ARRAY_INIT_TYPE(target_dimension, cur_dimension, vartype))) != RH4N_RET_OK) { return(varlibret); }
+    }
+
+    if(cur_dimension == target_dimension) { return(RH4N_RET_OK); }
+
+    for(; i < target->length; i++) {
+        ((RH4nVarObj*)target->value)[i].type = RH4NVARTYPEARRAY;
+        if((varlibret = _rh4nvarExpandArray(&((RH4nVarObj*)target->value)[i], cur_dimension+1, 
+            target_dimension, target_length, vartype)) != RH4N_RET_OK) {
+            return(varlibret);
+        }
+    }
+    return(RH4N_RET_OK);
+}
