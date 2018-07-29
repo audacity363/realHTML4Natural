@@ -101,7 +101,9 @@ int rh4nvarSetFloatArrayEntry(RH4nVarList*, char*, char*, int*, double);
 int rh4nvarGetFloatArrayEntry(RH4nVarList*, char*, char*, int*, double*);
 //Group
 int rh4nvarCreateNewGroup(RH4nVarList*, char*);
+int rh4nvarCreateNewGroup_m(RH4nVarList*, char**, char*);
 int rh4nvarMoveVarToGroup(RH4nVarList*, char*, char*);
+int rh4nvarMoveVarToGroup_m(RH4nVarList*, char*, char**);
 //Array
 int rh4nvarGetArrayVarType(RH4nVarList*, char*, char*, int*);
 int rh4nvarExpandArray(RH4nVarList*, char*, char*, int, int*);
@@ -111,7 +113,9 @@ void rh4nvarFreeList(RH4nVarList*);
 //Private
 //Utils
 int rh4nvarCreatenewVariable(RH4nVarList*, char*, char*, int, RH4nVarRef*);
+int rh4nvarCreatenewVariable_m(RH4nVarList*, char**, char*, int, RH4nVarRef*);
 int rh4nvarSearchVarRef(RH4nVarEntry_t*, char*, RH4nVarRef*);
+void _rh4nvarmoveToGroup(RH4nVarList*, RH4nVarEntry_t*, RH4nVarEntry_t*);
 //String
 int rh4nvarSetString(RH4nVarObj *target, char *value);
 //String

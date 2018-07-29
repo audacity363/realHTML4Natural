@@ -61,6 +61,31 @@ int rh4nvarCreatenewVariable(RH4nVarList *varlist, char *pgroupname, char *pname
     return(RH4N_RET_OK);
 }
 
+int rh4nvarCreatenewVariable_m(RH4nVarList *varlist, char **pgroupname, char *pname, int type, RH4nVarRef *pnewvar) {
+    RH4nVarList tmplist;
+    RH4nVarRef _refvar = RH4NVAR_REF_INIT;
+    int i = 0, varlibret = 0;
+    char *grpname = NULL;
+
+    rh4nvarInitList(&tmplist);
+    tmplist.anker = varlist->anker;
+
+    if(pgroupname) {
+        for(;pgroupname[i+1] != NULL; i++) {
+            if((varlibret = rh4nvarGetRef(&tmplist, NULL, pgroupname[i], &_refvar)) != RH4N_RET_OK) {
+                return(varlibret);
+            }
+            tmplist.anker = _refvar.var->nextlvl;
+        }
+    }
+
+    if(pgroupname != NULL) {
+        grpname = pgroupname[i];
+    }
+
+    return(rh4nvarCreatenewVariable(&tmplist, grpname, pname, type, pnewvar));
+}
+
 int rh4nvarGetRef(RH4nVarList *varlist, char *pgroupname, char *pname, RH4nVarRef *prefvar) {
     RH4NVAR_CHECKVARLIST(varlist);
     if(!prefvar) { return(RH4N_RET_PARM_ERR); }
@@ -90,6 +115,25 @@ int rh4nvarGetRef(RH4nVarList *varlist, char *pgroupname, char *pname, RH4nVarRe
     prefvar->name = _refvar.name;
     prefvar->var = _refvar.var;
     return(RH4N_RET_OK);
+}
+
+int rh4nvarGetRef_m(RH4nVarList *varlist, char **pgroupname, char *pname, RH4nVarRef *prefvar) {
+    RH4nVarList tmplist;
+    RH4nVarRef _refvar = RH4NVAR_REF_INIT;
+    int i = 0, varlibret = 0;
+
+    rh4nvarInitList(&tmplist);
+    tmplist.anker = varlist->anker;
+
+    if(pgroupname) {
+        for(;pgroupname[i] != NULL; i++) {
+            if((varlibret = rh4nvarGetRef(&tmplist, NULL, pgroupname[i], &_refvar)) != RH4N_RET_OK) {
+                return(varlibret);
+            }
+            tmplist.anker = _refvar.var->nextlvl;
+        }
+    }
+    return(rh4nvarGetRef(&tmplist, NULL, pname, prefvar));
 }
 
 

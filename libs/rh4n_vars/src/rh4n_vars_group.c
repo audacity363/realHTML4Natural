@@ -6,18 +6,19 @@
 
 int rh4nvarCreateNewGroup(RH4nVarList *varlist, char *pgroupname) {
     RH4nVarRef _refvar = RH4NVAR_REF_INIT;
-    int varlibret = 0;
 
-    if((varlibret = rh4nvarCreatenewVariable(varlist, NULL, pgroupname, RH4NVARTYPEGROUP, &_refvar)) != RH4N_RET_OK) { 
-        return(varlibret); 
-    }
-    return(RH4N_RET_OK);
+    return(rh4nvarCreatenewVariable(varlist, NULL, pgroupname, RH4NVARTYPEGROUP, &_refvar));
+}
+
+int rh4nvarCreateNewGroup_m(RH4nVarList *varlist, char **pparentgroups, char *pgroupname) {
+    RH4nVarRef _refvar = RH4NVAR_REF_INIT;
+    
+    return(rh4nvarCreatenewVariable_m(varlist, pparentgroups, pgroupname, RH4NVARTYPEGROUP, &_refvar));
 }
 
 
 int rh4nvarMoveVarToGroup(RH4nVarList *varlist, char *pvarname, char *pgroupname) {
     RH4nVarRef _groupref = RH4NVAR_REF_INIT, _varref = RH4NVAR_REF_INIT;
-    RH4nVarEntry_t *targetvar = NULL, *hptr = NULL;
     int varlibret = 0;
 
     if((varlibret = rh4nvarSearchVarRef(varlist->anker, pgroupname, &_groupref)) != RH4N_RET_OK) { return(varlibret); }
@@ -25,7 +26,36 @@ int rh4nvarMoveVarToGroup(RH4nVarList *varlist, char *pvarname, char *pgroupname
 
     if((varlibret = rh4nvarSearchVarRef(varlist->anker, pvarname, &_varref)) != RH4N_RET_OK) { return(varlibret); }
     
-    targetvar = _varref.var;
+    _rh4nvarmoveToGroup(varlist, _groupref.var, _varref.var);
+
+    return(RH4N_RET_OK);
+}
+
+int rh4nvarMoveVarToGroup_m(RH4nVarList *varlist, char *pvarname, char **pgroupnames) {
+    RH4nVarRef _refgrp = RH4NVAR_REF_INIT, _refvar = RH4NVAR_REF_INIT;
+    RH4nVarEntry_t *forkanker = NULL;
+    int i = 0, x = 0, varlibret = 0;
+
+    forkanker = varlist->anker;
+
+    for(; pgroupnames[i] != NULL; i++) {
+        if((varlibret = rh4nvarSearchVarRef(forkanker, pgroupnames[i], &_refgrp)) != RH4N_RET_OK) {
+            return(varlibret);
+        }
+        forkanker = _refgrp.var->nextlvl;
+    }
+
+    if((varlibret = rh4nvarSearchVarRef(varlist->anker, pvarname, &_refvar)) != RH4N_RET_OK) {
+        return(varlibret);
+    }
+
+    _rh4nvarmoveToGroup(varlist, _refgrp.var, _refvar.var);
+
+    return(RH4N_RET_OK);
+}
+
+void _rh4nvarmoveToGroup(RH4nVarList *varlist, RH4nVarEntry_t *targetgrp, RH4nVarEntry_t *targetvar) {
+    RH4nVarEntry_t *hptr = NULL;
 
     if(targetvar->prev == NULL) { 
         varlist->anker = targetvar->next;
@@ -37,16 +67,14 @@ int rh4nvarMoveVarToGroup(RH4nVarList *varlist, char *pvarname, char *pgroupname
 
     targetvar->prev = targetvar->next = NULL;
 
-    if(_groupref.var->nextlvl == NULL) {
-        _groupref.var->nextlvl = targetvar;
-        targetvar->prev = _groupref.var;
+    if(targetgrp->nextlvl == NULL) {
+        targetgrp->nextlvl = targetvar;
+        targetvar->prev = targetgrp;
     } else {
-        for(hptr = _groupref.var->nextlvl; hptr->next != NULL; hptr = hptr->next);
+        for(hptr = targetgrp->nextlvl; hptr->next != NULL; hptr = hptr->next);
         hptr->next = targetvar;
         targetvar->prev = hptr;
     }
-    
-    return(RH4N_RET_OK);
 }
 
 int rh4nvarGroupExist(RH4nVarList *varlist, char *pgroupname) {
