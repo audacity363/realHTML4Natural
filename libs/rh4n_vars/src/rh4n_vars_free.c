@@ -10,6 +10,7 @@ void rh4nvarFreeList(RH4nVarList *varlist) {
 
 void rh4nvarFreeFork(RH4nVarEntry_t *forkanker) {
     RH4nVarEntry_t *hptr = NULL, *prev = NULL;
+    if(forkanker == NULL) { return; }
     
     for(hptr = forkanker; hptr->next != NULL; hptr = hptr->next);
     
