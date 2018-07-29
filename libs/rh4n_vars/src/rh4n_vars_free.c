@@ -26,7 +26,9 @@ void rh4nvarFreeFork(RH4nVarEntry_t *forkanker) {
         hptr = prev;
     }
     free(forkanker->name);
-    if(forkanker->var.value) free(forkanker->var.value);
+    if(hptr->var.type == RH4NVARTYPEARRAY) rh4nvarFreeArray(hptr);
+    else if(hptr->var.type == RH4NVARTYPEGROUP) rh4nvarFreeFork(hptr->nextlvl);
+    else if(forkanker->var.value) free(forkanker->var.value);
     free(forkanker);
 }
 
