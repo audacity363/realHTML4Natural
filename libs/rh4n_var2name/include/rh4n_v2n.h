@@ -12,6 +12,14 @@ typedef struct {
     RH4nVarPosition_t *parm_positions;
 } RH4nVarPositions_t;
 
+typedef struct {
+    int length;
+    char **groups;
+} RH4nParentGroups_t;
+
+//defined in rh4n_v2n_resolvenames.c
+extern RH4nParentGroups_t parents;
+
 #ifdef RH4NLDAPARSER
 int rh4nv2nStart(RH4nVarList*, RH4nLDAEntry_t*, char*, RH4nProperties*, char*);
 int rh4nv2nStartPosition(RH4nLDAEntry_t*, char*, RH4nVarPositions_t*, RH4nProperties*, char*);

@@ -84,3 +84,11 @@ int rh4nvarGroupExist(RH4nVarList *varlist, char *pgroupname) {
     if(_refvar.var->var.type != RH4NVARTYPEGROUP) return(0);
     return(1);
 }
+
+int rh4nvarGroupExist_m(RH4nVarList *varlist, char **parentgroups, char *pgroupname) {
+    RH4nVarRef _refvar = RH4NVAR_REF_INIT;
+
+    if(rh4nvarGetRef_m(varlist, parentgroups, pgroupname, &_refvar) != RH4N_RET_OK) return(0);
+    if(_refvar.var->var.type != RH4NVARTYPEGROUP) return(0);
+    return(1);
+}
