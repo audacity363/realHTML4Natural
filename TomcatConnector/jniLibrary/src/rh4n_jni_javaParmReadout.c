@@ -35,7 +35,7 @@ int rh4nReadOutParms(JNIEnv *env, jobject jnatparams, RH4nProperties *properties
 
     for(; i < sizeof(parms)/sizeof(struct javaParm); i++) {
 
-        //printf("Search for [%s] type [%s]\n", parms[i].jname, parms[i].jtype);
+        //fprintf(stderr, "Search for [%s] type [%s]\n", parms[i].jname, parms[i].jtype); fflush(stderr);
         jfid = (*env)->GetFieldID(env, jcrh4nparams, parms[i].jname, parms[i].jtype);
 
         if(jfid == NULL) {
@@ -105,6 +105,7 @@ int rh4NUrlVariableHandler(JNIEnv *env, jclass jcrh4nparms, jobject jorh4nparms,
     }
 
     rh4nvarInitList(&properties->urlvars);
+    //fprintf(stderr, "URL Var length: %d\n", jnameslength); fflush(stderr);
 
     for(; i < jnameslength; i++) {
         if((joname = (*env)->GetObjectArrayElement(env, jonames, i)) == NULL) {
@@ -125,10 +126,10 @@ int rh4NUrlVariableHandler(JNIEnv *env, jclass jcrh4nparms, jobject jorh4nparms,
             return(RH4N_RET_JNI_ERR);
         } 
 
-        rh4n_log_debug(properties->logging, "URLVar: Name: [%s] Value: [%s]\n", cname, cvalue);
+        //fprintf(stderr, "URLVar: Name: [%s] Value: [%s]\n", cname, cvalue); fflush(stderr);
 
         if((rc = rh4nvarCreateNewString(&properties->urlvars, NULL, (char*)cname, (char*)cvalue)) != RH4N_RET_OK) {
-            sprintf(error_str, "Could not create new String [%s]. Varlib return: %d", cname, rc);
+            sprintf(error_str, "Could not create new String [%s]. Varlib return: %d\n", cname, rc);
             rh4n_log_error(properties->logging, "%s", error_str);
             (*env)->ReleaseStringUTFChars(env, (jstring)joname, cname);
             (*env)->ReleaseStringUTFChars(env, (jstring)jovalue, cvalue);

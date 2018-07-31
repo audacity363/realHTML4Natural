@@ -71,11 +71,13 @@ int rh4nvarCreatenewVariable_m(RH4nVarList *varlist, char **pgroupname, char *pn
     tmplist.anker = varlist->anker;
 
     if(pgroupname) {
-        for(;pgroupname[i+1] != NULL; i++) {
-            if((varlibret = rh4nvarGetRef(&tmplist, NULL, pgroupname[i], &_refvar)) != RH4N_RET_OK) {
-                return(varlibret);
+        if(pgroupname[0] != NULL) {
+            for(;pgroupname[i+1] != NULL; i++) {
+                if((varlibret = rh4nvarGetRef(&tmplist, NULL, pgroupname[i], &_refvar)) != RH4N_RET_OK) {
+                    return(varlibret);
+                }
+                tmplist.anker = _refvar.var->nextlvl;
             }
-            tmplist.anker = _refvar.var->nextlvl;
         }
     }
 
