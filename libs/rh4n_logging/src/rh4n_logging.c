@@ -44,12 +44,16 @@ RH4nLogrule *rh4nLoggingCreateStreamingRule(const char *library, const char *pro
 
     time(&rawtime);
     timeinfo = localtime(&rawtime);
-    logfile = rh4nLoggingCreateLogfilepath(library, program, logpath, timeinfo);
+    if(strlen(logpath) == 0) {
+        tmp->outputfile = stdout;
+    } else {
+        logfile = rh4nLoggingCreateLogfilepath(library, program, logpath, timeinfo);
 
-    if((tmp->outputfile = fopen(logfile, "a")) == NULL) {
-        fprintf(stderr, "Could not open logfile [%s]: %s\n", logfile, strerror(errno));
-        fflush(stderr);
-        return(NULL);
+        if((tmp->outputfile = fopen(logfile, "a")) == NULL) {
+            fprintf(stderr, "Could not open logfile [%s]: %s\n", logfile, strerror(errno));
+            fflush(stderr);
+            return(NULL);
+        }
     }
 
     return(tmp);

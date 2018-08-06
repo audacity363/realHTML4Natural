@@ -62,7 +62,8 @@ void _rh4nvarmoveToGroup(RH4nVarList *varlist, RH4nVarEntry_t *targetgrp, RH4nVa
         varlist->anker->prev = NULL;
     } else {
         targetvar->prev->next = targetvar->next;
-        targetvar->next->prev = targetvar->prev;
+        if(targetvar->next != NULL) 
+            targetvar->next->prev = targetvar->prev;
     }
 
     targetvar->prev = targetvar->next = NULL;

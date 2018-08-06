@@ -53,7 +53,8 @@ int rh4nnatStartVariableReadout(WORD nparms, void *parmhandle, pnni_611_function
         rh4n_log_debug(props->logging, "Vartype: %c", var_description.format);
         rh4n_log_debug(props->logging, "Length: %d", var_description.length);
         rh4n_log_debug(props->logging, "Dimensions: %d", var_description.dimensions);
-        rh4n_log_debug(props->logging, "");
+        rh4n_log_debug(props->logging, "Array length: X: %.2d, Y: %.2d, Z: %.2d", var_description.occurrences[0],
+            var_description.occurrences[1], var_description.occurrences[2]);
 
         for(x = 0; x < callbacktabsize; x++) {
             if(callbacks[x].vartype == var_description.format) {
