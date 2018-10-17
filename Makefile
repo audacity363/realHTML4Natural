@@ -330,7 +330,7 @@ NATUSER_BIN = ./bin/natuserlib
 natuserlib: utils logging vars json_generator ldaparser var2name natuserlib_clean natuserlib_pre \
 			$(NATUSER_OBJS) $(NATUSER_READOUT_OBJS) $(NATUSER_PUTVAR_OBJS)
 	@printf "Linking librealHTML4Natural.so\n"
-	$(CC) $(LFLAGS1_SO) $(NATUSER_BIN)/*.o $(LIBS) $(LFLAGS2_SO) -o ./bin/librealHTML4Natural.so
+	@$(CC) $(LFLAGS1_SO) $(NATUSER_BIN)/*.o $(LIBS) $(LFLAGS2_SO) -o ./bin/librealHTML4Natural.so
 	@printf "Done compiling and linking natuserlib\n"
 
 nat_test: natuserlib

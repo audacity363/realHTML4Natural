@@ -36,7 +36,6 @@ void rh4njsonPrintObject(RH4nVarEntry_t *anker, FILE *outputfile, int level, RH4
         }
 
         rh4n_log_debug(props->logging, "Das ist die Stelle!!!");
-
         //I have no idear why I have written this piece of code but i leave it in
         //in case i can remeber it....
 #if 0
