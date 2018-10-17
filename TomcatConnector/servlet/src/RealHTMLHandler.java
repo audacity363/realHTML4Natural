@@ -28,7 +28,6 @@ public class RealHTMLHandler extends RealHTMLInit {
         super.init();
 
         this.bs = new JNILoader();
-        this.bs.printVersion();
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) 
@@ -111,7 +110,7 @@ public class RealHTMLHandler extends RealHTMLInit {
                 sendErrorMessage(response, natret.error_msg);
                 return;
             }
-            deliverFile(response, parms.outputfile, true);
+            deliverFile(response, parms.outputfile, true, parms.charEncoding);
 
         } catch(Exception e) {
             throw(new ServletException(e));
@@ -185,6 +184,7 @@ public class RealHTMLHandler extends RealHTMLInit {
         parms.loglevel = route.route.loglevel;
         parms.natparms = env.natparms;
         parms.natsrcpath = env.natsourcepath;
+        parms.charEncoding = env.charEncoding;
         parms.environs = env.environvars.toArray(new EnvironmentVar[env.environvars.size()]);
 
         HashMap<String, String> routeparms = route.getParms();
@@ -294,12 +294,13 @@ public class RealHTMLHandler extends RealHTMLInit {
         return(varlist);
     }
 
-    private void deliverFile(HttpServletResponse response, String filepath, Boolean deletefile) 
+    private void deliverFile(HttpServletResponse response, String filepath, Boolean deletefile, String encoding) 
         throws Exception {
         File returnfile = null;
         FileReader filereader = null;
 
         response.setContentType("text/html");
+        response.setCharacterEncoding(encoding);
         try {
             returnfile = new File(filepath);
             filereader =  new FileReader(filepath);

@@ -38,6 +38,9 @@
 		<label for="natsrc">Natural SRC Path:</label>
 		<input type="text" name="natsrc">
 		<br>
+        <label for="charencoding">Character Encoding</label>
+        <input type="text" name="charencoding">
+        <br>
 		<input value="put" name="_method" type="hidden">
 		<button type="submit">Add Env</button>
 	</form>

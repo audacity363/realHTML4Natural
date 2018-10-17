@@ -188,3 +188,19 @@ pnni_611_functions rh4nUtilsgetNNIFunctions(RH4nProperties *props, void *pshared
 
     return(nnifuncs);
 }
+
+void convert1Bto4BString(char *inbuffer, wchar_t *outbuffer, int length)
+{
+    int i, offset;
+
+    void *v_in, *v_out, *v_tmp;
+
+    v_in = (void*)inbuffer;
+    v_out = (void*)outbuffer;
+
+    for(i=0; i < length; i++) {
+        offset = (sizeof(wchar_t)*i)+3;
+        v_tmp = v_out+offset;
+        memcpy(v_tmp, v_in+i, 1);
+    }
+}

@@ -15,12 +15,12 @@ public class EnvironmentBuffer {
 		this.enviroments = new HashMap<String, Environment>();
 	}
 	
-	public void addEnviroment(String enviroment, String natparms, String natsourcepath) throws EnvironmentException {
+	public void addEnviroment(String enviroment, String natparms, String natsourcepath, String encoding) throws EnvironmentException {
 		if(this.enviroments.containsKey(enviroment)) {
 			throw(new EnvironmentException("Enviroment " + enviroment + " already exists"));
 		}
 		
-		Environment env = new Environment(natparms, natsourcepath);
+		Environment env = new Environment(natparms, natsourcepath, encoding);
 		this.enviroments.put(enviroment, env);
 	}
 	

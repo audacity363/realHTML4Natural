@@ -32,8 +32,10 @@ long rh4nnatGetURLVar(WORD nparms, void *parmhandle, void *traditional) {
     if(strlen(groupname) == 0) pgroupname = NULL;
     else pgroupname = groupname;
 
+    rh4nvarPrintList(&initparms.props->urlvars, initparms.props);
+
     if(rh4nvarExist(&initparms.props->urlvars, pgroupname, varname) == false) {
-        rh4n_log_error(initparms.props->logging, "Could not find variable [%s].[%s]. varlib return: %d\n", 
+        rh4n_log_error(initparms.props->logging, "Could not find variable [%s].[%s]. varlib return: %d", 
             groupname, varname, utilsret);
         return(RH4N_RET_UNKOWN_VAR);
     }

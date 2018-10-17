@@ -21,16 +21,18 @@ public class RealHTMLManageEnvironment extends RealHTMLInit {
 		String envname = request.getParameter("envname");
 		String natparm = request.getParameter("natparm");
 		String natsrc = request.getParameter("natsrc");
+        String encoding = request.getParameter("charencoding");
 		String method = request.getParameter("_method");
 		
 		try {
 			if(method.equals("put")) {
-				envs.addEnviroment(envname, natparm, natsrc);
+				envs.addEnviroment(envname, natparm, natsrc, encoding);
 				getServletContext().setAttribute("message", "Successfully added environment " + envname);
 			} else if(method.equals("post")) {
 				Environment env = envs.getEnvironment(envname);
 				env.natparms = natparm;
 				env.natsourcepath = natsrc;
+                env.charEncoding = encoding;
 				getServletContext().setAttribute("message", "Successfully edited environment " + envname);
 			} else if(method.equals("delete")) {
 				envs.deleteEnvironment(envname);

@@ -52,7 +52,7 @@ public class Export {
 	}
 	
 	private Element envtoString(Document doc, String envname) throws EnvironmentException {
-		Element envElement, natsrcElement, natparmElement; 
+		Element envElement, natsrcElement, natparmElement, encodingElement; 
 		Environment env = this.envs.getEnvironment(envname);
 		
 		envElement = doc.createElement("environment");
@@ -63,6 +63,9 @@ public class Export {
 		
 		natparmElement = doc.createElement("natparms");
 		natparmElement.setTextContent(env.natparms);
+    
+        encodingElement = doc.createElement("charencoding");
+        encodingElement.setTextContent(env.charEncoding);
 		
 		envElement.appendChild(natsrcElement);
 		envElement.appendChild(natparmElement);

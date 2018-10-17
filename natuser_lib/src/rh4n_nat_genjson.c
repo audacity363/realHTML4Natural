@@ -7,6 +7,7 @@
 #include "rh4n_nat.h"
 #include "rh4n_ldaparser.h"
 #include "rh4n_v2n.h"
+#include "rh4n_json.h"
 
 long rh4nnatGenJSON(WORD nparms, void *parmhandle, void *traditional) {
     if(traditional)  return(RH4N_RET_TARADITIONAL); 
@@ -18,6 +19,8 @@ long rh4nnatGenJSON(WORD nparms, void *parmhandle, void *traditional) {
     struct RH4nNatLDAInfos ldainfos;
     RH4nVarList varlist;
     RH4nLDAEntry_t *ldavars = NULL;
+
+    setlocale(LC_ALL, "de_DE");
 
     if((utilsret = rh4nnatInit(parmhandle, &initparms, errorstr, true)) != RH4N_RET_OK) {
         return(utilsret);
@@ -67,7 +70,14 @@ long rh4nnatGenJSON(WORD nparms, void *parmhandle, void *traditional) {
     }
     rh4n_log_info(initparms.props->logging, "Successfully matched names");
 
-    rh4nvarPrintJSONToFile(&varlist, initparms.props->outputfile, initparms.props);
+    //rh4nvarPrintJSONToFile(&varlist, initparms.props->outputfile, initparms.props);
+    rh4n_log_info(initparms.props->logging, "Start generating JSON");
+    RH4nVarList tmp;
+    //tmp.anker = varlist.anker->nextlvl;
+    tmp.anker = varlist.anker;
+    rh4n_log_develop(initparms.props->logging, "Generate JSON from anker: [%s]->[%p]", tmp.anker->name, tmp.anker->name);
+    rh4nvarPrintList(&tmp, initparms.props);
+    rh4njsonPrintJSONToFile(&tmp, initparms.props->outputfile, initparms.props);
 
     rh4nUtilscloseSharedLibrary(initparms.sharedlibrary);
     rh4nldaFreeList(ldavars);
