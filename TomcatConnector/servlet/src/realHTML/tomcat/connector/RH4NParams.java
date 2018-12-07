@@ -17,6 +17,7 @@ public class RH4NParams {
     public String logpath;
     public String errorRepresentation;
     public String username;
+    public String charEncoding;
 
     public EnvironmentVar[] environs;
 }

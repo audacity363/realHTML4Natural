@@ -8,26 +8,44 @@
 
 int rh4nnatputAtoN(RH4nNatVarHandleParms *args, char *groupname, char *varname) {
     char *buff = NULL, natbuff[MAX_NAT_N_SIZE];
-    int rc = 0, strlength = 0;
+    int rc = 0, strlength = 0, sourcetype = 0, sourceval_i = 0;
 
     if(args->desc->dimensions > 0) return(rh4nnatputAtoNArray(args, groupname, varname));
 
-    memset(natbuff, 0x00, sizeof(natbuff));
-
-    if((rc = rh4nvarGetStringLength(args->varlist, groupname, varname, &strlength)) !=  RH4N_RET_OK) {
-        sprintf(args->errorstr, "Could not get strlen from %s.%s. Varlibret: %d", groupname, varname, rc);
-        return(rc);
+    if((rc = rh4nvarGetVarType(args->varlist, groupname, varname, &sourcetype)) != RH4N_RET_OK) { 
+        sprintf(args->errorstr, "Could not get vartype from %s.%s. Varlibret: %d", groupname, varname, rc);
+        return(rc); 
     }
 
-    if((buff = malloc(sizeof(char)*(strlength+1))) == NULL) {
-        return(RH4N_RET_MEMORY_ERR);
-    }
+    if(sourcetype == RH4NVARTYPESTRING) {
+        memset(natbuff, 0x00, sizeof(natbuff));
 
-    memset(buff, 0x00, sizeof(char)*(strlength+1));
-    if((rc = rh4nvarGetString(args->varlist, groupname, varname, strlength+1, buff)) != RH4N_RET_OK) {
-        sprintf(args->errorstr, "Could not get string from %s.%s. Varlib return: %d", groupname, varname, rc);
-        free(buff);
-        return(rc);
+        if((rc = rh4nvarGetStringLength(args->varlist, groupname, varname, &strlength)) !=  RH4N_RET_OK) {
+            sprintf(args->errorstr, "Could not get strlen from %s.%s. Varlibret: %d", groupname, varname, rc);
+            return(rc);
+        }
+
+        if((buff = malloc(sizeof(char)*(strlength+1))) == NULL) {
+            return(RH4N_RET_MEMORY_ERR);
+        }
+
+        memset(buff, 0x00, sizeof(char)*(strlength+1));
+        if((rc = rh4nvarGetString(args->varlist, groupname, varname, strlength+1, buff)) != RH4N_RET_OK) {
+            sprintf(args->errorstr, "Could not get string from %s.%s. Varlib return: %d", groupname, varname, rc);
+            free(buff);
+            return(rc);
+        }
+    } else if(sourcetype == RH4NVARTYPEINTEGER) {
+        if((rc = rh4nvarGetInt(args->varlist, groupname, varname, &sourceval_i)) != RH4N_RET_OK) {
+            sprintf(args->errorstr, "Could not get integer from %s.%s. Varlib return: %d", groupname, varname, rc);
+            return(rc);
+        }
+
+        if((buff = malloc(MAX_NAT_N_SIZE)) == NULL) {
+            return(RH4N_RET_MEMORY_ERR);
+        }
+
+        sprintf(buff, "%d", sourceval_i);
     }
 
     rh4n_log_debug(args->props->logging, "Trying to convert string: [%s] to numeric", buff);

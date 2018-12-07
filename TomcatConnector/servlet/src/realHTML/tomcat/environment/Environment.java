@@ -7,12 +7,14 @@ import realHTML.tomcat.routing.Routing;
 public class Environment {
 	public String natparms;
 	public String natsourcepath;
+    public String charEncoding;
 	public ArrayList<EnvironmentVar> environvars;
 	public Routing routing;
 	
-	public Environment(String natparms, String natsrc) {
+	public Environment(String natparms, String natsrc, String charencoding) {
 		this.natparms = natparms;
 		this.natsourcepath = natsrc;
+        this.charEncoding = charencoding;
 		this.routing = new Routing();
 		this.environvars = new ArrayList<EnvironmentVar>();
 	}

@@ -18,6 +18,7 @@ INCLUDE = -I./include/ \
 		  -I./libs/rh4n_utils/include \
           -I./libs/rh4n_logging/include/ \
 		  -I./libs/rh4n_vars/include/ \
+		  -I./libs/rh4n_jsongenerator/include/ \
 		  -I./libs/rh4n_ldaparser/include/ \
 		  -I./libs/rh4n_var2name/include/ \
 		  -I./natuser_lib/include/ \
@@ -25,7 +26,8 @@ INCLUDE = -I./include/ \
 		  $(JNIINCLUDE)
 
 LIBS = -L./bin/libs \
-	   -ldl -lrh4nutils -lrh4nlogging -lrh4nvar2name -lrh4nvars -lrh4nldaparser -lcrypt
+	   -ldl -lrh4nutils -lrh4nlogging -lrh4nvar2name -lrh4nvars -lrh4nldaparser \
+	   -lrh4njsongenerator -lcrypt
 
 CARGS1 = {{CCCARGS1}} $(INCLUDE)
 CARGS2 = {{CCCARGS2}}
@@ -44,6 +46,9 @@ help:
 	@printf "\t|                                                            |\n"
 	@printf "\t| vars                                                       |\n"
 	@printf "\t|   Vars library (./libs/rh4n_vars)                          |\n"
+	@printf "\t|                                                            |\n"
+	@printf "\t| json_generator                                              |\n"
+	@printf "\t|   JSON Generator library (./libs/rh4n_jsongenerator)       |\n"
 	@printf "\t|                                                            |\n"
 	@printf "\t| ldaparser                                                  |\n"
 	@printf "\t|   LDA parser library (./libs/rh4n_ldaparser)               |\n"
@@ -72,7 +77,7 @@ help:
 	@printf "\t+------------------------------------------------------------+\n\n"
 	@printf "\tall: Compiles everything\n"
 
-all: utils logging vars var2name ldaparser natuserlib jnilibrary tomcatconnector_warfile
+all: utils logging vars json_generator var2name ldaparser natuserlib jnilibrary tomcatconnector_warfile
 	@printf "You find the binarys under ./bin\n"
 
 #                         +------------------+
@@ -150,7 +155,9 @@ VARS_OBJS = rh4n_vars.o \
 		    rh4n_vars_float.o \
 		    rh4n_vars_ustring.o \
 		    rh4n_vars_printjson.o \
-		    rh4n_vars_free.o
+		    rh4n_vars_free.o \
+       		rh4n_vars_dump.o \
+			rh4n_vars_load.o
 VARS_LIB = librh4nvars.a
 
 vars: logging vars_clean vars_pre $(VARS_OBJS)
@@ -173,6 +180,41 @@ vars_clean:
 	@printf "Cleaning vars objects\n"
 	@rm -f $(VARS_BIN)/*.o
 
+#                         +-----------------+
+#-------------------------|  JSON generator |----------------------------------
+#                         +-----------------+
+
+JSON_SRC = ./libs/rh4n_jsongenerator/src
+JSON_BIN = ./bin/rh4n_jsongenerator
+JSON_OBJS = rh4n_json_generator.o \
+			rh4n_json_array.o \
+			rh4n_json_group.o
+JSON_LIB = librh4njsongenerator.a
+
+json_generator: logging vars json_generator_clean json_generator_pre $(JSON_OBJS)
+	@printf "Creating $(LIBOUTPUT)/$(JSON_LIB)\n"
+	@$(AR) -cru $(LIBOUTPUT)/$(JSON_LIB) $(JSON_BIN)/*.o
+	@printf "Done compiling and linking vars\n"
+
+$(JSON_OBJS):
+	@printf "CC $(JSON_SRC)/$*.c => $(JSON_BIN)/$*.o\n"
+	@$(CC) $(CARGS1) -o $(JSON_BIN)/$*.o $(JSON_SRC)/$*.c
+
+json_generator_pre:
+	@printf "Creating json generator output folder\n"
+	@mkdir -p $(JSON_BIN)
+	@mkdir -p $(LIBOUTPUT)
+
+json_generator_clean:
+	@printf "Cleaning json generator library\n"
+	@rm -f $(LIBOUTPUT)/$(JSON_BIN)
+	@printf "Cleaning vars objects\n"
+	@rm -f $(JSON_BIN)/*.o
+
+json_test: json_generator
+	@$(CC) -g ./libs/rh4n_jsongenerator/tests/main.c $(INCLUDE) -o ./libs/rh4n_jsongenerator/tests/main $(LIBS)
+	@./libs/rh4n_jsongenerator/tests/main 2> ./jsonout
+	@cat ./jsonout
 #                         +-----------------+
 #-------------------------|    LDA parser   |----------------------------------
 #                         +-----------------+
@@ -330,17 +372,44 @@ JAVA_UTILS_PACKAGE = $(JAVA_UTILS_PACKAGE_SRC)/Environ.java \
 					 $(JAVA_UTILS_PACKAGE_SRC)/RH4NParams.java \
 					 $(JAVA_UTILS_PACKAGE_SRC)/JNINatural.java \
 					 $(JAVA_UTILS_PACKAGE_SRC)/JNILoader.java \
-					 $(JAVA_UTILS_PACKAGE_SRC)/Route.java \
-					 $(JAVA_UTILS_PACKAGE_SRC)/Router.java \
-					 $(JAVA_UTILS_PACKAGE_SRC)/ConfigurationLoader.java \
 					 $(JAVA_UTILS_PACKAGE_SRC)/RH4NCallParms.java 
 
 JAVA_UTILS_EXCEPTIONS_SRC = $(TOMCONNECTOR_SRC)/realHTML/servlet/exceptions
-JAVA_UTILS_EXCEPTIONS = $(JAVA_UTILS_EXCEPTIONS_SRC)/RouteException.java
+JAVA_UTILS_EXCEPTIONS = $(JAVA_UTILS_EXCEPTIONS_SRC)/RouteException.java \
+						$(JAVA_UTILS_EXCEPTIONS_SRC)/EnvironmentException.java \
+						$(JAVA_UTILS_EXCEPTIONS_SRC)/EnvironmentVarException.java \
+						$(JAVA_UTILS_EXCEPTIONS_SRC)/XMLException.java
 
-TOMCAT_SERVLETS = $(TOMCONNECTOR_SRC)/realHTMLHandler.java \
-				  $(TOMCONNECTOR_SRC)/realHTMLLogin.java \
-				  $(TOMCONNECTOR_SRC)/realHTMLLogout.java
+JAVA_ROUTING_PACKAGE_SRC = $(TOMCONNECTOR_SRC)/realHTML/tomcat/routing
+JAVA_ROUTING_PACKAGE = $(JAVA_ROUTING_PACKAGE_SRC)/Route.java \
+					   $(JAVA_ROUTING_PACKAGE_SRC)/PathType.java \
+					   $(JAVA_ROUTING_PACKAGE_SRC)/PathEntry.java \
+					   $(JAVA_ROUTING_PACKAGE_SRC)/PathTemplate.java \
+					   $(JAVA_ROUTING_PACKAGE_SRC)/Routing.java 
+
+JAVA_ENVIRONMENT_PACKAGE_SRC = $(TOMCONNECTOR_SRC)/realHTML/tomcat/environment
+JAVA_ENVIRONMENT_PACKAGE = $(JAVA_ENVIRONMENT_PACKAGE_SRC)/EnvironmentVar.java \
+						   $(JAVA_ENVIRONMENT_PACKAGE_SRC)/Environment.java \
+						   $(JAVA_ENVIRONMENT_PACKAGE_SRC)/EnvironmentBuffer.java
+
+JAVA_XML_PACKAGE_SRC = $(TOMCONNECTOR_SRC)/realHTML/tomcat/xml
+JAVA_XML_PACKAGE = $(JAVA_XML_PACKAGE_SRC)/Export.java \
+				   $(JAVA_XML_PACKAGE_SRC)/Import.java
+
+JAVA_GUI_PACKAGE_SRC = $(TOMCONNECTOR_SRC)/realHTML/tomcat/gui
+JAVA_GUI_PACKAGE = $(JAVA_GUI_PACKAGE_SRC)/RouteTree.java \
+
+TOMCAT_SERVLETS =  $(TOMCONNECTOR_SRC)/RealHTMLInit.java \
+				  $(TOMCONNECTOR_SRC)/RealHTMLHandler.java \
+				  $(TOMCONNECTOR_SRC)/RealHTMLLogin.java \
+				  $(TOMCONNECTOR_SRC)/RealHTMLLogout.java \
+				  $(TOMCONNECTOR_SRC)/RealHTMLLoadConfig.java \
+				  $(TOMCONNECTOR_SRC)/RealHTMLManageEnvironment.java \
+				  $(TOMCONNECTOR_SRC)/RealHTMLManageEnvironmentVars.java \
+				  $(TOMCONNECTOR_SRC)/RealHTMLManageRoute.java \
+				  $(TOMCONNECTOR_SRC)/RealHTMLSaveConfig.java
+
+
 TOMCAT_SERVLETS_BIN = ./bin/servlet/servlets
 
 WARFILE_PREFIX = ./TomcatConnector/servlet/web
@@ -350,6 +419,14 @@ tomcatconnector_package: tomcatconnector_package_clean tomcatconnector_package_p
 	@$(JAVAC) -d $(TOMCONNECTOR_LIB_BIN) -cp $(CLASSPATH) $(JAVA_UTILS_EXCEPTIONS)
 	@printf "Compiling realHTML.tomcat.JSONMatcher\n"
 	@$(JAVAC) -d $(TOMCONNECTOR_LIB_BIN) -cp $(CLASSPATH) $(JAVA_JSON_PARSER)
+	@printf "Compiling realHTML.tomcat.routing\n"
+	@$(JAVAC) -d $(TOMCONNECTOR_LIB_BIN) -cp $(CLASSPATH) $(JAVA_ROUTING_PACKAGE)
+	@printf "Compiling realHTML.tomcat.environment\n"
+	@$(JAVAC) -d $(TOMCONNECTOR_LIB_BIN) -cp $(CLASSPATH) $(JAVA_ENVIRONMENT_PACKAGE)
+	@printf "Compiling realHTML.tomcat.xml\n"
+	@$(JAVAC) -d $(TOMCONNECTOR_LIB_BIN) -cp $(CLASSPATH) $(JAVA_XML_PACKAGE)
+	@printf "Compiling realHTML.tomcat.gui\n"
+	@$(JAVAC) -d $(TOMCONNECTOR_LIB_BIN) -cp $(CLASSPATH) $(JAVA_GUI_PACKAGE)
 	@printf "Compiling realHTML.tomcat.connector\n"
 	@$(JAVAC) -d $(TOMCONNECTOR_LIB_BIN) -cp $(CLASSPATH) $(JAVA_UTILS_PACKAGE)
 	@printf "Creating realHTMLconnector.jar\n"

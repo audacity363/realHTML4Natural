@@ -48,7 +48,7 @@ public class Import {
 		NodeList environmentsElements, tmpList;
 		Element targetElement, tmpElement;
 		
-		String envname, natsrc = "", natparms = "";
+		String envname, natsrc = "", natparms = "", encoding = "";
 		
 		environmentsElements = doc.getElementsByTagName("environment");
 		for(int i = 0; i < environmentsElements.getLength(); i++) {
@@ -69,8 +69,16 @@ public class Import {
 				tmpElement = (Element)tmpList.item(0);
 				natparms = tmpElement.getTextContent();
 			}
+
+            tmpList = targetElement.getElementsByTagName("charencoding");
+            if(tmpList.getLength() != 0) {
+                tmpElement = (Element)tmpList.item(0);
+                encoding = tmpElement.getTextContent();
+            } else {
+                encoding = "ISO-8859-1";
+            }
 			
-			envs.addEnviroment(envname, natparms, natsrc);
+			envs.addEnviroment(envname, natparms, natsrc, encoding);
 			envs = this.readRoutes(targetElement, envname, envs);
 			envs = this.readEnvirons(targetElement, envname, envs);
 			envname = natsrc = natparms = "";

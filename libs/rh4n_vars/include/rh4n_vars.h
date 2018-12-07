@@ -51,6 +51,7 @@ typedef char bool;
                                      varentry->var.length = -1;
 #define RH4NVAR_ARRAY_INIT_TYPE(dims, dim, vartype) dims == dim ? vartype : RH4NVARTYPEARRAY
 
+#define RH4NVAR_END_OF_LIST -2
 
 
 //Public
@@ -109,6 +110,12 @@ int rh4nvarGetArrayVarType(RH4nVarList*, char*, char*, int*);
 int rh4nvarExpandArray(RH4nVarList*, char*, char*, int, int*);
 //Free
 void rh4nvarFreeList(RH4nVarList*);
+//Dump
+int rh4nvarDumpToFile(RH4nVarList *varlist, char *filename);
+void rh4nvarDumpAppendToFile(int fileno, RH4nVarList *varlist);
+//Load
+int rh4nvarLoadFromFile(char*, RH4nVarList*);
+int rh4nvarLoadFromFileOffset(int, RH4nVarList*);
 
 //Private
 //Utils
@@ -137,5 +144,15 @@ int _rh4nvarExpandArray(RH4nVarObj*, int, int, int*, int);
 //Free
 void rh4nvarFreeArray(RH4nVarEntry_t*);
 void rh4nvarFreeFork(RH4nVarEntry_t*);
+//Dump
+void rh4nvarsDumpNode(RH4nVarEntry_t*, int);
+void rh4nvarsWriteNodeToFile(RH4nVarEntry_t*, int);
+void rh4nvarDumpValue(RH4nVarObj*, int);
+void rh4nvarDumpArray(RH4nVarObj*, int);
+//Load
+int rh4nvarsLoadNode(int, RH4nVarList*);
+int rh4nvarsLoadValue(int, RH4nVarObj*);
+int rh4nvarsLoadArray(int, RH4nVarObj*);
+void rh4nvarsPutInNewNode(char, char, RH4nVarEntry_t*, RH4nVarEntry_t*, RH4nVarList*);
 #endif
 

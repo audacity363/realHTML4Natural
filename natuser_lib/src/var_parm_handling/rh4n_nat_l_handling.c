@@ -11,7 +11,7 @@ int rh4nnatBoolHandler(RH4nNatVarHandleParms *args) {
     bool tmpbuff = 0;
 
     if(args->desc->dimensions > 0) {
-        return(rh4nnatStringArrayHandler(args));
+        return(rh4nnatBoolArrayHandler(args));
     }
     
     if((nniret = args->nnifuncs->pf_nni_get_parm(args->nnifuncs, args->parmindex, args->parmhandle, 
@@ -40,16 +40,16 @@ int rh4nnatBoolArrayHandler(RH4nNatVarHandleParms *args) {
     for(; x < args->desc->occurrences[0]; x++) {
         arrindex[0] = x; arrindex[1] = arrindex[2] = 0;
         if(args->desc->dimensions == 1) {
-            if((varlibret = rh4nnatSaveIntegerArrayEntry(args, arrindex)) != RH4N_RET_OK) return(varlibret);
+            if((varlibret = rh4nnatSaveBoolArrayEntry(args, arrindex)) != RH4N_RET_OK) return(varlibret);
         } else {
             for(y = 0; y < args->desc->occurrences[1]; y++) {
                 arrindex[1] = y; arrindex[2] = 0;
                 if(args->desc->dimensions == 2) {
-                    if((varlibret = rh4nnatSaveIntegerArrayEntry(args, arrindex)) != RH4N_RET_OK) return(varlibret);
+                    if((varlibret = rh4nnatSaveBoolArrayEntry(args, arrindex)) != RH4N_RET_OK) return(varlibret);
                 } else {
                     for(z = 0; z < args->desc->occurrences[2]; z++) {
                         arrindex[2] = z;
-                        if((varlibret = rh4nnatSaveIntegerArrayEntry(args, arrindex)) != RH4N_RET_OK) return(varlibret);
+                        if((varlibret = rh4nnatSaveBoolArrayEntry(args, arrindex)) != RH4N_RET_OK) return(varlibret);
                     }
                 }
             }
@@ -71,15 +71,6 @@ int rh4nnatSaveBoolArrayEntry(RH4nNatVarHandleParms *args, int index[3]) {
         rh4n_log_error(args->props->logging, "%s", args->errorstr);
         return(RH4N_RET_NNI_ERR);
 
-    }
-
-    switch(args->desc->length) {
-        case 1:
-            tmpbuff = tmpbuff >> 24; 
-            break;
-        case 2:
-            tmpbuff = tmpbuff >> 16; 
-            break;
     }
 
     if(args->desc->dimensions == 1) varlibindex[0] = index[0];

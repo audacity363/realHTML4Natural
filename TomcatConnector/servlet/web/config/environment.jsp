@@ -39,6 +39,9 @@
 	<br>
 	<label for="natsrc">Natural RSC PATH:</label>
 	<input type="text" name="natsrc" value=<%= environment.natsourcepath %>>
+    <br>
+    <label for="charencoding">Character Encoding</label>
+    <input type="text" name="charencoding" value=<%= environment.charEncoding %>>
 	<br>
 	<input value=<%= envname %> name="envname" type="hidden">
 	<input value="post" name="_method" type="hidden">

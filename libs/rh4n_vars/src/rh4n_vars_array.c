@@ -10,6 +10,7 @@ int rh4nvarCreateNewArray(RH4nVarList *varlist, char *pgroupname, char *pname, i
     RH4nVarObj *ytarget = NULL, *ztarget = NULL;
 
     if(dimensions < 1 && dimensions > 3) { return(RH4N_RET_VAR_BAD_DIM); }
+    if(length[0] == 0) { dimensions = 1; }
     if((createret = rh4nvarCheckDimLength(dimensions, length)) != RH4N_RET_OK) { return(createret); }
 
     if((createret = rh4nvarCreatenewVariable(varlist, pgroupname, pname, RH4NVARTYPEARRAY, &_refvar)) != RH4N_RET_OK) { 

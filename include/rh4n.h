@@ -40,6 +40,7 @@
 #define RH4N_RET_LDA_NAT_MISSMATCH 31
 #define RH4N_RET_STRUCT_ERR 32
 #define RH4N_RET_NO_USER 33
+#define RH4N_RET_FILE_ERR 34
 
 
 typedef struct {

@@ -111,6 +111,8 @@ if(!$tomcatpath) {
         chomp $findret;
         $tomcatpath = $findret;
     }
+	my $tomcatlibpath = dirname($tomcatpath);
+	$tomcatpath .= ":" . $tomcatlibpath . "/jsp-api.jar";
 }
 
 if(!$jnipath) {
