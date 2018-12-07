@@ -1,13 +1,13 @@
 # Just a reminder for the next commit
 # TODO: Put the the classes in the makefile template
 
-CC = /usr/bin/gcc
+CC = /usr/vac/bin/xlc
 AR = /usr/bin/ar
 JAR = /usr/java8_64/bin/jar
 JAVAC = /usr/java8_64/bin/javac
 JAVAH = /usr/java8_64/bin/javah
 
-LFLAGS1_SO = -shared 
+LFLAGS1_SO = -G
 LFLAGS2_SO = 
 
 TOMCATCLASSPATH = /opt/tomcat/tomcat-rh4n/lib/*
@@ -21,6 +21,7 @@ INCLUDE = -I./include/ \
 		  -I./libs/rh4n_utils/include \
           -I./libs/rh4n_logging/include/ \
 		  -I./libs/rh4n_vars/include/ \
+		  -I./libs/rh4n_jsongenerator/include/ \
 		  -I./libs/rh4n_ldaparser/include/ \
 		  -I./libs/rh4n_var2name/include/ \
 		  -I./natuser_lib/include/ \
@@ -28,11 +29,12 @@ INCLUDE = -I./include/ \
 		  $(JNIINCLUDE)
 
 LIBS = -L./bin/libs \
-	   -ldl -lrh4nutils -lrh4nlogging -lrh4nvar2name -lrh4nvars -lrh4nldaparser -lcrypt
+	   -ldl -lrh4nutils -lrh4nlogging -lrh4nvar2name -lrh4nvars -lrh4nldaparser \
+	   -lrh4njsongenerator -lcrypt
 
-CARGS1 = -g -c -fPIC $(INCLUDE)
+CARGS1 = -g -c -fpic $(INCLUDE)
 CARGS2 = 
-CARGS_SO = -c -g -fPIC $(INCLUDE)
+CARGS_SO = -c -g -fpic $(INCLUDE)
 
 LIBOUTPUT = ./bin/libs/
 
@@ -47,6 +49,9 @@ help:
 	@printf "\t|                                                            |\n"
 	@printf "\t| vars                                                       |\n"
 	@printf "\t|   Vars library (./libs/rh4n_vars)                          |\n"
+	@printf "\t|                                                            |\n"
+	@printf "\t| jsongenerator                                              |\n"
+	@printf "\t|   JSON Generator library (./libs/rh4n_jsongenerator)       |\n"
 	@printf "\t|                                                            |\n"
 	@printf "\t| ldaparser                                                  |\n"
 	@printf "\t|   LDA parser library (./libs/rh4n_ldaparser)               |\n"
@@ -172,13 +177,49 @@ vars_pre:
 
 vars_clean:
 	@printf "Cleaning vars library\n"
-	@rm -f $(LIBOUTPUT)/$(UTILS_BIN)
+	@rm -f $(LIBOUTPUT)/$(VARS_BIN)
 	@printf "Cleaning vars objects\n"
 	@rm -f $(VARS_BIN)/*.o
 
-vars_test: vars
+vars_test: var2name
 	@$(CC) -g ./libs/rh4n_vars/test/main.c $(INCLUDE) -o ./libs/rh4n_vars/test/main $(LIBS)
 	@./libs/rh4n_vars/test/main
+
+#                         +-----------------+
+#-------------------------|  JSON generator |----------------------------------
+#                         +-----------------+
+
+JSON_SRC = ./libs/rh4n_jsongenerator/src
+JSON_BIN = ./bin/rh4n_jsongenerator
+JSON_OBJS = rh4n_json_generator.o \
+			rh4n_json_array.o \
+			rh4n_json_group.o
+JSON_LIB = librh4njsongenerator.a
+
+json_generator: logging vars json_generator_clean json_generator_pre $(JSON_OBJS)
+	@printf "Creating $(LIBOUTPUT)/$(JSON_LIB)\n"
+	@$(AR) -cru $(LIBOUTPUT)/$(JSON_LIB) $(JSON_BIN)/*.o
+	@printf "Done compiling and linking vars\n"
+
+$(JSON_OBJS):
+	@printf "CC $(JSON_SRC)/$*.c => $(JSON_BIN)/$*.o\n"
+	@$(CC) $(CARGS1) -o $(JSON_BIN)/$*.o $(JSON_SRC)/$*.c
+
+json_generator_pre:
+	@printf "Creating json generator output folder\n"
+	@mkdir -p $(JSON_BIN)
+	@mkdir -p $(LIBOUTPUT)
+
+json_generator_clean:
+	@printf "Cleaning json generator library\n"
+	@rm -f $(LIBOUTPUT)/$(JSON_BIN)
+	@printf "Cleaning vars objects\n"
+	@rm -f $(JSON_BIN)/*.o
+
+json_test: json_generator
+	@$(CC) -g ./libs/rh4n_jsongenerator/tests/main.c $(INCLUDE) -o ./libs/rh4n_jsongenerator/tests/main $(LIBS)
+	@./libs/rh4n_jsongenerator/tests/main 2> ./jsonout
+	@cat ./jsonout
 
 #                         +-----------------+
 #-------------------------|    LDA parser   |----------------------------------
@@ -247,6 +288,10 @@ var2name_clean:
 	@printf "Cleaning var2name objects\n"
 	@rm -f $(VAR2NAME_BIN)/*.o
 
+var2name_test: var2name
+	@$(CC) -g ./libs/rh4n_var2name/test/main.c $(INCLUDE) -o ./libs/rh4n_var2name/test/main $(LIBS)
+	@./libs/rh4n_var2name/test/main
+
 #                         +-----------------+
 #-------------------------|   Natuser lib   |----------------------------------
 #                         +-----------------+
@@ -282,11 +327,21 @@ NATUSER_PUTVAR_OBJS = rh4n_nat_put_a.o \
 NATUSER_SRC = ./natuser_lib/src
 NATUSER_BIN = ./bin/natuserlib
 
-natuserlib: utils logging vars ldaparser var2name natuserlib_clean natuserlib_pre \
+natuserlib: utils logging vars json_generator ldaparser var2name natuserlib_clean natuserlib_pre \
 			$(NATUSER_OBJS) $(NATUSER_READOUT_OBJS) $(NATUSER_PUTVAR_OBJS)
-	@printf "Linking realHTML4Natural.so\n"
-	@$(CC) $(LFLAGS1_SO) $(NATUSER_BIN)/*.o $(LIBS) $(LFLAGS2_SO) -o ./bin/realHTML4Natural.so
+	@printf "Linking librealHTML4Natural.so\n"
+	@$(CC) $(LFLAGS1_SO) $(NATUSER_BIN)/*.o $(LIBS) $(LFLAGS2_SO) -o ./bin/librealHTML4Natural.so
 	@printf "Done compiling and linking natuserlib\n"
+
+nat_test: natuserlib
+	@printf "Cleaning Natural test\n"
+	@rm -f ./natuser_lib/test/rh4n_nat_test_genjson
+	@printf "CC rh4n_nat_test_genjson.c => rh4n_nat_test_genjson.c\n"
+	@$(CC) -g ./natuser_lib/test/rh4n_nat_test_genjson.c $(INCLUDE) \
+		-o ./natuser_lib/test/rh4n_nat_test_genjson $(LIBS)
+	@printf "Running test\n"
+	@export NATUSER=./bin/librealHTML4Natural.so; ./natuser_lib/test/rh4n_nat_test_genjson
+	
 
 $(NATUSER_OBJS): 
 	@printf "CC $(NATUSER_SRC)/$*.c => $(NATUSER_BIN)/$*.o\n"
@@ -307,7 +362,7 @@ natuserlib_pre:
 natuserlib_clean:
 	@printf "Cleaning natuser objects\n"
 	@rm -f $(NATUSER_BIN)/*.o
-	@rm -f ./bin/realHTML4Natural.so
+	@rm -f ./bin/librealHTML4Natural.so
 	
 
 #                         +-----------------+
