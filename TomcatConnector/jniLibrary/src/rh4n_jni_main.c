@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <unistd.h>
 
 #include "rh4n.h"
 
@@ -128,3 +129,34 @@ char *natErrno2Str(int naterrno)
     return(natstrerror[naterrno]);
 }
 
+int rh4nNaturalcreateProcess(RH4nProperties *props, RH4NEnvirons *environs, char *error_str) {
+    pid_t naturalpid = 0, receivedpid = 0;
+    int processret = 0;
+
+    rh4n_log_info(props->logging, "Create natural process");
+    if((naturalpid = fork()) == -1) {
+        rh4n_log_error(props->logging, "Creating natural process failed - %s", strerror(errno));
+        sprintf(error_str, "Could not create natural process. Fork failed - %s", strerror(errno));
+        return(RH4N_RET_INTERNAL_ERR);
+    }
+
+    if(naturalpid == 0) {
+        int natret = 0;
+	char outputfile[100];
+	sprintf(outputfile, "%s.props", props->outputfile);
+	rh4n_log_debug(props->logging, "Dumping everything into [%s]", outputfile);
+	natret = rh4nUtilsDumpProperties(outputfile, props);
+	rh4n_log_debug(props->logging, "Dumping: [%d]", natret);
+        //natret = rh4nCallNatural(props, environs);;
+        execl("/opt/softwareag/Natural/bin/rh4n", "/opt/softwareag/Natural/bin/rh4n", outputfile, NULL);
+        rh4n_log_debug(props->logging, "Exiting with status: %d", natret);
+        exit(natret);
+    }
+
+    rh4n_log_info(props->logging, "Waiting for Natural process. PID: [%d]", naturalpid);
+    receivedpid = waitpid(naturalpid, &processret, 0x00);
+    processret = WEXITSTATUS(processret);
+    rh4n_log_info(props->logging, "PID [%d] exited with state [%d]", receivedpid, processret);
+
+    return(processret);
+}

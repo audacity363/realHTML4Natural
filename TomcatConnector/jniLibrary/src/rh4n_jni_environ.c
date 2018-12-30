@@ -136,7 +136,7 @@ int rh4nEnvironReadout(JNIEnv *env, jobject jenviron, RH4NEnvirons *environs, ch
 }
 
 int rh4nEnvironPutAll(RH4NEnvirons *environs) {
-    if(environs == NULL) { return(RH4N_RET_FORMAT_ERR); }
+    if(environs == NULL) { return(RH4N_RET_OK); }
 
     int i = 0;
 

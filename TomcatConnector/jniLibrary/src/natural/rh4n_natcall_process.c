@@ -10,33 +10,6 @@
 #include "natural/rh4n_natcall.h"
 #include "rh4n_utils.h"
 
-int rh4nNaturalcreateProcess(RH4nProperties *props, RH4NEnvirons *environs, char *error_str) {
-    pid_t naturalpid = 0, receivedpid = 0;
-    int processret = 0;
-
-    rh4n_log_info(props->logging, "Create natural process");
-    if((naturalpid = fork()) == -1) {
-        rh4n_log_error(props->logging, "Creating natural process failed - %s", strerror(errno));
-        sprintf(error_str, "Could not create natural process. Fork failed - %s", strerror(errno));
-        return(RH4N_RET_INTERNAL_ERR);
-    }
-
-    if(naturalpid == 0) {
-        int natret = 0;
-        natret = rh4nCallNatural(props, environs);
-        rh4n_log_debug(props->logging, "Exiting with status: %d", natret);
-        exit(natret);
-    }
-
-    rh4n_log_info(props->logging, "Waiting for Natural process. PID: [%d]", naturalpid);
-    receivedpid = waitpid(naturalpid, &processret, 0x00);
-    processret = WEXITSTATUS(processret);
-    rh4n_log_info(props->logging, "PID [%d] exited with state [%d]", receivedpid, processret);
-
-    return(processret);
-}
-
-
 int rh4nCallNatural(RH4nProperties *props, RH4NEnvirons *environs) {
     struct parameter_description* naturalparms = NULL; 
     void *nnisharedlib = NULL;
@@ -81,10 +54,10 @@ int rh4nCallNatural(RH4nProperties *props, RH4NEnvirons *environs) {
     rh4n_log_debug(props->logging, "Successfully logedon to library");
 
 
-    if(rh4nEnvironPutAll(environs) != RH4N_RET_OK) {
+    /*if(rh4nEnvironPutAll(environs) != RH4N_RET_OK) {
         rh4n_log_error(props->logging, "Could not set enviroment variables");
         return(RH4N_RET_INTERNAL_ERR);
-    }
+    }*/
 
     rh4n_log_info(props->logging, "Calling natural program [%s]", props->natprogram);
     if((nniret = nnifuncs->pf_nni_callnat(nnifuncs, props->natprogram, 2, naturalparms, &naturalex)) != NNI_RC_OK) {

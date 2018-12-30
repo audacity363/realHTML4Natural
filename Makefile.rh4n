@@ -86,7 +86,8 @@ all: utils logging vars json_generator var2name ldaparser natuserlib jnilibrary 
 
 UTILS_SRC = ./libs/rh4n_utils/src
 UTILS_BIN = ./bin/rh4n_utils
-UTILS_OBJS = rh4n_utils.o
+UTILS_OBJS = rh4n_utils.o \
+	     rh4n_utils_prop.o
 UTILS_LIB = librh4nutils.a
 
 utils: utils_clean utils_pre $(UTILS_OBJS)
@@ -517,3 +518,10 @@ jnilibrary_clean:
 	@printf "Cleaning librealHTMLConnector.so\n"
 	@rm -f ./bin/librealHTMLConnector.so
 
+rh4nmain: jnilibrary rh4nmain_clean 
+	$(CC) -g $(INCLUDE) ./TomcatConnector/jniLibrary/src/rh4n_main.c $(LIBS) ./bin/jnilib/rh4n_natcall_process.o -o ./bin/rh4n
+
+rh4nmain_clean:
+	@printf "Cleaning rh4n main\n"
+	@rm -f ./bin/rh4n
+		

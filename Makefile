@@ -1,20 +1,17 @@
-# Just a reminder for the next commit
-# TODO: Put the the classes in the makefile template
-
-CC = /usr/vac/bin/xlc
+CC = /usr/bin/gcc
 AR = /usr/bin/ar
-JAR = /usr/java8_64/bin/jar
-JAVAC = /usr/java8_64/bin/javac
-JAVAH = /usr/java8_64/bin/javah
+JAR = /usr/bin/jar
+JAVAC = /usr/bin/javac
+JAVAH = /usr/bin/javah
 
-LFLAGS1_SO = -G
+LFLAGS1_SO = -shared -Wl,--no-undefined
 LFLAGS2_SO = 
 
-TOMCATCLASSPATH = /opt/tomcat/tomcat-rh4n/lib/*
+TOMCATCLASSPATH = /tomcat/lib/servlet-api.jar:/tomcat/lib/jsp-api.jar
 RH4NCLASSPATH = ./TomcatConnector/servlet/web/WEB-INF/lib/realHTMLconnector.jar:./TomcatConnector/servlet/web/WEB-INF/lib/minimal-json-0.9.5.jar:./TomcatConnector/servlet/web/WEB-INF/lib/commons-io-1.3.2.jar:./bin/servlet/lib
 CLASSPATH = "$(TOMCATCLASSPATH):$(RH4NCLASSPATH)"
 
-JNIINCLUDE = -I/usr/java8_64/include/ -I/usr/java8_64/include//linux/
+JNIINCLUDE = -I/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.191.b12-1.el7_6.x86_64/include/ -I/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.191.b12-1.el7_6.x86_64/include//linux/
 
 
 INCLUDE = -I./include/ \
@@ -32,9 +29,9 @@ LIBS = -L./bin/libs \
 	   -ldl -lrh4nutils -lrh4nlogging -lrh4nvar2name -lrh4nvars -lrh4nldaparser \
 	   -lrh4njsongenerator -lcrypt
 
-CARGS1 = -g -c -fpic $(INCLUDE)
+CARGS1 = -g -c -fPIC $(INCLUDE)
 CARGS2 = 
-CARGS_SO = -c -g -fpic $(INCLUDE)
+CARGS_SO = -c -g -fPIC $(INCLUDE)
 
 LIBOUTPUT = ./bin/libs/
 
@@ -50,7 +47,7 @@ help:
 	@printf "\t| vars                                                       |\n"
 	@printf "\t|   Vars library (./libs/rh4n_vars)                          |\n"
 	@printf "\t|                                                            |\n"
-	@printf "\t| jsongenerator                                              |\n"
+	@printf "\t| json_generator                                              |\n"
 	@printf "\t|   JSON Generator library (./libs/rh4n_jsongenerator)       |\n"
 	@printf "\t|                                                            |\n"
 	@printf "\t| ldaparser                                                  |\n"
@@ -80,7 +77,7 @@ help:
 	@printf "\t+------------------------------------------------------------+\n\n"
 	@printf "\tall: Compiles everything\n"
 
-all: utils logging vars var2name ldaparser natuserlib jnilibrary tomcatconnector_warfile
+all: utils logging vars json_generator var2name ldaparser natuserlib jnilibrary tomcatconnector_warfile
 	@printf "You find the binarys under ./bin\n"
 
 #                         +------------------+
@@ -89,7 +86,8 @@ all: utils logging vars var2name ldaparser natuserlib jnilibrary tomcatconnector
 
 UTILS_SRC = ./libs/rh4n_utils/src
 UTILS_BIN = ./bin/rh4n_utils
-UTILS_OBJS = rh4n_utils.o
+UTILS_OBJS = rh4n_utils.o \
+	     rh4n_utils_prop.o
 UTILS_LIB = librh4nutils.a
 
 utils: utils_clean utils_pre $(UTILS_OBJS)
@@ -158,7 +156,9 @@ VARS_OBJS = rh4n_vars.o \
 		    rh4n_vars_float.o \
 		    rh4n_vars_ustring.o \
 		    rh4n_vars_printjson.o \
-		    rh4n_vars_free.o
+		    rh4n_vars_free.o \
+       		rh4n_vars_dump.o \
+			rh4n_vars_load.o
 VARS_LIB = librh4nvars.a
 
 vars: logging vars_clean vars_pre $(VARS_OBJS)
@@ -177,13 +177,9 @@ vars_pre:
 
 vars_clean:
 	@printf "Cleaning vars library\n"
-	@rm -f $(LIBOUTPUT)/$(VARS_BIN)
+	@rm -f $(LIBOUTPUT)/$(UTILS_BIN)
 	@printf "Cleaning vars objects\n"
 	@rm -f $(VARS_BIN)/*.o
-
-vars_test: var2name
-	@$(CC) -g ./libs/rh4n_vars/test/main.c $(INCLUDE) -o ./libs/rh4n_vars/test/main $(LIBS)
-	@./libs/rh4n_vars/test/main
 
 #                         +-----------------+
 #-------------------------|  JSON generator |----------------------------------
@@ -220,7 +216,6 @@ json_test: json_generator
 	@$(CC) -g ./libs/rh4n_jsongenerator/tests/main.c $(INCLUDE) -o ./libs/rh4n_jsongenerator/tests/main $(LIBS)
 	@./libs/rh4n_jsongenerator/tests/main 2> ./jsonout
 	@cat ./jsonout
-
 #                         +-----------------+
 #-------------------------|    LDA parser   |----------------------------------
 #                         +-----------------+
@@ -288,10 +283,6 @@ var2name_clean:
 	@printf "Cleaning var2name objects\n"
 	@rm -f $(VAR2NAME_BIN)/*.o
 
-var2name_test: var2name
-	@$(CC) -g ./libs/rh4n_var2name/test/main.c $(INCLUDE) -o ./libs/rh4n_var2name/test/main $(LIBS)
-	@./libs/rh4n_var2name/test/main
-
 #                         +-----------------+
 #-------------------------|   Natuser lib   |----------------------------------
 #                         +-----------------+
@@ -327,21 +318,11 @@ NATUSER_PUTVAR_OBJS = rh4n_nat_put_a.o \
 NATUSER_SRC = ./natuser_lib/src
 NATUSER_BIN = ./bin/natuserlib
 
-natuserlib: utils logging vars json_generator ldaparser var2name natuserlib_clean natuserlib_pre \
+natuserlib: utils logging vars ldaparser var2name natuserlib_clean natuserlib_pre \
 			$(NATUSER_OBJS) $(NATUSER_READOUT_OBJS) $(NATUSER_PUTVAR_OBJS)
-	@printf "Linking librealHTML4Natural.so\n"
-	@$(CC) $(LFLAGS1_SO) $(NATUSER_BIN)/*.o $(LIBS) $(LFLAGS2_SO) -o ./bin/librealHTML4Natural.so
+	@printf "Linking realHTML4Natural.so\n"
+	@$(CC) $(LFLAGS1_SO) $(NATUSER_BIN)/*.o $(LIBS) $(LFLAGS2_SO) -o ./bin/realHTML4Natural.so
 	@printf "Done compiling and linking natuserlib\n"
-
-nat_test: natuserlib
-	@printf "Cleaning Natural test\n"
-	@rm -f ./natuser_lib/test/rh4n_nat_test_genjson
-	@printf "CC rh4n_nat_test_genjson.c => rh4n_nat_test_genjson.c\n"
-	@$(CC) -g ./natuser_lib/test/rh4n_nat_test_genjson.c $(INCLUDE) \
-		-o ./natuser_lib/test/rh4n_nat_test_genjson $(LIBS)
-	@printf "Running test\n"
-	@export NATUSER=./bin/librealHTML4Natural.so; ./natuser_lib/test/rh4n_nat_test_genjson
-	
 
 $(NATUSER_OBJS): 
 	@printf "CC $(NATUSER_SRC)/$*.c => $(NATUSER_BIN)/$*.o\n"
@@ -362,7 +343,7 @@ natuserlib_pre:
 natuserlib_clean:
 	@printf "Cleaning natuser objects\n"
 	@rm -f $(NATUSER_BIN)/*.o
-	@rm -f ./bin/librealHTML4Natural.so
+	@rm -f ./bin/realHTML4Natural.so
 	
 
 #                         +-----------------+
@@ -418,9 +399,8 @@ JAVA_XML_PACKAGE = $(JAVA_XML_PACKAGE_SRC)/Export.java \
 
 JAVA_GUI_PACKAGE_SRC = $(TOMCONNECTOR_SRC)/realHTML/tomcat/gui
 JAVA_GUI_PACKAGE = $(JAVA_GUI_PACKAGE_SRC)/RouteTree.java \
-				   $(JAVA_GUI_PACKAGE_SRC)/RouteSorting.java
 
-TOMCAT_SERVLETS = $(TOMCONNECTOR_SRC)/RealHTMLInit.java \
+TOMCAT_SERVLETS =  $(TOMCONNECTOR_SRC)/RealHTMLInit.java \
 				  $(TOMCONNECTOR_SRC)/RealHTMLHandler.java \
 				  $(TOMCONNECTOR_SRC)/RealHTMLLogin.java \
 				  $(TOMCONNECTOR_SRC)/RealHTMLLogout.java \
@@ -451,7 +431,7 @@ tomcatconnector_package: tomcatconnector_package_clean tomcatconnector_package_p
 	@printf "Compiling realHTML.tomcat.connector\n"
 	@$(JAVAC) -d $(TOMCONNECTOR_LIB_BIN) -cp $(CLASSPATH) $(JAVA_UTILS_PACKAGE)
 	@printf "Creating realHTMLconnector.jar\n"
-	@cd $(TOMCONNECTOR_LIB_BIN) && jar cf ../../../TomcatConnector/servlet/web/WEB-INF/lib/realHTMLconnector.jar ./realHTML
+	@cd $(TOMCONNECTOR_LIB_BIN) && jar cf ../../../TomcatConnector/servlet/web/WEB-INF/realHTMLconnector.jar ./realHTML
 	
 tomcatconnector_package_pre:
 	@printf "Creating tomcatconnector package output folder\n"
@@ -461,7 +441,7 @@ tomcatconnector_package_clean:
 	@printf "Cleaning tomcatconnector package\n"
 	@rm -rf $(TOMCONNECTOR_LIB_BIN)
 	@printf "Cleaning realHTMLconnector.jar\n"
-	@rm -f ./TomcatConnector/servlet/web/WEB-INF/lib/realHTMLconnector.jar
+	@rm -f ./TomcatConnector/servlet/web/WEB-INF/realHTMLconnector.jar
 
 tomcatconnector_servlet: tomcatconnector_package tomcatconnector_servlet_clean tomcatconnector_servlet_pre
 	@printf "Compiling servlets\n"
@@ -520,7 +500,7 @@ $(JNI_JSON_HANDLERS):
 
 $(JNI_NAT_HANDLERS):
 	@printf "CC $(JNI_SRC)/natural/$*.c => $(JNI_BIN)/$*.o\n"
-	@$(CC) $(CARGS_SO) -o $(JNI_BIN)/$*.o $(JNI_SRC)/natural/$*.c
+	@$(CC) -c -g $(INCLUDE) -o bin/rh4nmain/$*.o $(JNI_SRC)/natural/$*.c
 
 jniheader: tomcatconnector_package
 	@printf "Generating JNI headerfile\n"
@@ -538,3 +518,14 @@ jnilibrary_clean:
 	@printf "Cleaning librealHTMLConnector.so\n"
 	@rm -f ./bin/librealHTMLConnector.so
 
+rh4nmain: rh4nmain_clean rh4nmain_pre jnilibrary
+	$(CC) -g $(INCLUDE) ./TomcatConnector/jniLibrary/src/rh4n_main.c ./bin/rh4nmain/*.o $(LIBS) -o ./bin/rh4n
+
+rh4nmain_clean:
+	@printf "Cleaning rh4n main\n"
+	@rm -f ./bin/rh4n
+	@rm -rf ./bin/rh4nmain
+
+rh4nmain_pre:
+	@mkdir ./bin/rh4nmain
+		
